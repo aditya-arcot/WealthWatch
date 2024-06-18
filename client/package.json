@@ -8,6 +8,12 @@
         "watch": "ng build --watch --configuration development",
         "lint": "ng lint"
     },
+    "lint-staged": {
+        "*": [
+            "eslint --fix --no-warn-ignored",
+            "prettier --write --ignore-unknown"
+        ]
+    },
     "private": true,
     "dependencies": {
         "@angular/animations": "^18.0.0",
