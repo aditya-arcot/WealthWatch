@@ -6,6 +6,12 @@
     "scripts": {
         "lint": "eslint --fix ."
     },
+    "lint-staged": {
+        "*": [
+            "eslint --fix --no-warn-ignored",
+            "prettier --write --ignore-unknown"
+        ]
+    },
     "author": "",
     "license": "ISC",
     "description": "",
