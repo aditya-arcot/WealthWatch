@@ -11,17 +11,17 @@ export const configureCleanup = (): void => {
         'unhandledRejection',
     ]
     events.forEach((event) => {
-        process.on(event, (err?: Error) => {
-            runCleanupAndExit(event, err)
+        process.on(event, async (err?: Error) => {
+            await runCleanupAndExit(event, err)
         })
     })
     logger.debug('configured cleanup')
 }
 
-const runCleanupAndExit = (event: string, err?: Error): void => {
+const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
     logger.fatal(err, event)
     try {
-        closeDb()
+        await closeDb()
     } catch (e) {
         logger.fatal(e, 'error during cleanup')
     } finally {

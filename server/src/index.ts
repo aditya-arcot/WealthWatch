@@ -9,7 +9,7 @@ import { logger } from './utils/logger.js'
 
 logger.info(`start ${pid}`)
 
-openDb()
+await openDb()
 configureCleanup()
 
 const app = express()
