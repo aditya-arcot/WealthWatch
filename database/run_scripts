@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo "running scripts"
+
+DATABASE="dev.db"
+SCRIPTS_DIR="scripts"
+CONFIG_SCRIPT="set_config.sql"
+SCRIPTS=(
+    "drop_tables.sql"
+    "create_tables.sql"
+    "seed_data.sql"
+)
+
+for SCRIPT in "${SCRIPTS[@]}"
+do
+    echo
+    echo "running $SCRIPT"
+    sqlite3 -init "$SCRIPTS_DIR/$CONFIG_SCRIPT" $DATABASE < "$SCRIPTS_DIR/$SCRIPT"
+    if [ $? -eq 0 ]; then
+        echo "success"
+    else
+        echo "error"
+        exit 1
+    fi
+done
+
+echo
+echo done
