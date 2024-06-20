@@ -3,6 +3,10 @@ import methodOverride from 'method-override'
 import { pinoHttp } from 'pino-http'
 import { pid } from 'process'
 import { ExpressError } from './models/expressError.js'
+import accountsRouter from './routes/accountRoutes.js'
+import categoriesRouter from './routes/categoryRoutes.js'
+import transactionsRouter from './routes/transactionRoutes.js'
+import usersRouter from './routes/userRoutes.js'
 import { configureCleanup } from './utils/cleanup.js'
 import { openDb } from './utils/database.js'
 import { logger } from './utils/logger.js'
@@ -37,6 +41,10 @@ app.use(
 app.get('/', (_, res: Response): Response => {
     return res.send('alive')
 })
+app.use('/accounts', accountsRouter)
+app.use('/categories', categoriesRouter)
+app.use('/transactions', transactionsRouter)
+app.use('/users', usersRouter)
 app.all('*', (_req, _res, _next) => {
     throw new ExpressError('endpoint not found', 404)
 })

@@ -47,3 +47,15 @@ export const closeDb = async (): Promise<void> => {
     })
     logger.debug('disconnected from database')
 }
+
+export const runSelectQuery = <T>(query: string): Promise<T[]> => {
+    return new Promise((resolve, reject) => {
+        getDb().all(query, (err, rows: T[]) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(rows)
+            }
+        })
+    })
+}
