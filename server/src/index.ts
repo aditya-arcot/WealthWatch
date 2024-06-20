@@ -4,13 +4,13 @@ import { pinoHttp } from 'pino-http'
 import { pid } from 'process'
 import { ExpressError } from './models/expressError.js'
 import { configureCleanup } from './utils/cleanup.js'
-import { connectToDb } from './utils/database.js'
+import { openDb } from './utils/database.js'
 import { logger } from './utils/logger.js'
 
 logger.info(`start ${pid}`)
 
-const db = connectToDb()
-configureCleanup(db)
+openDb()
+configureCleanup()
 
 const app = express()
 
@@ -20,11 +20,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(
     (
-        err: Error | ExpressError,
+        err: Error,
         _req: Request,
         res: Response,
         _next: NextFunction
-    ) => {
+    ): Response => {
         if (err instanceof ExpressError) {
             return res.status(err.statusCode).send(err)
         } else {
@@ -34,14 +34,14 @@ app.use(
 )
 
 // routes
-app.get('/', (_: Request, res: Response) => {
+app.get('/', (_, res: Response): Response => {
     return res.send('alive')
 })
-app.all('*', (_req: Request, _res: Response, next) => {
-    next(new ExpressError('endpoint not found', 404))
+app.all('*', (_req, _res, _next) => {
+    throw new ExpressError('endpoint not found', 404)
 })
 
 const port = process.env['PORT'] || 3000
-app.listen(port, () => {
+app.listen(port, (): void => {
     logger.info(`server running on port ${port}`)
 })

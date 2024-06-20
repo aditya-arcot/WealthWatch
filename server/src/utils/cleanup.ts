@@ -1,8 +1,8 @@
 import { pid } from 'process'
-import { Database } from 'sqlite3'
+import { closeDb } from './database.js'
 import { logger } from './logger.js'
 
-export const configureCleanup = (db: Database) => {
+export const configureCleanup = (): void => {
     const events = [
         'SIGINT',
         'SIGTERM',
@@ -12,17 +12,16 @@ export const configureCleanup = (db: Database) => {
     ]
     events.forEach((event) => {
         process.on(event, (err?: Error) => {
-            runCleanupAndExit(db, event, err)
+            runCleanupAndExit(event, err)
         })
     })
     logger.debug('configured cleanup')
 }
 
-const runCleanupAndExit = (db: Database, event: string, err?: Error) => {
+const runCleanupAndExit = (event: string, err?: Error): void => {
     logger.fatal(err, event)
     try {
-        db.close()
-        logger.debug('disconnected from database')
+        closeDb()
     } catch (e) {
         logger.fatal(e, 'error during cleanup')
     } finally {
