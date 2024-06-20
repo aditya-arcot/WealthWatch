@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     account_id INTEGER NOT NULL,
     category_id INTEGER NOT NULL,
     amount REAL NOT NULL,
-    description TEXT,
+    description TEXT NOT NULL,
     timestamp TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)
