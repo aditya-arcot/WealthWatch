@@ -53,7 +53,7 @@
                         "scripts": []
                     },
                     "configurations": {
-                        "production": {
+                        "prod": {
                             "budgets": [
                                 {
                                     "type": "initial",
@@ -68,25 +68,25 @@
                             ],
                             "outputHashing": "all"
                         },
-                        "development": {
+                        "dev": {
                             "optimization": false,
                             "extractLicenses": false,
                             "sourceMap": true
                         }
                     },
-                    "defaultConfiguration": "production"
+                    "defaultConfiguration": "prod"
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
-                        "production": {
-                            "buildTarget": "client:build:production"
+                        "prod": {
+                            "buildTarget": "client:build:prod"
                         },
-                        "development": {
-                            "buildTarget": "client:build:development"
+                        "dev": {
+                            "buildTarget": "client:build:dev"
                         }
                     },
-                    "defaultConfiguration": "development"
+                    "defaultConfiguration": "dev"
                 },
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n"
