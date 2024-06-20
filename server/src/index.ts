@@ -8,12 +8,14 @@ import categoriesRouter from './routes/categoryRoutes.js'
 import transactionsRouter from './routes/transactionRoutes.js'
 import usersRouter from './routes/userRoutes.js'
 import { configureCleanup } from './utils/cleanup.js'
-import { openDb } from './utils/database.js'
+import { openDb, setDbConfig } from './utils/database.js'
 import { logger } from './utils/logger.js'
 
 logger.info(`start ${pid}`)
 
 await openDb()
+await setDbConfig()
+
 configureCleanup()
 
 const app = express()

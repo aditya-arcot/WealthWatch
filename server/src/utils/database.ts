@@ -28,6 +28,26 @@ export const openDb = async (): Promise<void> => {
     logger.info('connected to database')
 }
 
+export const setDbConfig = async () => {
+    const config = `
+        PRAGMA optimize;
+        PRAGMA busy_timeout = 30000;
+        PRAGMA journal_mode = WAL;
+        PRAGMA synchronous = normal;
+        PRAGMA foreign_keys = ON;
+    `
+    await new Promise<void>((resolve, reject) => {
+        getDb().exec(config, (err) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve()
+            }
+        })
+    })
+    logger.debug('set database config')
+}
+
 export const getDb = (): sqlite3.Database => {
     if (!db) {
         throw Error('database not initialized')
