@@ -1,6 +1,6 @@
+import { randomUUID } from 'crypto'
 import express, { NextFunction, Request, Response } from 'express'
 import methodOverride from 'method-override'
-import { pinoHttp } from 'pino-http'
 import { pid } from 'process'
 import { ExpressError } from './models/expressError.js'
 import accountsRouter from './routes/accountRoutes.js'
@@ -18,8 +18,41 @@ configureCleanup()
 const app = express()
 
 // middleware
-app.use(pinoHttp({ logger }))
 app.use(express.urlencoded({ extended: true }))
+app.use((req, res, next) => {
+    const id = randomUUID()
+    const requestLog = {
+        id,
+        method: req.method,
+        url: req.url,
+        query: req.query,
+        params: req.params,
+        headers: req.headers,
+        body: req.body,
+        remoteAddress: req.socket.remoteAddress,
+        remotePort: req.socket.remotePort,
+    }
+    logger.info({ requestLog }, 'received request')
+
+    const send = res.send
+    res.send = (body) => {
+        // @ts-expect-error: custom property
+        res._body = body
+        res.send = send
+        return res.send(body)
+    }
+    res.on('finish', () => {
+        const responseLog = {
+            id,
+            statusCode: res.statusCode,
+            headers: res.getHeaders(),
+            // @ts-expect-error: custom property
+            body: res._body,
+        }
+        logger.info({ responseLog }, 'sending response')
+    })
+    next()
+})
 app.use(methodOverride('_method'))
 app.use(
     (

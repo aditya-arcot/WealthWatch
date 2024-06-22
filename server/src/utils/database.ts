@@ -49,9 +49,11 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
     }
     const start = Date.now()
     const res = await clientPool.query(query, params)
-    logger.info(
-        { query, duration: Date.now() - start, rows: res.rowCount },
-        'executed query'
-    )
+    const queryLog = {
+        query,
+        duration: Date.now() - start,
+        rows: res.rowCount,
+    }
+    logger.info({ queryLog }, 'executed query')
     return res
 }
