@@ -1,19 +1,71 @@
-INSERT INTO
-    users (id, username, email, first_name, last_name)
-VALUES
-    (0, 'user1', 'user1@domain.com', 'User', '1');
+START TRANSACTION;
 
 INSERT INTO
-    accounts (id, user_id, name)
+    users (
+        username,
+        email,
+        first_name,
+        last_name,
+        salt,
+        hash
+    )
 VALUES
-    (0, 0, 'Account 1');
+    (
+        'john_doe',
+        'john.doe@example.com',
+        'John',
+        'Doe',
+        'abc123',
+        'def456'
+    ),
+    (
+        'jane_smith',
+        'jane.smith@example.com',
+        'Jane',
+        'Smith',
+        'xyz789',
+        'uvw987'
+    );
 
 INSERT INTO
-    categories (id, name)
+    accounts (user_id, name)
 VALUES
-    (0, 'Category 1');
+    (1, 'Savings Account'),
+    (1, 'Checking Account'),
+    (2, 'Investment Account');
 
 INSERT INTO
-    transactions (id, account_id, category_id, amount, description)
+    categories (name)
 VALUES
-    (0, 0, 0, 9.99, 'Transaction 1');
+    ('Groceries'),
+    ('Utilities'),
+    ('Entertainment'),
+    ('Transportation');
+
+INSERT INTO
+    transactions (
+        account_id,
+        category_id,
+        amount,
+        description,
+        timestamp
+    )
+VALUES
+    (1, 1, 50.25, 'HEB', '2024-06-15 13:24:00'),
+    (
+        1,
+        2,
+        100.00,
+        'Electricity bill',
+        '2024-06-16 09:45:00'
+    ),
+    (
+        2,
+        3,
+        35.00,
+        'Movie tickets',
+        '2024-06-18 20:15:00'
+    ),
+    (3, 4, 45.75, 'Gas', '2024-06-20 11:30:00');
+
+COMMIT;

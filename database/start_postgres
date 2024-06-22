@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source ./load_env
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER

@@ -1,5 +1,5 @@
 import { pid } from 'process'
-import { closeDb } from './database.js'
+import { closePool } from './database.js'
 import { logger } from './logger.js'
 
 export const configureCleanup = (): void => {
@@ -21,11 +21,11 @@ export const configureCleanup = (): void => {
 const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
     logger.fatal(err, event)
     try {
-        await closeDb()
+        await closePool()
     } catch (e) {
         logger.fatal(e, 'error during cleanup')
     } finally {
-        logger.info(`exit ${pid}`)
+        logger.info(`exiting - pid ${pid}`)
         process.exit(1)
     }
 }

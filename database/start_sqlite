@@ -1,3 +1,0 @@
-#!/bin/bash
-
-sqlite3 -init scripts/set_config.sql dev.db

@@ -8,16 +8,13 @@ import categoriesRouter from './routes/categoryRoutes.js'
 import transactionsRouter from './routes/transactionRoutes.js'
 import usersRouter from './routes/userRoutes.js'
 import { configureCleanup } from './utils/cleanup.js'
-import { openDb, setDbConfig } from './utils/database.js'
+import { createPool } from './utils/database.js'
 import { logger } from './utils/logger.js'
 
-logger.info(`start ${pid}`)
+logger.info(`started - pid ${pid}`)
 
-await openDb()
-await setDbConfig()
-
+await createPool()
 configureCleanup()
-
 const app = express()
 
 // middleware
@@ -47,11 +44,11 @@ app.use('/accounts', accountsRouter)
 app.use('/categories', categoriesRouter)
 app.use('/transactions', transactionsRouter)
 app.use('/users', usersRouter)
-app.all('*', (_req, _res, _next) => {
-    throw new ExpressError('endpoint not found', 404)
+app.all('*', (req, _res, _next) => {
+    throw new ExpressError(`endpoint not found - ${req.url}`, 404)
 })
 
 const port = process.env['PORT'] || 3000
 app.listen(port, (): void => {
-    logger.info(`server running on port ${port}`)
+    logger.info(`server running - port ${port}`)
 })

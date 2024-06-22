@@ -1,81 +1,57 @@
-import { accessSync, constants } from 'fs'
-import sqlite3 from 'sqlite3'
+import pg from 'pg'
+import { env } from 'process'
 import { logger } from './logger.js'
 
-let db: sqlite3.Database | null = null
+let clientPool: pg.Pool | null = null
 
-export const openDb = async (): Promise<void> => {
-    const dbUrl = process.env['SQLITE_DB_URL']
-    if (!dbUrl) {
-        throw Error('database url not provided')
+export const createPool = async (): Promise<void> => {
+    logger.debug('creating database pool')
+    if (!env['DB_USER']) throw Error('database username not set')
+    const user = env['DB_USER']
+    if (!env['DB_PASSWORD']) throw Error('database password not set')
+    const password = env['DB_PASSWORD']
+    if (!env['DB_NAME']) throw Error('database name not set')
+    const database = env['DB_NAME']
+
+    const config: pg.PoolConfig = {
+        database,
+        user,
+        password,
+        max: 20,
+        allowExitOnIdle: true,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+        maxUses: 7500,
     }
+    clientPool = new pg.Pool(config)
 
     try {
-        accessSync(dbUrl, constants.F_OK)
-    } catch (err) {
-        throw Error('database file does not exist')
+        await runQuery('SELECT 1')
+    } catch (e) {
+        await clientPool.end()
+        throw Error('failed to create database pool')
     }
-
-    db = await new Promise<sqlite3.Database>((resolve, reject) => {
-        const database = new sqlite3.Database(dbUrl, (err) => {
-            if (err) {
-                reject(Error('failed to open database connection'))
-            } else {
-                resolve(database)
-            }
-        })
-    })
-    logger.info('connected to database')
+    logger.debug('created database pool')
 }
 
-export const setDbConfig = async () => {
-    const config = `
-        PRAGMA optimize;
-        PRAGMA busy_timeout = 30000;
-        PRAGMA journal_mode = WAL;
-        PRAGMA synchronous = normal;
-        PRAGMA foreign_keys = ON;
-    `
-    await new Promise<void>((resolve, reject) => {
-        getDb().exec(config, (err) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve()
-            }
-        })
-    })
-    logger.debug('set database config')
-}
-
-export const getDb = (): sqlite3.Database => {
-    if (!db) {
-        throw Error('database not initialized')
+export const closePool = async (): Promise<void> => {
+    logger.debug('closing database pool')
+    if (!clientPool) {
+        throw Error('pool not initialized')
     }
-    return db
+    await clientPool.end()
+    logger.debug('closed database pool')
 }
 
-export const closeDb = async (): Promise<void> => {
-    await new Promise<void>((resolve, reject) => {
-        getDb().close((err) => {
-            if (err) {
-                reject(Error('failed to close database connection'))
-            } else {
-                resolve()
-            }
-        })
-    })
-    logger.debug('disconnected from database')
-}
-
-export const runSelectQuery = <T>(query: string): Promise<T[]> => {
-    return new Promise((resolve, reject) => {
-        getDb().all(query, (err, rows: T[]) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(rows)
-            }
-        })
-    })
+export const runQuery = async (query: string, params: unknown[] = []) => {
+    if (!clientPool) {
+        throw Error('pool not initialized')
+    }
+    const start = Date.now()
+    const res = await clientPool.query(query, params)
+    logger.info(
+        { query, duration: Date.now() - start, rows: res.rowCount },
+        'executed query'
+    )
+    return res
 }

@@ -2,7 +2,7 @@ import { pino } from 'pino'
 import { env, exit } from 'process'
 
 const level = env['LOG_LEVEL'] || 'info'
-const token = env['LOGTAIL_TOKEN']
+const token = env['SERVER_LOGTAIL_TOKEN']
 if (!token) {
     console.error('logtail token missing')
     exit(1)

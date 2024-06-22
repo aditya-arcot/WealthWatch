@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ -f ../.env ]; then
+    echo "loading .env"
+    export $(grep -v '^#' ../.env | xargs)
+fi
+
+if [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ] || [ -z "$SCRIPTS_DIR" ]; then
+    echo "error - one or more required env vars are not set"
+    exit 1
+fi
+
+echo "done checking vars"
+echo
