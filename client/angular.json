@@ -38,7 +38,7 @@
                 "build": {
                     "builder": "@angular-devkit/build-angular:application",
                     "options": {
-                        "outputPath": "dist/client",
+                        "outputPath": "dist",
                         "index": "src/index.html",
                         "browser": "src/main.ts",
                         "polyfills": ["zone.js"],
@@ -54,6 +54,10 @@
                     },
                     "configurations": {
                         "prod": {
+                            "optimization": true,
+                            "extractLicenses": true,
+                            "sourceMap": false,
+                            "namedChunks": false,
                             "budgets": [
                                 {
                                     "type": "initial",
@@ -71,7 +75,14 @@
                         "dev": {
                             "optimization": false,
                             "extractLicenses": false,
-                            "sourceMap": true
+                            "sourceMap": true,
+                            "namedChunks": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/env.ts",
+                                    "with": "src/environments/env.dev.ts"
+                                }
+                            ]
                         }
                     },
                     "defaultConfiguration": "prod"
