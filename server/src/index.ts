@@ -1,3 +1,4 @@
+import cors from 'cors'
 import { randomUUID } from 'crypto'
 import express, { NextFunction, Request, Response } from 'express'
 import methodOverride from 'method-override'
@@ -5,6 +6,7 @@ import { pid } from 'process'
 import { ExpressError } from './models/expressError.js'
 import accountsRouter from './routes/accountRoutes.js'
 import categoriesRouter from './routes/categoryRoutes.js'
+import secretsRouter from './routes/secretsRoutes.js'
 import transactionsRouter from './routes/transactionRoutes.js'
 import usersRouter from './routes/userRoutes.js'
 import { configureCleanup } from './utils/cleanup.js'
@@ -18,6 +20,11 @@ configureCleanup()
 const app = express()
 
 // middleware
+app.use(
+    cors({
+        origin: 'http://localhost:4200',
+    })
+)
 app.use(express.urlencoded({ extended: true }))
 app.use((req, res, next) => {
     const id = randomUUID()
@@ -73,6 +80,7 @@ app.use(
 app.get('/', (_, res: Response): Response => {
     return res.send('alive')
 })
+app.use('/secrets', secretsRouter)
 app.use('/accounts', accountsRouter)
 app.use('/categories', categoriesRouter)
 app.use('/transactions', transactionsRouter)
