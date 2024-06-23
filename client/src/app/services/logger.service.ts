@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Logtail } from '@logtail/browser'
 import { NGXLogger } from 'ngx-logger'
-import { SecretsService } from './secrets.service'
 
 @Injectable({
     providedIn: 'root',
@@ -9,12 +8,10 @@ import { SecretsService } from './secrets.service'
 export class LoggerService {
     private logtail: Logtail | undefined
 
-    constructor(
-        private logger: NGXLogger,
-        secretsSvc: SecretsService
-    ) {
-        const token = secretsSvc.secrets?.logtailToken
-        if (token) this.logtail = new Logtail(token)
+    constructor(private logger: NGXLogger) {}
+
+    configureLogtail(token: string): void {
+        this.logtail = new Logtail(token)
     }
 
     debug(message: string, ...args: unknown[]): void {

@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { NGXLogger } from 'ngx-logger'
 import { Observable, catchError, of, switchMap } from 'rxjs'
+import { LoggerService } from './logger.service'
 import { SecretsService } from './secrets.service'
 
 @Injectable({
@@ -9,20 +9,22 @@ import { SecretsService } from './secrets.service'
 })
 export class StartupService {
     constructor(
-        private logger: NGXLogger,
+        private logger: LoggerService,
         private secretsSvc: SecretsService
     ) {}
 
     startup(): Observable<boolean> {
-        this.logger.debug('app startup')
+        this.logger.debug('starting up')
         return this.secretsSvc.getSecrets().pipe(
             switchMap((secrets?) => {
                 if (!secrets) {
                     this.logger.error('failed to get secrets')
                     return of(false)
                 }
-                this.secretsSvc.secrets = secrets
                 this.logger.debug('received secrets')
+                this.secretsSvc.secrets = secrets
+                this.logger.configureLogtail(secrets.logtailToken)
+                this.logger.debug('startup complete')
                 return of(true)
             }),
             catchError((err: HttpErrorResponse) => {
