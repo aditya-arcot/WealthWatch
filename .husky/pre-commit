@@ -1,1 +1,2 @@
+npx snyk test --all-projects
 npx lint-staged
