@@ -25,6 +25,7 @@ export const logRequestResponse = (
         query: req.query,
         params: req.params,
         headers: req.headers,
+        session: req.session,
         body: req.body,
         remoteAddress: req.socket.remoteAddress,
         remotePort: req.socket.remotePort,
