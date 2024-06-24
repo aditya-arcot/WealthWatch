@@ -1,9 +1,9 @@
 import express from 'express'
-import accountsRouter from './accountRoutes.js'
-import categoriesRouter from './categoryRoutes.js'
+import accountRouter from './accountRoutes.js'
+import categoryRouter from './categoryRoutes.js'
 import secretsRouter from './secretsRoutes.js'
-import transactionsRouter from './transactionRoutes.js'
-import usersRouter from './userRoutes.js'
+import transactionRouter from './transactionRoutes.js'
+import userRouter from './userRoutes.js'
 
 const routes = [
     {
@@ -12,19 +12,19 @@ const routes = [
     },
     {
         path: '/accounts',
-        router: accountsRouter,
+        router: accountRouter,
     },
     {
         path: '/categories',
-        router: categoriesRouter,
+        router: categoryRouter,
     },
     {
         path: '/transactions',
-        router: transactionsRouter,
+        router: transactionRouter,
     },
     {
         path: '/users',
-        router: usersRouter,
+        router: userRouter,
     },
 ]
 
