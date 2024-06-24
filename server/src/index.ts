@@ -25,6 +25,7 @@ app.use(
         origin: 'http://localhost:4200',
     })
 )
+app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use((req, res, next) => {
     const id = randomUUID()
