@@ -6,8 +6,8 @@ INSERT INTO
         email,
         first_name,
         last_name,
-        salt,
-        hash
+        password_salt,
+        password_hash
     )
 VALUES
     (

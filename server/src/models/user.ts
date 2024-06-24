@@ -4,6 +4,6 @@ export interface User {
     email: string
     first_name: string
     last_name: string
-    salt: string | null
-    hash: string | null
+    password_salt: string | null
+    password_hash: string | null
 }

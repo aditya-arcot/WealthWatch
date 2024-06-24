@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    salt TEXT,
-    hash TEXT
+    password_salt TEXT,
+    password_hash TEXT
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
