@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ExpressError } from '../models/expressError.js'
+import { HttpError } from '../models/httpError.js'
 import { getAllTransactions } from '../models/transaction.js'
 
 export const getTransactions = async (_req: Request, res: Response) => {
@@ -7,6 +7,6 @@ export const getTransactions = async (_req: Request, res: Response) => {
         const transactions = await getAllTransactions()
         return res.send(transactions)
     } catch (error) {
-        throw new ExpressError('failed to get transactions', 500)
+        throw new HttpError('failed to get transactions', 500)
     }
 }

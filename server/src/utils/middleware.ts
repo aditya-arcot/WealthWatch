@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
 import { env, exit } from 'process'
-import { ExpressError } from '../models/expressError.js'
+import { HttpError } from '../models/httpError.js'
 import { getPool } from './database.js'
 import { logger } from './logger.js'
 
@@ -81,7 +81,7 @@ export const authenticate = (
     if (req.session && req.session.user) {
         return next()
     }
-    throw new ExpressError('unauthorized', 401)
+    throw new HttpError('unauthorized', 401)
 }
 
 export const handleError = (
@@ -91,7 +91,7 @@ export const handleError = (
     _next: NextFunction
 ): Response => {
     logger.error(err, err.message)
-    if (err instanceof ExpressError) {
+    if (err instanceof HttpError) {
         return res.status(err.statusCode).send(err.message)
     } else {
         return res.status(500).send(err.message)

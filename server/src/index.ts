@@ -3,7 +3,7 @@ import helmet from 'helmet'
 import methodOverride from 'method-override'
 import { pid } from 'process'
 import swaggerUi from 'swagger-ui-express'
-import { ExpressError } from './models/expressError.js'
+import { HttpError } from './models/httpError.js'
 import router from './routes/index.js'
 import { configureCleanup } from './utils/cleanup.js'
 import { createPool } from './utils/database.js'
@@ -39,7 +39,7 @@ if (process.env['NODE_ENV'] !== 'production') {
 }
 app.use('/', router)
 app.use((req, _res, _next) => {
-    throw new ExpressError(`endpoint not found - ${req.url}`, 404)
+    throw new HttpError(`endpoint not found - ${req.url}`, 404)
 })
 app.use(handleError)
 app.listen(port, (): void => {

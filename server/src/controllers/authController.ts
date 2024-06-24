@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
-import { ExpressError } from '../models/expressError.js'
+import { HttpError } from '../models/httpError.js'
 import { User, createUser, getUserByUsername } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 
@@ -9,15 +9,15 @@ export const login = async (req: Request, res: Response) => {
     const username: string | undefined = req.body.username
     const password: string | undefined = req.body.password
     if (!username || !password) {
-        throw new ExpressError('missing username or password', 400)
+        throw new HttpError('missing username or password', 400)
     }
 
     const user = await getUserByUsername(username)
     if (!user) {
-        throw new ExpressError('user not found', 404)
+        throw new HttpError('user not found', 404)
     }
     if (!bcrypt.compareSync(password, user.password_hash)) {
-        throw new ExpressError('invalid username or password', 400)
+        throw new HttpError('invalid username or password', 400)
     }
 
     logger.debug(user, 'login success')
@@ -38,7 +38,7 @@ export const register = async (req: Request, res: Response) => {
 
     const newUser = await createUser(user)
     if (!newUser) {
-        throw new ExpressError('user not found', 404)
+        throw new HttpError('user not found', 404)
     }
 
     logger.debug(newUser, 'register success')

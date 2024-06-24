@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ExpressError } from '../models/expressError.js'
+import { HttpError } from '../models/httpError.js'
 import { getAllUsers } from '../models/user.js'
 
 export const getUsers = async (_req: Request, res: Response) => {
@@ -7,6 +7,6 @@ export const getUsers = async (_req: Request, res: Response) => {
         const users = await getAllUsers()
         return res.send(users)
     } catch (error) {
-        throw new ExpressError('failed to get users', 500)
+        throw new HttpError('failed to get users', 500)
     }
 }

@@ -1,6 +1,6 @@
 import { runQuery } from '../utils/database.js'
 import { logger } from '../utils/logger.js'
-import { ExpressError } from './expressError.js'
+import { HttpError } from './httpError.js'
 
 export interface User {
     id: number
@@ -37,7 +37,7 @@ export const createUser = async (user: User): Promise<User> => {
         !user.last_name ||
         !user.password_hash
     ) {
-        throw new ExpressError('missing user info', 400)
+        throw new HttpError('missing user info', 400)
     }
     const query =
         'INSERT INTO users (username, email, first_name, last_name, password_hash) VALUES ($1, $2, $3, $4, $5) RETURNING *'
