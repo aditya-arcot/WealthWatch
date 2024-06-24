@@ -8,8 +8,8 @@ import { configureCleanup } from './utils/cleanup.js'
 import { createPool } from './utils/database.js'
 import { logger } from './utils/logger.js'
 import {
-    configureSession,
-    handleCors,
+    createCorsMiddleware,
+    createSessionMiddleware,
     handleError,
     logRequestResponse,
 } from './utils/middleware.js'
@@ -22,11 +22,11 @@ configureCleanup()
 const port = process.env['PORT'] || 3000
 const app = express()
 app.use(helmet())
-app.use(handleCors)
+app.use(createCorsMiddleware)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
-app.use(configureSession())
+app.use(createSessionMiddleware())
 app.use(logRequestResponse)
 app.use('/', router)
 app.use((req, _res, _next) => {
