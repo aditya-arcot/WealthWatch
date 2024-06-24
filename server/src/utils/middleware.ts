@@ -53,6 +53,7 @@ export const errorHandler = (
     res: Response,
     _next: NextFunction
 ): Response => {
+    logger.error(err, err.message)
     if (err instanceof ExpressError) {
         return res.status(err.statusCode).send(err)
     } else {
