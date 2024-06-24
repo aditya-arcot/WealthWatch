@@ -6,35 +6,11 @@ import secretsRouter from './secretsRoutes.js'
 import transactionRouter from './transactionRoutes.js'
 import userRouter from './userRoutes.js'
 
-const routes = [
-    {
-        path: '/auth',
-        router: authRouter,
-    },
-    {
-        path: '/secrets',
-        router: secretsRouter,
-    },
-    {
-        path: '/accounts',
-        router: accountRouter,
-    },
-    {
-        path: '/categories',
-        router: categoryRouter,
-    },
-    {
-        path: '/transactions',
-        router: transactionRouter,
-    },
-    {
-        path: '/users',
-        router: userRouter,
-    },
-]
-
 const router = express.Router()
-routes.forEach((route) => {
-    router.use(route.path, route.router)
-})
+router.use('/auth', authRouter)
+router.use('/secrets', secretsRouter)
+router.use('/accounts', accountRouter)
+router.use('/categories', categoryRouter)
+router.use('/transactions', transactionRouter)
+router.use('/users', userRouter)
 export default router

@@ -2,6 +2,7 @@ import express from 'express'
 import helmet from 'helmet'
 import methodOverride from 'method-override'
 import { pid } from 'process'
+import swaggerUi from 'swagger-ui-express'
 import { ExpressError } from './models/expressError.js'
 import router from './routes/index.js'
 import { configureCleanup } from './utils/cleanup.js'
@@ -13,13 +14,14 @@ import {
     handleError,
     logRequestResponse,
 } from './utils/middleware.js'
+import { createSwaggerSpec } from './utils/swagger.js'
 
 logger.info(`started - pid ${pid}`)
 
 await createPool()
 configureCleanup()
 
-const port = process.env['PORT'] || 3000
+const port = parseInt(process.env['PORT'] || '3000')
 const app = express()
 app.use(helmet())
 app.use(createCorsMiddleware)
@@ -28,6 +30,13 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(createSessionMiddleware())
 app.use(logRequestResponse)
+if (process.env['NODE_ENV'] !== 'production') {
+    app.use(
+        '/swagger',
+        swaggerUi.serve,
+        swaggerUi.setup(createSwaggerSpec(port))
+    )
+}
 app.use('/', router)
 app.use((req, _res, _next) => {
     throw new ExpressError(`endpoint not found - ${req.url}`, 404)
