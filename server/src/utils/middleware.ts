@@ -73,6 +73,17 @@ export const logRequestResponse = (
     next()
 }
 
+export const authenticate = (
+    req: Request,
+    _res: Response,
+    next: NextFunction
+) => {
+    if (req.session && req.session.user) {
+        return next()
+    }
+    throw new ExpressError('unauthorized', 401)
+}
+
 export const handleError = (
     err: Error,
     _req: Request,
