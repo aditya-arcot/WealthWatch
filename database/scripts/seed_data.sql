@@ -6,7 +6,6 @@ INSERT INTO
         email,
         first_name,
         last_name,
-        password_salt,
         password_hash
     )
 VALUES
@@ -16,7 +15,6 @@ VALUES
         'John',
         'Doe',
         'abc123',
-        'def456'
     ),
     (
         'jane_smith',
@@ -24,7 +22,6 @@ VALUES
         'Jane',
         'Smith',
         'xyz789',
-        'uvw987'
     );
 
 INSERT INTO
