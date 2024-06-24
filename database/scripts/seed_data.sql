@@ -14,14 +14,16 @@ VALUES
         'john.doe@example.com',
         'John',
         'Doe',
-        'abc123',
+        -- password: test
+        '$2a$10$se487z9CUvLL0fColtXwBuf/JhKO3Of90j.UsCP1bETP9IuygLUZ6', 
     ),
     (
         'jane_smith',
         'jane.smith@example.com',
         'Jane',
         'Smith',
-        'xyz789',
+        -- password: test2
+        '$2a$10$hRfjKvwkD07tS17fxRF12uPiKcmMivtwkzWIxZIOoW5pZyH/VxuDe',
     );
 
 INSERT INTO

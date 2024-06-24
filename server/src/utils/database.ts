@@ -34,12 +34,16 @@ export const createPool = async (): Promise<void> => {
     logger.debug('created database pool')
 }
 
-export const closePool = async (): Promise<void> => {
-    logger.debug('closing database pool')
+export const getPool = (): pg.Pool => {
     if (!clientPool) {
         throw Error('pool not initialized')
     }
-    await clientPool.end()
+    return clientPool
+}
+
+export const closePool = async (): Promise<void> => {
+    logger.debug('closing database pool')
+    await getPool().end()
     logger.debug('closed database pool')
 }
 

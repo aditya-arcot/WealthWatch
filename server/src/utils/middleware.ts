@@ -1,7 +1,11 @@
+import pgSession from 'connect-pg-simple'
 import cors from 'cors'
 import { randomUUID } from 'crypto'
 import { NextFunction, Request, Response } from 'express'
+import session from 'express-session'
+import { env, exit } from 'process'
 import { ExpressError } from '../models/expressError.js'
+import { getPool } from './database.js'
 import { logger } from './logger.js'
 
 export const handleCors = cors({
@@ -45,6 +49,27 @@ export const logRequestResponse = (
         logger.info({ responseLog }, 'sending response')
     })
     next()
+}
+
+export const configureSession = () => {
+    if (!env['SESSION_SECRET']) {
+        logger.fatal('missing session secret')
+        exit(1)
+    }
+    const postgresSession = pgSession(session)
+    const sessionStore = new postgresSession({
+        pool: getPool(),
+        createTableIfMissing: true,
+    })
+    return session({
+        store: sessionStore,
+        secret: env['SESSION_SECRET'],
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
+        },
+    })
 }
 
 export const handleError = (

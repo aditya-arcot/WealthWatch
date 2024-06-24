@@ -1,11 +1,16 @@
 import express from 'express'
 import accountRouter from './accountRoutes.js'
+import authRouter from './authRoutes.js'
 import categoryRouter from './categoryRoutes.js'
 import secretsRouter from './secretsRoutes.js'
 import transactionRouter from './transactionRoutes.js'
 import userRouter from './userRoutes.js'
 
 const routes = [
+    {
+        path: '/auth',
+        router: authRouter,
+    },
     {
         path: '/secrets',
         router: secretsRouter,
