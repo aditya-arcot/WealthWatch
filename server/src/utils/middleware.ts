@@ -55,8 +55,8 @@ export const errorHandler = (
 ): Response => {
     logger.error(err, err.message)
     if (err instanceof ExpressError) {
-        return res.status(err.statusCode).send(err)
+        return res.status(err.statusCode).send(err.message)
     } else {
-        return res.status(500).send(err)
+        return res.status(500).send(err.message)
     }
 }
