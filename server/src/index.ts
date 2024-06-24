@@ -8,9 +8,9 @@ import { configureCleanup } from './utils/cleanup.js'
 import { createPool } from './utils/database.js'
 import { logger } from './utils/logger.js'
 import {
-    corsHandler,
-    errorHandler,
-    requestResponseLogger,
+    handleCors,
+    handleError,
+    logRequestResponse,
 } from './utils/middleware.js'
 
 logger.info(`started - pid ${pid}`)
@@ -21,16 +21,16 @@ configureCleanup()
 const port = process.env['PORT'] || 3000
 const app = express()
 app.use(helmet())
-app.use(corsHandler)
+app.use(handleCors)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(requestResponseLogger)
+app.use(logRequestResponse)
 app.use(methodOverride('_method'))
 app.use('/', router)
 app.use((req, _res, _next) => {
     throw new ExpressError(`endpoint not found - ${req.url}`, 404)
 })
-app.use(errorHandler)
+app.use(handleError)
 app.listen(port, (): void => {
     logger.info(`server running - port ${port}`)
 })

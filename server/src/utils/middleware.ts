@@ -4,11 +4,11 @@ import { NextFunction, Request, Response } from 'express'
 import { ExpressError } from '../models/expressError.js'
 import { logger } from './logger.js'
 
-export const corsHandler = cors({
+export const handleCors = cors({
     origin: 'http://localhost:4200',
 })
 
-export const requestResponseLogger = (
+export const logRequestResponse = (
     req: Request,
     res: Response,
     next: NextFunction
@@ -47,7 +47,7 @@ export const requestResponseLogger = (
     next()
 }
 
-export const errorHandler = (
+export const handleError = (
     err: Error,
     _req: Request,
     res: Response,
