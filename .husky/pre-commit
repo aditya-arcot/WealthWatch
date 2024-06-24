@@ -1,2 +1,2 @@
-npx snyk test --all-projects
+npx snyk test --all-projects --policy-path=.snyk
 npx lint-staged
