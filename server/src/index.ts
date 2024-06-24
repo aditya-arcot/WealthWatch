@@ -1,96 +1,36 @@
-import cors from 'cors'
-import { randomUUID } from 'crypto'
-import express, { NextFunction, Request, Response } from 'express'
+import express from 'express'
+import helmet from 'helmet'
 import methodOverride from 'method-override'
 import { pid } from 'process'
 import { ExpressError } from './models/expressError.js'
-import accountsRouter from './routes/accountRoutes.js'
-import categoriesRouter from './routes/categoryRoutes.js'
-import secretsRouter from './routes/secretsRoutes.js'
-import transactionsRouter from './routes/transactionRoutes.js'
-import usersRouter from './routes/userRoutes.js'
+import router from './routes/index.js'
 import { configureCleanup } from './utils/cleanup.js'
 import { createPool } from './utils/database.js'
 import { logger } from './utils/logger.js'
+import {
+    corsHandler,
+    errorHandler,
+    requestResponseLogger,
+} from './utils/middleware.js'
 
 logger.info(`started - pid ${pid}`)
 
 await createPool()
 configureCleanup()
-const app = express()
-
-// middleware
-app.use(
-    cors({
-        origin: 'http://localhost:4200',
-    })
-)
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use((req, res, next) => {
-    const id = randomUUID()
-    const requestLog = {
-        id,
-        method: req.method,
-        url: req.url,
-        query: req.query,
-        params: req.params,
-        headers: req.headers,
-        body: req.body,
-        remoteAddress: req.socket.remoteAddress,
-        remotePort: req.socket.remotePort,
-    }
-    logger.info({ requestLog }, 'received request')
-
-    const send = res.send
-    res.send = (body) => {
-        // @ts-expect-error: custom property
-        res._body = body
-        res.send = send
-        return res.send(body)
-    }
-    res.on('finish', () => {
-        const responseLog = {
-            id,
-            statusCode: res.statusCode,
-            headers: res.getHeaders(),
-            // @ts-expect-error: custom property
-            body: res._body,
-        }
-        logger.info({ responseLog }, 'sending response')
-    })
-    next()
-})
-app.use(methodOverride('_method'))
-app.use(
-    (
-        err: Error,
-        _req: Request,
-        res: Response,
-        _next: NextFunction
-    ): Response => {
-        if (err instanceof ExpressError) {
-            return res.status(err.statusCode).send(err)
-        } else {
-            return res.status(500).send(err)
-        }
-    }
-)
-
-// routes
-app.get('/', (_, res: Response): Response => {
-    return res.send('alive')
-})
-app.use('/secrets', secretsRouter)
-app.use('/accounts', accountsRouter)
-app.use('/categories', categoriesRouter)
-app.use('/transactions', transactionsRouter)
-app.use('/users', usersRouter)
-app.all('*', (req, _res, _next) => {
-    throw new ExpressError(`endpoint not found - ${req.url}`, 404)
-})
 
 const port = process.env['PORT'] || 3000
+const app = express()
+app.use(helmet())
+app.use(corsHandler)
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(requestResponseLogger)
+app.use(methodOverride('_method'))
+app.use('/', router)
+app.use((req, _res, _next) => {
+    throw new ExpressError(`endpoint not found - ${req.url}`, 404)
+})
+app.use(errorHandler)
 app.listen(port, (): void => {
     logger.info(`server running - port ${port}`)
 })
