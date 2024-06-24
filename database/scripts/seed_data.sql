@@ -15,7 +15,7 @@ VALUES
         'John',
         'Doe',
         -- password: test
-        '$2a$10$se487z9CUvLL0fColtXwBuf/JhKO3Of90j.UsCP1bETP9IuygLUZ6', 
+        '$2a$10$se487z9CUvLL0fColtXwBuf/JhKO3Of90j.UsCP1bETP9IuygLUZ6'
     ),
     (
         'jane_smith',
@@ -23,7 +23,7 @@ VALUES
         'Jane',
         'Smith',
         -- password: test2
-        '$2a$10$hRfjKvwkD07tS17fxRF12uPiKcmMivtwkzWIxZIOoW5pZyH/VxuDe',
+        '$2a$10$hRfjKvwkD07tS17fxRF12uPiKcmMivtwkzWIxZIOoW5pZyH/VxuDe'
     );
 
 INSERT INTO
