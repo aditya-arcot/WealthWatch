@@ -4,6 +4,10 @@ import { HttpError } from '../models/httpError.js'
 import { User, createUser, getUserByUsername } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 
+export const checkLoggedIn = (_req: Request, res: Response) => {
+    return res.status(200).send()
+}
+
 export const login = async (req: Request, res: Response) => {
     logger.debug('logging in user')
     const username: string | undefined = req.body.username
@@ -23,6 +27,16 @@ export const login = async (req: Request, res: Response) => {
     logger.debug(user, 'login success')
     req.session.user = user
     return res.json(user)
+}
+
+export const logout = (req: Request, res: Response) => {
+    logger.debug('logging out user')
+    req.session.destroy((err) => {
+        if (err) {
+            throw new HttpError('failed to log out', 500)
+        }
+        return res.status(200).send()
+    })
 }
 
 export const register = async (req: Request, res: Response) => {

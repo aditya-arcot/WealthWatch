@@ -1,6 +1,12 @@
 import express from 'express'
-import { login, register } from '../controllers/authController.js'
+import {
+    checkLoggedIn,
+    login,
+    logout,
+    register,
+} from '../controllers/authController.js'
 import { catchAsync } from '../utils/catchAsync.js'
+import { authenticate } from '../utils/middleware.js'
 
 const router = express.Router()
 
@@ -10,6 +16,21 @@ const router = express.Router()
  *   name: Auth
  *   description: Auth management
  */
+
+/**
+ * @swagger
+ * /auth/checkLoggedIn:
+ *   get:
+ *     summary: Check if user is logged in
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: User is logged in
+ *       401:
+ *          $ref: '#/components/responses/Unauthorized'
+ */
+
+router.route('/checkLoggedIn').get(authenticate, checkLoggedIn)
 
 /**
  * @swagger
@@ -40,6 +61,20 @@ router.route('/login').post(catchAsync(login))
 
 /**
  * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: User was logged out
+ *       401:
+ *          $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/logout').post(authenticate, logout)
+
+/**
+ * @swagger
  * /auth/register:
  *   post:
  *     summary: Register for a new account
@@ -63,7 +98,7 @@ router.route('/login').post(catchAsync(login))
  *                 type: string
  *     responses:
  *       200:
- *         description: The egistered user
+ *         description: The registered user
  *         content:
  *           application/json:
  *             schema:
