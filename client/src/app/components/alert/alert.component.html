@@ -1,21 +1,21 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-6">
-            @for (notification of notifications; track $index) {
+            @for (alert of alerts; track $index) {
                 <div
                     class="m-2 mb-0 p-3 alert alert-dismissible {{
-                        getNotificationClass(notification.type)
+                        getAlertClass(alert.type)
                     }}"
                     role="alert"
                 >
-                    <h4>{{ notification.message }}</h4>
-                    @for (line of notification.subtext; track $index) {
+                    <h4>{{ alert.message }}</h4>
+                    @for (line of alert.subtext; track $index) {
                         <p>{{ line }}</p>
                     }
                     <button
                         type="button"
                         class="btn-close"
-                        (click)="onClose(notification.id)"
+                        (click)="onClose(alert.id)"
                         aria-hidden="true"
                     ></button>
                 </div>
