@@ -1,5 +1,4 @@
 import { runQuery } from '../utils/database.js'
-import { logger } from '../utils/logger.js'
 import { HttpError } from './httpError.js'
 
 export interface User {
@@ -12,7 +11,6 @@ export interface User {
 }
 
 export const getAllUsers = async (): Promise<User[]> => {
-    logger.debug('getting all users')
     const query = 'SELECT * FROM users'
     const rows: User[] = (await runQuery(query)).rows
     return rows
@@ -21,7 +19,6 @@ export const getAllUsers = async (): Promise<User[]> => {
 export const getUserByUsername = async (
     username: string
 ): Promise<User | null> => {
-    logger.debug('getting user by username')
     const query = 'SELECT * FROM users WHERE username = $1'
     const rows: User[] = (await runQuery(query, [username])).rows
     if (!rows[0]) return null
@@ -29,7 +26,6 @@ export const getUserByUsername = async (
 }
 
 export const createUser = async (user: User): Promise<User> => {
-    logger.debug('creating user')
     if (
         !user.username ||
         !user.email ||

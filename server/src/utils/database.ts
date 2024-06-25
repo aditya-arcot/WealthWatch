@@ -59,6 +59,6 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
         rowCount: res.rowCount,
         rows: res.rows,
     }
-    logger.info({ queryLog }, 'executed query')
+    logger.debug({ queryLog }, 'executed query')
     return res
 }

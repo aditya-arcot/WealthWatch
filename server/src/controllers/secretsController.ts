@@ -5,7 +5,7 @@ import { HttpError } from '../models/httpError.js'
 import { logger } from '../utils/logger.js'
 
 export const getSecrets = async (_req: Request, res: Response) => {
-    logger.info('getting secrets')
+    logger.debug('getting secrets')
     if (!env['CLIENT_LOGTAIL_TOKEN']) {
         throw new HttpError('missing one or more secrets', 500)
     }
