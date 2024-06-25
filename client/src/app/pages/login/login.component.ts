@@ -95,7 +95,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
                         this.loginFormGroup.reset()
                         return throwError(() => err)
                     }
-                    this.loginFormGroup.setValue({ username, password: '' })
+                    this.loginFormGroup.patchValue({ password: '' })
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
