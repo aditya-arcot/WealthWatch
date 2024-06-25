@@ -5,6 +5,7 @@ import { logger } from '../utils/logger.js'
 
 export const getCurrentUser = (req: Request, res: Response) => {
     logger.debug('getting current user')
+    // undefined when not logged in
     return res.send(req.session.user)
 }
 

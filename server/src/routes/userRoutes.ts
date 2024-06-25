@@ -20,15 +20,13 @@ const router = express.Router()
  *     tags: [Users]
  *     responses:
  *       200:
- *         description: The current user
+ *         description: The current user (undefined if not logged in)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/current').get(authenticate, getCurrentUser)
+router.route('/current').get(getCurrentUser)
 
 /**
  * @swagger

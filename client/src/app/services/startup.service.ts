@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable, catchError, of, switchMap, throwError } from 'rxjs'
+import { User } from '../models/user'
 import { AlertService } from './alert.service'
 import { LoggerService } from './logger.service'
 import { SecretsService } from './secrets.service'
@@ -24,7 +25,10 @@ export class StartupService {
     startup(): Observable<void> {
         this.logger.debug('starting up')
         return this.userSvc.currentUser().pipe(
-            switchMap(() => {
+            switchMap((user?: User) => {
+                if (!user) {
+                    return throwError(() => new Error('not logged in'))
+                }
                 this.logger.debug('received current user')
                 return this.getSecrets()
             }),

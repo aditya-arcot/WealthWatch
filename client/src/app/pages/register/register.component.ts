@@ -16,6 +16,7 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, throwError } from 'rxjs'
+import { User } from '../../models/user'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
@@ -59,11 +60,15 @@ export class RegisterComponent implements OnInit, AfterViewInit {
             .currentUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
-                    this.logger.error('register required')
+                    this.logger.error('error while getting current user')
                     return throwError(() => err)
                 })
             )
-            .subscribe(() => {
+            .subscribe((user?: User) => {
+                if (!user) {
+                    this.logger.info('not logged in')
+                    return
+                }
                 this.router.navigateByUrl('/home')
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addSuccessAlert('Already logged in')

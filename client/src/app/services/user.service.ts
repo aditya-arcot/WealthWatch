@@ -13,6 +13,6 @@ export class UserService {
 
     currentUser() {
         const url = `${this.baseUrl}/current`
-        return this.http.get<User>(url)
+        return this.http.get<User | undefined>(url)
     }
 }
