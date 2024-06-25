@@ -20,7 +20,7 @@
                                 required
                             />
                             @if (
-                                loginFormGroup['controls']['username'].hasError(
+                                loginFormGroup.controls['username'].hasError(
                                     'required'
                                 )
                             ) {
@@ -40,7 +40,7 @@
                                 minlength="8"
                             />
                             @if (
-                                loginFormGroup['controls']['password'].hasError(
+                                loginFormGroup.controls['password'].hasError(
                                     'required'
                                 )
                             ) {
@@ -48,7 +48,7 @@
                                     Password cannot be empty
                                 </div>
                             } @else if (
-                                loginFormGroup['controls']['password'].hasError(
+                                loginFormGroup.controls['password'].hasError(
                                     'minlength'
                                 )
                             ) {
