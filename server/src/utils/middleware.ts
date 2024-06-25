@@ -10,6 +10,7 @@ import { logger } from './logger.js'
 
 export const createCorsMiddleware = cors({
     origin: 'http://localhost:4200',
+    credentials: true,
 })
 
 export const createSessionMiddleware = () => {
