@@ -16,6 +16,7 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, throwError } from 'rxjs'
+import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
@@ -37,7 +38,8 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         private logger: LoggerService,
         private userSvc: UserService,
         private router: Router,
-        private authSvc: AuthService
+        private authSvc: AuthService,
+        private alertSvc: AlertService
     ) {
         this.registerFormGroup = this.formBuilder.group(
             {
@@ -62,8 +64,9 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                 })
             )
             .subscribe(() => {
-                this.logger.info('already logged in')
                 this.router.navigateByUrl('/home')
+                this.alertSvc.clearAlerts()
+                this.alertSvc.addSuccessAlert('Already logged in')
             })
     }
 
@@ -122,14 +125,15 @@ export class RegisterComponent implements OnInit, AfterViewInit {
             .register(firstName, lastName, email, username, password)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
-                    this.logger.error('register failed')
+                    this.alertSvc.addErrorAlert('Registration failed')
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
-                this.logger.info('register success')
                 this.router.navigateByUrl('/home')
+                this.alertSvc.clearAlerts()
+                this.alertSvc.addSuccessAlert('Success signing up')
             })
     }
 }

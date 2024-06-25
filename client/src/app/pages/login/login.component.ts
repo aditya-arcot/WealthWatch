@@ -15,6 +15,7 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, throwError } from 'rxjs'
+import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
@@ -36,7 +37,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
         private logger: LoggerService,
         private userSvc: UserService,
         private authSvc: AuthService,
-        private router: Router
+        private router: Router,
+        private alertSvc: AlertService
     ) {
         this.loginFormGroup = this.formBuilder.group({
             username: ['', [Validators.required]],
@@ -49,13 +51,14 @@ export class LoginComponent implements OnInit, AfterViewInit {
             .currentUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
-                    this.logger.error('login required')
+                    this.logger.info('login required')
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.logger.info('login not required')
                 this.router.navigateByUrl('/home')
+                this.alertSvc.clearAlerts()
+                this.alertSvc.addSuccessAlert('Already logged in')
             })
     }
 
@@ -63,7 +66,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
         const form = this.loginForm?.nativeElement
         form.addEventListener('submit', (submitEvent: SubmitEvent) => {
             if (!this.loginFormGroup.valid || !form.checkValidity()) {
-                this.logger.error('validation error')
+                this.alertSvc.addErrorAlert('Fix inputs and try again')
                 submitEvent.preventDefault()
                 submitEvent.stopPropagation()
             } else {
@@ -82,18 +85,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
             .login(username, password)
             .pipe(
                 catchError((err) => {
+                    this.alertSvc.addErrorAlert('Login failed')
                     if (err.status === 404) {
                         this.loginFormGroup.reset()
-                        return throwError(() => Error('user not found'))
+                        return throwError(() => err)
                     }
                     this.loginFormGroup.setValue({ username, password: '' })
-                    return throwError(() => Error('incorrect password'))
+                    return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
-                this.logger.info('login success')
                 this.router.navigateByUrl('/home')
+                this.alertSvc.clearAlerts()
+                this.alertSvc.addSuccessAlert('Success signing in')
             })
     }
 }

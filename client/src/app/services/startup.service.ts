@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, catchError, of, switchMap } from 'rxjs'
+import { Observable, catchError, of, switchMap, throwError } from 'rxjs'
+import { AlertService } from './alert.service'
 import { LoggerService } from './logger.service'
 import { SecretsService } from './secrets.service'
 import { UserService } from './user.service'
@@ -16,18 +17,22 @@ export class StartupService {
         private logger: LoggerService,
         private userSvc: UserService,
         private secretsSvc: SecretsService,
-        private router: Router
+        private router: Router,
+        private alertSvc: AlertService
     ) {}
 
     startup(): Observable<void> {
         this.logger.debug('starting up')
         return this.userSvc.currentUser().pipe(
             switchMap(() => {
+                this.logger.debug('received current user')
                 return this.getSecrets()
             }),
             catchError((err: HttpErrorResponse) => {
-                this.logger.error('error while getting current user', err)
                 this.router.navigateByUrl('/login')
+                this.logger.error('error while getting current user', err)
+                this.alertSvc.clearAlerts()
+                this.alertSvc.addErrorAlert('Not logged in')
                 return of(undefined)
             })
         )
@@ -37,9 +42,7 @@ export class StartupService {
         return this.secretsSvc.getSecrets().pipe(
             switchMap((secrets?) => {
                 if (!secrets) {
-                    this.logger.error('failed to get secrets')
-                    this.router.navigateByUrl('/startup-error')
-                    return of(undefined)
+                    return throwError(() => new Error('no secrets'))
                 }
                 this.logger.debug('received secrets')
                 this.secretsSvc.secrets = secrets
@@ -49,8 +52,9 @@ export class StartupService {
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
-                this.logger.error('error while getting secrets', err)
                 this.router.navigateByUrl('/startup-error')
+                this.logger.error('error while getting secrets', err)
+                this.alertSvc.addErrorAlert('Failed to receive secrets')
                 return of(undefined)
             })
         )

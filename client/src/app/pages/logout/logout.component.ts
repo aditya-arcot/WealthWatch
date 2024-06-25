@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, throwError } from 'rxjs'
+import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
 
@@ -14,7 +15,8 @@ export class LogoutComponent implements OnInit {
     constructor(
         private authSvc: AuthService,
         private logger: LoggerService,
-        private router: Router
+        private router: Router,
+        private alertSvc: AlertService
     ) {}
 
     ngOnInit(): void {
@@ -22,15 +24,17 @@ export class LogoutComponent implements OnInit {
             .logout()
             .pipe(
                 catchError((err) => {
-                    this.logger.error('error while logging out', err)
                     this.router.navigateByUrl('/home')
+                    this.alertSvc.clearAlerts()
+                    this.alertSvc.addErrorAlert('Logout failed')
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.logger.info('logged out')
                 setTimeout(() => {
                     this.router.navigateByUrl('/login')
+                    this.alertSvc.clearAlerts()
+                    this.alertSvc.addSuccessAlert('Success signing out')
                 }, 3000)
             })
     }

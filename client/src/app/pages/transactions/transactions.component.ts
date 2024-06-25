@@ -1,5 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
-import { tap } from 'rxjs'
+import { catchError, throwError } from 'rxjs'
+import { AlertService } from '../../services/alert.service'
 import { TransactionService } from '../../services/transaction.service'
 
 @Component({
@@ -9,12 +11,20 @@ import { TransactionService } from '../../services/transaction.service'
     templateUrl: './transactions.component.html',
 })
 export class TransactionsComponent implements OnInit {
-    constructor(private transactionSvc: TransactionService) {}
+    constructor(
+        private transactionSvc: TransactionService,
+        private alertSvc: AlertService
+    ) {}
 
     ngOnInit(): void {
         this.transactionSvc
             .getTransactions()
-            .pipe(tap((transactions) => console.log(transactions)))
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert('Failed to get transactions')
+                    return throwError(() => err)
+                })
+            )
             .subscribe()
     }
 }
