@@ -21,7 +21,7 @@ export const login = async (req: Request, res: Response) => {
         throw new HttpError('user not found', 404)
     }
     if (!bcrypt.compareSync(password, user.password_hash)) {
-        throw new HttpError('invalid username or password', 400)
+        throw new HttpError('incorrect password', 400)
     }
 
     logger.debug(user, 'login success')
