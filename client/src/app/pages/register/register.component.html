@@ -18,6 +18,7 @@
                                 class="form-control"
                                 formControlName="firstName"
                                 required
+                                autocomplete="given-name"
                             />
                             @if (
                                 registerFormGroup.controls[
@@ -37,6 +38,7 @@
                                 class="form-control"
                                 formControlName="lastName"
                                 required
+                                autocomplete="family-name"
                             />
                             @if (
                                 registerFormGroup.controls['lastName'].hasError(
@@ -56,6 +58,7 @@
                                 class="form-control"
                                 formControlName="email"
                                 required
+                                autocomplete="email"
                             />
                             @if (
                                 registerFormGroup.controls['email'].hasError(
@@ -83,6 +86,7 @@
                                 class="form-control"
                                 formControlName="username"
                                 required
+                                autocomplete="username"
                             />
                             @if (
                                 registerFormGroup.controls['username'].hasError(
@@ -106,6 +110,7 @@
                                 (input)="
                                     setConfirmPasswordValidity(confirmPassword)
                                 "
+                                autocomplete="new-password"
                             />
                             @if (
                                 registerFormGroup.controls['password'].hasError(
@@ -139,6 +144,7 @@
                                 (input)="
                                     setConfirmPasswordValidity(confirmPassword)
                                 "
+                                autocomplete="new-password"
                             />
                             @if (
                                 registerFormGroup.controls[

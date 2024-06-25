@@ -18,6 +18,7 @@
                                 class="form-control"
                                 formControlName="username"
                                 required
+                                autocomplete="username"
                             />
                             @if (
                                 loginFormGroup.controls['username'].hasError(
@@ -38,6 +39,7 @@
                                 formControlName="password"
                                 required
                                 minlength="8"
+                                autocomplete="current-password"
                             />
                             @if (
                                 loginFormGroup.controls['password'].hasError(
