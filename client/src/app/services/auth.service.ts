@@ -24,4 +24,21 @@ export class AuthService {
         const url = `${this.baseUrl}/logout`
         return this.http.post<void>(url, {})
     }
+
+    register(
+        firstName: string,
+        lastName: string,
+        email: string,
+        username: string,
+        password: string
+    ) {
+        const url = `${this.baseUrl}/register`
+        return this.http.post<void>(url, {
+            firstName,
+            lastName,
+            email,
+            username,
+            password,
+        })
+    }
 }
