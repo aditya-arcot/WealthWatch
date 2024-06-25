@@ -1,4 +1,4 @@
-import { CommonModule, JsonPipe } from '@angular/common'
+import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import {
     AfterViewInit,
@@ -22,7 +22,7 @@ import { UserService } from '../../services/user.service'
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ReactiveFormsModule, CommonModule, JsonPipe, RouterLink],
+    imports: [ReactiveFormsModule, CommonModule, RouterLink],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })
