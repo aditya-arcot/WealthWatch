@@ -1,4 +1,8 @@
-import { provideHttpClient } from '@angular/common/http'
+import {
+    HTTP_INTERCEPTORS,
+    provideHttpClient,
+    withInterceptorsFromDi,
+} from '@angular/common/http'
 import {
     APP_INITIALIZER,
     ApplicationConfig,
@@ -7,16 +11,16 @@ import {
 } from '@angular/core'
 import { provideRouter } from '@angular/router'
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
-import { lastValueFrom } from 'rxjs'
 import { env } from '../environments/env'
 import { routes } from './app.routes'
+import { AuthInterceptor } from './pages/transactions/auth-interceptor'
 import { StartupService } from './services/startup.service'
 
 export const appConfig: ApplicationConfig = {
     providers: [
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes),
-        provideHttpClient(),
+        provideHttpClient(withInterceptorsFromDi()),
         importProvidersFrom(
             LoggerModule.forRoot({
                 level:
@@ -28,12 +32,13 @@ export const appConfig: ApplicationConfig = {
         {
             provide: APP_INITIALIZER,
             useFactory: (startupSvc: StartupService) => () =>
-                lastValueFrom(startupSvc.startup()).then((success) => {
-                    if (!success) {
-                        // TODO reroute to error page
-                    }
-                }),
+                startupSvc.startup(),
             deps: [StartupService],
+            multi: true,
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
             multi: true,
         },
     ],

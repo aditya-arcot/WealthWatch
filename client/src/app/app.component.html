@@ -1,1 +1,9 @@
-<router-outlet />
+@if (!this.authSvc.checkAuthPath(this.router.url)) {
+    <app-header />
+}
+
+<main class="container-fluid">
+    <div class="mt-2 mb-2">
+        <router-outlet />
+    </div>
+</main>
