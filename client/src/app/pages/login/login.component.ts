@@ -1,4 +1,5 @@
 import { CommonModule, JsonPipe } from '@angular/common'
+import { HttpErrorResponse } from '@angular/common/http'
 import {
     AfterViewInit,
     Component,
@@ -13,7 +14,7 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-import { catchError, finalize, of, throwError } from 'rxjs'
+import { catchError, finalize, throwError } from 'rxjs'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
@@ -47,15 +48,14 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.userSvc
             .currentUser()
             .pipe(
-                catchError(() => {
+                catchError((err: HttpErrorResponse) => {
                     this.logger.error('login required')
-                    return of(undefined)
+                    return throwError(() => err)
                 })
             )
             .subscribe(() => {
                 this.logger.info('login not required')
                 this.router.navigateByUrl('/home')
-                return of(undefined)
             })
     }
 
