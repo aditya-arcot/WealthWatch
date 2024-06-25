@@ -1,5 +1,10 @@
 import express from 'express'
-import { getCurrentUser, getUsers } from '../controllers/userController.js'
+import {
+    checkEmailExists,
+    checkUsernameExists,
+    getCurrentUser,
+    getUsers,
+} from '../controllers/userController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -47,5 +52,55 @@ router.route('/current').get(getCurrentUser)
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.route('/').get(authenticate, catchAsync(getUsers))
+
+/**
+ * @swagger
+ * /users/username-in-use/{username}:
+ *   get:
+ *     summary: Check if username is in use
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The username to check
+ *     responses:
+ *       200:
+ *         description: Whether the username is in use
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: boolean
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/username-in-use/:username').get(catchAsync(checkUsernameExists))
+
+/**
+ * @swagger
+ * /users/email-in-use/{email}:
+ *   get:
+ *     summary: Check if email is in use
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The email to check
+ *     responses:
+ *       200:
+ *         description: Whether the email is in use
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: boolean
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/email-in-use/:email').get(catchAsync(checkEmailExists))
 
 export default router

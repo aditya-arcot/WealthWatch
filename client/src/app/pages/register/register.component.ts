@@ -15,7 +15,15 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-import { catchError, finalize, throwError } from 'rxjs'
+import {
+    catchError,
+    finalize,
+    forkJoin,
+    map,
+    of,
+    switchMap,
+    throwError,
+} from 'rxjs'
 import { User } from '../../models/user'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
@@ -121,24 +129,64 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     register() {
         this.logger.info('registering')
         this.loading = true
+
         const firstName = this.registerFormGroup.value.firstName
         const lastName = this.registerFormGroup.value.lastName
         const email = this.registerFormGroup.value.email
         const username = this.registerFormGroup.value.username
         const password = this.registerFormGroup.value.password
-        this.authSvc
-            .register(firstName, lastName, email, username, password)
+
+        forkJoin({
+            usernameInUse: this.userSvc.checkUsernameInUse(username),
+            emailInUse: this.userSvc.checkEmailInUse(email),
+        })
             .pipe(
+                switchMap((res) => {
+                    if (res.emailInUse || res.usernameInUse) {
+                        if (res.emailInUse) {
+                            this.alertSvc.addErrorAlert(
+                                'Email is already in use'
+                            )
+                            this.registerFormGroup.patchValue({
+                                email: '',
+                                confirmPassword: '',
+                            })
+                        }
+                        if (res.usernameInUse) {
+                            this.alertSvc.addErrorAlert(
+                                'Username is already in use'
+                            )
+                            this.registerFormGroup.patchValue({
+                                username: '',
+                                confirmPassword: '',
+                            })
+                        }
+                        return of(false)
+                    }
+                    return this.authSvc
+                        .register(
+                            firstName,
+                            lastName,
+                            email,
+                            username,
+                            password
+                        )
+                        .pipe(map(() => true))
+                }),
                 catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Registration failed')
+                    this.alertSvc.addErrorAlert(
+                        'Registration failed. Try again'
+                    )
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe(() => {
-                this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Success signing up')
+            .subscribe((res) => {
+                if (res) {
+                    this.router.navigateByUrl('/home')
+                    this.alertSvc.clearAlerts()
+                    this.alertSvc.addSuccessAlert('Success signing up')
+                }
             })
     }
 }
