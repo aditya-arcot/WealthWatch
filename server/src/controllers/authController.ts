@@ -4,10 +4,6 @@ import { HttpError } from '../models/httpError.js'
 import { User, createUser, getUserByUsername } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 
-export const checkLoggedIn = (_req: Request, res: Response) => {
-    return res.status(200).send()
-}
-
 export const login = async (req: Request, res: Response) => {
     logger.debug('logging in user')
     const username: string | undefined = req.body.username

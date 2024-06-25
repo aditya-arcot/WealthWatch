@@ -1,10 +1,5 @@
 import express from 'express'
-import {
-    checkLoggedIn,
-    login,
-    logout,
-    register,
-} from '../controllers/authController.js'
+import { login, logout, register } from '../controllers/authController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -16,21 +11,6 @@ const router = express.Router()
  *   name: Auth
  *   description: Auth management
  */
-
-/**
- * @swagger
- * /auth/checkLoggedIn:
- *   get:
- *     summary: Check if user is logged in
- *     tags: [Auth]
- *     responses:
- *       200:
- *         description: User is logged in
- *       401:
- *          $ref: '#/components/responses/Unauthorized'
- */
-
-router.route('/checkLoggedIn').get(authenticate, checkLoggedIn)
 
 /**
  * @swagger

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getUsers } from '../controllers/userController.js'
+import { getCurrentUser, getUsers } from '../controllers/userController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -11,6 +11,24 @@ const router = express.Router()
  *   name: Users
  *   description: Users management
  */
+
+/**
+ * @swagger
+ * /users/current:
+ *   get:
+ *     summary: Get current user
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: The current user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/current').get(authenticate, getCurrentUser)
 
 /**
  * @swagger
