@@ -13,7 +13,7 @@ import { provideRouter } from '@angular/router'
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
 import { env } from '../environments/env'
 import { routes } from './app.routes'
-import { AuthInterceptor } from './pages/transactions/auth-interceptor'
+import { AuthInterceptor } from './interceptors/auth-interceptor'
 import { StartupService } from './services/startup.service'
 
 export const appConfig: ApplicationConfig = {
