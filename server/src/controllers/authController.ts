@@ -14,9 +14,9 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await getUserByUsername(username)
     if (!user) {
-        throw new HttpError('user not found', 404)
+        throw new HttpError("user doesn't exist", 404)
     }
-    if (!bcrypt.compareSync(password, user.password_hash)) {
+    if (!bcrypt.compareSync(password, user.passwordHash)) {
         throw new HttpError('incorrect password', 400)
     }
 
@@ -41,14 +41,14 @@ export const register = async (req: Request, res: Response) => {
         id: 0, // will be set by database
         username: req.body.username,
         email: req.body.email,
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        password_hash: bcrypt.hashSync(req.body.password, 10),
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        passwordHash: bcrypt.hashSync(req.body.password, 10),
     }
 
     const newUser = await createUser(user)
     if (!newUser) {
-        throw new HttpError('user not found', 404)
+        throw new HttpError('failed to create user', 500)
     }
 
     logger.debug(newUser, 'register success')

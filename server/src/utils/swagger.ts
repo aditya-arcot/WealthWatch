@@ -22,7 +22,7 @@ export const createSwaggerSpec = (port: number) => {
                                 type: 'string',
                                 description: 'The account ID',
                             },
-                            user_id: {
+                            userId: {
                                 type: 'string',
                                 description: 'The user ID',
                             },
@@ -61,11 +61,11 @@ export const createSwaggerSpec = (port: number) => {
                                 type: 'string',
                                 description: 'The transaction ID',
                             },
-                            account_id: {
+                            accountId: {
                                 type: 'string',
                                 description: 'The account ID',
                             },
-                            category_id: {
+                            categoryId: {
                                 type: 'string',
                                 description: 'The category ID',
                             },
@@ -98,15 +98,15 @@ export const createSwaggerSpec = (port: number) => {
                                 type: 'string',
                                 description: 'The user email',
                             },
-                            first_name: {
+                            firstName: {
                                 type: 'string',
                                 description: 'The user first name',
                             },
-                            last_name: {
+                            lastName: {
                                 type: 'string',
                                 description: 'The user last name',
                             },
-                            password_hash: {
+                            passwordHash: {
                                 type: 'string',
                                 description: 'The user password hash',
                             },

@@ -1,7 +1,7 @@
 export interface Transaction {
     id: number
-    account_id: number
-    category_id: number
+    accountId: number
+    categoryId: number
     amount: number
     description: string
     timestamp: Date
