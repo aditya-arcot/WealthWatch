@@ -19,4 +19,9 @@ export class AuthService {
         const url = `${this.baseUrl}/login`
         return this.http.post<void>(url, { username, password })
     }
+
+    logout() {
+        const url = `${this.baseUrl}/logout`
+        return this.http.post<void>(url, {})
+    }
 }
