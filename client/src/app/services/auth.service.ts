@@ -7,7 +7,7 @@ import { env } from '../../environments/env'
 })
 export class AuthService {
     readonly baseUrl = `${env.apiUrl}/auth`
-    readonly authPaths = ['login', 'logout', 'register']
+    readonly authPaths = ['/login', '/logout', '/register']
 
     constructor(private http: HttpClient) {}
 
