@@ -12,8 +12,19 @@ import { AuthService } from './services/auth.service'
     styleUrl: './app.component.css',
 })
 export class AppComponent {
+    readonly noHeaderPaths = [
+        '/startup-error',
+        '/login',
+        '/logout',
+        '/register',
+    ]
+
     constructor(
         public authSvc: AuthService,
         public router: Router
     ) {}
+
+    noHeaderPath(path: string) {
+        return this.noHeaderPaths.includes(path)
+    }
 }

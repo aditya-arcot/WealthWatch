@@ -1,4 +1,4 @@
-@if (!this.authSvc.checkAuthPath(this.router.url)) {
+@if (!noHeaderPath(this.router.url)) {
     <app-header />
 }
 
