@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import { HttpError } from '../models/httpError.js'
-import { User, createUser, getUserByUsername } from '../models/user.js'
+import { User, createUser, fetchUserByUsername } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 
 export const login = async (req: Request, res: Response) => {
@@ -12,7 +12,7 @@ export const login = async (req: Request, res: Response) => {
         throw new HttpError('missing username or password', 400)
     }
 
-    const user = await getUserByUsername(username)
+    const user = await fetchUserByUsername(username)
     if (!user) {
         throw new HttpError("user doesn't exist", 404)
     }

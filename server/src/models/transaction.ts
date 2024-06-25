@@ -29,7 +29,7 @@ const mapDbTransactionToTransaction = (
     timestamp: dbTransaction.timestamp,
 })
 
-export const getAllTransactions = async (): Promise<Transaction[]> => {
+export const fetchTransactions = async (): Promise<Transaction[]> => {
     const query = 'SELECT * FROM transactions'
     const rows: DbTransaction[] = (await runQuery(query)).rows
     return rows.map(mapDbTransactionToTransaction)

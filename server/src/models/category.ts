@@ -5,7 +5,7 @@ export interface Category {
     name: string
 }
 
-export const getAllCategories = async (): Promise<Category[]> => {
+export const fetchCategories = async (): Promise<Category[]> => {
     const query = 'SELECT * FROM categories'
     const rows: Category[] = (await runQuery(query)).rows
     return rows
