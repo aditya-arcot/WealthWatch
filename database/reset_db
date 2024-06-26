@@ -18,13 +18,19 @@ echo
 
 echo "checking user"
 if psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER';" | grep -q 1; then
-    echo "user already exists"
+    echo "user already exists. dropping..."
+    psql postgres -c "DROP USER $DB_USER;"
 else
-    echo "user does not exist. creating..."
-    psql postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
-    echo "granting permissions"
-    psql $DB_NAME -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+    echo "user does not exist"
 fi
+echo
+
+echo "creating user"
+psql postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
+echo
+
+echo "granting permissions"
+psql $DB_NAME -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 echo
 
 echo "creating tables"
