@@ -34,10 +34,9 @@ psql $DB_NAME -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 echo
 
 echo "creating tables"
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f $SCRIPTS_DIR/create_tables.sql -v ON_ERROR_STOP=1
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/create_tables.sql -v ON_ERROR_STOP=1
 echo
 
 echo "seeding data"
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f $SCRIPTS_DIR/seed_data.sql -v ON_ERROR_STOP=1
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_data.sql -v ON_ERROR_STOP=1
 echo
-
