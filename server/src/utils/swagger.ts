@@ -1,6 +1,6 @@
 import swaggerJSDoc from 'swagger-jsdoc'
 
-export const createSwaggerSpec = (port: number) => {
+export const createSwaggerSpec = () => {
     const options = {
         definition: {
             openapi: '3.1.0',
@@ -8,11 +8,6 @@ export const createSwaggerSpec = (port: number) => {
                 title: 'Personal Finance App API',
                 version: '1.0.0',
             },
-            servers: [
-                {
-                    url: `http://localhost:${port}`,
-                },
-            ],
             components: {
                 schemas: {
                     Account: {
@@ -120,7 +115,7 @@ export const createSwaggerSpec = (port: number) => {
                 },
             },
         },
-        apis: ['./src/routes/*.ts'],
+        apis: ['./dist/routes/*.js'],
     }
     return swaggerJSDoc(options)
 }
