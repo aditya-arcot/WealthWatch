@@ -1,4 +1,36 @@
 #!/bin/bash
 
+show_help() {
+    echo "Usage: start_postgres [options]"
+    echo ""
+    echo "Options:"
+    echo "  --env file     Specify the environment file"
+    echo "  -h, --help     Display this help message"
+}
+
+ENV_FILE="../.env"
+
+while [[ "$1" != "" ]]; do
+    case $1 in
+        --env)
+            shift
+            ENV_FILE=$1
+            ;;
+        -h | --help)
+            show_help
+            exit
+            ;;
+        *)
+            echo "Invalid option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+echo "Environment file: $ENV_FILE"
+
 source ./load_env
+
 PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER

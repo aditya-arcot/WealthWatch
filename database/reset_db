@@ -2,6 +2,43 @@
 
 set -e
 
+show_help() {
+    echo "Usage: reset_db [options]"
+    echo ""
+    echo "Options:"
+    echo "  --seed         Seed the database"
+    echo "  --env file     Specify the environment file"
+    echo "  -h, --help     Display this help message"
+}
+
+SEED=false
+ENV_FILE="../.env"
+
+while [[ "$1" != "" ]]; do
+    case $1 in
+        --seed)
+            SEED=true
+            ;;
+        --env)
+            shift
+            ENV_FILE=$1
+            ;;
+        -h | --help)
+            show_help
+            exit
+            ;;
+        *)
+            echo "Invalid option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+echo "Seed: $SEED"
+echo "Environment file: $ENV_FILE"
+
 source ./load_env
 
 if psql -lqt | cut -d \| -f 1 | grep -qw $DB_NAME; then
@@ -37,6 +74,8 @@ echo "creating tables"
 PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/create_tables.sql -v ON_ERROR_STOP=1
 echo
 
-echo "seeding data"
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_data.sql -v ON_ERROR_STOP=1
-echo
+if [ "$SEED" = true ]; then
+    echo "seeding data"
+    PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_data.sql -v ON_ERROR_STOP=1
+    echo
+fi
