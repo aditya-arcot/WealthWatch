@@ -6,6 +6,8 @@ let clientPool: pg.Pool | null = null
 
 export const createPool = async (): Promise<void> => {
     logger.debug('creating database pool')
+    if (!env['DB_HOST']) throw Error('database host not set')
+    const host = env['DB_HOST']
     if (!env['DB_USER']) throw Error('database username not set')
     const user = env['DB_USER']
     if (!env['DB_PASSWORD']) throw Error('database password not set')
@@ -14,6 +16,7 @@ export const createPool = async (): Promise<void> => {
     const database = env['DB_NAME']
 
     const config: pg.PoolConfig = {
+        host,
         database,
         user,
         password,

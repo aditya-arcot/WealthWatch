@@ -1,0 +1,83 @@
+name: Deploy
+on:
+    push:
+        branches: main
+
+env:
+    VERSION: ${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
+    REPO: ${{ github.event.repository.name }}
+
+jobs:
+    main:
+        runs-on: macbook-pro-13
+        environment: prod
+        steps:
+            - name: context
+              run: echo "${{ toJSON(github) }}"
+
+            - name: lowercase repo name env var
+              run: echo "REPO_NAME_LOWER=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+            - name: docker env vars
+              run: |
+                  echo "SERVER_DOCKER_IMAGE=${{ env.REPO_NAME_LOWER }}-server" >> $GITHUB_ENV
+                  echo "CLIENT_DOCKER_IMAGE=${{ env.REPO_NAME_LOWER }}-client" >> $GITHUB_ENV
+                  echo "DOCKER_TAG=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_ENV
+
+            - name: checkout code
+              uses: actions/checkout@v4
+
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+                  cache: 'npm'
+
+            - name: install, build - server
+              run: |
+                  cd server/
+                  npm ci
+                  npm run build
+
+            - name: create .env - server
+              run: |
+                  cd server/
+                  echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
+                  echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
+                  echo "SERVER_LOGTAIL_TOKEN=${{ vars.SERVER_LOGTAIL_TOKEN }}" >> .env
+                  echo "SESSION_SECRET=${{ vars.SESSION_SECRET }}" >> .env
+                  echo "CLIENT_LOGTAIL_TOKEN=${{ vars.CLIENT_LOGTAIL_TOKEN }}" >> .env
+                  echo "DB_HOST=${{ vars.DB_HOST }}" >> .env
+                  echo "DB_USER=${{ vars.DB_USER }}" >> .env
+                  echo "DB_PASSWORD=${{ vars.DB_PASSWORD }}" >> .env
+                  echo "DB_NAME=${{ vars.DB_NAME }}" >> .env
+
+            - name: copy files - server
+              run: |
+                  cd server/
+                  mkdir stage
+                  cp -r .env Dockerfile package.json package-lock.json dist stage/
+
+            # - name: install, build - client
+            #   run: |
+            #       cd client/
+            #       npm ci
+            #       npm run build
+
+            # - name: copy files - client
+            #   run: |
+            #       cd client/
+            #       mkdir stage
+            #       cp -r Dockerfile dist stage/
+
+            - name: build, push docker image - server
+              run: |
+                  cd server/stage
+                  IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ env.SERVER_DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+                  docker build -t $IMAGE .
+                  docker push $IMAGE
+
+            - name: start docker - server
+              run: |
+                  cd server/stage
+                  DOCKER_REGISTRY=${{ vars.DOCKER_REGISTRY }} docker-compose up -d
