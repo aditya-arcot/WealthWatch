@@ -1,7 +1,7 @@
 name: ${REPO}
 services:
     server:
-        image: ${REGISTRY}/${IMAGE}:${TAG}
+        image: ${IMAGE}
         ports:
             - '3000:3000'
         restart: always

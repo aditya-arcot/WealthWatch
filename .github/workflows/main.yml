@@ -13,38 +13,40 @@ jobs:
     set-vars:
         runs-on: mbp-13
         outputs:
-            repo: ${{ steps.vars.outputs.REPO_LOWERCASE }}
-            server-docker-image: ${{ steps.vars.outputs.SERVER_DOCKER_IMAGE }}
-            client-docker-image: ${{ steps.vars.outputs.CLIENT_DOCKER_IMAGE }}
-            docker-tag: ${{ steps.vars.outputs.DOCKER_TAG }}
+            repo: ${{ steps.vars.outputs.repo_lowercase }}
+            server_image: ${{ steps.vars.outputs.server_image }}
+            client_image: ${{ steps.vars.outputs.client_image }}
+            image_tag: ${{ steps.vars.outputs.image_tag }}
         steps:
             - name: set docker vars
               id: vars
               run: |
-                  REPO_LOWERCASE=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')
-                  echo "REPO_LOWERCASE=$REPO_LOWERCASE" >> $GITHUB_OUTPUT
-                  echo "SERVER_DOCKER_IMAGE=${REPO_LOWERCASE}-server" >> $GITHUB_OUTPUT
-                  echo "CLIENT_DOCKER_IMAGE=${REPO_LOWERCASE}-client" >> $GITHUB_OUTPUT
-                  echo "DOCKER_TAG=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_OUTPUT
+                  repo_lowercase=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')
+                  echo "repo_lowercase=$repo_lowercase" >> $GITHUB_OUTPUT
+                  echo "server_image=${repo_lowercase}-server" >> $GITHUB_OUTPUT
+                  echo "client_image=${repo_lowercase}-client" >> $GITHUB_OUTPUT
+                  echo "image_tag=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_OUTPUT
 
     run-test:
         needs: set-vars
         if: github.ref_name == 'test'
         uses: ./.github/workflows/deploy.yml
+        secrets: inherit
         with:
             runner: mbp-14
             repo: ${{ needs.set-vars.outputs.repo }}
-            server-docker-image: ${{ needs.set-vars.outputs.server-docker-image }}
-            client-docker-image: ${{ needs.set-vars.outputs.client-docker-image }}
-            docker-tag: ${{ needs.set-vars.outputs.docker-tag }}
+            server_image: ${{ needs.set-vars.outputs.server_image }}
+            client_image: ${{ needs.set-vars.outputs.client_image }}
+            image_tag: ${{ needs.set-vars.outputs.image_tag }}
 
     run-main:
         needs: set-vars
         if: github.ref_name == 'main'
         uses: ./.github/workflows/deploy.yml
+        secrets: inherit
         with:
             runner: mbp-13
             repo: ${{ needs.set-vars.outputs.repo }}
-            server-docker-image: ${{ needs.set-vars.outputs.server-docker-image }}
-            client-docker-image: ${{ needs.set-vars.outputs.client-docker-image }}
-            docker-tag: ${{ needs.set-vars.outputs.docker-tag }}
+            server_image: ${{ needs.set-vars.outputs.server_image }}
+            client_image: ${{ needs.set-vars.outputs.client_image }}
+            image_tag: ${{ needs.set-vars.outputs.image_tag }}

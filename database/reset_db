@@ -12,7 +12,7 @@ show_help() {
 }
 
 SEED=false
-ENV_FILE="../.env"
+ENV_FILE="../.env.dev"
 
 while [[ "$1" != "" ]]; do
     case $1 in

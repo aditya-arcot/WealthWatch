@@ -8,13 +8,13 @@ on:
             repo:
                 required: true
                 type: string
-            server-docker-image:
+            server_image:
                 required: true
                 type: string
-            client-docker-image:
+            client_image:
                 required: true
                 type: string
-            docker-tag:
+            image_tag:
                 required: true
                 type: string
 
@@ -41,21 +41,36 @@ jobs:
             - name: create .env (server)
               run: |
                   cd server/
-                  echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
-                  echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
-                  echo "SERVER_LOGTAIL_TOKEN=${{ vars.SERVER_LOGTAIL_TOKEN }}" >> .env
-                  echo "SESSION_SECRET=${{ vars.SESSION_SECRET }}" >> .env
-                  echo "CLIENT_LOGTAIL_TOKEN=${{ vars.CLIENT_LOGTAIL_TOKEN }}" >> .env
-                  echo "DB_HOST=${{ vars.DB_HOST }}" >> .env
-                  echo "DB_USER=${{ vars.DB_USER }}" >> .env
-                  echo "DB_PASSWORD=${{ vars.DB_PASSWORD }}" >> .env
-                  echo "DB_NAME=${{ vars.DB_NAME }}" >> .env
+                  echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
+                  echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+                  echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+                  echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+                  echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+                  echo "LOG_LEVEL=${{ secrets.LOG_LEVEL }}" >> .env
+                  echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
+                  echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
+                  echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
 
             - name: copy files (server)
               run: |
                   cd server/
                   mkdir stage
                   cp -r .env Dockerfile package.json package-lock.json dist stage/
+
+            - name: build, push docker image (server)
+              run: |
+                  cd server/stage/
+                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_image }}:${{ inputs.image_tag }}
+                  docker build -t $IMAGE .
+                  docker push $IMAGE
+                  echo "SERVER_IMAGE=${IMAGE}" >> $GITHUB_ENV
+
+            - name: start docker (server)
+              run: |
+                  cd server
+                  REPO=${{ inputs.repo }} \
+                  IMAGE=${{ env.SERVER_IMAGE }} \
+                  docker-compose up -d
 
             # - name: install, build - client
             #   run: |
@@ -68,19 +83,3 @@ jobs:
             #       cd client/
             #       mkdir stage
             #       cp -r Dockerfile dist stage/
-
-            - name: build, push docker image (server)
-              run: |
-                  cd server/stage
-                  IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ inputs.server-docker-image }}:${{ inputs.docker-tag }}
-                  docker build -t $IMAGE .
-                  docker push $IMAGE
-
-            - name: start docker (server)
-              run: |
-                  cd server/stage
-                  REPO=${{ inputs.repo }} \
-                  REGISTRY=${{ vars.DOCKER_REGISTRY }} \
-                  IMAGE=${{ inputs.server-docker-image }} \
-                  TAG=${{ inputs.docker-tag }} \
-                  docker-compose up -d
