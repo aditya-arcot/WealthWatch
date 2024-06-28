@@ -1,0 +1,50 @@
+name: CI/CD Pipeline
+on:
+    push:
+        branches:
+            - main
+            - test
+
+env:
+    VERSION: ${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
+    REPO: ${{ github.event.repository.name }}
+
+jobs:
+    set-vars:
+        runs-on: mbp-13
+        outputs:
+            repo: ${{ steps.vars.outputs.REPO_LOWERCASE }}
+            server-docker-image: ${{ steps.vars.outputs.SERVER_DOCKER_IMAGE }}
+            client-docker-image: ${{ steps.vars.outputs.CLIENT_DOCKER_IMAGE }}
+            docker-tag: ${{ steps.vars.outputs.DOCKER_TAG }}
+        steps:
+            - name: set docker vars
+              id: vars
+              run: |
+                  REPO_LOWERCASE=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')
+                  echo "REPO_LOWERCASE=$REPO_LOWERCASE" >> $GITHUB_OUTPUT
+                  echo "SERVER_DOCKER_IMAGE=${REPO_LOWERCASE}-server" >> $GITHUB_OUTPUT
+                  echo "CLIENT_DOCKER_IMAGE=${REPO_LOWERCASE}-client" >> $GITHUB_OUTPUT
+                  echo "DOCKER_TAG=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_OUTPUT
+
+    run-test:
+        needs: set-vars
+        if: github.ref_name == 'test'
+        uses: ./.github/workflows/deploy.yml
+        with:
+            runner: mbp-14
+            repo: ${{ needs.set-vars.outputs.repo }}
+            server-docker-image: ${{ needs.set-vars.outputs.server-docker-image }}
+            client-docker-image: ${{ needs.set-vars.outputs.client-docker-image }}
+            docker-tag: ${{ needs.set-vars.outputs.docker-tag }}
+
+    run-main:
+        needs: set-vars
+        if: github.ref_name == 'main'
+        uses: ./.github/workflows/deploy.yml
+        with:
+            runner: mbp-13
+            repo: ${{ needs.set-vars.outputs.repo }}
+            server-docker-image: ${{ needs.set-vars.outputs.server-docker-image }}
+            client-docker-image: ${{ needs.set-vars.outputs.client-docker-image }}
+            docker-tag: ${{ needs.set-vars.outputs.docker-tag }}

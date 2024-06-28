@@ -1,31 +1,30 @@
-name: Deploy
+name: Deploy in Docker
 on:
-    push:
-        branches: main
-
-env:
-    VERSION: ${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
-    REPO: ${{ github.event.repository.name }}
+    workflow_call:
+        inputs:
+            runner:
+                required: true
+                type: string
+            repo:
+                required: true
+                type: string
+            server-docker-image:
+                required: true
+                type: string
+            client-docker-image:
+                required: true
+                type: string
+            docker-tag:
+                required: true
+                type: string
 
 jobs:
-    main:
-        runs-on: macbook-pro-13
-        environment: prod
+    deploy:
+        runs-on: ${{ inputs.runner }}
+        environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
         steps:
-            - name: context
-              run: echo "${{ toJSON(github) }}"
-
-            - name: lowercase repo name env var
-              run: echo "REPO_NAME_LOWER=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-            - name: docker env vars
-              run: |
-                  echo "SERVER_DOCKER_IMAGE=${{ env.REPO_NAME_LOWER }}-server" >> $GITHUB_ENV
-                  echo "CLIENT_DOCKER_IMAGE=${{ env.REPO_NAME_LOWER }}-client" >> $GITHUB_ENV
-                  echo "DOCKER_TAG=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_ENV
-
-            - name: checkout code
-              uses: actions/checkout@v4
+            - name: checkout
+              uses: actions/checkout@v3
 
             - name: setup node
               uses: actions/setup-node@v4
@@ -33,13 +32,13 @@ jobs:
                   node-version: 'lts/*'
                   cache: 'npm'
 
-            - name: install, build - server
+            - name: install, build (server)
               run: |
                   cd server/
                   npm ci
                   npm run build
 
-            - name: create .env - server
+            - name: create .env (server)
               run: |
                   cd server/
                   echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
@@ -52,7 +51,7 @@ jobs:
                   echo "DB_PASSWORD=${{ vars.DB_PASSWORD }}" >> .env
                   echo "DB_NAME=${{ vars.DB_NAME }}" >> .env
 
-            - name: copy files - server
+            - name: copy files (server)
               run: |
                   cd server/
                   mkdir stage
@@ -70,14 +69,18 @@ jobs:
             #       mkdir stage
             #       cp -r Dockerfile dist stage/
 
-            - name: build, push docker image - server
+            - name: build, push docker image (server)
               run: |
                   cd server/stage
-                  IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ env.SERVER_DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+                  IMAGE=${{ vars.DOCKER_REGISTRY }}/${{ inputs.server-docker-image }}:${{ inputs.docker-tag }}
                   docker build -t $IMAGE .
                   docker push $IMAGE
 
-            - name: start docker - server
+            - name: start docker (server)
               run: |
                   cd server/stage
-                  DOCKER_REGISTRY=${{ vars.DOCKER_REGISTRY }} docker-compose up -d
+                  REPO=${{ inputs.repo }} \
+                  REGISTRY=${{ vars.DOCKER_REGISTRY }} \
+                  IMAGE=${{ inputs.server-docker-image }} \
+                  TAG=${{ inputs.docker-tag }} \
+                  docker-compose up -d
