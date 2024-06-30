@@ -1,0 +1,15 @@
+name: ${REPO}
+services:
+    server:
+        image: ${SERVER_IMAGE}
+        ports:
+            - '3000:3000'
+        restart: always
+        container_name: server
+
+    client:
+        image: ${CLIENT_IMAGE}
+        ports:
+            - '80:80'
+        restart: always
+        container_name: client

@@ -41,6 +41,12 @@ jobs:
                   npm ci
                   npm run build
 
+            - name: install, build (client)
+              run: |
+                  cd client/
+                  npm ci
+                  npm run build
+
             - name: create .env (server)
               run: |
                   cd server/
@@ -60,6 +66,12 @@ jobs:
                   mkdir stage
                   cp -r .env Dockerfile package.json package-lock.json dist stage/
 
+            - name: copy files (client)
+              run: |
+                  cd client/
+                  mkdir stage
+                  cp -r Dockerfile nginx.conf dist stage/
+
             - name: build, push docker image (server)
               run: |
                   cd server/stage/
@@ -68,21 +80,17 @@ jobs:
                   docker push $IMAGE
                   echo "SERVER_IMAGE=${IMAGE}" >> $GITHUB_ENV
 
-            - name: start docker (server)
+            - name: build, push docker image (client)
               run: |
-                  cd server
+                  cd client/stage/
+                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_image }}:${{ inputs.image_tag }}
+                  docker build -t $IMAGE .
+                  docker push $IMAGE
+                  echo "CLIENT_IMAGE=${IMAGE}" >> $GITHUB_ENV
+
+            - name: start docker
+              run: |
                   REPO=${{ inputs.repo }} \
-                  IMAGE=${{ env.SERVER_IMAGE }} \
+                  SERVER_IMAGE=${{ env.SERVER_IMAGE }} \
+                  CLIENT_IMAGE=${{ env.CLIENT_IMAGE }} \
                   docker-compose up -d
-
-            # - name: install, build - client
-            #   run: |
-            #       cd client/
-            #       npm ci
-            #       npm run build
-
-            # - name: copy files - client
-            #   run: |
-            #       cd client/
-            #       mkdir stage
-            #       cp -r Dockerfile dist stage/

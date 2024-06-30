@@ -9,7 +9,7 @@ import { getPool } from './database.js'
 import { logger } from './logger.js'
 
 export const createCorsMiddleware = cors({
-    origin: 'http://localhost:4200',
+    origin: ['http://localhost:4200', 'http://localhost'],
     credentials: true,
 })
 
