@@ -8,8 +8,12 @@ import { HttpError } from '../models/httpError.js'
 import { getPool } from './database.js'
 import { logger } from './logger.js'
 
+const origins = ['http://localhost:4200', 'http://localhost']
+if (env['EXTERNAL_CLIENT_URL']) {
+    origins.push(env['EXTERNAL_CLIENT_URL'])
+}
 export const createCorsMiddleware = cors({
-    origin: ['http://localhost:4200', 'http://localhost'],
+    origin: origins,
     credentials: true,
 })
 
