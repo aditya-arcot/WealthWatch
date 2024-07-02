@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
+import { User } from '../models/user'
 
 @Injectable({
     providedIn: 'root',
@@ -12,7 +13,7 @@ export class AuthService {
 
     login(username: string, password: string) {
         const url = `${this.baseUrl}/login`
-        return this.http.post<void>(url, { username, password })
+        return this.http.post<User>(url, { username, password })
     }
 
     logout() {
@@ -28,7 +29,7 @@ export class AuthService {
         password: string
     ) {
         const url = `${this.baseUrl}/register`
-        return this.http.post<void>(url, {
+        return this.http.post<User>(url, {
             firstName,
             lastName,
             email,

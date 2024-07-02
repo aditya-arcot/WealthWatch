@@ -22,6 +22,7 @@ import {
     map,
     of,
     switchMap,
+    tap,
     throwError,
 } from 'rxjs'
 import { User } from '../../models/user'
@@ -65,9 +66,10 @@ export class RegisterComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.userSvc
-            .currentUser()
+            .getSessionUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
+                    this.userSvc.clearCurrentUser()
                     this.logger.error('error while getting current user')
                     return throwError(() => err)
                 })
@@ -77,6 +79,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                     this.logger.info('not logged in')
                     return
                 }
+                this.userSvc.storeCurrentUser(user)
                 this.router.navigateByUrl('/home')
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addSuccessAlert('Already logged in')
@@ -171,7 +174,10 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                             username,
                             password
                         )
-                        .pipe(map(() => true))
+                        .pipe(
+                            tap((user) => this.userSvc.storeCurrentUser(user)),
+                            map(() => true)
+                        )
                 }),
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(

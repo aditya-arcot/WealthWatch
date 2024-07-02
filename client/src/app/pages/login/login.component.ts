@@ -49,9 +49,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.userSvc
-            .currentUser()
+            .getSessionUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
+                    this.userSvc.clearCurrentUser()
                     this.logger.error('error while getting current user')
                     return throwError(() => err)
                 })
@@ -61,6 +62,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
                     this.logger.info('not logged in')
                     return
                 }
+                this.userSvc.storeCurrentUser(user)
                 this.router.navigateByUrl('/home')
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addSuccessAlert('Already logged in')
@@ -100,7 +102,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe(() => {
+            .subscribe((user) => {
+                this.userSvc.storeCurrentUser(user)
                 this.router.navigateByUrl('/home')
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addSuccessAlert('Success signing in')

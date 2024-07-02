@@ -3,7 +3,7 @@ import { Router } from '@angular/router'
 import { catchError, throwError } from 'rxjs'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
-import { LoggerService } from '../../services/logger.service'
+import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-logout',
@@ -14,12 +14,13 @@ import { LoggerService } from '../../services/logger.service'
 export class LogoutComponent implements OnInit {
     constructor(
         private authSvc: AuthService,
-        private logger: LoggerService,
+        private userSvc: UserService,
         private router: Router,
         private alertSvc: AlertService
     ) {}
 
     ngOnInit(): void {
+        this.userSvc.clearCurrentUser()
         this.authSvc
             .logout()
             .pipe(

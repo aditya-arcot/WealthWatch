@@ -24,15 +24,18 @@ export class StartupService {
 
     startup(): Observable<void> {
         this.logger.debug('starting up')
-        return this.userSvc.currentUser().pipe(
+        this.userSvc.clearCurrentUser()
+        return this.userSvc.getSessionUser().pipe(
             switchMap((user?: User) => {
                 if (!user) {
                     return throwError(() => new Error('not logged in'))
                 }
                 this.logger.debug('received current user')
+                this.userSvc.storeCurrentUser(user)
                 return this.getSecrets()
             }),
             catchError((err: HttpErrorResponse) => {
+                this.userSvc.clearCurrentUser()
                 this.router.navigateByUrl('/login')
                 this.logger.error('error while getting current user', err)
                 this.alertSvc.clearAlerts()
