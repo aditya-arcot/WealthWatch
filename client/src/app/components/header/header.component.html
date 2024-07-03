@@ -1,6 +1,6 @@
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Personal Finance App</a>
+        <a class="navbar-brand" routerLink="/home"> Personal Finance App </a>
         <button
             class="navbar-toggler"
             type="button"
@@ -27,12 +27,18 @@
                 </a>
             </div>
             <div class="navbar-nav ms-auto">
+                @if (userName) {
+                    <span class="navbar-text d-none d-lg-block p-2">
+                        Welcome, {{ userName }}
+                    </span>
+                }
                 <a
                     class="nav-link"
                     routerLink="/logout"
                     routerLinkActive="active"
-                    >Logout</a
                 >
+                    Logout
+                </a>
             </div>
         </div>
     </div>
