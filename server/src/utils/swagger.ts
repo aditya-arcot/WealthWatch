@@ -5,7 +5,7 @@ export const createSwaggerSpec = () => {
         definition: {
             openapi: '3.1.0',
             info: {
-                title: 'Personal Finance App API',
+                title: 'WealthWatch API',
                 version: '1.0.0',
             },
             components: {
