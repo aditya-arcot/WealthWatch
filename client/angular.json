@@ -96,9 +96,6 @@
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
-                        "prod": {
-                            "buildTarget": "client:build:prod"
-                        },
                         "dev": {
                             "buildTarget": "client:build:dev"
                         }
