@@ -109,13 +109,13 @@ jobs:
                   CLIENT_PORT=${{ secrets.CLIENT_PORT }} \
                   docker compose up -d
 
-            - name: configure, restartnginx
+            - name: configure, restart nginx
               if: github.ref_name == 'main'
               run: |
                   sed -e "s/{SERVER_PORT}/${{ secrets.SERVER_PORT }}/g" \
                     -e "s/{CLIENT_PORT}/${{ secrets.CLIENT_PORT }}/g" \
                     wealthwatch.conf > wealthwatch.conf.tmp
                   mv wealthwatch.conf.tmp wealthwatch.conf
-                  cp yelpcamp.conf /usr/local/etc/nginx/servers/
+                  cp wealthwatch.conf /usr/local/etc/nginx/servers/
                   nginx -t
                   brew services restart nginx
