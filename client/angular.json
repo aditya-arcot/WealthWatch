@@ -78,6 +78,18 @@
                             ],
                             "outputHashing": "all"
                         },
+                        "test": {
+                            "optimization": true,
+                            "extractLicenses": true,
+                            "sourceMap": false,
+                            "namedChunks": false,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/env.ts",
+                                    "with": "src/environments/env.test.ts"
+                                }
+                            ]
+                        },
                         "dev": {
                             "optimization": false,
                             "extractLicenses": false,

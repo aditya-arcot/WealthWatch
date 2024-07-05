@@ -8,12 +8,12 @@ import { HttpError } from '../models/httpError.js'
 import { getPool } from './database.js'
 import { logger } from './logger.js'
 
-const origins = ['http://localhost:4200', 'http://localhost']
-if (env['EXTERNAL_CLIENT_URL']) {
-    origins.push(env['EXTERNAL_CLIENT_URL'])
-}
+const origins = [
+    'https://wealthwatch.aditya-arcot.com',
+    `http://localhost:${env['CLIENT_PORT']}`,
+]
 export const createCorsMiddleware = cors({
-    origin: origins,
+    origin: env['NODE_ENV'] === 'production' ? origins : true,
     credentials: true,
 })
 

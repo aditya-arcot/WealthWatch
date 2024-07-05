@@ -41,27 +41,36 @@ jobs:
                   npm ci
                   npm run build
 
+            - name: modify env.test.ts (client)
+              if: github.ref_name == 'test'
+              run: |
+                  cd client/src/environments/
+                  sed -e "s/{SERVER_PORT}/${{ secrets.SERVER_PORT}}/g" env.test.ts > env.test.ts.tmp
+                  mv env.test.ts.tmp env.test.ts
+
             - name: install, build (client)
               run: |
                   cd client/
                   npm ci
-                  npm run build
+                  if [ "${{ github.ref_name }}" == "main" ]; then
+                    npm run build
+                  else
+                    npm run build:test
+                  fi
 
             - name: create .env (server)
               run: |
                   cd server/
                   echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
+                  echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
                   echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
                   echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
                   echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
                   echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-                  if [ -n "${{ secrets.EXTERNAL_CLIENT_URL }}" ]; then
-                    echo "EXTERNAL_CLIENT_URL=${{ secrets.EXTERNAL_CLIENT_URL }}" >> .env
-                  fi
                   echo "LOG_LEVEL=${{ secrets.LOG_LEVEL }}" >> .env
                   echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
-                  echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
                   echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
+                  echo "CLIENT_PORT=${{ secrets.CLIENT_PORT }}" >> .env
 
             - name: copy files (server)
               run: |
@@ -95,5 +104,7 @@ jobs:
               run: |
                   REPO=${{ inputs.repo }} \
                   SERVER_IMAGE=${{ env.SERVER_IMAGE }} \
+                  SERVER_PORT=${{ secrets.SERVER_PORT }} \
                   CLIENT_IMAGE=${{ env.CLIENT_IMAGE }} \
-                  docker-compose up -d
+                  CLIENT_PORT=${{ secrets.CLIENT_PORT }} \
+                  docker compose up -d

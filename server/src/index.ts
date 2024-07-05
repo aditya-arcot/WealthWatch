@@ -21,8 +21,9 @@ logger.info(`started - pid ${pid}`)
 await createPool()
 configureCleanup()
 
-const port = parseInt(env['PORT'] || '3000')
 const app = express()
+
+logger.debug('configuring middleware')
 app.use(helmet())
 app.use(createCorsMiddleware)
 app.use(express.json())
@@ -34,11 +35,16 @@ if (env['NODE_ENV'] !== 'production') {
     logger.debug('configuring swagger')
     app.use('/swagger', swaggerUi.serve, swaggerUi.setup(createSwaggerSpec()))
 }
+
+logger.debug('configuring routes')
 app.use('/', router)
 app.use((req, _res, _next) => {
     throw new HttpError(`endpoint not found - ${req.url}`, 404)
 })
 app.use(handleError)
+
+logger.debug('starting server')
+const port = 3000
 app.listen(port, (): void => {
     logger.info(`server running - port ${port}`)
 })
