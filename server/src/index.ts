@@ -22,6 +22,9 @@ await createPool()
 configureCleanup()
 
 const app = express()
+if (env['NODE_ENV'] === 'production') {
+    app.set('trust proxy', 1)
+}
 
 logger.debug('configuring middleware')
 app.use(helmet())
