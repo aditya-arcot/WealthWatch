@@ -41,6 +41,7 @@ if (env['NODE_ENV'] !== 'production') {
 
 logger.debug('configuring routes')
 app.use('/', router)
+app.use('/status', (_req, res) => res.send('ok'))
 app.use((req, _res, _next) => {
     throw new HttpError(`endpoint not found - ${req.url}`, 404)
 })
