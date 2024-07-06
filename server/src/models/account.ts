@@ -18,8 +18,10 @@ const mapDbAccountToAccount = (dbAccount: DbAccount): Account => ({
     name: dbAccount.name,
 })
 
-export const fetchAccounts = async (): Promise<Account[]> => {
-    const query = 'SELECT * FROM accounts'
-    const rows: DbAccount[] = (await runQuery(query)).rows
+export const fetchAccountsByUser = async (
+    userId: number
+): Promise<Account[]> => {
+    const query = 'SELECT * FROM accounts WHERE user_id = $1'
+    const rows: DbAccount[] = (await runQuery(query, [userId])).rows
     return rows.map(mapDbAccountToAccount)
 }
