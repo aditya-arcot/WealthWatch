@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    password_hash TEXT
+    password_hash TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
@@ -14,6 +14,14 @@ CREATE TABLE IF NOT EXISTS accounts (
     user_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS balances (
+    id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL,
+    amount REAL NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -27,6 +35,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     category_id INTEGER NOT NULL,
     amount REAL NOT NULL,
     description TEXT NOT NULL,
+    nickname TEXT,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)

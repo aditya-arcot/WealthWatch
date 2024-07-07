@@ -6,6 +6,7 @@ export interface Transaction {
     categoryId: number
     amount: number
     description: string
+    nickname: string
     timestamp: Date
 }
 
@@ -15,6 +16,7 @@ interface DbTransaction {
     category_id: number
     amount: number
     description: string
+    nickname: string
     timestamp: Date
 }
 
@@ -26,6 +28,7 @@ const mapDbTransactionToTransaction = (
     categoryId: dbTransaction.category_id,
     amount: dbTransaction.amount,
     description: dbTransaction.description,
+    nickname: dbTransaction.nickname,
     timestamp: dbTransaction.timestamp,
 })
 
