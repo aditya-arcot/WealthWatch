@@ -3,7 +3,7 @@ import cors from 'cors'
 import { randomUUID } from 'crypto'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
-import { env, exit } from 'process'
+import { env } from 'process'
 import { HttpError } from '../models/httpError.js'
 import { getPool } from './database.js'
 import { logger } from './logger.js'
@@ -19,8 +19,7 @@ export const createCorsMiddleware = cors({
 
 export const createSessionMiddleware = () => {
     if (!env['SESSION_SECRET']) {
-        logger.fatal('missing session secret')
-        exit(1)
+        throw Error('missing session secret')
     }
     const postgresSession = pgSession(session)
     const sessionStore = new postgresSession({

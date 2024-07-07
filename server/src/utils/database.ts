@@ -6,20 +6,20 @@ let clientPool: pg.Pool | null = null
 
 export const createPool = async (): Promise<void> => {
     logger.debug('creating database pool')
-    if (!env['DB_HOST']) throw Error('database host not set')
-    const host = env['DB_HOST']
-    if (!env['DB_USER']) throw Error('database username not set')
-    const user = env['DB_USER']
-    if (!env['DB_PASSWORD']) throw Error('database password not set')
-    const password = env['DB_PASSWORD']
-    if (!env['DB_NAME']) throw Error('database name not set')
-    const database = env['DB_NAME']
+    if (
+        !env['DB_HOST'] ||
+        !env['DB_NAME'] ||
+        !env['DB_USER'] ||
+        !env['DB_PASSWORD']
+    ) {
+        throw Error('missing one or more database secrets')
+    }
 
     const config: pg.PoolConfig = {
-        host,
-        database,
-        user,
-        password,
+        host: env['DB_HOST'],
+        database: env['DB_NAME'],
+        user: env['DB_USER'],
+        password: env['DB_PASSWORD'],
         max: 20,
         allowExitOnIdle: true,
         idleTimeoutMillis: 30000,

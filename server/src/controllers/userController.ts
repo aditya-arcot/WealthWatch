@@ -19,7 +19,8 @@ export const getUsers = async (_req: Request, res: Response) => {
         const users = await fetchUsers()
         return res.send(users)
     } catch (error) {
-        throw new HttpError('failed to get users', 500)
+        logger.error(error)
+        throw new HttpError('failed to get users')
     }
 }
 
@@ -32,7 +33,8 @@ export const checkUsernameExists = async (req: Request, res: Response) => {
         const user = await fetchUserByUsername(req.params['username'])
         return res.send(!!user)
     } catch (error) {
-        throw new HttpError('failed to check username', 500)
+        logger.error(error)
+        throw new HttpError('failed to check username')
     }
 }
 
@@ -45,6 +47,7 @@ export const checkEmailExists = async (req: Request, res: Response) => {
         const user = await fetchUserByEmail(req.params['email'])
         return res.send(!!user)
     } catch (error) {
-        throw new HttpError('failed to check email', 500)
+        logger.error(error)
+        throw new HttpError('failed to check email')
     }
 }

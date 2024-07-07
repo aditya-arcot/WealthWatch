@@ -12,6 +12,7 @@ export const getTransactionsByUser = async (req: Request, res: Response) => {
         const transactions = await fetchTransactionsByUser(req.session.user.id)
         return res.send(transactions)
     } catch (error) {
-        throw new HttpError('failed to get transactions', 500)
+        logger.error(error)
+        throw new HttpError('failed to get transactions')
     }
 }

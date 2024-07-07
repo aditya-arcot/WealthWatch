@@ -7,7 +7,7 @@ import { logger } from '../utils/logger.js'
 export const getSecrets = async (_req: Request, res: Response) => {
     logger.debug('getting secrets')
     if (!env['CLIENT_LOGTAIL_TOKEN']) {
-        throw new HttpError('missing one or more secrets', 500)
+        throw new HttpError('missing one or more secrets')
     }
     const secrets: ClientSecrets = {
         logtailToken: env['CLIENT_LOGTAIL_TOKEN'],

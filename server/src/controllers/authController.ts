@@ -29,7 +29,7 @@ export const logout = (req: Request, res: Response) => {
     logger.debug('logging out user')
     req.session.destroy((err) => {
         if (err) {
-            throw new HttpError('failed to log out', 500)
+            throw new HttpError('failed to log out')
         }
         return res.status(200).send()
     })
@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response) => {
 
     const newUser = await createUser(user)
     if (!newUser) {
-        throw new HttpError('failed to create user', 500)
+        throw new HttpError('failed to create user')
     }
 
     logger.debug(newUser, 'register success')
