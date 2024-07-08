@@ -28,12 +28,6 @@ const mapDbUserToUser = (dbUser: DbUser): User => ({
     passwordHash: dbUser.password_hash,
 })
 
-export const fetchUsers = async (): Promise<User[]> => {
-    const query = 'SELECT * FROM users'
-    const rows: DbUser[] = (await runQuery(query)).rows
-    return rows.map(mapDbUserToUser)
-}
-
 export const fetchUserByUsername = async (
     username: string
 ): Promise<User | null> => {

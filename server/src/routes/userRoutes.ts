@@ -3,10 +3,8 @@ import {
     checkEmailExists,
     checkUsernameExists,
     getCurrentUser,
-    getUsers,
 } from '../controllers/userController.js'
 import { catchAsync } from '../utils/catchAsync.js'
-import { authenticate } from '../utils/middleware.js'
 
 const router = express.Router()
 
@@ -32,26 +30,6 @@ const router = express.Router()
  *               $ref: '#/components/schemas/User'
  */
 router.route('/current').get(getCurrentUser)
-
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Retrieve a list of users
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: A list of users
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.route('/').get(authenticate, catchAsync(getUsers))
 
 /**
  * @swagger
