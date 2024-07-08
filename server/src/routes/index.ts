@@ -2,6 +2,7 @@ import express from 'express'
 import accountRouter from './accountRoutes.js'
 import authRouter from './authRoutes.js'
 import categoryRouter from './categoryRoutes.js'
+import plaidRouter from './plaidRoutes.js'
 import secretsRouter from './secretsRoutes.js'
 import transactionRouter from './transactionRoutes.js'
 import userRouter from './userRoutes.js'
@@ -13,4 +14,5 @@ router.use('/accounts', accountRouter)
 router.use('/categories', categoryRouter)
 router.use('/transactions', transactionRouter)
 router.use('/users', userRouter)
+router.use('/plaid', plaidRouter)
 export default router

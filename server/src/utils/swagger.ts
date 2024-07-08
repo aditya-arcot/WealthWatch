@@ -107,6 +107,40 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    LinkToken: {
+                        type: 'object',
+                        properties: {
+                            expiration: {
+                                type: 'string',
+                                description: 'The link token expiration',
+                            },
+                            linkToken: {
+                                type: 'string',
+                                description: 'The link token',
+                            },
+                            requestId: {
+                                type: 'string',
+                                description: 'The request ID',
+                            },
+                        },
+                    },
+                    AccessToken: {
+                        type: 'object',
+                        properties: {
+                            accessToken: {
+                                type: 'string',
+                                description: 'The access token',
+                            },
+                            itemId: {
+                                type: 'string',
+                                description: 'The item ID',
+                            },
+                            requestId: {
+                                type: 'string',
+                                description: 'The request ID',
+                            },
+                        },
+                    },
                 },
                 responses: {
                     Unauthorized: {

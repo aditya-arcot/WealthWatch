@@ -1,10 +1,69 @@
 import { Component } from '@angular/core'
+import {
+    NgxPlaidLinkService,
+    PlaidConfig,
+    PlaidLinkHandler,
+} from 'ngx-plaid-link'
+import { catchError, switchMap, throwError } from 'rxjs'
+import { AccessToken, LinkToken } from '../../models/plaid'
+import { AlertService } from '../../services/alert.service'
+import { LoggerService } from '../../services/logger.service'
+import { PlaidService } from '../../services/plaid.service'
 
 @Component({
     selector: 'app-accounts',
     standalone: true,
     imports: [],
     templateUrl: './accounts.component.html',
-    styleUrl: './accounts.component.css',
 })
-export class AccountsComponent {}
+export class AccountsComponent {
+    constructor(
+        private plaidSvc: PlaidService,
+        private logger: LoggerService,
+        private plaidLinkSvc: NgxPlaidLinkService,
+        private alertSvc: AlertService
+    ) {}
+
+    linkAccount(): void {
+        this.plaidSvc
+            .createLinkToken()
+            .pipe(
+                catchError((err) => {
+                    this.logger.error('failed to create link token', err)
+                    this.alertSvc.addErrorAlert(
+                        'Something went wrong. Please try again.'
+                    )
+                    return throwError(() => err)
+                }),
+                switchMap((resp: LinkToken) => {
+                    this.logger.debug('received link token', resp)
+                    const config: PlaidConfig = {
+                        token: resp.linkToken,
+                        onLoad: () => this.logger.debug('loaded plaid link'),
+                        onExit: () => this.logger.debug('exited plaid link'),
+                        onSuccess: (token: string, metadata: object) =>
+                            this.handleLinkSuccess(token, metadata),
+                    }
+                    return this.plaidLinkSvc.createPlaid(config)
+                })
+            )
+            .subscribe((handler: PlaidLinkHandler) => {
+                handler.open()
+            })
+    }
+
+    handleLinkSuccess(token: string, metadata: object): void {
+        this.logger.debug('plaid link success', token, metadata)
+        this.plaidSvc.exchangePublicToken(token, metadata).subscribe({
+            next: (resp: AccessToken) => {
+                this.logger.debug('received access token', resp)
+            },
+            error: (err) => {
+                this.logger.error('failed to exchange public token', err)
+                this.alertSvc.addErrorAlert(
+                    'Something went wrong. Please try again.'
+                )
+            },
+        })
+    }
+}
