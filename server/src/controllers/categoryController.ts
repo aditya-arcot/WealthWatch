@@ -9,6 +9,7 @@ export const getCategories = async (_req: Request, res: Response) => {
         const categories = await fetchCategories()
         return res.send(categories)
     } catch (error) {
-        throw new HttpError('failed to get categories', 500)
+        logger.error(error)
+        throw new HttpError('failed to get categories')
     }
 }

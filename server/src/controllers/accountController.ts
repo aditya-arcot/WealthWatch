@@ -12,6 +12,7 @@ export const getAccountsByUser = async (req: Request, res: Response) => {
         const accounts = await fetchAccountsByUser(req.session.user.id)
         return res.send(accounts)
     } catch (error) {
-        throw new HttpError('failed to get accounts', 500)
+        logger.error(error)
+        throw new HttpError('failed to get accounts')
     }
 }

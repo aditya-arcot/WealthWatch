@@ -29,6 +29,7 @@
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.11.3",
         "ngx-logger": "^5.0.12",
+        "ngx-plaid-link": "^14.0.0",
         "rxjs": "~7.8.0",
         "tslib": "^2.3.0",
         "uuid": "^10.0.0",

@@ -19,7 +19,7 @@ interface DbUser {
     password_hash: string
 }
 
-const mapDbUserToUser = (dbUser: DbUser): User => ({
+const mapDbUser = (dbUser: DbUser): User => ({
     id: dbUser.id,
     username: dbUser.username,
     email: dbUser.email,
@@ -28,26 +28,20 @@ const mapDbUserToUser = (dbUser: DbUser): User => ({
     passwordHash: dbUser.password_hash,
 })
 
-export const fetchUsers = async (): Promise<User[]> => {
-    const query = 'SELECT * FROM users'
-    const rows: DbUser[] = (await runQuery(query)).rows
-    return rows.map(mapDbUserToUser)
-}
-
 export const fetchUserByUsername = async (
     username: string
 ): Promise<User | null> => {
     const query = 'SELECT * FROM users WHERE username = $1'
     const rows: DbUser[] = (await runQuery(query, [username])).rows
     if (!rows[0]) return null
-    return mapDbUserToUser(rows[0])
+    return mapDbUser(rows[0])
 }
 
 export const fetchUserByEmail = async (email: string): Promise<User | null> => {
     const query = 'SELECT * FROM users WHERE email = $1'
     const rows: DbUser[] = (await runQuery(query, [email])).rows
     if (!rows[0]) return null
-    return mapDbUserToUser(rows[0])
+    return mapDbUser(rows[0])
 }
 
 export const createUser = async (user: User): Promise<User | null> => {
@@ -72,5 +66,5 @@ export const createUser = async (user: User): Promise<User | null> => {
         ])
     ).rows
     if (!rows[0]) return null
-    return mapDbUserToUser(rows[0])
+    return mapDbUser(rows[0])
 }

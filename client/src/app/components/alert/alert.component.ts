@@ -36,4 +36,13 @@ export class AlertComponent implements OnDestroy {
                 return 'alert-danger'
         }
     }
+
+    getAlertIconClass(type: AlertType): string {
+        switch (type) {
+            case AlertType.Success:
+                return 'bi-check-circle-fill'
+            case AlertType.Error:
+                return 'bi-exclamation-triangle-fill'
+        }
+    }
 }
