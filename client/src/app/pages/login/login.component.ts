@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.userSvc
-            .getSessionUser()
+            .getCurrentUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.userSvc.clearCurrentUser()

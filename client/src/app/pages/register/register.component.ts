@@ -66,7 +66,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.userSvc
-            .getSessionUser()
+            .getCurrentUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.userSvc.clearCurrentUser()
