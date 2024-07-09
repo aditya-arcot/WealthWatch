@@ -72,7 +72,7 @@ export const exchangePublicToken = async (
     }
 }
 
-const mapDbItemToItem = (dbItem: DbPlaidItem): PlaidItem => ({
+const mapDbItem = (dbItem: DbPlaidItem): PlaidItem => ({
     id: dbItem.id,
     accessToken: dbItem.access_token,
     institutionId: dbItem.institution_id,
@@ -88,7 +88,7 @@ export const fetchItemsByUser = async (
         WHERE user_id = $1
     `
     const rows: DbPlaidItem[] = (await runQuery(query, [userId])).rows
-    return rows.map(mapDbItemToItem)
+    return rows.map(mapDbItem)
 }
 
 export const createItem = async (item: PlaidItem) => {

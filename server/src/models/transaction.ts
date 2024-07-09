@@ -20,9 +20,7 @@ interface DbTransaction {
     timestamp: Date
 }
 
-const mapDbTransactionToTransaction = (
-    dbTransaction: DbTransaction
-): Transaction => ({
+const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     id: dbTransaction.id,
     accountId: dbTransaction.account_id,
     categoryId: dbTransaction.category_id,
@@ -41,5 +39,5 @@ export const fetchTransactionsByUser = async (
         WHERE accounts.user_id = $1
     `
     const rows: DbTransaction[] = (await runQuery(query, [userId])).rows
-    return rows.map(mapDbTransactionToTransaction)
+    return rows.map(mapDbTransaction)
 }
