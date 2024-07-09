@@ -48,9 +48,12 @@ export class AlertService {
         }
         this.alerts.push(alert)
         this.alertSubject.next([...this.alerts])
-        setTimeout(() => {
-            this.removeAlert(alert.id)
-        }, 3000)
+        setTimeout(
+            () => {
+                this.removeAlert(alert.id)
+            },
+            alert.type === AlertType.Success ? 3000 : 10000
+        )
     }
 
     removeAlert(id: string): void {
