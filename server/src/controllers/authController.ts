@@ -43,7 +43,7 @@ export const register = async (req: Request, res: Response) => {
         email: req.body.email,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        passwordHash: bcrypt.hashSync(req.body.password, 10),
+        passwordHash: bcrypt.hashSync(req.body.password),
     }
 
     const newUser = await createUser(user)

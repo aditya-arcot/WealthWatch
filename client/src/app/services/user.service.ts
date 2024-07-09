@@ -16,11 +16,10 @@ export class UserService {
     ) {}
 
     storeCurrentUser(user: User) {
-        this.logger.debug('storing current user', user)
         sessionStorage.setItem('user', JSON.stringify(user))
     }
 
-    getCurrentUser(): User | null {
+    getStoredCurrentUser(): User | null {
         const userStr = sessionStorage.getItem('user')
         if (!userStr) return null
         return JSON.parse(userStr) as User
@@ -30,7 +29,7 @@ export class UserService {
         sessionStorage.removeItem('user')
     }
 
-    getSessionUser() {
+    getCurrentUser() {
         const url = `${this.baseUrl}/current`
         return this.http.get<User | undefined>(url)
     }

@@ -39,13 +39,9 @@
                         Welcome, {{ userName }}
                     </span>
                 }
-                <a
-                    class="nav-link"
-                    routerLink="/logout"
-                    routerLinkActive="active"
-                >
+                <button class="btn btn-outline-danger" (click)="logout()">
                     Logout
-                </a>
+                </button>
             </div>
         </div>
     </div>

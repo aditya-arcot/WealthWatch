@@ -1,6 +1,7 @@
 import pgSession from 'connect-pg-simple'
 import cors from 'cors'
 import { randomUUID } from 'crypto'
+import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
 import { env } from 'process'
@@ -8,12 +9,14 @@ import { HttpError } from '../models/httpError.js'
 import { getPool } from './database.js'
 import { logger } from './logger.js'
 
+export const production = env['NODE_ENV'] === 'production'
+
 const origins = [
     'https://wealthwatch.aditya-arcot.com',
     `http://localhost:${env['CLIENT_PORT']}`,
 ]
-export const createCorsMiddleware = cors({
-    origin: env['NODE_ENV'] === 'production' ? origins : true,
+export const corsMiddleware = cors({
+    origin: production ? origins : true,
     credentials: true,
 })
 
@@ -32,10 +35,28 @@ export const createSessionMiddleware = () => {
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: env['NODE_ENV'] === 'production',
-            maxAge: 1000 * 60 * 60 * 24, // 1 day
+            secure: production,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day,
+            sameSite: 'strict',
         },
     })
+}
+
+export const createCsrfMiddleware = () => {
+    if (!env['CSRF_SECRET']) {
+        throw Error('missing csrf secret')
+    }
+    const csrfSecret = env['CSRF_SECRET']
+    const options = {
+        getSecret: () => csrfSecret,
+        cookieName: production ? '__Host-psifi.x-csrf-token' : 'x-csrf-token',
+        cookieOptions: {
+            secure: production,
+            sameSite: production ? ('strict' as const) : ('lax' as const),
+        },
+    }
+    const { doubleCsrfProtection } = doubleCsrf(options)
+    return doubleCsrfProtection
 }
 
 export const logRequestResponse = (
