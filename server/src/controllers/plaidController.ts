@@ -6,7 +6,11 @@ import {
     PlaidEnvironments,
 } from 'plaid'
 import { env } from 'process'
-import { Account, createAccounts } from '../models/account.js'
+import {
+    Account,
+    createAccounts,
+    fetchAccountsWithInstitutionByUser,
+} from '../models/account.js'
 import { HttpError } from '../models/httpError.js'
 import {
     createItem,
@@ -33,34 +37,51 @@ logger.debug(config, 'configured plaid client')
 
 export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
+    if (!req.session.user) {
+        throw new HttpError('unauthorized', 401)
+    }
+
     try {
-        if (!req.session.user) {
-            throw new HttpError('unauthorized', 401)
-        }
         const token = await createLinkTokenByUser(req.session.user.id, client)
         return res.send(token)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to create link token')
+        throw new HttpError('unexpected error while creating link token')
     }
 }
 
 export const getAccessToken = async (req: Request, res: Response) => {
     logger.debug('getting access token')
+    if (!req.session.user) {
+        throw new HttpError('unauthorized', 401)
+    }
+
+    const publicToken: string | undefined = req.body.publicToken
+    if (!publicToken) {
+        throw new HttpError('missing public token', 400)
+    }
+    const metadata: LinkSessionSuccessMetadata = req.body.metadata
+    if (!metadata) {
+        throw new HttpError('missing metadata', 400)
+    }
+
+    // check for duplicate account using institution id, account name, account mask
+    const accounts = await fetchAccountsWithInstitutionByUser(
+        req.session.user.id
+    )
+    if (
+        accounts.some((acc) => {
+            return (
+                acc.institutionId === metadata.institution?.institution_id &&
+                metadata.accounts?.some((newAcc) => {
+                    return acc.name === newAcc.name && acc.mask === newAcc.mask
+                })
+            )
+        })
+    )
+        throw new HttpError('account already exists', 409)
+
     try {
-        if (!req.session.user) {
-            throw new HttpError('unauthorized', 401)
-        }
-
-        const publicToken: string | undefined = req.body.publicToken
-        if (!publicToken) {
-            throw new HttpError('missing public token', 400)
-        }
-        const metadata: LinkSessionSuccessMetadata = req.body.metadata
-        if (!metadata) {
-            throw new HttpError('missing metadata', 400)
-        }
-
         const token = await exchangePublicToken(publicToken, client)
         const newItem: PlaidItem = {
             id: token.itemId,
@@ -69,7 +90,6 @@ export const getAccessToken = async (req: Request, res: Response) => {
             institutionName: metadata.institution?.name ?? '',
             userId: req.session.user?.id,
         }
-        await createItem(newItem)
 
         const newAccounts: Account[] = []
         metadata.accounts?.forEach((acc) => {
@@ -82,11 +102,12 @@ export const getAccessToken = async (req: Request, res: Response) => {
                 subtype: acc.subtype!,
             })
         })
-        await createAccounts(newAccounts)
 
+        await createItem(newItem)
+        await createAccounts(newAccounts)
         return res.send(token)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to get access token')
+        throw new HttpError('unexpected error while getting access token')
     }
 }

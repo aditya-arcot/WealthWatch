@@ -18,7 +18,7 @@ interface DbAccount {
     subtype: string
 }
 
-const mapDbAccountToAccount = (dbAccount: DbAccount): Account => ({
+const mapDbAccount = (dbAccount: DbAccount): Account => ({
     id: dbAccount.id,
     name: dbAccount.name,
     itemId: dbAccount.item_id,
@@ -27,18 +27,50 @@ const mapDbAccountToAccount = (dbAccount: DbAccount): Account => ({
     subtype: dbAccount.subtype,
 })
 
+export interface AccountWithInstitution extends Account {
+    institutionId: string
+}
+
+interface DbAccountWithInstitution extends DbAccount {
+    institution_id: string
+}
+
+const mapDbAccountWithInstitutionId = (
+    dbAccount: DbAccountWithInstitution
+): AccountWithInstitution => ({
+    ...mapDbAccount(dbAccount),
+    institutionId: dbAccount.institution_id,
+})
+
 export const fetchAccountsByUser = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `
         SELECT * FROM accounts
-        WHERE accounts.itemId IN (
+        WHERE accounts.item_id IN (
             SELECT id FROM items
             WHERE user_id = $1
         )
     `
     const rows: DbAccount[] = (await runQuery(query, [userId])).rows
-    return rows.map(mapDbAccountToAccount)
+    return rows.map(mapDbAccount)
+}
+
+export const fetchAccountsWithInstitutionByUser = async (
+    userId: number
+): Promise<AccountWithInstitution[]> => {
+    const query = `
+        SELECT *
+        FROM accounts
+        JOIN items ON accounts.item_id = items.id
+        WHERE accounts.item_id IN (
+            SELECT id FROM items
+            WHERE user_id = $1
+        )
+    `
+    const rows: DbAccountWithInstitution[] = (await runQuery(query, [userId]))
+        .rows
+    return rows.map(mapDbAccountWithInstitutionId)
 }
 
 export const createAccounts = async (accounts: Account[]) => {

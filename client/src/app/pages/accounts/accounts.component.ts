@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { Component } from '@angular/core'
 import {
     NgxPlaidLinkService,
@@ -57,12 +58,19 @@ export class AccountsComponent {
         this.plaidSvc.exchangePublicToken(token, metadata).subscribe({
             next: (resp: AccessToken) => {
                 this.logger.debug('received access token', resp)
+                this.alertSvc.addSuccessAlert('Success linking account')
             },
-            error: (err) => {
+            error: (err: HttpErrorResponse) => {
                 this.logger.error('failed to exchange public token', err)
-                this.alertSvc.addErrorAlert(
-                    'Something went wrong. Please try again.'
-                )
+                if (err.status === 409) {
+                    this.alertSvc.addErrorAlert(
+                        'This account has already been linked'
+                    )
+                } else {
+                    this.alertSvc.addErrorAlert(
+                        'Something went wrong. Please try again'
+                    )
+                }
             },
         })
     }
