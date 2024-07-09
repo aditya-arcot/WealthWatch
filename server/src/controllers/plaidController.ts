@@ -60,7 +60,7 @@ export const getAccessToken = async (req: Request, res: Response) => {
     if (!publicToken) {
         throw new HttpError('missing public token', 400)
     }
-    const metadata: LinkSessionSuccessMetadata = req.body.metadata
+    const metadata: LinkSessionSuccessMetadata | undefined = req.body.metadata
     if (!metadata) {
         throw new HttpError('missing metadata', 400)
     }
