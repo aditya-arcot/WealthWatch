@@ -14,6 +14,7 @@ import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
 import { env } from '../environments/env'
 import { routes } from './app.routes'
 import { AuthInterceptor } from './interceptors/auth-interceptor'
+import { CSRFInterceptor } from './interceptors/csrf-interceptor'
 import { StartupService } from './services/startup.service'
 
 export const appConfig: ApplicationConfig = {
@@ -39,6 +40,11 @@ export const appConfig: ApplicationConfig = {
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptor,
+            multi: true,
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: CSRFInterceptor,
             multi: true,
         },
     ],
