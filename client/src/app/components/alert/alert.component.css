@@ -1,7 +1,17 @@
-h4 {
-    margin-bottom: 2px;
-}
-
 p {
     margin-bottom: 0;
+}
+
+.alerts {
+    position: fixed;
+    z-index: 1050;
+    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    pointer-events: none;
+}
+
+.alert {
+    pointer-events: all;
 }
