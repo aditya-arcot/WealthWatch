@@ -1,1 +1,3 @@
+#!/bin/sh
+ggshield secret scan pre-commit "$@"
 npx lint-staged
