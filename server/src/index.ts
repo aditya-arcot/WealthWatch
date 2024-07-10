@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(createSessionMiddleware())
 app.use(cookieParser())
 app.use(createCsrfMiddleware())
-if (production) {
+if (!production) {
     logger.debug('configuring swagger')
     app.use('/swagger', swaggerUi.serve, swaggerUi.setup(createSwaggerSpec()))
 }
