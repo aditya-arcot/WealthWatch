@@ -27,54 +27,12 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
-                    Category: {
-                        type: 'object',
-                        properties: {
-                            id: {
-                                type: 'string',
-                                description: 'The category ID',
-                            },
-                            name: {
-                                type: 'string',
-                                description: 'The category name',
-                            },
-                        },
-                    },
                     Secrets: {
                         type: 'object',
                         properties: {
                             logtailToken: {
                                 type: 'string',
                                 description: 'The Logtail token',
-                            },
-                        },
-                    },
-                    Transaction: {
-                        type: 'object',
-                        properties: {
-                            id: {
-                                type: 'string',
-                                description: 'The transaction ID',
-                            },
-                            accountId: {
-                                type: 'string',
-                                description: 'The account ID',
-                            },
-                            categoryId: {
-                                type: 'string',
-                                description: 'The category ID',
-                            },
-                            amount: {
-                                type: 'number',
-                                description: 'The transaction amount',
-                            },
-                            description: {
-                                type: 'string',
-                                description: 'The transaction description',
-                            },
-                            timestamp: {
-                                type: 'string',
-                                description: 'The transaction timestamp',
                             },
                         },
                     },
