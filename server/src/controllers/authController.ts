@@ -26,6 +26,7 @@ export const login = async (req: Request, res: Response) => {
         return res.send(user)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw new HttpError('failed to login')
     }
 }
