@@ -17,7 +17,7 @@ import {
     logRequestResponse,
     production,
 } from './utils/middleware.js'
-import { createSwaggerSpec } from './utils/swagger.js'
+import { createSwaggerSpec, swaggerOptions } from './utils/swagger.js'
 
 logger.info(`started - pid ${pid}`)
 
@@ -39,18 +39,21 @@ app.use(express.urlencoded({ extended: true }))
 app.use(createSessionMiddleware())
 app.use(cookieParser())
 app.use(createCsrfMiddleware())
-if (!production) {
-    logger.debug('configuring swagger')
-    app.use('/swagger', swaggerUi.serve, swaggerUi.setup(createSwaggerSpec()))
-}
 
 logger.debug('configuring routes')
+app.use('/status', (_req, res) => res.send('ok'))
 app.get('/csrf-token', (req, res) => {
     const token = req.csrfToken!()
     res.json({ csrfToken: token })
 })
+if (!production) {
+    app.use(
+        '/swagger',
+        swaggerUi.serve,
+        swaggerUi.setup(createSwaggerSpec(), swaggerOptions)
+    )
+}
 app.use('/', router)
-app.use('/status', (_req, res) => res.send('ok'))
 app.use((req, _res, _next) => {
     throw new HttpError(`endpoint not found - ${req.url}`, 404)
 })
