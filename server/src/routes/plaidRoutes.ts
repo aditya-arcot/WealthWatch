@@ -1,7 +1,7 @@
 import express from 'express'
 import {
-    createLinkToken,
-    getAccessToken,
+    exchangePublicToken,
+    getLinkToken,
 } from '../controllers/plaidController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -17,9 +17,9 @@ const router = express.Router()
 
 /**
  * @swagger
- * /plaid/create-link-token:
- *   post:
- *     summary: Create link token
+ * /plaid/link-token:
+ *   get:
+ *     summary: Get link token
  *     tags: [Plaid]
  *     responses:
  *       200:
@@ -31,15 +31,13 @@ const router = express.Router()
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router
-    .route('/create-link-token')
-    .post(authenticate, catchAsync(createLinkToken))
+router.route('/link-token').get(authenticate, catchAsync(getLinkToken))
 
 /**
  * @swagger
- * /plaid/get-access-token:
+ * /plaid/public-token:
  *   post:
- *     summary: Get access token
+ *     summary: Exchange public token for access token
  *     tags: [Plaid]
  *     parameters:
  *       - in: body
@@ -64,6 +62,8 @@ router
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/get-access-token').post(authenticate, catchAsync(getAccessToken))
+router
+    .route('/public-token')
+    .post(authenticate, catchAsync(exchangePublicToken))
 
 export default router

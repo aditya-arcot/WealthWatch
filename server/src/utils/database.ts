@@ -55,13 +55,25 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
         throw Error('pool not initialized')
     }
     const start = Date.now()
-    const res = await clientPool.query(query, params)
-    const queryLog = {
-        query,
-        duration: Date.now() - start,
-        rowCount: res.rowCount,
-        rows: res.rows,
+    query = query.replace(/\s+/g, ' ').trim()
+    try {
+        const res = await clientPool.query(query, params)
+        const queryLog = {
+            query,
+            params,
+            duration: Date.now() - start,
+            rowCount: res.rowCount,
+            rows: res.rows,
+        }
+        logger.debug({ queryLog }, 'executed query')
+        return res
+    } catch (error) {
+        const queryLog = {
+            query,
+            params,
+            duration: Date.now() - start,
+        }
+        logger.error({ queryLog }, 'failed to execute query')
+        throw error
     }
-    logger.debug({ queryLog }, 'executed query')
-    return res
 }

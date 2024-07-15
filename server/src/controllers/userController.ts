@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { HttpError } from '../models/httpError.js'
-import { fetchUserByEmail, fetchUserByUsername } from '../models/user.js'
+import { retrieveUserByEmail, retrieveUserByUsername } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 
 export const getCurrentUser = (req: Request, res: Response) => {
@@ -10,29 +10,31 @@ export const getCurrentUser = (req: Request, res: Response) => {
 }
 
 export const checkUsernameExists = async (req: Request, res: Response) => {
-    logger.debug('checking if username exists in database')
+    logger.debug('checking if user with username exists')
+
+    const username: string | undefined = req.params['username']
+    if (!username) throw new HttpError('missing username', 400)
+
     try {
-        if (!req.params['username']) {
-            throw new HttpError('missing username', 400)
-        }
-        const user = await fetchUserByUsername(req.params['username'])
+        const user = await retrieveUserByUsername(username)
         return res.send(!!user)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to check username')
+        throw new HttpError('failed to check if username exists')
     }
 }
 
 export const checkEmailExists = async (req: Request, res: Response) => {
-    logger.debug('checking if email exists in database')
+    logger.debug('checking if user with email exists')
+
+    const email: string | undefined = req.params['email']
+    if (!email) throw new HttpError('missing email', 400)
+
     try {
-        if (!req.params['email']) {
-            throw new HttpError('missing email', 400)
-        }
-        const user = await fetchUserByEmail(req.params['email'])
+        const user = await retrieveUserByEmail(email)
         return res.send(!!user)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to check email')
+        throw new HttpError('failed to check if email exists')
     }
 }

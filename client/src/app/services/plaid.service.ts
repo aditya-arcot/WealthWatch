@@ -12,12 +12,12 @@ export class PlaidService {
     constructor(private http: HttpClient) {}
 
     createLinkToken() {
-        const url = `${this.baseUrl}/create-link-token`
-        return this.http.post<LinkToken>(url, {})
+        const url = `${this.baseUrl}/link-token`
+        return this.http.get<LinkToken>(url)
     }
 
     exchangePublicToken(publicToken: string, metadata: object) {
-        const url = `${this.baseUrl}/get-access-token`
+        const url = `${this.baseUrl}/public-token`
         return this.http.post<AccessToken>(url, { publicToken, metadata })
     }
 }

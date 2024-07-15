@@ -1,6 +1,4 @@
-import { CountryCode, PlaidApi, Products } from 'plaid'
 import { runQuery } from '../utils/database.js'
-import { HttpError } from './httpError.js'
 
 export interface LinkToken {
     expiration: string
@@ -14,100 +12,112 @@ export interface AccessToken {
     requestId: string
 }
 
-export interface PlaidItem {
-    id: string
+export interface Item {
+    id: number
+    userId: number
+    itemId: string
     accessToken: string
     institutionId: string
     institutionName: string
-    userId: number
+    healthy: boolean
+    cursor: string | null
 }
 
-interface DbPlaidItem {
-    id: string
+interface DbItem {
+    id: number
+    user_id: number
+    item_id: string
     access_token: string
     institution_id: string
     institution_name: string
-    user_id: number
+    healthy: boolean
+    cursor: string | null
 }
 
-export const createLinkTokenByUser = async (
-    userId: number,
-    client: PlaidApi
-): Promise<LinkToken> => {
-    const resp = await client.linkTokenCreate({
-        user: {
-            client_user_id: userId.toString(),
-        },
-        client_name: 'WealthWatch',
-        language: 'en',
-        country_codes: [CountryCode.Us],
-        // balance automatically included
-        products: [Products.Transactions],
-        required_if_supported_products: [
-            Products.Investments,
-            Products.Liabilities,
-        ],
-        transactions: {
-            days_requested: 365,
-        },
-    })
-    return {
-        expiration: resp.data.expiration,
-        linkToken: resp.data.link_token,
-        requestId: resp.data.request_id,
-    }
-}
-
-export const exchangePublicToken = async (
-    publicToken: string,
-    client: PlaidApi
-) => {
-    const resp = await client.itemPublicTokenExchange({
-        public_token: publicToken,
-    })
-    return {
-        accessToken: resp.data.access_token,
-        itemId: resp.data.item_id,
-        requestId: resp.data.request_id,
-    }
-}
-
-const mapDbItem = (dbItem: DbPlaidItem): PlaidItem => ({
+const mapDbItem = (dbItem: DbItem): Item => ({
     id: dbItem.id,
+    userId: dbItem.user_id,
+    itemId: dbItem.item_id,
     accessToken: dbItem.access_token,
     institutionId: dbItem.institution_id,
     institutionName: dbItem.institution_name,
-    userId: dbItem.user_id,
+    healthy: dbItem.healthy,
+    cursor: dbItem.cursor,
 })
 
-export const fetchItemsByUser = async (
-    userId: number
-): Promise<PlaidItem[]> => {
+export const retrieveItemById = async (
+    itemId: string
+): Promise<Item | null> => {
     const query = `
-        SELECT * FROM items
-        WHERE user_id = $1
-    `
-    const rows: DbPlaidItem[] = (await runQuery(query, [userId])).rows
-    return rows.map(mapDbItem)
+        SELECT * 
+        FROM items
+        WHERE item_id = $1
+        `
+    const rows: DbItem[] = (await runQuery(query, [itemId])).rows
+    if (!rows[0]) return null
+    return mapDbItem(rows[0])
 }
 
-export const createItem = async (item: PlaidItem) => {
-    if (
-        !item.id ||
-        !item.accessToken ||
-        !item.institutionId ||
-        !item.institutionName ||
-        !item.userId
-    ) {
-        throw new HttpError('missing item data', 400)
-    }
-    const query =
-        'INSERT INTO items (id, access_token, institution_id, institution_name, user_id) VALUES ($1, $2, $3, $4, $5)'
-    await runQuery(query, [
-        item.id,
-        item.accessToken,
-        item.institutionId,
-        item.institutionName,
-        item.userId,
-    ])
+export const retrieveItemByUserIdAndInstitutionId = async (
+    userId: number,
+    institutionId: string
+): Promise<Item | null> => {
+    const query = `
+        SELECT * 
+        FROM items
+        WHERE user_id = $1
+            AND institution_id = $2
+        `
+    const rows: DbItem[] = (await runQuery(query, [userId, institutionId])).rows
+    if (!rows[0]) return null
+    return mapDbItem(rows[0])
+}
+
+export const createItem = async (
+    userId: number,
+    itemId: string,
+    accessToken: string,
+    institutionId: string,
+    institutionName: string,
+    healthy: boolean = true,
+    cursor?: string
+): Promise<Item | null> => {
+    const query = `
+        INSERT INTO items (
+            user_id,
+            item_id,
+            access_token,
+            institution_id,
+            institution_name,
+            healthy,
+            cursor
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING *
+    `
+    const rows: DbItem[] = (
+        await runQuery(query, [
+            userId,
+            itemId,
+            accessToken,
+            institutionId,
+            institutionName,
+            healthy,
+            cursor ?? null,
+        ])
+    ).rows
+    if (!rows[0]) return null
+    return mapDbItem(rows[0])
+}
+
+export const updateItemCursor = async (
+    itemId: string,
+    cursor: string | null
+) => {
+    const query = `
+        UPDATE items 
+        SET cursor = $1 
+        WHERE item_id = $2
+    `
+    await runQuery(query, [cursor, itemId])
 }

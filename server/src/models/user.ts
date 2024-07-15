@@ -1,5 +1,4 @@
 import { runQuery } from '../utils/database.js'
-import { HttpError } from './httpError.js'
 
 export interface User {
     id: number
@@ -28,7 +27,7 @@ const mapDbUser = (dbUser: DbUser): User => ({
     passwordHash: dbUser.password_hash,
 })
 
-export const fetchUserByUsername = async (
+export const retrieveUserByUsername = async (
     username: string
 ): Promise<User | null> => {
     const query = 'SELECT * FROM users WHERE username = $1'
@@ -37,32 +36,39 @@ export const fetchUserByUsername = async (
     return mapDbUser(rows[0])
 }
 
-export const fetchUserByEmail = async (email: string): Promise<User | null> => {
+export const retrieveUserByEmail = async (
+    email: string
+): Promise<User | null> => {
     const query = 'SELECT * FROM users WHERE email = $1'
     const rows: DbUser[] = (await runQuery(query, [email])).rows
     if (!rows[0]) return null
     return mapDbUser(rows[0])
 }
 
-export const createUser = async (user: User): Promise<User | null> => {
-    if (
-        !user.username ||
-        !user.email ||
-        !user.firstName ||
-        !user.lastName ||
-        !user.passwordHash
-    ) {
-        throw new HttpError('missing user info', 400)
-    }
-    const query =
-        'INSERT INTO users (username, email, first_name, last_name, password_hash) VALUES ($1, $2, $3, $4, $5) RETURNING *'
+export const createUser = async (
+    username: string,
+    email: string,
+    firstName: string,
+    lastName: string,
+    passwordHash: string
+): Promise<User | null> => {
+    const query = `
+        INSERT INTO users (
+            username, 
+            email, 
+            first_name, 
+            last_name, 
+            password_hash
+        ) 
+        VALUES ($1, $2, $3, $4, $5) 
+        RETURNING *`
     const rows: DbUser[] = (
         await runQuery(query, [
-            user.username,
-            user.email,
-            user.firstName,
-            user.lastName,
-            user.passwordHash,
+            username,
+            email,
+            firstName,
+            lastName,
+            passwordHash,
         ])
     ).rows
     if (!rows[0]) return null
