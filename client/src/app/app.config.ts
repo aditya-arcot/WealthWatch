@@ -9,6 +9,7 @@ import {
     importProvidersFrom,
     provideZoneChangeDetection,
 } from '@angular/core'
+import { Title } from '@angular/platform-browser'
 import { provideRouter } from '@angular/router'
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
 import { env } from '../environments/env'
@@ -47,5 +48,6 @@ export const appConfig: ApplicationConfig = {
             useClass: CSRFInterceptor,
             multi: true,
         },
+        Title,
     ],
 }

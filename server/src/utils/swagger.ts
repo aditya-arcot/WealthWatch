@@ -1,11 +1,15 @@
+import { env } from 'process'
 import swaggerJSDoc from 'swagger-jsdoc'
+import { production } from './middleware.js'
 
 export const createSwaggerSpec = () => {
     const options = {
         definition: {
             openapi: '3.1.0',
             info: {
-                title: 'WealthWatch API',
+                title: production
+                    ? 'WealthWatch API'
+                    : `WealthWatch API - ${env['NODE_ENV']}`,
                 version: '1.0.0',
             },
             components: {

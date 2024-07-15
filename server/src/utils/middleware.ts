@@ -9,7 +9,7 @@ import { HttpError } from '../models/httpError.js'
 import { getPool } from './database.js'
 import { logger } from './logger.js'
 
-export const production = env['NODE_ENV'] === 'production'
+export const production = env['NODE_ENV'] === 'prod'
 
 const origins = [
     'https://wealthwatch.aditya-arcot.com',
