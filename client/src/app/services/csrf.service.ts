@@ -7,15 +7,16 @@ import { env } from '../../environments/env'
 })
 export class CSRFService {
     readonly baseUrl = `${env.apiUrl}/csrf-token`
+    readonly csrfTokenName = `csrfToken-${env.name}`
 
     constructor(private http: HttpClient) {}
 
     storeCsrfToken(token: string) {
-        sessionStorage.setItem('csrfToken', token)
+        sessionStorage.setItem(this.csrfTokenName, token)
     }
 
     getStoredCsrfToken() {
-        return sessionStorage.getItem('csrfToken')
+        return sessionStorage.getItem(this.csrfTokenName)
     }
 
     getCsrfToken() {

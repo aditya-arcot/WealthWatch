@@ -47,9 +47,12 @@ export const createCsrfMiddleware = () => {
         throw Error('missing csrf secret')
     }
     const csrfSecret = env['CSRF_SECRET']
+    const cookieName = production
+        ? '__Host-psifi.x-csrf-token'
+        : `x-csrf-token-${env['NODE_ENV']}`
     const options = {
         getSecret: () => csrfSecret,
-        cookieName: production ? '__Host-psifi.x-csrf-token' : 'x-csrf-token',
+        cookieName,
         cookieOptions: {
             secure: production,
             sameSite: production ? ('strict' as const) : ('lax' as const),
