@@ -73,6 +73,18 @@ export const retrieveItemByUserIdAndInstitutionId = async (
     return mapDbItem(rows[0])
 }
 
+export const retrieveItemsByUserId = async (
+    userId: number
+): Promise<Item[]> => {
+    const query = `
+        SELECT *
+        FROM items
+        WHERE user_id = $1
+    `
+    const rows: DbItem[] = (await runQuery(query, [userId])).rows
+    return rows.map(mapDbItem)
+}
+
 export const createItem = async (
     userId: number,
     itemId: string,

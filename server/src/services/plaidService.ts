@@ -186,6 +186,12 @@ const retrieveTransactionUpdates = async (item: Item) => {
     }
 }
 
+export const removeItem = async (item: Item) => {
+    logger.debug('removing item')
+    const resp = await client.itemRemove({ access_token: item.accessToken })
+    logger.debug({ resp }, 'received plaid item remove response')
+}
+
 const mapPlaidAccount = (account: AccountBase, itemId: number): Account => {
     return {
         id: 0,

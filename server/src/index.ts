@@ -32,12 +32,12 @@ if (production) {
 logger.debug('configuring middleware')
 app.use(helmet())
 app.use(corsMiddleware)
-app.use(logRequestResponse)
 app.use(methodOverride('_method'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(createSessionMiddleware())
 app.use(cookieParser())
+app.use(logRequestResponse)
 app.use(createCsrfMiddleware())
 
 logger.debug('configuring routes')

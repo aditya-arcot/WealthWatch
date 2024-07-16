@@ -3,8 +3,10 @@ import {
     checkEmailExists,
     checkUsernameExists,
     getCurrentUser,
+    removeCurrentUser,
 } from '../controllers/userController.js'
 import { catchAsync } from '../utils/catchAsync.js'
+import { authenticate } from '../utils/middleware.js'
 
 const router = express.Router()
 
@@ -28,8 +30,19 @@ const router = express.Router()
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
+ *   delete:
+ *     summary: Remove current user
+ *     tags: [Users]
+ *     responses:
+ *       204:
+ *         description: The current user has been removed
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/current').get(getCurrentUser)
+router
+    .route('/current')
+    .get(getCurrentUser)
+    .delete(authenticate, catchAsync(removeCurrentUser))
 
 /**
  * @swagger

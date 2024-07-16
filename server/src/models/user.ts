@@ -74,3 +74,7 @@ export const createUser = async (
     if (!rows[0]) return null
     return mapDbUser(rows[0])
 }
+
+export const deleteUser = async (userId: number) => {
+    await runQuery('DELETE FROM users WHERE id = $1', [userId])
+}
