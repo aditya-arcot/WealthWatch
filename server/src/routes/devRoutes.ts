@@ -25,7 +25,7 @@ const router = express.Router()
  *         description: All users deleted
  */
 router.route('/users').delete(
-    catchAsync(async (_req: Request, res: Response) => {
+    catchAsync(async (req: Request, res: Response) => {
         logger.debug('deleting all users')
 
         const users = await retrieveUsers()
@@ -44,7 +44,7 @@ router.route('/users').delete(
             })
         )
 
-        return res.status(204).send()
+        req.session.destroy(() => res.status(204).send())
     })
 )
 
