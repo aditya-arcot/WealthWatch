@@ -46,7 +46,7 @@ router.route('/login').post(catchAsync(login))
  *     summary: Logout user
  *     tags: [Auth]
  *     responses:
- *       200:
+ *       204:
  *         description: User was logged out
  *       401:
  *          $ref: '#/components/responses/Unauthorized'

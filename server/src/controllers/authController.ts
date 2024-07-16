@@ -37,7 +37,7 @@ export const logout = (req: Request, res: Response) => {
         if (err) {
             throw new HttpError('failed to log out')
         }
-        return res.send()
+        return res.status(204).send()
     })
 }
 
