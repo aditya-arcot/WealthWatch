@@ -79,7 +79,7 @@ export const createLinkToken = async (
     }
 
     const resp = await client.linkTokenCreate(params)
-    logger.debug({ resp }, 'received plaid link token response')
+    logger.debug({ resp }, 'received plaid link token create response')
 
     return {
         expiration: resp.data.expiration,
@@ -113,9 +113,9 @@ export const syncItemData = async (item: Item) => {
     logger.debug({ item }, 'syncing item data')
 
     logger.debug('updating accounts')
-    const {
-        data: { accounts: plaidAccounts },
-    } = await client.accountsGet({ access_token: item.accessToken })
+    const resp = await client.accountsGet({ access_token: item.accessToken })
+    logger.debug({ resp }, 'received plaid accounts get response')
+    const plaidAccounts = resp.data.accounts
     const accounts = await createOrUpdateAccounts(
         plaidAccounts.map((acc) => mapPlaidAccount(acc, item.id))
     )
@@ -153,18 +153,24 @@ const retrieveTransactionUpdates = async (item: Item) => {
         while (hasMore) {
             let data: TransactionsSyncResponse
             if (cursor) {
-                data = (
-                    await client.transactionsSync({
-                        access_token: item.accessToken,
-                        cursor,
-                    })
-                ).data
+                const resp = await client.transactionsSync({
+                    access_token: item.accessToken,
+                    cursor,
+                })
+                logger.debug(
+                    { resp },
+                    'received plaid transactions sync response'
+                )
+                data = resp.data
             } else {
-                data = (
-                    await client.transactionsSync({
-                        access_token: item.accessToken,
-                    })
-                ).data
+                const resp = await client.transactionsSync({
+                    access_token: item.accessToken,
+                })
+                logger.debug(
+                    { resp },
+                    'received plaid transactions sync response'
+                )
+                data = resp.data
             }
 
             added = added.concat(data.added)
