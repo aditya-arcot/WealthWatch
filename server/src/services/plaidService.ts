@@ -13,9 +13,7 @@ import {
 import { env } from 'process'
 import { Account, createOrUpdateAccounts } from '../models/account.js'
 import {
-    AccessToken,
     Item,
-    LinkToken,
     retrieveItemById,
     retrieveItemByUserIdAndInstitutionId,
     updateItemCursor,
@@ -45,7 +43,7 @@ logger.debug(config, 'configured plaid client')
 export const createLinkToken = async (
     userId: number,
     itemId?: string
-): Promise<LinkToken> => {
+): Promise<string> => {
     let accessToken = null
     // balance product automatically included
     let products = [Products.Transactions]
@@ -81,11 +79,7 @@ export const createLinkToken = async (
     const resp = await client.linkTokenCreate(params)
     logger.debug({ resp }, 'received plaid link token create response')
 
-    return {
-        expiration: resp.data.expiration,
-        linkToken: resp.data.link_token,
-        requestId: resp.data.request_id,
-    }
+    return resp.data.link_token
 }
 
 export const checkExistingItem = async (
@@ -97,7 +91,7 @@ export const checkExistingItem = async (
 
 export const exchangePublicTokenForAccessToken = async (
     publicToken: string
-): Promise<AccessToken> => {
+) => {
     const resp = await client.itemPublicTokenExchange({
         public_token: publicToken,
     })
@@ -105,7 +99,6 @@ export const exchangePublicTokenForAccessToken = async (
     return {
         accessToken: resp.data.access_token,
         itemId: resp.data.item_id,
-        requestId: resp.data.request_id,
     }
 }
 

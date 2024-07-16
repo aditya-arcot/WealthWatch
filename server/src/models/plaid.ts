@@ -1,17 +1,5 @@
 import { runQuery } from '../utils/database.js'
 
-export interface LinkToken {
-    expiration: string
-    linkToken: string
-    requestId: string
-}
-
-export interface AccessToken {
-    accessToken: string
-    itemId: string
-    requestId: string
-}
-
 export interface Item {
     id: number
     userId: number

@@ -6,7 +6,6 @@ import {
     PlaidLinkHandler,
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
-import { AccessToken, LinkToken } from '../../models/plaid'
 import { AlertService } from '../../services/alert.service'
 import { LoggerService } from '../../services/logger.service'
 import { PlaidService } from '../../services/plaid.service'
@@ -27,7 +26,7 @@ export class AccountsComponent {
 
     linkAccount(): void {
         this.plaidSvc
-            .createLinkToken()
+            .getLinkToken()
             .pipe(
                 catchError((err) => {
                     this.logger.error('failed to create link token', err)
@@ -36,7 +35,7 @@ export class AccountsComponent {
                     )
                     return throwError(() => err)
                 }),
-                switchMap((resp: LinkToken) => {
+                switchMap((resp) => {
                     this.logger.debug('received link token', resp)
                     const config: PlaidConfig = {
                         token: resp.linkToken,
@@ -56,8 +55,8 @@ export class AccountsComponent {
     handleLinkSuccess(token: string, metadata: object): void {
         this.logger.debug('plaid link success', token, metadata)
         this.plaidSvc.exchangePublicToken(token, metadata).subscribe({
-            next: (resp: AccessToken) => {
-                this.logger.debug('received access token', resp)
+            next: () => {
+                this.logger.debug('exchanged public token')
                 this.alertSvc.addSuccessAlert('Success linking account')
             },
             error: (err: HttpErrorResponse) => {

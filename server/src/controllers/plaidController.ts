@@ -20,7 +20,7 @@ export const getLinkToken = async (req: Request, res: Response) => {
 
     try {
         const token = await createLinkToken(userId, itemId)
-        return res.send(token)
+        return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)
         throw new HttpError('failed to create link token')
@@ -46,17 +46,17 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     }
 
     try {
-        const token = await exchangePublicTokenForAccessToken(publicToken)
+        const resp = await exchangePublicTokenForAccessToken(publicToken)
         const item = await createItem(
             userId,
-            token.itemId,
-            token.accessToken,
+            resp.itemId,
+            resp.accessToken,
             institution.institution_id,
             institution.name
         )
         if (!item) throw Error('item not created')
         await syncItemData(item)
-        return res.send(token)
+        return res.status(204).send()
     } catch (error) {
         logger.error(error)
         throw new HttpError('failed to exchange public token')
