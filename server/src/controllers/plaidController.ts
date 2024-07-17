@@ -3,8 +3,8 @@ import { LinkSessionSuccessMetadata } from 'plaid'
 import { HttpError } from '../models/httpError.js'
 import {
     createItem,
-    createLinkEvent,
-    LinkEvent,
+    createPlaidLinkEvent,
+    PlaidLinkEvent,
     retrieveItemByUserIdAndInstitutionId,
 } from '../models/plaid.js'
 import {
@@ -34,11 +34,11 @@ export const getLinkToken = async (req: Request, res: Response) => {
 export const handleLinkEvent = async (req: Request, res: Response) => {
     logger.debug('handling link event')
 
-    const event: LinkEvent | undefined = req.body.event
+    const event: PlaidLinkEvent | undefined = req.body.event
     if (!event) throw new HttpError('missing event', 400)
 
     try {
-        const newEvent = await createLinkEvent(event)
+        const newEvent = await createPlaidLinkEvent(event)
         if (!newEvent) throw Error('event not created')
         return res.status(204).send()
     } catch (error) {
@@ -71,7 +71,10 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     }
 
     try {
-        const resp = await exchangePublicTokenForAccessToken(publicToken)
+        const resp = await exchangePublicTokenForAccessToken(
+            publicToken,
+            userId
+        )
         const item = await createItem(
             userId,
             resp.itemId,

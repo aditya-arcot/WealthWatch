@@ -1,23 +1,33 @@
 import {
     AccountBase,
+    AccountsGetRequest,
     Configuration,
     CountryCode,
+    ItemPublicTokenExchangeRequest,
+    ItemRemoveRequest,
     LinkTokenCreateRequest,
     PlaidApi,
     PlaidEnvironments,
+    Products as PlaidProducts,
     RemovedTransaction as PlaidRemovedTransaction,
     Transaction as PlaidTransaction,
-    Products,
-    TransactionsSyncResponse,
+    TransactionsSyncRequest,
 } from 'plaid'
 import { env } from 'process'
 import { Account, createOrUpdateAccounts } from '../models/account.js'
-import { Item, retrieveItemById, updateItemCursor } from '../models/plaid.js'
+import {
+    createPlaidApiRequest,
+    Item,
+    PlaidApiRequest,
+    retrieveItemById,
+    updateItemCursor,
+} from '../models/plaid.js'
 import {
     createOrUpdateTransactions,
     deleteTransactions,
     Transaction,
 } from '../models/transaction.js'
+import { safeStringify } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 
 if (!env['PLAID_ENV'] || !env['PLAID_CLIENT_ID'] || !env['PLAID_SECRET']) {
@@ -35,21 +45,59 @@ const config = new Configuration({
 const client = new PlaidApi(config)
 logger.debug(config, 'configured plaid client')
 
+const callPlaidClientMethod = async <T extends object, P extends object>(
+    method: (params: P) => Promise<T>,
+    params: P,
+    userId: number,
+    itemId?: number
+) => {
+    const req: PlaidApiRequest = {
+        id: -1,
+        userId,
+        itemId: itemId ?? null,
+        method: method.name,
+        params,
+    }
+
+    try {
+        const resp: T = await method.bind(client)(params)
+        const sanitized = JSON.parse(safeStringify(resp)) as {
+            request?: object
+        }
+        delete sanitized['request']
+        req.response = sanitized
+        createPlaidApiRequest(req)
+        return resp
+    } catch (error) {
+        logger.error({ error }, `plaid client error - ${method.name}`)
+        if (error instanceof Error) {
+            req.errorName = error.name
+            req.errorMessage = error.message
+            req.errorStack = error.stack ?? null
+        } else {
+            req.errorName = 'unknown'
+        }
+        createPlaidApiRequest(req)
+        throw error
+    }
+}
+
 export const createLinkToken = async (
     userId: number,
     itemId?: string
 ): Promise<string> => {
     let accessToken = null
     // balance product automatically included
-    let products = [Products.Transactions]
+    let products = [PlaidProducts.Transactions]
     let requiredIfSupportedProducts = [
-        Products.Investments,
-        Products.Liabilities,
+        PlaidProducts.Investments,
+        PlaidProducts.Liabilities,
     ]
 
+    let item: Item | null = null
     // link update mode
     if (itemId) {
-        const item = await retrieveItemById(itemId)
+        item = await retrieveItemById(itemId)
         if (!item) throw Error('item not found')
         accessToken = item.accessToken
         products = []
@@ -71,19 +119,26 @@ export const createLinkToken = async (
         access_token: accessToken,
     }
 
-    const resp = await client.linkTokenCreate(params)
-    logger.debug({ resp }, 'received plaid link token create response')
-
+    const resp = await callPlaidClientMethod(
+        client.linkTokenCreate,
+        params,
+        userId,
+        item?.id
+    )
     return resp.data.link_token
 }
 
 export const exchangePublicTokenForAccessToken = async (
-    publicToken: string
+    publicToken: string,
+    userId: number
 ) => {
-    const resp = await client.itemPublicTokenExchange({
-        public_token: publicToken,
-    })
-    logger.debug({ resp }, 'received plaid public token exchange response')
+    const params: ItemPublicTokenExchangeRequest = { public_token: publicToken }
+    const resp = await callPlaidClientMethod(
+        client.itemPublicTokenExchange,
+        params,
+        userId
+    )
+
     return {
         accessToken: resp.data.access_token,
         itemId: resp.data.item_id,
@@ -94,8 +149,14 @@ export const syncItemData = async (item: Item) => {
     logger.debug({ item }, 'syncing item data')
 
     logger.debug('updating accounts')
-    const resp = await client.accountsGet({ access_token: item.accessToken })
-    logger.debug({ resp }, 'received plaid accounts get response')
+    const params: AccountsGetRequest = { access_token: item.accessToken }
+    const resp = await callPlaidClientMethod(
+        client.accountsGet,
+        params,
+        item.userId,
+        item.id
+    )
+
     const plaidAccounts = resp.data.accounts
     const accounts = await createOrUpdateAccounts(
         plaidAccounts.map((acc) => mapPlaidAccount(acc, item.id))
@@ -132,33 +193,29 @@ const retrieveTransactionUpdates = async (item: Item) => {
 
     try {
         while (hasMore) {
-            let data: TransactionsSyncResponse
+            let params: TransactionsSyncRequest
             if (cursor) {
-                const resp = await client.transactionsSync({
+                params = {
                     access_token: item.accessToken,
                     cursor,
-                })
-                logger.debug(
-                    { resp },
-                    'received plaid transactions sync response'
-                )
-                data = resp.data
+                }
             } else {
-                const resp = await client.transactionsSync({
+                params = {
                     access_token: item.accessToken,
-                })
-                logger.debug(
-                    { resp },
-                    'received plaid transactions sync response'
-                )
-                data = resp.data
+                }
             }
+            const resp = await callPlaidClientMethod(
+                client.transactionsSync,
+                params,
+                item.userId,
+                item.id
+            )
 
-            added = added.concat(data.added)
-            modified = modified.concat(data.modified)
-            removed = removed.concat(data.removed)
-            hasMore = data.has_more
-            cursor = data.next_cursor
+            added = added.concat(resp.data.added)
+            modified = modified.concat(resp.data.modified)
+            removed = removed.concat(resp.data.removed)
+            hasMore = resp.data.has_more
+            cursor = resp.data.next_cursor
         }
         return { added, modified, removed, cursor }
     } catch (error) {
@@ -169,8 +226,8 @@ const retrieveTransactionUpdates = async (item: Item) => {
 
 export const removeItem = async (item: Item) => {
     logger.debug('removing item')
-    const resp = await client.itemRemove({ access_token: item.accessToken })
-    logger.debug({ resp }, 'received plaid item remove response')
+    const params: ItemRemoveRequest = { access_token: item.accessToken }
+    await callPlaidClientMethod(client.itemRemove, params, item.userId, item.id)
 }
 
 const mapPlaidAccount = (account: AccountBase, itemId: number): Account => {

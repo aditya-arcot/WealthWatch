@@ -105,4 +105,17 @@ CREATE TABLE IF NOT EXISTS plaid_link_events (
     create_timestamp TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS plaid_api_requests (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    method TEXT NOT NULL,
+    params JSON NOT NULL,
+    response JSON,
+    error_name TEXT,
+    error_message TEXT,
+    error_stack TEXT,
+    create_timestamp TIMESTAMP DEFAULT NOW()
+);
+
 COMMIT;

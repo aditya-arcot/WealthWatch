@@ -1,6 +1,6 @@
 import { runQuery } from '../utils/database.js'
 
-export interface LinkEvent {
+export interface PlaidLinkEvent {
     id: number
     userId: number
     type: string
@@ -15,7 +15,7 @@ export interface LinkEvent {
     errorMessage?: string | null
 }
 
-interface DbLinkEvent {
+interface DbPlaidLinkEvent {
     id: number
     user_id: number
     type: string
@@ -30,7 +30,7 @@ interface DbLinkEvent {
     error_message: string | null
 }
 
-const mapDbLinkEvent = (dbLinkEvent: DbLinkEvent): LinkEvent => ({
+const mapDbLinkEvent = (dbLinkEvent: DbPlaidLinkEvent): PlaidLinkEvent => ({
     id: dbLinkEvent.id,
     userId: dbLinkEvent.user_id,
     type: dbLinkEvent.type,
@@ -45,11 +45,11 @@ const mapDbLinkEvent = (dbLinkEvent: DbLinkEvent): LinkEvent => ({
     errorMessage: dbLinkEvent.error_message,
 })
 
-export const createLinkEvent = async (
-    event: LinkEvent
-): Promise<LinkEvent | null> => {
+export const createPlaidLinkEvent = async (
+    event: PlaidLinkEvent
+): Promise<PlaidLinkEvent | null> => {
     const query = `
-        INSERT INTO link_events (
+        INSERT INTO plaid_link_events (
             user_id,
             type,
             session_id,
@@ -65,7 +65,7 @@ export const createLinkEvent = async (
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING *
     `
-    const rows: DbLinkEvent[] = (
+    const rows: DbPlaidLinkEvent[] = (
         await runQuery(query, [
             event.userId,
             event.type,
@@ -82,6 +82,46 @@ export const createLinkEvent = async (
     ).rows
     if (!rows[0]) return null
     return mapDbLinkEvent(rows[0])
+}
+
+export interface PlaidApiRequest {
+    id: number
+    userId: number
+    itemId?: number | null
+    method: string
+    params: object
+    response?: object | null
+    errorName?: string | null
+    errorMessage?: string | null
+    errorStack?: string | null
+}
+
+export const createPlaidApiRequest = async (
+    request: PlaidApiRequest
+): Promise<void> => {
+    const query = `
+        INSERT INTO plaid_api_requests (
+            user_id,
+            item_id,
+            method,
+            params,
+            response,
+            error_name,
+            error_message,
+            error_stack
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `
+    await runQuery(query, [
+        request.userId,
+        request.itemId,
+        request.method,
+        request.params,
+        request.response,
+        request.errorName,
+        request.errorMessage,
+        request.errorStack,
+    ])
 }
 
 export interface Item {
