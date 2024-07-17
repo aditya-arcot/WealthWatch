@@ -2,6 +2,7 @@ import express from 'express'
 import {
     exchangePublicToken,
     getLinkToken,
+    handleLinkEvent,
 } from '../controllers/plaidController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -32,6 +33,27 @@ const router = express.Router()
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.route('/link-token').get(authenticate, catchAsync(getLinkToken))
+
+/**
+ * @swagger
+ * /plaid/link-event:
+ *   post:
+ *     summary: Handle link event
+ *     tags: [Plaid]
+ *     parameters:
+ *       - in: body
+ *         name: event
+ *         schema:
+ *           type: object
+ *         required: true
+ *         description: The link event
+ *     responses:
+ *       204:
+ *         description: The link event was handled
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
 
 /**
  * @swagger

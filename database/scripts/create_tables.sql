@@ -89,4 +89,20 @@ BEFORE UPDATE ON transactions
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
+CREATE TABLE IF NOT EXISTS link_events (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    request_id TEXT,
+    institution_id TEXT,
+    institution_name TEXT,
+    public_token TEXT,
+    status TEXT,
+    error_type TEXT,
+    error_code TEXT,
+    error_message TEXT,
+    create_timestamp TIMESTAMP DEFAULT NOW()
+);
+
 COMMIT;

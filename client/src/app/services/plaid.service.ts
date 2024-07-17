@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
+import { LinkEvent } from '../models/plaid'
 
 @Injectable({
     providedIn: 'root',
@@ -13,6 +14,11 @@ export class PlaidService {
     getLinkToken() {
         const url = `${this.baseUrl}/link-token`
         return this.http.get<{ linkToken: string }>(url)
+    }
+
+    handleLinkEvent(event: LinkEvent) {
+        const url = `${this.baseUrl}/link-event`
+        return this.http.post<void>(url, { event })
     }
 
     exchangePublicToken(publicToken: string, metadata: object) {

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import { HttpError } from '../models/httpError.js'
-import { createItem } from '../models/plaid.js'
+import { createItem, createLinkEvent, LinkEvent } from '../models/plaid.js'
 import {
     checkExistingItem,
     createLinkToken,
@@ -24,6 +24,22 @@ export const getLinkToken = async (req: Request, res: Response) => {
     } catch (error) {
         logger.error(error)
         throw new HttpError('failed to create link token')
+    }
+}
+
+export const handleLinkEvent = async (req: Request, res: Response) => {
+    logger.debug('handling link event')
+
+    const event: LinkEvent | undefined = req.body.event
+    if (!event) throw new HttpError('missing event', 400)
+
+    try {
+        const newEvent = await createLinkEvent(event)
+        if (!newEvent) throw Error('event not created')
+        return res.status(204).send()
+    } catch (error) {
+        logger.error(error)
+        throw new HttpError('failed to create link event')
     }
 }
 
