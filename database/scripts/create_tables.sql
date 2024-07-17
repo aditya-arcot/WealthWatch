@@ -26,7 +26,7 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     item_id TEXT UNIQUE NOT NULL,
     access_token TEXT NOT NULL,
     institution_id TEXT NOT NULL,
@@ -44,7 +44,7 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS accounts (
     id SERIAL PRIMARY KEY,
-    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
     account_id TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     mask TEXT,
@@ -67,7 +67,7 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS transactions (
     id SERIAL PRIMARY KEY,
-    account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+    account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     transaction_id TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     amount NUMERIC(28, 10) NOT NULL,
@@ -89,7 +89,7 @@ BEFORE UPDATE ON transactions
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
-CREATE TABLE IF NOT EXISTS link_events (
+CREATE TABLE IF NOT EXISTS plaid_link_events (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     type TEXT NOT NULL,
