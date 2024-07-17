@@ -38,22 +38,28 @@ done
 
 echo "Seed: $SEED"
 echo "Environment file: $ENV_FILE"
+echo
 
 source ./load_env
 
 if psql -lqt | cut -d \| -f 1 | grep -qw $DB_NAME; then
-    echo "database already exists. dropping..."
-    dropdb $DB_NAME
+    echo "database already exists"
+    if PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -tAc "SELECT COUNT(*) FROM items;" | grep -q 0; then
+        echo "database has no items. dropping..."
+        dropdb $DB_NAME
+    else
+        echo "database has items. unregister them before reset. aborting..."
+        exit 1
+    fi
 else
     echo "database does not exist"
 fi
 echo
 
-echo "creating database"
+echo "creating database..."
 createdb $DB_NAME
 echo
 
-echo "checking user"
 if psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER';" | grep -q 1; then
     echo "user already exists. dropping..."
     psql postgres -c "DROP USER $DB_USER;"
@@ -62,20 +68,20 @@ else
 fi
 echo
 
-echo "creating user"
+echo "creating user..."
 psql postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
 echo
 
-echo "granting permissions"
+echo "granting permissions..."
 psql $DB_NAME -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 echo
 
-echo "creating tables"
+echo "creating tables..."
 PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/create_tables.sql -v ON_ERROR_STOP=1
 echo
 
 if [ "$SEED" = true ]; then
-    echo "seeding data"
+    echo "seeding data..."
     PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_data.sql -v ON_ERROR_STOP=1
     echo
 fi
