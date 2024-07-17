@@ -1,9 +1,13 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import { HttpError } from '../models/httpError.js'
-import { createItem, createLinkEvent, LinkEvent } from '../models/plaid.js'
 import {
-    checkExistingItem,
+    createItem,
+    createLinkEvent,
+    LinkEvent,
+    retrieveItemByUserIdAndInstitutionId,
+} from '../models/plaid.js'
+import {
     createLinkToken,
     exchangePublicTokenForAccessToken,
     syncItemData,
@@ -57,7 +61,12 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     if (!institution || !institution.institution_id || !institution.name)
         throw new HttpError('missing institution info', 400)
 
-    if (await checkExistingItem(userId, institution.institution_id)) {
+    if (
+        await retrieveItemByUserIdAndInstitutionId(
+            userId,
+            institution.institution_id
+        )
+    ) {
         throw new HttpError('account already exists', 409)
     }
 

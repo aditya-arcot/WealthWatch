@@ -12,12 +12,7 @@ import {
 } from 'plaid'
 import { env } from 'process'
 import { Account, createOrUpdateAccounts } from '../models/account.js'
-import {
-    Item,
-    retrieveItemById,
-    retrieveItemByUserIdAndInstitutionId,
-    updateItemCursor,
-} from '../models/plaid.js'
+import { Item, retrieveItemById, updateItemCursor } from '../models/plaid.js'
 import {
     createOrUpdateTransactions,
     deleteTransactions,
@@ -80,13 +75,6 @@ export const createLinkToken = async (
     logger.debug({ resp }, 'received plaid link token create response')
 
     return resp.data.link_token
-}
-
-export const checkExistingItem = async (
-    userId: number,
-    institutionId: string
-): Promise<boolean> => {
-    return !!(await retrieveItemByUserIdAndInstitutionId(userId, institutionId))
 }
 
 export const exchangePublicTokenForAccessToken = async (
