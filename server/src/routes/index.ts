@@ -6,6 +6,7 @@ import devRouter from './devRoutes.js'
 import itemRouter from './itemRoutes.js'
 import plaidRouter from './plaidRoutes.js'
 import secretsRouter from './secretsRoutes.js'
+import transactionRouter from './transactionRoutes.js'
 import userRouter from './userRoutes.js'
 
 const router = express.Router()
@@ -17,6 +18,7 @@ if (!production) {
 router.use('/items', itemRouter)
 router.use('/plaid', plaidRouter)
 router.use('/secrets', secretsRouter)
+router.use('/transactions', transactionRouter)
 router.use('/users', userRouter)
 
 export default router

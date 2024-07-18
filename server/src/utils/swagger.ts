@@ -132,6 +132,70 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    Transaction: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'string',
+                                description: 'The transaction ID',
+                            },
+                            accountId: {
+                                type: 'string',
+                                description: 'The account ID',
+                            },
+                            transactionId: {
+                                type: 'string',
+                                description: 'The Plaid transaction ID',
+                            },
+                            name: {
+                                type: 'string',
+                                description: 'The transaction name',
+                            },
+                            amount: {
+                                type: 'number',
+                                description: 'The transaction amount',
+                            },
+                            merchant: {
+                                type: 'string',
+                                description: 'The transaction merchant',
+                            },
+                            merchantId: {
+                                type: 'string',
+                                description: 'The transaction merchant ID',
+                            },
+                            category: {
+                                type: 'string',
+                                description: 'The transaction category',
+                            },
+                            detailedCategory: {
+                                type: 'string',
+                                description:
+                                    'The transaction detailed category',
+                            },
+                            paymentChannel: {
+                                type: 'string',
+                                description: 'The transaction payment channel',
+                            },
+                            isoCurrencyCode: {
+                                type: 'string',
+                                description:
+                                    'The transaction ISO currency code',
+                            },
+                            unofficialCurrencyCode: {
+                                type: 'string',
+                                description:
+                                    'The transaction unofficial currency code',
+                            },
+                            date: {
+                                type: 'string',
+                                description: 'The transaction date',
+                            },
+                            pending: {
+                                type: 'boolean',
+                                description: 'The transaction pending status',
+                            },
+                        },
+                    },
                     User: {
                         type: 'object',
                         properties: {
