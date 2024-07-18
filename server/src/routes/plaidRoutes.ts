@@ -75,12 +75,8 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
  *         required: true
  *         description: The metadata
  *     responses:
- *       200:
- *         description: The access token object
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/AccessToken'
+ *       204:
+ *         description: The public token was exchanged
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

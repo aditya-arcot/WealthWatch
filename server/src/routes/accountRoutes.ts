@@ -16,11 +16,11 @@ const router = express.Router()
  * @swagger
  * /accounts:
  *   get:
- *     summary: Retrieve a list of accounts
+ *     summary: Retrieve a user's accounts
  *     tags: [Accounts]
  *     responses:
  *       200:
- *         description: A list of accounts
+ *         description: A list of user's accounts
  *         content:
  *           application/json:
  *             schema:

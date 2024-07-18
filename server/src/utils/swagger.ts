@@ -35,13 +35,54 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                                 description: 'The account ID',
                             },
-                            userId: {
+                            itemId: {
                                 type: 'string',
-                                description: 'The user ID',
+                                description: 'The item ID',
+                            },
+                            accountId: {
+                                type: 'string',
+                                description: 'The Plaid account ID',
                             },
                             name: {
                                 type: 'string',
                                 description: 'The account name',
+                            },
+                            mask: {
+                                type: 'string',
+                                description: 'The account mask',
+                            },
+                            officialName: {
+                                type: 'string',
+                                description: 'The account official name',
+                            },
+                            currentBalance: {
+                                type: 'number',
+                                description: 'The account current balance',
+                            },
+                            availableBalance: {
+                                type: 'number',
+                                description: 'The account available balance',
+                            },
+                            isoCurrencyCode: {
+                                type: 'string',
+                                description: 'The account ISO currency code',
+                            },
+                            unofficialCurrencyCode: {
+                                type: 'string',
+                                description:
+                                    'The account unofficial currency code',
+                            },
+                            creditLimit: {
+                                type: 'number',
+                                description: 'The account credit limit',
+                            },
+                            type: {
+                                type: 'string',
+                                description: 'The account type',
+                            },
+                            subtype: {
+                                type: 'string',
+                                description: 'The account subtype',
                             },
                         },
                     },
@@ -86,34 +127,9 @@ export const createSwaggerSpec = () => {
                     LinkToken: {
                         type: 'object',
                         properties: {
-                            expiration: {
-                                type: 'string',
-                                description: 'The link token expiration',
-                            },
                             linkToken: {
                                 type: 'string',
                                 description: 'The link token',
-                            },
-                            requestId: {
-                                type: 'string',
-                                description: 'The request ID',
-                            },
-                        },
-                    },
-                    AccessToken: {
-                        type: 'object',
-                        properties: {
-                            accessToken: {
-                                type: 'string',
-                                description: 'The access token',
-                            },
-                            itemId: {
-                                type: 'string',
-                                description: 'The item ID',
-                            },
-                            requestId: {
-                                type: 'string',
-                                description: 'The request ID',
                             },
                         },
                     },
