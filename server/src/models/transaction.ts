@@ -142,6 +142,7 @@ export const retrieveTransactionsByUserId = async (
                     WHERE user_id = $1
                 )
             )
+        ORDER BY date DESC
     `
     const rows: DbTransaction[] = (await runQuery(query, [userId])).rows
     return rows.map(mapDbTransaction)

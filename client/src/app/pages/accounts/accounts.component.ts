@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http'
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import {
     NgxPlaidLinkService,
     PlaidConfig,
@@ -10,8 +10,11 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
+import { ItemWithAccounts } from '../../models/item'
 import { LinkEvent } from '../../models/plaid'
+import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
+import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
 import { PlaidService } from '../../services/plaid.service'
 import { UserService } from '../../services/user.service'
@@ -22,14 +25,55 @@ import { UserService } from '../../services/user.service'
     imports: [],
     templateUrl: './accounts.component.html',
 })
-export class AccountsComponent {
+export class AccountsComponent implements OnInit {
+    itemsWithAccounts: ItemWithAccounts[] = []
+
     constructor(
         private userSvc: UserService,
         private plaidSvc: PlaidService,
         private logger: LoggerService,
         private plaidLinkSvc: NgxPlaidLinkService,
-        private alertSvc: AlertService
+        private alertSvc: AlertService,
+        private accountSvc: AccountService,
+        private itemSvc: ItemService
     ) {}
+
+    ngOnInit(): void {
+        this.loadAccounts()
+    }
+
+    loadAccounts(): void {
+        this.itemSvc
+            .getItems()
+            .pipe(
+                switchMap((items) => {
+                    this.logger.debug('loaded items', items)
+                    this.itemsWithAccounts = items.map((item) => {
+                        return { ...item, accounts: [] }
+                    })
+                    return this.accountSvc.getAccounts()
+                })
+            )
+            .subscribe((accounts) => {
+                this.logger.debug('loaded accounts', accounts)
+                accounts.forEach((account) => {
+                    const item = this.itemsWithAccounts.find(
+                        (item) => item.id === account.itemId
+                    )
+                    if (!item) {
+                        this.alertSvc.addErrorAlert(
+                            'Something went wrong. Please report this issue.',
+                            [
+                                `Failed to find item with id ${account.itemId} for account ${account.id}`,
+                            ]
+                        )
+                        return
+                    }
+                    item.accounts.push(account)
+                })
+                this.logger.debug('mapped accounts', this.itemsWithAccounts)
+            })
+    }
 
     linkAccount(): void {
         this.plaidSvc
@@ -71,6 +115,7 @@ export class AccountsComponent {
         const type = 'success'
         this.logger.debug(type, token, metadata)
         const event: LinkEvent = {
+            id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
             type,
             sessionId: metadata.link_session_id,
@@ -84,13 +129,14 @@ export class AccountsComponent {
         this.plaidSvc.exchangePublicToken(token, metadata).subscribe({
             next: () => {
                 this.logger.debug('exchanged public token')
-                this.alertSvc.addSuccessAlert('Success linking account')
+                this.alertSvc.addSuccessAlert('Success linking institution')
+                this.loadAccounts()
             },
             error: (err: HttpErrorResponse) => {
                 this.logger.error('failed to exchange public token', err)
                 if (err.status === 409) {
                     this.alertSvc.addErrorAlert(
-                        'This account has already been linked'
+                        'This institution has already been linked'
                     )
                 } else {
                     this.alertSvc.addErrorAlert(
@@ -108,6 +154,7 @@ export class AccountsComponent {
         const type = 'exit'
         this.logger.debug(type, error, metadata)
         const event: LinkEvent = {
+            id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
             type,
             sessionId: metadata.link_session_id,
@@ -126,6 +173,7 @@ export class AccountsComponent {
         const type = `event - ${eventName.toLowerCase()}`
         this.logger.debug(type, metadata)
         const event: LinkEvent = {
+            id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
             type,
             sessionId: metadata.link_session_id,

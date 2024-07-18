@@ -1,4 +1,5 @@
 export interface LinkEvent {
+    id: number
     userId: number
     type: string
     sessionId: string
