@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express'
-import { retrieveItemsByUserId } from '../models/plaid.js'
+import { retrieveItemsByUserId } from '../models/item.js'
 import { deleteUser, retrieveUsers } from '../models/user.js'
 import { removeItem } from '../services/plaidService.js'
 import { catchAsync } from '../utils/catchAsync.js'

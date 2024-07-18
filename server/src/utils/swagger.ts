@@ -86,6 +86,43 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    Item: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'string',
+                                description: 'The item ID',
+                            },
+                            userId: {
+                                type: 'string',
+                                description: 'The user ID',
+                            },
+                            itemId: {
+                                type: 'string',
+                                description: 'The Plaid item ID',
+                            },
+                            accessToken: {
+                                type: 'string',
+                                description: 'The item access token',
+                            },
+                            institutionId: {
+                                type: 'string',
+                                description: 'The institution ID',
+                            },
+                            institutionName: {
+                                type: 'string',
+                                description: 'The institution name',
+                            },
+                            healthy: {
+                                type: 'boolean',
+                                description: 'The item healthy status',
+                            },
+                            cursor: {
+                                type: 'string',
+                                description: 'The item cursor',
+                            },
+                        },
+                    },
                     Secrets: {
                         type: 'object',
                         properties: {

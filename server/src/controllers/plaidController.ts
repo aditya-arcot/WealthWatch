@@ -3,10 +3,9 @@ import { LinkSessionSuccessMetadata } from 'plaid'
 import { HttpError } from '../models/httpError.js'
 import {
     createItem,
-    createPlaidLinkEvent,
-    PlaidLinkEvent,
     retrieveItemByUserIdAndInstitutionId,
-} from '../models/plaid.js'
+} from '../models/item.js'
+import { createPlaidLinkEvent, PlaidLinkEvent } from '../models/plaid.js'
 import {
     createLinkToken,
     exchangePublicTokenForAccessToken,

@@ -15,13 +15,8 @@ import {
 } from 'plaid'
 import { env } from 'process'
 import { Account, createOrUpdateAccounts } from '../models/account.js'
-import {
-    createPlaidApiRequest,
-    Item,
-    PlaidApiRequest,
-    retrieveItemById,
-    updateItemCursor,
-} from '../models/plaid.js'
+import { Item, retrieveItemById, updateItemCursor } from '../models/item.js'
+import { createPlaidApiRequest, PlaidApiRequest } from '../models/plaid.js'
 import {
     createOrUpdateTransactions,
     deleteTransactions,

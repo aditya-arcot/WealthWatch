@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { HttpError } from '../models/httpError.js'
-import { retrieveItemsByUserId } from '../models/plaid.js'
+import { retrieveItemsByUserId } from '../models/item.js'
 import {
     deleteUser,
     retrieveUserByEmail,
