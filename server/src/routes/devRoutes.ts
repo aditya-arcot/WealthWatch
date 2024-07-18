@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express'
-import { retrieveItemsByUserId } from '../models/item.js'
+import { retrieveItemsByUserId, updateItemToInactive } from '../models/item.js'
 import { deleteUser, retrieveUsers } from '../models/user.js'
 import { removeItem } from '../services/plaidService.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -18,7 +18,7 @@ const router = express.Router()
  * @swagger
  * /dev/users:
  *   delete:
- *     summary: Delete all users
+ *     summary: Unregister items, delete users and child data
  *     tags: [Dev]
  *     responses:
  *       204:
@@ -45,6 +45,43 @@ router.route('/users').delete(
         )
 
         req.session.destroy(() => res.status(204).send())
+    })
+)
+
+/**
+ * @swagger
+ * /dev/items:
+ *   delete:
+ *     summary: Unregister & deactivate all items
+ *     tags: [Dev]
+ *     responses:
+ *       204:
+ *         description: All items deactivated
+ */
+router.route('/items').delete(
+    catchAsync(async (_req: Request, res: Response) => {
+        logger.debug('deactivating all items')
+
+        const users = await retrieveUsers()
+        await Promise.all(
+            users.map(async (user) => {
+                logger.debug({ user }, 'deactivating items for user')
+
+                const items = await retrieveItemsByUserId(user.id)
+                await Promise.all(
+                    items.map(async (item) => {
+                        try {
+                            await removeItem(item)
+                            await updateItemToInactive(item.id)
+                        } catch (error) {
+                            logger.error(error)
+                        }
+                    })
+                )
+            })
+        )
+
+        return res.status(204).send()
     })
 )
 

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     item_id TEXT UNIQUE NOT NULL,
+    active BOOLEAN NOT NULL,
     access_token TEXT NOT NULL,
     institution_id TEXT NOT NULL,
     institution_name TEXT NOT NULL,
@@ -41,6 +42,11 @@ CREATE TRIGGER trigger_items_update_timestamp
 BEFORE UPDATE ON items
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE VIEW active_items AS
+SELECT *
+FROM items
+WHERE active = TRUE;
 
 CREATE TABLE IF NOT EXISTS accounts (
     id SERIAL PRIMARY KEY,
@@ -59,6 +65,13 @@ CREATE TABLE IF NOT EXISTS accounts (
     create_timestamp TIMESTAMP DEFAULT NOW(),
     update_timestamp TIMESTAMP DEFAULT NOW()
 );
+
+CREATE VIEW active_accounts AS
+SELECT a.*
+FROM accounts a
+JOIN items i 
+    ON a.item_id = i.id
+WHERE i.active = TRUE;
 
 CREATE TRIGGER trigger_accounts_update_timestamp
 BEFORE UPDATE ON accounts
@@ -83,6 +96,15 @@ CREATE TABLE IF NOT EXISTS transactions (
     create_timestamp TIMESTAMP DEFAULT NOW(),
     update_timestamp TIMESTAMP DEFAULT NOW()
 );
+
+CREATE VIEW active_transactions AS
+SELECT t.*
+FROM transactions t
+JOIN accounts a 
+    ON t.account_id = a.id
+JOIN items i 
+    ON a.item_id = i.id
+WHERE i.active = TRUE;
 
 CREATE TRIGGER trigger_transactions_update_timestamp
 BEFORE UPDATE ON transactions

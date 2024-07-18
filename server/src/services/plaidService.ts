@@ -61,7 +61,7 @@ const callPlaidClientMethod = async <T extends object, P extends object>(
         }
         delete sanitized['request']
         req.response = sanitized
-        createPlaidApiRequest(req)
+        await createPlaidApiRequest(req)
         return resp
     } catch (error) {
         logger.error({ error }, `plaid client error - ${method.name}`)
@@ -72,7 +72,7 @@ const callPlaidClientMethod = async <T extends object, P extends object>(
         } else {
             req.errorName = 'unknown'
         }
-        createPlaidApiRequest(req)
+        await createPlaidApiRequest(req)
         throw error
     }
 }

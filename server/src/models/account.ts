@@ -52,11 +52,11 @@ export const retrieveAccountsByUserId = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `
-        SELECT accounts.* 
-        FROM accounts
+        SELECT a.* 
+        FROM accounts a
         WHERE 
-            accounts.item_id IN (
-                SELECT id FROM items
+            a.item_id IN (
+                SELECT id FROM active_items
                 WHERE user_id = $1
             )
     `

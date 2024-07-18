@@ -130,15 +130,15 @@ export const retrieveTransactionsByUserId = async (
     userId: number
 ): Promise<Transaction[]> => {
     const query = `
-        SELECT transactions.*
-        FROM transactions
+        SELECT t.*
+        FROM transactions t
         WHERE
-            transactions.account_id IN (
+            t.account_id IN (
                 SELECT id
                 FROM accounts
                 WHERE item_id IN (
                     SELECT id
-                    FROM items
+                    FROM active_items
                     WHERE user_id = $1
                 )
             )

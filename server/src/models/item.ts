@@ -4,6 +4,7 @@ export interface Item {
     id: number
     userId: number
     itemId: string
+    active: boolean
     accessToken: string
     institutionId: string
     institutionName: string
@@ -15,6 +16,7 @@ interface DbItem {
     id: number
     user_id: number
     item_id: string
+    active: boolean
     access_token: string
     institution_id: string
     institution_name: string
@@ -26,6 +28,7 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     id: dbItem.id,
     userId: dbItem.user_id,
     itemId: dbItem.item_id,
+    active: dbItem.active,
     accessToken: dbItem.access_token,
     institutionId: dbItem.institution_id,
     institutionName: dbItem.institution_name,
@@ -38,7 +41,7 @@ export const retrieveItemById = async (
 ): Promise<Item | null> => {
     const query = `
         SELECT * 
-        FROM items
+        FROM active_items
         WHERE item_id = $1
         `
     const rows: DbItem[] = (await runQuery(query, [itemId])).rows
@@ -52,7 +55,7 @@ export const retrieveItemByUserIdAndInstitutionId = async (
 ): Promise<Item | null> => {
     const query = `
         SELECT * 
-        FROM items
+        FROM active_items
         WHERE user_id = $1
             AND institution_id = $2
         `
@@ -66,7 +69,7 @@ export const retrieveItemsByUserId = async (
 ): Promise<Item[]> => {
     const query = `
         SELECT *
-        FROM items
+        FROM active_items
         WHERE user_id = $1
     `
     const rows: DbItem[] = (await runQuery(query, [userId])).rows
@@ -79,6 +82,7 @@ export const createItem = async (
     accessToken: string,
     institutionId: string,
     institutionName: string,
+    active: boolean = true,
     healthy: boolean = true,
     cursor?: string
 ): Promise<Item | null> => {
@@ -86,19 +90,21 @@ export const createItem = async (
         INSERT INTO items (
             user_id,
             item_id,
+            active,
             access_token,
             institution_id,
             institution_name,
             healthy,
             cursor
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
     `
     const rows: DbItem[] = (
         await runQuery(query, [
             userId,
             itemId,
+            active,
             accessToken,
             institutionId,
             institutionName,
@@ -120,4 +126,13 @@ export const updateItemCursor = async (
         WHERE item_id = $2
     `
     await runQuery(query, [cursor, itemId])
+}
+
+export const updateItemToInactive = async (id: number) => {
+    const query = `
+        UPDATE items 
+        SET active = $1 
+        WHERE id = $2
+    `
+    await runQuery(query, [false, id])
 }
