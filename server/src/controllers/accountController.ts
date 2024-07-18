@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { retrieveAccountsByUser } from '../models/account.js'
+import { retrieveAccountsByUserId } from '../models/account.js'
 import { HttpError } from '../models/httpError.js'
 import { logger } from '../utils/logger.js'
 
@@ -10,7 +10,7 @@ export const getAccountsByUser = async (req: Request, res: Response) => {
     if (!userId) throw new HttpError('missing user id', 400)
 
     try {
-        const accounts = await retrieveAccountsByUser(userId)
+        const accounts = await retrieveAccountsByUserId(userId)
         return res.send(accounts)
     } catch (error) {
         logger.error(error)

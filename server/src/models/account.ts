@@ -48,7 +48,7 @@ const mapDbAccount = (dbAccount: DbAccount): Account => ({
     subtype: dbAccount.subtype,
 })
 
-export const retrieveAccountsByUser = async (
+export const retrieveAccountsByUserId = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `
