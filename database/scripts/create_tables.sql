@@ -26,8 +26,9 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     item_id TEXT UNIQUE NOT NULL,
+    active BOOLEAN NOT NULL,
     access_token TEXT NOT NULL,
     institution_id TEXT NOT NULL,
     institution_name TEXT NOT NULL,
@@ -42,9 +43,14 @@ BEFORE UPDATE ON items
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
+CREATE VIEW active_items AS
+SELECT *
+FROM items
+WHERE active = TRUE;
+
 CREATE TABLE IF NOT EXISTS accounts (
     id SERIAL PRIMARY KEY,
-    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
     account_id TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     mask TEXT,
@@ -60,6 +66,13 @@ CREATE TABLE IF NOT EXISTS accounts (
     update_timestamp TIMESTAMP DEFAULT NOW()
 );
 
+CREATE VIEW active_accounts AS
+SELECT a.*
+FROM accounts a
+JOIN items i 
+    ON a.item_id = i.id
+WHERE i.active = TRUE;
+
 CREATE TRIGGER trigger_accounts_update_timestamp
 BEFORE UPDATE ON accounts
 FOR EACH ROW
@@ -67,7 +80,7 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS transactions (
     id SERIAL PRIMARY KEY,
-    account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+    account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     transaction_id TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     amount NUMERIC(28, 10) NOT NULL,
@@ -84,9 +97,47 @@ CREATE TABLE IF NOT EXISTS transactions (
     update_timestamp TIMESTAMP DEFAULT NOW()
 );
 
+CREATE VIEW active_transactions AS
+SELECT t.*
+FROM transactions t
+JOIN accounts a 
+    ON t.account_id = a.id
+JOIN items i 
+    ON a.item_id = i.id
+WHERE i.active = TRUE;
+
 CREATE TRIGGER trigger_transactions_update_timestamp
 BEFORE UPDATE ON transactions
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TABLE IF NOT EXISTS plaid_link_events (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    request_id TEXT,
+    institution_id TEXT,
+    institution_name TEXT,
+    public_token TEXT,
+    status TEXT,
+    error_type TEXT,
+    error_code TEXT,
+    error_message TEXT,
+    create_timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS plaid_api_requests (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    method TEXT NOT NULL,
+    params JSON NOT NULL,
+    response JSON,
+    error_name TEXT,
+    error_message TEXT,
+    error_stack TEXT,
+    create_timestamp TIMESTAMP DEFAULT NOW()
+);
 
 COMMIT;

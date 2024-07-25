@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
 import { User } from '../models/user'
-import { LoggerService } from './logger.service'
 
 @Injectable({
     providedIn: 'root',
@@ -10,10 +9,7 @@ import { LoggerService } from './logger.service'
 export class UserService {
     readonly baseUrl = `${env.apiUrl}/users`
 
-    constructor(
-        private http: HttpClient,
-        private logger: LoggerService
-    ) {}
+    constructor(private http: HttpClient) {}
 
     storeCurrentUser(user: User) {
         sessionStorage.setItem('user', JSON.stringify(user))

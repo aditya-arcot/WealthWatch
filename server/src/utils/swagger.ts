@@ -35,13 +35,91 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                                 description: 'The account ID',
                             },
-                            userId: {
+                            itemId: {
                                 type: 'string',
-                                description: 'The user ID',
+                                description: 'The item ID',
+                            },
+                            accountId: {
+                                type: 'string',
+                                description: 'The Plaid account ID',
                             },
                             name: {
                                 type: 'string',
                                 description: 'The account name',
+                            },
+                            mask: {
+                                type: 'string',
+                                description: 'The account mask',
+                            },
+                            officialName: {
+                                type: 'string',
+                                description: 'The account official name',
+                            },
+                            currentBalance: {
+                                type: 'number',
+                                description: 'The account current balance',
+                            },
+                            availableBalance: {
+                                type: 'number',
+                                description: 'The account available balance',
+                            },
+                            isoCurrencyCode: {
+                                type: 'string',
+                                description: 'The account ISO currency code',
+                            },
+                            unofficialCurrencyCode: {
+                                type: 'string',
+                                description:
+                                    'The account unofficial currency code',
+                            },
+                            creditLimit: {
+                                type: 'number',
+                                description: 'The account credit limit',
+                            },
+                            type: {
+                                type: 'string',
+                                description: 'The account type',
+                            },
+                            subtype: {
+                                type: 'string',
+                                description: 'The account subtype',
+                            },
+                        },
+                    },
+                    Item: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'string',
+                                description: 'The item ID',
+                            },
+                            userId: {
+                                type: 'string',
+                                description: 'The user ID',
+                            },
+                            itemId: {
+                                type: 'string',
+                                description: 'The Plaid item ID',
+                            },
+                            accessToken: {
+                                type: 'string',
+                                description: 'The item access token',
+                            },
+                            institutionId: {
+                                type: 'string',
+                                description: 'The institution ID',
+                            },
+                            institutionName: {
+                                type: 'string',
+                                description: 'The institution name',
+                            },
+                            healthy: {
+                                type: 'boolean',
+                                description: 'The item healthy status',
+                            },
+                            cursor: {
+                                type: 'string',
+                                description: 'The item cursor',
                             },
                         },
                     },
@@ -51,6 +129,70 @@ export const createSwaggerSpec = () => {
                             logtailToken: {
                                 type: 'string',
                                 description: 'The Logtail token',
+                            },
+                        },
+                    },
+                    Transaction: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'string',
+                                description: 'The transaction ID',
+                            },
+                            accountId: {
+                                type: 'string',
+                                description: 'The account ID',
+                            },
+                            transactionId: {
+                                type: 'string',
+                                description: 'The Plaid transaction ID',
+                            },
+                            name: {
+                                type: 'string',
+                                description: 'The transaction name',
+                            },
+                            amount: {
+                                type: 'number',
+                                description: 'The transaction amount',
+                            },
+                            merchant: {
+                                type: 'string',
+                                description: 'The transaction merchant',
+                            },
+                            merchantId: {
+                                type: 'string',
+                                description: 'The transaction merchant ID',
+                            },
+                            category: {
+                                type: 'string',
+                                description: 'The transaction category',
+                            },
+                            detailedCategory: {
+                                type: 'string',
+                                description:
+                                    'The transaction detailed category',
+                            },
+                            paymentChannel: {
+                                type: 'string',
+                                description: 'The transaction payment channel',
+                            },
+                            isoCurrencyCode: {
+                                type: 'string',
+                                description:
+                                    'The transaction ISO currency code',
+                            },
+                            unofficialCurrencyCode: {
+                                type: 'string',
+                                description:
+                                    'The transaction unofficial currency code',
+                            },
+                            date: {
+                                type: 'string',
+                                description: 'The transaction date',
+                            },
+                            pending: {
+                                type: 'boolean',
+                                description: 'The transaction pending status',
                             },
                         },
                     },
@@ -86,34 +228,9 @@ export const createSwaggerSpec = () => {
                     LinkToken: {
                         type: 'object',
                         properties: {
-                            expiration: {
-                                type: 'string',
-                                description: 'The link token expiration',
-                            },
                             linkToken: {
                                 type: 'string',
                                 description: 'The link token',
-                            },
-                            requestId: {
-                                type: 'string',
-                                description: 'The request ID',
-                            },
-                        },
-                    },
-                    AccessToken: {
-                        type: 'object',
-                        properties: {
-                            accessToken: {
-                                type: 'string',
-                                description: 'The access token',
-                            },
-                            itemId: {
-                                type: 'string',
-                                description: 'The item ID',
-                            },
-                            requestId: {
-                                type: 'string',
-                                description: 'The request ID',
                             },
                         },
                     },

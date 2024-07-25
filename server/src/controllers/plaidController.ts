@@ -1,9 +1,12 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import { HttpError } from '../models/httpError.js'
-import { createItem } from '../models/plaid.js'
 import {
-    checkExistingItem,
+    createItem,
+    retrieveItemByUserIdAndInstitutionId,
+} from '../models/item.js'
+import { createPlaidLinkEvent, PlaidLinkEvent } from '../models/plaid.js'
+import {
     createLinkToken,
     exchangePublicTokenForAccessToken,
     syncItemData,
@@ -20,10 +23,26 @@ export const getLinkToken = async (req: Request, res: Response) => {
 
     try {
         const token = await createLinkToken(userId, itemId)
-        return res.send(token)
+        return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)
         throw new HttpError('failed to create link token')
+    }
+}
+
+export const handleLinkEvent = async (req: Request, res: Response) => {
+    logger.debug('handling link event')
+
+    const event: PlaidLinkEvent | undefined = req.body.event
+    if (!event) throw new HttpError('missing event', 400)
+
+    try {
+        const newEvent = await createPlaidLinkEvent(event)
+        if (!newEvent) throw Error('event not created')
+        return res.status(204).send()
+    } catch (error) {
+        logger.error(error)
+        throw new HttpError('failed to create link event')
     }
 }
 
@@ -41,22 +60,30 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     if (!institution || !institution.institution_id || !institution.name)
         throw new HttpError('missing institution info', 400)
 
-    if (await checkExistingItem(userId, institution.institution_id)) {
+    if (
+        await retrieveItemByUserIdAndInstitutionId(
+            userId,
+            institution.institution_id
+        )
+    ) {
         throw new HttpError('account already exists', 409)
     }
 
     try {
-        const token = await exchangePublicTokenForAccessToken(publicToken)
+        const resp = await exchangePublicTokenForAccessToken(
+            publicToken,
+            userId
+        )
         const item = await createItem(
             userId,
-            token.itemId,
-            token.accessToken,
+            resp.itemId,
+            resp.accessToken,
             institution.institution_id,
             institution.name
         )
         if (!item) throw Error('item not created')
         await syncItemData(item)
-        return res.send(token)
+        return res.status(204).send()
     } catch (error) {
         logger.error(error)
         throw new HttpError('failed to exchange public token')
