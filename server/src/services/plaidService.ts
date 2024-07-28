@@ -261,7 +261,7 @@ const mapPlaidTransaction = (
         paymentChannel: transaction.payment_channel,
         isoCurrencyCode: transaction.iso_currency_code,
         unofficialCurrencyCode: transaction.unofficial_currency_code,
-        date: new Date(transaction.date),
+        date: new Date(transaction.authorized_date ?? transaction.date),
         pending: transaction.pending,
     }
 }
