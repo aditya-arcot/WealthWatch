@@ -1,7 +1,12 @@
 import express, { Request, Response } from 'express'
-import { retrieveItemsByUserId, updateItemToInactive } from '../models/item.js'
+import { SandboxItemFireWebhookRequestWebhookCodeEnum } from 'plaid'
+import {
+    retrieveItemById,
+    retrieveItemsByUserId,
+    updateItemToInactive,
+} from '../models/item.js'
 import { deleteUser, retrieveUsers } from '../models/user.js'
-import { removeItem } from '../services/plaidService.js'
+import { fireWebhook, removeItem } from '../services/plaidService.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { logger } from '../utils/logger.js'
 
@@ -85,9 +90,59 @@ router.route('/items').delete(
     })
 )
 
+/**
+ * @swagger
+ * /dev/webhook:
+ *   post:
+ *     summary: Fire Plaid webhook
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The item id
+ *       - in: query
+ *         name: code
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The webhook code
+ *     responses:
+ *       204:
+ *         description: Webhook fired
+ */
+router.route('/webhook').post(
+    catchAsync(async (req: Request, res: Response) => {
+        const itemId: string | undefined = req.query['itemId'] as string
+        if (!itemId) throw Error('missing item id')
+
+        const item = await retrieveItemById(itemId)
+        if (!item) throw Error('item not found')
+
+        const code: string | undefined = req.query['code'] as string
+        if (
+            !code ||
+            typeof code !== 'string' ||
+            !Object.values(
+                SandboxItemFireWebhookRequestWebhookCodeEnum
+            ).includes(code as SandboxItemFireWebhookRequestWebhookCodeEnum)
+        ) {
+            throw Error('invalid webhook code')
+        }
+        code
+        await fireWebhook(
+            item,
+            code as SandboxItemFireWebhookRequestWebhookCodeEnum
+        )
+
+        return res.status(204).send()
+    })
+)
+
 // TODO - plaid sandbox routes
 // create public token
 // reset login
-// fire webhook
 
 export default router

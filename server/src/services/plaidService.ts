@@ -11,6 +11,8 @@ import {
     Products as PlaidProducts,
     RemovedTransaction as PlaidRemovedTransaction,
     Transaction as PlaidTransaction,
+    SandboxItemFireWebhookRequest,
+    SandboxItemFireWebhookRequestWebhookCodeEnum,
     TransactionsSyncRequest,
 } from 'plaid'
 import { env } from 'process'
@@ -224,6 +226,24 @@ export const removeItem = async (item: Item) => {
     logger.debug('removing item')
     const params: ItemRemoveRequest = { access_token: item.accessToken }
     await callPlaidClientMethod(client.itemRemove, params, item.userId, item.id)
+}
+
+export const fireWebhook = async (
+    item: Item,
+    code: SandboxItemFireWebhookRequestWebhookCodeEnum
+) => {
+    logger.debug('firing webhook')
+    const params: SandboxItemFireWebhookRequest = {
+        access_token: item.accessToken,
+        webhook_code: code,
+    }
+    const resp = await callPlaidClientMethod(
+        client.sandboxItemFireWebhook,
+        params,
+        item.userId,
+        item.id
+    )
+    logger.debug(resp)
 }
 
 const mapPlaidAccount = (account: AccountBase, itemId: number): Account => {
