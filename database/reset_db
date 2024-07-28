@@ -44,12 +44,19 @@ source ./load_env
 
 if psql -lqt | cut -d \| -f 1 | grep -qw $DB_NAME; then
     echo "database already exists"
-    if PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -tAc "SELECT COUNT(*) FROM active_items;" | grep -q 0; then
-        echo "database has no active items. dropping..."
-        dropdb $DB_NAME
+    echo "checking for active items..."
+    VIEW_EXISTS=$(PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -tAc "SELECT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'active_items');")
+    if [ "$VIEW_EXISTS" = "t" ]; then
+        if PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -tAc "SELECT COUNT(*) FROM active_items;" | grep -q 0; then
+            echo "database has no active items. dropping..."
+            dropdb $DB_NAME
+        else
+            echo "database has active items. deactivate them before reset. aborting..."
+            exit 1
+        fi
     else
-        echo "database has active items. deactivate them before reset. aborting..."
-        exit 1
+        echo "view 'active_items' does not exist. dropping..."
+        dropdb $DB_NAME
     fi
 else
     echo "database does not exist"
