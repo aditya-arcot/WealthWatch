@@ -8,6 +8,36 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TABLE IF NOT EXISTS audit (
+    id SERIAL PRIMARY KEY,
+    operation CHAR(1) NOT NULL CHECK (operation IN ('I', 'U', 'D')),
+    table_name TEXT NOT NULL,
+    row_id INTEGER NOT NULL,
+    row_data JSON NOT NULL,
+    user_id TEXT NOT NULL,
+    create_timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION insert_audit_record()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
+        VALUES ('I', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user, NOW());
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
+        VALUES ('U', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user, NOW());
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
+        VALUES ('D', TG_TABLE_NAME, OLD.id, row_to_json(OLD), current_user, NOW());
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
@@ -23,6 +53,11 @@ CREATE TRIGGER trigger_users_update_timestamp
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_users_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON users
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
 
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
@@ -42,6 +77,11 @@ CREATE TRIGGER trigger_items_update_timestamp
 BEFORE UPDATE ON items
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_items_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON items
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
 
 CREATE VIEW active_items AS
 SELECT *
@@ -66,17 +106,22 @@ CREATE TABLE IF NOT EXISTS accounts (
     update_timestamp TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TRIGGER trigger_accounts_update_timestamp
+BEFORE UPDATE ON accounts
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_accounts_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON accounts
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
+
 CREATE VIEW active_accounts AS
 SELECT a.*
 FROM accounts a
 JOIN items i 
     ON a.item_id = i.id
 WHERE i.active = TRUE;
-
-CREATE TRIGGER trigger_accounts_update_timestamp
-BEFORE UPDATE ON accounts
-FOR EACH ROW
-EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS transactions (
     id SERIAL PRIMARY KEY,
@@ -97,6 +142,16 @@ CREATE TABLE IF NOT EXISTS transactions (
     update_timestamp TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TRIGGER trigger_transactions_update_timestamp
+BEFORE UPDATE ON transactions
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_transactions_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON transactions
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
+
 CREATE VIEW active_transactions AS
 SELECT t.*
 FROM transactions t
@@ -105,11 +160,6 @@ JOIN accounts a
 JOIN items i 
     ON a.item_id = i.id
 WHERE i.active = TRUE;
-
-CREATE TRIGGER trigger_transactions_update_timestamp
-BEFORE UPDATE ON transactions
-FOR EACH ROW
-EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS plaid_link_events (
     id SERIAL PRIMARY KEY,
