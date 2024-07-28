@@ -78,6 +78,7 @@ jobs:
                   echo "PLAID_ENV=${{ secrets.PLAID_ENV }}" >> .env
                   echo "PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }}" >> .env
                   echo "PLAID_SECRET=${{ secrets.PLAID_SECRET }}" >> .env
+                  echo "PLAID_WEBHOOK_URL=${{ secrets.PLAID_WEBHOOK_URL }}" >> .env
 
                   echo "CLIENT_PORT=${{ secrets.CLIENT_PORT }}" >> .env
                   echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env

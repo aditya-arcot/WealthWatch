@@ -112,6 +112,7 @@ export const createLinkToken = async (
             days_requested: 365,
         },
         access_token: accessToken,
+        webhook: env['PLAID_WEBHOOK_URL'] ?? '',
     }
 
     const resp = await callPlaidClientMethod(
