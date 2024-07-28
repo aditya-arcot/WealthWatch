@@ -118,7 +118,7 @@ export const createLinkToken = async (
         products,
         required_if_supported_products: requiredIfSupportedProducts,
         transactions: {
-            days_requested: 365,
+            days_requested: 365, // max - 730
         },
         access_token: accessToken,
         webhook: env['PLAID_WEBHOOK_URL'] ?? '',

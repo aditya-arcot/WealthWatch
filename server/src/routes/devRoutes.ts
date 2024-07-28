@@ -13,6 +13,7 @@ import {
     exchangePublicTokenAndCreateItemAndSync,
     fireWebhook,
     removeItem,
+    syncItemData,
 } from '../services/plaidService.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { logger } from '../utils/logger.js'
@@ -168,6 +169,35 @@ router.route('/item').post(
             institutionName,
             publicToken
         )
+        return res.status(204).send()
+    })
+)
+
+/**
+ * @swagger
+ * /dev/item-sync:
+ *   post:
+ *     summary: Sync item
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       204:
+ *         description: Synced item
+ */
+router.route('/item-sync').post(
+    catchAsync(async (req: Request, res: Response) => {
+        const itemId: string | undefined = req.query['itemId'] as string
+        if (!itemId) throw new HttpError('missing item id', 400)
+
+        const item = await retrieveItemById(itemId)
+        if (!item) throw new HttpError('item not found', 404)
+
+        await syncItemData(item)
         return res.status(204).send()
     })
 )
