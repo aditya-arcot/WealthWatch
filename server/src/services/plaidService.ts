@@ -13,17 +13,24 @@ import {
     Transaction as PlaidTransaction,
     SandboxItemFireWebhookRequest,
     SandboxItemFireWebhookRequestWebhookCodeEnum,
+    SandboxPublicTokenCreateRequest,
     TransactionsSyncRequest,
 } from 'plaid'
 import { env } from 'process'
 import { Account, createOrUpdateAccounts } from '../models/account.js'
-import { Item, retrieveItemById, updateItemCursor } from '../models/item.js'
+import {
+    createItem,
+    Item,
+    retrieveItemById,
+    updateItemCursor,
+} from '../models/item.js'
 import { createPlaidApiRequest, PlaidApiRequest } from '../models/plaid.js'
 import {
     createOrUpdateTransactions,
     deleteTransactions,
     Transaction,
 } from '../models/transaction.js'
+import { User } from '../models/user.js'
 import { safeStringify } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 
@@ -237,13 +244,59 @@ export const fireWebhook = async (
         access_token: item.accessToken,
         webhook_code: code,
     }
-    const resp = await callPlaidClientMethod(
+    await callPlaidClientMethod(
         client.sandboxItemFireWebhook,
         params,
         item.userId,
         item.id
     )
-    logger.debug(resp)
+}
+
+export const createPublicToken = async (user: User, institutionId: string) => {
+    logger.debug('creating public token')
+
+    const lastYear = new Date()
+    lastYear.setFullYear(lastYear.getFullYear() - 1)
+
+    const year = lastYear.getFullYear()
+    const month = String(lastYear.getMonth() + 1).padStart(2, '0')
+    const day = String(lastYear.getDate()).padStart(2, '0')
+    const startDate = `${year}-${month}-${day}`
+
+    const params: SandboxPublicTokenCreateRequest = {
+        institution_id: institutionId,
+        initial_products: [PlaidProducts.Transactions],
+        options: {
+            webhook: env['PLAID_WEBHOOK_URL'] ?? '',
+            transactions: {
+                start_date: startDate,
+            },
+        },
+    }
+    const resp = await callPlaidClientMethod(
+        client.sandboxPublicTokenCreate,
+        params,
+        user.id
+    )
+    return resp.data.public_token
+}
+
+export const exchangePublicTokenAndCreateItemAndSync = async (
+    userId: number,
+    institutionId: string,
+    institutionName: string,
+    publicToken: string
+) => {
+    const resp = await exchangePublicTokenForAccessToken(publicToken, userId)
+    const item = await createItem(
+        userId,
+        resp.itemId,
+        resp.accessToken,
+        institutionId,
+        institutionName
+    )
+    if (!item) throw Error('item not created')
+    await syncItemData(item)
 }
 
 const mapPlaidAccount = (account: AccountBase, itemId: number): Account => {

@@ -1,15 +1,11 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import { HttpError } from '../models/httpError.js'
-import {
-    createItem,
-    retrieveItemByUserIdAndInstitutionId,
-} from '../models/item.js'
+import { retrieveItemByUserIdAndInstitutionId } from '../models/item.js'
 import { createPlaidLinkEvent, PlaidLinkEvent } from '../models/plaid.js'
 import {
     createLinkToken,
-    exchangePublicTokenForAccessToken,
-    syncItemData,
+    exchangePublicTokenAndCreateItemAndSync,
 } from '../services/plaidService.js'
 import { logger } from '../utils/logger.js'
 
@@ -60,29 +56,19 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     if (!institution || !institution.institution_id || !institution.name)
         throw new HttpError('missing institution info', 400)
 
-    if (
-        await retrieveItemByUserIdAndInstitutionId(
-            userId,
-            institution.institution_id
-        )
-    ) {
-        throw new HttpError('account already exists', 409)
-    }
+    const item = await retrieveItemByUserIdAndInstitutionId(
+        userId,
+        institution.institution_id
+    )
+    if (item) throw new HttpError('account already exists', 409)
 
     try {
-        const resp = await exchangePublicTokenForAccessToken(
-            publicToken,
-            userId
-        )
-        const item = await createItem(
+        await exchangePublicTokenAndCreateItemAndSync(
             userId,
-            resp.itemId,
-            resp.accessToken,
             institution.institution_id,
-            institution.name
+            institution.name,
+            publicToken
         )
-        if (!item) throw Error('item not created')
-        await syncItemData(item)
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
