@@ -163,7 +163,7 @@ WHERE i.active = TRUE;
 
 CREATE TABLE IF NOT EXISTS plaid_link_events (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER,
     type TEXT NOT NULL,
     session_id TEXT NOT NULL,
     request_id TEXT,
@@ -179,8 +179,8 @@ CREATE TABLE IF NOT EXISTS plaid_link_events (
 
 CREATE TABLE IF NOT EXISTS plaid_api_requests (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    user_id INTEGER,
+    item_id INTEGER,
     method TEXT NOT NULL,
     params JSON NOT NULL,
     response JSON,

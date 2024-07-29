@@ -52,12 +52,12 @@ logger.debug(config, 'configured plaid client')
 const callPlaidClientMethod = async <T extends object, P extends object>(
     method: (params: P) => Promise<T>,
     params: P,
-    userId: number,
+    userId?: number,
     itemId?: number
 ) => {
     const req: PlaidApiRequest = {
         id: -1,
-        userId,
+        userId: userId ?? null,
         itemId: itemId ?? null,
         method: method.name,
         params,

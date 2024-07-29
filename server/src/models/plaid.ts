@@ -86,7 +86,7 @@ export const createPlaidLinkEvent = async (
 
 export interface PlaidApiRequest {
     id: number
-    userId: number
+    userId?: number | null
     itemId?: number | null
     method: string
     params: object
