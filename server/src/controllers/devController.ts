@@ -56,10 +56,10 @@ export const deactivateItems = async (_req: Request, res: Response) => {
 
 export const fireSandboxWebhook = async (req: Request, res: Response) => {
     const itemId: string | undefined = req.query['itemId'] as string
-    if (!itemId) throw Error('missing item id')
+    if (!itemId) throw new HttpError('missing item id', 400)
 
     const item = await retrieveItemById(itemId)
-    if (!item) throw Error('item not found')
+    if (!item) throw new HttpError('item not found', 404)
 
     const code: string | undefined = req.query['code'] as string
     const codeEnum = code as SandboxItemFireWebhookRequestWebhookCodeEnum
@@ -69,7 +69,7 @@ export const fireSandboxWebhook = async (req: Request, res: Response) => {
             codeEnum
         )
     ) {
-        throw Error('invalid webhook code')
+        throw new HttpError('invalid webhook code', 400)
     }
 
     await fireWebhook(item, codeEnum)

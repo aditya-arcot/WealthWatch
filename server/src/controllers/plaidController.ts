@@ -23,7 +23,7 @@ export const getLinkToken = async (req: Request, res: Response) => {
         return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to create link token')
+        throw Error('failed to create link token')
     }
 }
 
@@ -39,7 +39,7 @@ export const handleLinkEvent = async (req: Request, res: Response) => {
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to create link event')
+        throw Error('failed to create link event')
     }
 }
 
@@ -73,7 +73,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to exchange public token')
+        throw Error('failed to exchange public token')
     }
 }
 

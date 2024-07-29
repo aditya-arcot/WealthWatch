@@ -14,6 +14,6 @@ export const getTransactionsByUser = async (req: Request, res: Response) => {
         return res.send(transactions)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to get transactions')
+        throw Error('failed to get transactions')
     }
 }

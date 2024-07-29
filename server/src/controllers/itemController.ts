@@ -14,6 +14,6 @@ export const getItemsByUser = async (req: Request, res: Response) => {
         return res.send(items)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to get items')
+        throw Error('failed to get items')
     }
 }

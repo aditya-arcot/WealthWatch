@@ -27,7 +27,7 @@ export const login = async (req: Request, res: Response) => {
     } catch (error) {
         logger.error(error)
         if (error instanceof HttpError) throw error
-        throw new HttpError('failed to login')
+        throw Error('failed to login')
     }
 }
 
@@ -35,7 +35,7 @@ export const logout = (req: Request, res: Response) => {
     logger.debug('logging out user')
     req.session.destroy((err) => {
         if (err) {
-            throw new HttpError('failed to log out')
+            throw Error('failed to log out')
         }
         return res.status(204).send()
     })
@@ -69,6 +69,6 @@ export const register = async (req: Request, res: Response) => {
         return res.status(201).send(user)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to register')
+        throw Error('failed to register')
     }
 }
