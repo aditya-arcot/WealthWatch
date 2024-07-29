@@ -68,6 +68,7 @@ export const logRequestResponse = (
     next: NextFunction
 ) => {
     const id = randomUUID()
+    const start = Date.now()
     const requestLog = {
         id,
         method: req.method,
@@ -92,6 +93,7 @@ export const logRequestResponse = (
     res.on('finish', () => {
         const responseLog = {
             id,
+            duration: Date.now() - start,
             statusCode: res.statusCode,
             headers: res.getHeaders(),
             // @ts-expect-error: custom property
