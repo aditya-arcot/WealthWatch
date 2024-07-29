@@ -4,8 +4,9 @@ import helmet from 'helmet'
 import methodOverride from 'method-override'
 import { pid } from 'process'
 import swaggerUi from 'swagger-ui-express'
-import { HttpError } from './models/httpError.js'
+import { handleWebhook } from './controllers/plaidController.js'
 import router from './routes/index.js'
+import { catchAsync } from './utils/catchAsync.js'
 import { configureCleanup } from './utils/cleanup.js'
 import { createPool } from './utils/database.js'
 import { logger } from './utils/logger.js'
@@ -14,6 +15,7 @@ import {
     createCsrfMiddleware,
     createSessionMiddleware,
     handleError,
+    handleUnmatchedRoute,
     logRequestResponse,
     production,
 } from './utils/middleware.js'
@@ -24,6 +26,7 @@ logger.info(`started - pid ${pid}`)
 await createPool()
 configureCleanup()
 
+logger.debug('configuring main app')
 const app = express()
 if (production) {
     app.set('trust proxy', 1)
@@ -37,7 +40,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(createSessionMiddleware())
 app.use(cookieParser())
-app.use(logRequestResponse)
+app.use(logRequestResponse) // keep before csrf
 app.use(createCsrfMiddleware())
 
 logger.debug('configuring routes')
@@ -54,13 +57,31 @@ if (!production) {
     )
 }
 app.use('/', router)
-app.use((req, _res, _next) => {
-    throw new HttpError(`endpoint not found - ${req.url}`, 404)
-})
+app.use(handleUnmatchedRoute)
 app.use(handleError)
 
-logger.debug('starting server')
+logger.debug('starting main app')
 const port = 3000
-app.listen(port, (): void => {
-    logger.info(`server running - port ${port}`)
+app.listen(port, () => {
+    logger.info(`main server running - port ${port}`)
+})
+
+logger.debug('configuring webhook app')
+const webhookApp = express()
+
+logger.debug('configuring middleware')
+webhookApp.use(express.json())
+webhookApp.use(express.urlencoded({ extended: true }))
+webhookApp.use(logRequestResponse)
+
+logger.debug('configuring routes')
+webhookApp.use('/status', (_req, res) => res.send('ok'))
+webhookApp.post('/webhooks', catchAsync(handleWebhook))
+webhookApp.use(handleUnmatchedRoute)
+webhookApp.use(handleError)
+
+logger.debug('starting webhook app')
+const webhookPort = 3001
+webhookApp.listen(webhookPort, () => {
+    logger.info(`webhook server running - port ${webhookPort}`)
 })

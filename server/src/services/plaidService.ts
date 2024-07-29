@@ -1,3 +1,6 @@
+import { importJWK, JWK, jwtVerify } from 'jose'
+import { sha256 } from 'js-sha256'
+import { jwtDecode } from 'jwt-decode'
 import {
     AccountBase,
     AccountsGetRequest,
@@ -337,5 +340,50 @@ const mapPlaidTransaction = (
         unofficialCurrencyCode: transaction.unofficial_currency_code,
         date: new Date(transaction.authorized_date ?? transaction.date),
         pending: transaction.pending,
+    }
+}
+
+export const verifyWebhook = async (
+    token: string,
+    body: string
+): Promise<void> => {
+    const decodedTokenHeader = jwtDecode(token, { header: true })
+    if (
+        !decodedTokenHeader.kid ||
+        !decodedTokenHeader.alg ||
+        !decodedTokenHeader.typ
+    ) {
+        throw Error('invalid jwt header')
+    }
+    if (decodedTokenHeader.alg !== 'ES256') {
+        throw Error('invalid algorithm')
+    }
+    if (decodedTokenHeader.typ !== 'JWT') {
+        throw Error('invalid type')
+    }
+
+    const params = { key_id: decodedTokenHeader.kid }
+    const resp = await callPlaidClientMethod(
+        client.webhookVerificationKeyGet,
+        params
+    )
+    const plaidJwk = resp.data.key
+
+    const joseJwk: JWK = {
+        alg: plaidJwk.alg,
+        crv: plaidJwk.crv,
+        kid: plaidJwk.kid,
+        kty: plaidJwk.kty,
+        use: plaidJwk.use,
+        x: plaidJwk.x,
+        y: plaidJwk.y,
+    }
+    const keyLike = await importJWK(joseJwk)
+
+    const { payload } = await jwtVerify(token, keyLike, {
+        maxTokenAge: '5 min',
+    })
+    if (sha256(body) !== payload['request_body_sha256']) {
+        throw Error('body hash does not match')
     }
 }

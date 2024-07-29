@@ -113,6 +113,14 @@ export const authenticate = (
     throw new HttpError('unauthorized', 401)
 }
 
+export const handleUnmatchedRoute = (
+    req: Request,
+    _res: Response,
+    _next: NextFunction
+) => {
+    throw new HttpError(`endpoint not found - ${req.url}`, 404)
+}
+
 export const handleError = (
     err: Error,
     _req: Request,
