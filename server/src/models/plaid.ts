@@ -3,6 +3,7 @@ import { runQuery } from '../utils/database.js'
 export interface PlaidLinkEvent {
     id: number
     userId: number
+    timestamp: Date
     type: string
     sessionId: string
     requestId?: string | null
@@ -18,6 +19,7 @@ export interface PlaidLinkEvent {
 interface DbPlaidLinkEvent {
     id: number
     user_id: number
+    timestamp: Date
     type: string
     session_id: string
     request_id: string | null
@@ -33,6 +35,7 @@ interface DbPlaidLinkEvent {
 const mapDbLinkEvent = (dbLinkEvent: DbPlaidLinkEvent): PlaidLinkEvent => ({
     id: dbLinkEvent.id,
     userId: dbLinkEvent.user_id,
+    timestamp: dbLinkEvent.timestamp,
     type: dbLinkEvent.type,
     sessionId: dbLinkEvent.session_id,
     requestId: dbLinkEvent.request_id,
@@ -51,6 +54,7 @@ export const createPlaidLinkEvent = async (
     const query = `
         INSERT INTO plaid_link_events (
             user_id,
+            timestamp,
             type,
             session_id,
             request_id,
@@ -62,12 +66,13 @@ export const createPlaidLinkEvent = async (
             error_code,
             error_message
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         RETURNING *
     `
     const rows: DbPlaidLinkEvent[] = (
         await runQuery(query, [
             event.userId,
+            event.timestamp,
             event.type,
             event.sessionId,
             event.requestId,
@@ -88,6 +93,8 @@ export interface PlaidApiRequest {
     id: number
     userId?: number | null
     itemId?: number | null
+    timestamp: Date
+    duration: number
     method: string
     params: object
     response?: object | null
@@ -96,13 +103,45 @@ export interface PlaidApiRequest {
     errorStack?: string | null
 }
 
+interface DbPlaidApiRequest {
+    id: number
+    user_id: number | null
+    item_id: number | null
+    timestamp: Date
+    duration: number
+    method: string
+    params: object
+    response: object | null
+    error_name: string | null
+    error_message: string | null
+    error_stack: string | null
+}
+
+const mapDbPlaidApiRequest = (
+    dbPlaidApiRequest: DbPlaidApiRequest
+): PlaidApiRequest => ({
+    id: dbPlaidApiRequest.id,
+    userId: dbPlaidApiRequest.user_id,
+    itemId: dbPlaidApiRequest.item_id,
+    timestamp: dbPlaidApiRequest.timestamp,
+    duration: dbPlaidApiRequest.duration,
+    method: dbPlaidApiRequest.method,
+    params: dbPlaidApiRequest.params,
+    response: dbPlaidApiRequest.response,
+    errorName: dbPlaidApiRequest.error_name,
+    errorMessage: dbPlaidApiRequest.error_message,
+    errorStack: dbPlaidApiRequest.error_stack,
+})
+
 export const createPlaidApiRequest = async (
     request: PlaidApiRequest
-): Promise<void> => {
+): Promise<PlaidApiRequest | null> => {
     const query = `
         INSERT INTO plaid_api_requests (
             user_id,
             item_id,
+            timestamp,
+            duration,
             method,
             params,
             response,
@@ -110,16 +149,23 @@ export const createPlaidApiRequest = async (
             error_message,
             error_stack
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING *
     `
-    await runQuery(query, [
-        request.userId,
-        request.itemId,
-        request.method,
-        request.params,
-        request.response,
-        request.errorName,
-        request.errorMessage,
-        request.errorStack,
-    ])
+    const rows: DbPlaidApiRequest[] = (
+        await runQuery(query, [
+            request.userId,
+            request.itemId,
+            request.timestamp,
+            request.duration,
+            request.method,
+            request.params,
+            request.response,
+            request.errorName,
+            request.errorMessage,
+            request.errorStack,
+        ])
+    ).rows
+    if (!rows[0]) return null
+    return mapDbPlaidApiRequest(rows[0])
 }

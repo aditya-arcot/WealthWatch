@@ -3,7 +3,7 @@ START TRANSACTION;
 CREATE OR REPLACE FUNCTION set_update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
-    new.update_timestamp = NOW();
+    new.update_timestamp = TIMEZONE('UTC', NOW());
     RETURN new;
 END;
 $$ LANGUAGE plpgsql;
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS audit (
     row_id INTEGER NOT NULL,
     row_data JSON NOT NULL,
     user_id TEXT NOT NULL,
-    create_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE OR REPLACE FUNCTION insert_audit_record()
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS users (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TRIGGER trigger_users_update_timestamp
@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS items (
     institution_name TEXT NOT NULL,
     healthy BOOLEAN NOT NULL,
     cursor TEXT,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TRIGGER trigger_items_update_timestamp
@@ -102,8 +102,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     credit_limit NUMERIC(28, 10),
     type TEXT NOT NULL,
     subtype TEXT NOT NULL,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TRIGGER trigger_accounts_update_timestamp
@@ -138,8 +138,8 @@ CREATE TABLE IF NOT EXISTS transactions (
     unofficial_currency_code TEXT,
     date DATE NOT NULL,
     pending BOOLEAN NOT NULL,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TRIGGER trigger_transactions_update_timestamp
@@ -161,9 +161,30 @@ JOIN items i
     ON a.item_id = i.id
 WHERE i.active = TRUE;
 
+CREATE TABLE IF NOT EXISTS app_requests (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER,
+    timestamp TIMESTAMP NOT NULL,
+    duration INTEGER NOT NULL,
+    method TEXT NOT NULL,
+    url TEXT NOT NULL,
+    query_params JSON,
+    route_params JSON,
+    request_headers JSON,
+    request_body JSON,
+    remote_address TEXT,
+    remote_port INTEGER,
+    session JSON,
+    response_status INTEGER NOT NULL,
+    response_headers JSON,
+    response_body JSON,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
+
 CREATE TABLE IF NOT EXISTS plaid_link_events (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
+    timestamp TIMESTAMP NOT NULL,
     type TEXT NOT NULL,
     session_id TEXT NOT NULL,
     request_id TEXT,
@@ -174,20 +195,22 @@ CREATE TABLE IF NOT EXISTS plaid_link_events (
     error_type TEXT,
     error_code TEXT,
     error_message TEXT,
-    create_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TABLE IF NOT EXISTS plaid_api_requests (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
     item_id INTEGER,
+    timestamp TIMESTAMP NOT NULL,
+    duration INTEGER NOT NULL,
     method TEXT NOT NULL,
     params JSON NOT NULL,
     response JSON,
     error_name TEXT,
     error_message TEXT,
     error_stack TEXT,
-    create_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 COMMIT;

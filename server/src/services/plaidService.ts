@@ -27,7 +27,7 @@ import {
     retrieveItemById,
     updateItemCursor,
 } from '../models/item.js'
-import { createPlaidApiRequest, PlaidApiRequest } from '../models/plaid.js'
+import { PlaidApiRequest } from '../models/plaid.js'
 import {
     createOrUpdateTransactions,
     deleteTransactions,
@@ -36,6 +36,7 @@ import {
 import { User } from '../models/user.js'
 import { safeStringify } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
+import { addPlaidApiRequestLogToQueue } from '../utils/queue.js'
 
 if (!env['PLAID_ENV'] || !env['PLAID_CLIENT_ID'] || !env['PLAID_SECRET']) {
     throw Error('missing one or more plaid secrets')
@@ -60,6 +61,8 @@ const callPlaidClientMethod = async <T extends object, P extends object>(
 ) => {
     const req: PlaidApiRequest = {
         id: -1,
+        timestamp: new Date(),
+        duration: -1,
         userId: userId ?? null,
         itemId: itemId ?? null,
         method: method.name,
@@ -68,14 +71,19 @@ const callPlaidClientMethod = async <T extends object, P extends object>(
 
     try {
         const resp: T = await method.bind(client)(params)
+        req.duration = Date.now() - req.timestamp.getTime()
+
         const sanitized = JSON.parse(safeStringify(resp)) as {
             request?: object
         }
         delete sanitized['request']
         req.response = sanitized
-        await createPlaidApiRequest(req)
+
+        await addPlaidApiRequestLogToQueue(req)
         return resp
     } catch (error) {
+        req.duration = Date.now() - req.timestamp.getTime()
+
         logger.error({ error }, `plaid client error - ${method.name}`)
         if (error instanceof Error) {
             req.errorName = error.name
@@ -84,7 +92,8 @@ const callPlaidClientMethod = async <T extends object, P extends object>(
         } else {
             req.errorName = 'unknown'
         }
-        await createPlaidApiRequest(req)
+
+        await addPlaidApiRequestLogToQueue(req)
         throw error
     }
 }

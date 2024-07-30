@@ -2,13 +2,14 @@ import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata, WebhookType } from 'plaid'
 import { HttpError } from '../models/httpError.js'
 import { retrieveItemByUserIdAndInstitutionId } from '../models/item.js'
-import { createPlaidLinkEvent, PlaidLinkEvent } from '../models/plaid.js'
+import { PlaidLinkEvent } from '../models/plaid.js'
 import {
     createLinkToken,
     exchangePublicTokenAndCreateItemAndSync,
     verifyWebhook,
 } from '../services/plaidService.js'
 import { logger } from '../utils/logger.js'
+import { addPlaidLinkEventLogToQueue } from '../utils/queue.js'
 
 export const getLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
@@ -33,14 +34,8 @@ export const handleLinkEvent = async (req: Request, res: Response) => {
     const event: PlaidLinkEvent | undefined = req.body.event
     if (!event) throw new HttpError('missing event', 400)
 
-    try {
-        const newEvent = await createPlaidLinkEvent(event)
-        if (!newEvent) throw Error('event not created')
-        return res.status(204).send()
-    } catch (error) {
-        logger.error(error)
-        throw Error('failed to create link event')
-    }
+    await addPlaidLinkEventLogToQueue(event)
+    return res.status(202).send()
 }
 
 export const exchangePublicToken = async (req: Request, res: Response) => {

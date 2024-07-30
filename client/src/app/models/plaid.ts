@@ -1,6 +1,7 @@
 export interface LinkEvent {
     id: number
     userId: number
+    timestamp: Date
     type: string
     sessionId: string
     requestId?: string | null

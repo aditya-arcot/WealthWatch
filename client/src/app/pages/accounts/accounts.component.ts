@@ -117,6 +117,7 @@ export class AccountsComponent implements OnInit {
         const event: LinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
             institutionId: metadata.institution?.institution_id,
@@ -156,6 +157,7 @@ export class AccountsComponent implements OnInit {
         const event: LinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,
@@ -175,6 +177,7 @@ export class AccountsComponent implements OnInit {
         const event: LinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,

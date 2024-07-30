@@ -47,7 +47,7 @@ logger.debug('configuring routes')
 app.use('/status', (_req, res) => res.send('ok'))
 app.get('/csrf-token', (req, res) => {
     const token = req.csrfToken!()
-    res.json({ csrfToken: token })
+    res.send({ csrfToken: token })
 })
 if (!production) {
     app.use(
