@@ -20,8 +20,15 @@ export const configureCleanup = (): void => {
     logger.debug('configured cleanup')
 }
 
+let exiting = false
 const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
     logger.fatal(err, event)
+    if (exiting) {
+        logger.debug('already exiting')
+        return
+    }
+
+    exiting = true
     try {
         await closePool()
         closeRedis()
