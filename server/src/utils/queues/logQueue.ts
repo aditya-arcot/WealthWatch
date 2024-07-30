@@ -119,7 +119,8 @@ export const initializeLogWorker = () => {
 
 export const closeLogWorker = async () => {
     if (!logWorker) {
-        throw Error('log worker not initialized')
+        logger.warn('log worker not initialized')
+        return
     }
     await logWorker.close()
     logger.debug('closed log worker')

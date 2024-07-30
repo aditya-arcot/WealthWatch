@@ -42,7 +42,8 @@ export const initializeItemSyncWorker = () => {
 
 export const closeItemSyncWorker = async () => {
     if (!itemSyncWorker) {
-        throw Error('item sync worker not initialized')
+        logger.warn('item sync worker not initialized')
+        return
     }
     await itemSyncWorker.close()
     logger.debug('closed item sync worker')
