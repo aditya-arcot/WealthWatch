@@ -59,19 +59,17 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
     try {
         const res = await clientPool.query(query, params)
         const queryLog = {
-            query,
-            params,
             duration: Date.now() - start,
+            query,
             rowCount: res.rowCount,
-            rows: res.rows,
         }
         logger.debug({ queryLog }, 'executed query')
         return res
     } catch (error) {
         const queryLog = {
-            query,
-            params,
             duration: Date.now() - start,
+            query,
+            error,
         }
         logger.error({ queryLog }, 'failed to execute query')
         throw error
