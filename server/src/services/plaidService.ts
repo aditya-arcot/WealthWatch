@@ -36,7 +36,7 @@ import {
 import { User } from '../models/user.js'
 import { safeStringify } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
-import { addPlaidApiRequestLogToQueue } from '../utils/logQueue.js'
+import { addPlaidApiRequestLogToQueue } from '../utils/queues/logQueue.js'
 
 if (!env['PLAID_ENV'] || !env['PLAID_CLIENT_ID'] || !env['PLAID_SECRET']) {
     throw Error('missing one or more plaid secrets')

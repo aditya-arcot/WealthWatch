@@ -1,6 +1,7 @@
 import { exit, pid } from 'process'
-import { closePool, closeRedis } from './database.js'
+import { closePool } from './database.js'
 import { logger } from './logger.js'
+import { closeRedis } from './redis.js'
 
 export const configureCleanup = (): void => {
     const events = [

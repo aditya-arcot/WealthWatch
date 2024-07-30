@@ -12,7 +12,7 @@ import { logger } from '../utils/logger.js'
 import {
     addPlaidLinkEventLogToQueue,
     addWebhookLogToQueue,
-} from '../utils/logQueue.js'
+} from '../utils/queues/logQueue.js'
 
 export const getLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')

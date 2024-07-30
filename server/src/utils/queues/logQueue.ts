@@ -1,5 +1,5 @@
 import { Queue, Worker } from 'bullmq'
-import { LogJobType } from '../models/job.js'
+import { LogJobType } from '../../models/job.js'
 import {
     createPlaidApiRequest,
     createPlaidLinkEvent,
@@ -7,10 +7,10 @@ import {
     PlaidApiRequest,
     PlaidLinkEvent,
     Webhook,
-} from '../models/plaid.js'
-import { AppRequest, createAppRequest } from '../models/request.js'
-import { getRedis } from './database.js'
-import { logger } from './logger.js'
+} from '../../models/plaid.js'
+import { AppRequest, createAppRequest } from '../../models/request.js'
+import { logger } from '../logger.js'
+import { getRedis } from '../redis.js'
 
 let logQueue: Queue | null = null
 
