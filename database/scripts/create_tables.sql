@@ -213,4 +213,11 @@ CREATE TABLE IF NOT EXISTS plaid_api_requests (
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+CREATE TABLE IF NOT EXISTS webhooks (
+    id SERIAL PRIMARY KEY,
+    timestamp TIMESTAMP NOT NULL,
+    data JSON NOT NULL,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
+
 COMMIT;

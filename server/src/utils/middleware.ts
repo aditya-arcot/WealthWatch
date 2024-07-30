@@ -8,7 +8,7 @@ import { HttpError } from '../models/httpError.js'
 import { AppRequest } from '../models/request.js'
 import { getPool } from './database.js'
 import { logger } from './logger.js'
-import { addAppRequestToQueue } from './queue.js'
+import { addAppRequestToQueue } from './logQueue.js'
 
 export const production = env['NODE_ENV'] === 'prod'
 

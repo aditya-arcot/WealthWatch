@@ -8,8 +8,9 @@ import { handleWebhook } from './controllers/plaidController.js'
 import router from './routes/index.js'
 import { catchAsync } from './utils/catchAsync.js'
 import { configureCleanup } from './utils/cleanup.js'
-import { createPool } from './utils/database.js'
+import { createPool, createRedis } from './utils/database.js'
 import { logger } from './utils/logger.js'
+import { initializeLogQueue, initializeLogWorker } from './utils/logQueue.js'
 import {
     corsMiddleware,
     createCsrfMiddleware,
@@ -23,8 +24,11 @@ import { createSwaggerSpec, swaggerOptions } from './utils/swagger.js'
 
 logger.info(`started - pid ${pid}`)
 
+createRedis()
 await createPool()
 configureCleanup()
+initializeLogQueue()
+initializeLogWorker()
 
 logger.debug('configuring main app')
 const app = express()

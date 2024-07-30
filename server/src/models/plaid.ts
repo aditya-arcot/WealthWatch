@@ -169,3 +169,27 @@ export const createPlaidApiRequest = async (
     if (!rows[0]) return null
     return mapDbPlaidApiRequest(rows[0])
 }
+
+export interface Webhook {
+    id: number
+    timestamp: Date
+    data: object
+}
+
+export const createWebhook = async (
+    webhook: Webhook
+): Promise<Webhook | null> => {
+    const query = `
+        INSERT INTO webhooks (
+            timestamp, 
+            data
+        )
+        VALUES ($1, $2)
+        RETURNING *
+    `
+    const rows: Webhook[] = (
+        await runQuery(query, [webhook.timestamp, webhook.data])
+    ).rows
+    if (!rows[0]) return null
+    return rows[0]
+}

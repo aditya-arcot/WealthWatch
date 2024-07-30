@@ -1,15 +1,18 @@
 import { Request, Response } from 'express'
-import { LinkSessionSuccessMetadata, WebhookType } from 'plaid'
+import { LinkSessionSuccessMetadata } from 'plaid'
 import { HttpError } from '../models/httpError.js'
 import { retrieveItemByUserIdAndInstitutionId } from '../models/item.js'
-import { PlaidLinkEvent } from '../models/plaid.js'
+import { PlaidLinkEvent, Webhook } from '../models/plaid.js'
 import {
     createLinkToken,
     exchangePublicTokenAndCreateItemAndSync,
     verifyWebhook,
 } from '../services/plaidService.js'
 import { logger } from '../utils/logger.js'
-import { addPlaidLinkEventLogToQueue } from '../utils/queue.js'
+import {
+    addPlaidLinkEventLogToQueue,
+    addWebhookLogToQueue,
+} from '../utils/logQueue.js'
 
 export const getLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
@@ -72,7 +75,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     }
 }
 
-export const handleWebhook = async (req: Request, _res: Response) => {
+export const handleWebhook = async (req: Request, res: Response) => {
     logger.debug('received webhook')
 
     const token = req.headers['plaid-verification']
@@ -91,35 +94,14 @@ export const handleWebhook = async (req: Request, _res: Response) => {
         throw new HttpError('failed to verify webhook', 400)
     }
 
-    const webhookType: WebhookType | undefined = req.body.webhook_type
-    const webhookCode: string | undefined = req.body.webhook_code
-
-    logger.debug(`webhook - type: ${webhookType}, code: ${webhookCode}`)
-
-    switch (webhookType) {
-        case WebhookType.Assets: {
-            throw new HttpError('assets webhook', 501)
-        }
-        case WebhookType.Auth: {
-            throw new HttpError('auth webhook', 501)
-        }
-        case WebhookType.Holdings: {
-            throw new HttpError('holdings webhook', 501)
-        }
-        case WebhookType.InvestmentsTransactions: {
-            throw new HttpError('investments transactions webhook', 501)
-        }
-        case WebhookType.Item: {
-            throw new HttpError('item webhook', 501)
-        }
-        case WebhookType.Liabilities: {
-            throw new HttpError('liabilities webhook', 501)
-        }
-        case WebhookType.Transactions: {
-            throw new HttpError('transactions webhook', 501)
-        }
-        default: {
-            throw new HttpError('unhandled webhook', 400)
-        }
+    const webhook: Webhook = {
+        id: -1,
+        timestamp: new Date(),
+        data: req.body,
     }
+    await addWebhookLogToQueue(webhook)
+
+    // TODO add webhook to queue
+
+    return res.status(202).send()
 }
