@@ -18,7 +18,7 @@ const redis = new Redis({
 const logQueue = new Queue('logs', { connection: redis })
 
 export const addAppRequestToQueue = async (req: AppRequest) => {
-    logger.debug('adding app request job to queue')
+    logger.debug('adding app request log job to queue')
     await logQueue.add('log', { type: LogJobType.AppRequestLog, log: req })
 }
 
@@ -39,7 +39,7 @@ const logWorker = new Worker(
     'logs',
     async (job) => {
         const type: LogJobType = job.data.type
-        logger.debug(`starting log job (id ${job.id}) - type ${type}`)
+        logger.debug(`starting ${type} log job (id ${job.id})`)
         switch (type) {
             case LogJobType.AppRequestLog: {
                 const req: AppRequest | undefined = job.data.log
