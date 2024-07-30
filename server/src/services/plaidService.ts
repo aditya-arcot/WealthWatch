@@ -51,7 +51,7 @@ const config = new Configuration({
     },
 })
 const client = new PlaidApi(config)
-logger.debug(config, 'configured plaid client')
+logger.debug({ config }, 'configured plaid client')
 
 const callPlaidClientMethod = async <T extends object, P extends object>(
     method: (params: P) => Promise<T>,
