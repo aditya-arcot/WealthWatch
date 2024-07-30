@@ -171,13 +171,13 @@ CREATE TABLE IF NOT EXISTS app_requests (
     query_params JSON,
     route_params JSON,
     request_headers JSON,
-    request_body JSON,
+    request_body TEXT,
     remote_address TEXT,
     remote_port INTEGER,
     session JSON,
     response_status INTEGER NOT NULL,
     response_headers JSON,
-    response_body JSON,
+    response_body TEXT,
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 

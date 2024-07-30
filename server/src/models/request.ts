@@ -1,5 +1,4 @@
 import { runQuery } from '../utils/database.js'
-import { safeStringify } from '../utils/format.js'
 
 export interface AppRequest {
     id: number
@@ -11,13 +10,13 @@ export interface AppRequest {
     queryParams?: object | null
     routeParams?: object | null
     requestHeaders?: object | null
-    requestBody?: object | null
+    requestBody?: string | null
     remoteAddress?: string | null
     remotePort?: number | null
     session?: object | null
     responseStatus: number
     responseHeaders?: object | null
-    responseBody?: object | null
+    responseBody?: string | null
 }
 
 interface DbAppRequest {
@@ -30,13 +29,13 @@ interface DbAppRequest {
     query_params: object | null
     route_params: object | null
     request_headers: object | null
-    request_body: object | null
+    request_body: string | null
     remote_address: string | null
     remote_port: number | null
     session: object | null
     response_status: number
     response_headers: object | null
-    response_body: object | null
+    response_body: string | null
 }
 
 const mapDbAppRequest = (dbAppRequest: DbAppRequest): AppRequest => ({
@@ -98,7 +97,7 @@ export const createAppRequest = async (
             request.session,
             request.responseStatus,
             request.responseHeaders,
-            request.responseBody ? safeStringify(request.responseBody) : null,
+            request.responseBody,
         ])
     ).rows
     if (!rows[0]) return null
