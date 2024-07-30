@@ -75,7 +75,7 @@ export const logRequestResponse = (
         timestamp: new Date(),
         duration: -1,
         method: req.method,
-        url: req.url,
+        url: req.baseUrl + req.path,
         queryParams: req.query,
         routeParams: req.params,
         requestHeaders: req.headers,
