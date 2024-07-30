@@ -14,6 +14,7 @@ import { getRedis } from '../redis.js'
 import { workerOptions } from './index.js'
 
 let logQueue: Queue | null = null
+let logWorker: Worker | null = null
 
 export const initializeLogQueue = () => {
     logQueue = new Queue('logs', { connection: getRedis() })
@@ -55,8 +56,6 @@ export const addWebhookLogToQueue = async (webhook: object) => {
         log: webhook,
     })
 }
-
-let logWorker: Worker | null = null
 
 export const initializeLogWorker = () => {
     logWorker = new Worker(

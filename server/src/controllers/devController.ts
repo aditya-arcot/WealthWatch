@@ -12,8 +12,8 @@ import {
     createPublicToken,
     exchangePublicTokenAndCreateItemAndSync,
     fireWebhook,
+    queueItemSync,
     removeItem,
-    syncItemData,
 } from '../services/plaidService.js'
 import { logger } from '../utils/logger.js'
 
@@ -105,6 +105,6 @@ export const syncItem = async (req: Request, res: Response) => {
     const item = await retrieveItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    await syncItemData(item)
+    await queueItemSync(item)
     return res.status(204).send()
 }

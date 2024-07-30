@@ -36,6 +36,7 @@ import {
 import { User } from '../models/user.js'
 import { safeStringify } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
+import { addItemSyncToQueue } from '../utils/queues/itemSyncQueue.js'
 import { addPlaidApiRequestLogToQueue } from '../utils/queues/logQueue.js'
 
 if (!env['PLAID_ENV'] || !env['PLAID_CLIENT_ID'] || !env['PLAID_SECRET']) {
@@ -160,6 +161,10 @@ export const exchangePublicTokenForAccessToken = async (
         accessToken: resp.data.access_token,
         itemId: resp.data.item_id,
     }
+}
+
+export const queueItemSync = async (item: Item) => {
+    await addItemSyncToQueue(item)
 }
 
 export const syncItemData = async (item: Item) => {
@@ -308,7 +313,7 @@ export const exchangePublicTokenAndCreateItemAndSync = async (
         institutionName
     )
     if (!item) throw Error('item not created')
-    await syncItemData(item)
+    await queueItemSync(item)
 }
 
 const mapPlaidAccount = (account: AccountBase, itemId: number): Account => {
