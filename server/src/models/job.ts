@@ -1,5 +1,5 @@
 export enum LogJobType {
-    AppRequestLog,
-    PlaidLinkEventLog,
-    PlaidApiRequestLog,
+    AppRequestLog = 'AppRequestLog',
+    PlaidLinkEventLog = 'PlaidLinkEventLog',
+    PlaidApiRequestLog = 'PlaidApiRequestLog',
 }
