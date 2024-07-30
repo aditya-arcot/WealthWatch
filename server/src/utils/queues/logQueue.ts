@@ -107,7 +107,7 @@ export const initializeLogWorker = () => {
     )
 
     logWorker.on('failed', (job, err) => {
-        logger.error({ error: err }, `job (id ${job?.id}) failed`)
+        logger.error({ err }, `job (id ${job?.id}) failed`)
     })
 
     logWorker.on('completed', (job) => {

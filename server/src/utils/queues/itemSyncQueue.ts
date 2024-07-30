@@ -38,6 +38,16 @@ export const initializeItemSyncWorker = () => {
         },
         { connection: getRedis(), ...workerOptions }
     )
+
+    itemSyncWorker.on('failed', (job, err) => {
+        logger.error({ err }, `job (id ${job?.id}) failed`)
+    })
+
+    itemSyncWorker.on('completed', (job) => {
+        logger.debug(`job (id ${job.id}) completed`)
+    })
+
+    logger.debug('initialized item sync worker')
 }
 
 export const closeItemSyncWorker = async () => {
