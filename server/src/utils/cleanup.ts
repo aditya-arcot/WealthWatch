@@ -30,9 +30,9 @@ const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
 
     exiting = true
     try {
-        await closePool()
-        closeRedis()
         await closeWorkers()
+        closeRedis()
+        await closePool()
     } catch (e) {
         logger.fatal(e, 'error during cleanup')
     } finally {
