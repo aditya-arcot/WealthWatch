@@ -1,5 +1,9 @@
 import { Queue, Worker } from 'bullmq'
-import { LogJobType } from '../../models/job.js'
+import {
+    createFailureJob,
+    createSuccessJob,
+    LogJobType,
+} from '../../models/job.js'
 import {
     createPlaidApiRequest,
     createPlaidLinkEvent,
@@ -106,12 +110,14 @@ export const initializeLogWorker = () => {
         { connection: getRedis(), ...workerOptions }
     )
 
-    logWorker.on('failed', (job, err) => {
+    logWorker.on('failed', async (job, err) => {
         logger.error({ err }, `job (id ${job?.id}) failed`)
+        await createFailureJob(job?.id, 'log', job?.data, err)
     })
 
-    logWorker.on('completed', (job) => {
+    logWorker.on('completed', async (job) => {
         logger.debug(`job (id ${job.id}) completed`)
+        await createSuccessJob(job.id, 'log', job.data)
     })
 
     logger.debug('initialized log worker')

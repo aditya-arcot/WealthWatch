@@ -1,5 +1,6 @@
 import { Queue, Worker } from 'bullmq'
 import { Item } from '../../models/item.js'
+import { createFailureJob, createSuccessJob } from '../../models/job.js'
 import { syncItemData } from '../../services/plaidService.js'
 import { logger } from '../logger.js'
 import { getRedis } from '../redis.js'
@@ -39,12 +40,14 @@ export const initializeItemSyncWorker = () => {
         { connection: getRedis(), ...workerOptions }
     )
 
-    itemSyncWorker.on('failed', (job, err) => {
+    itemSyncWorker.on('failed', async (job, err) => {
         logger.error({ err }, `job (id ${job?.id}) failed`)
+        await createFailureJob(job?.id, 'itemSync', job?.data, err)
     })
 
-    itemSyncWorker.on('completed', (job) => {
+    itemSyncWorker.on('completed', async (job) => {
         logger.debug(`job (id ${job.id}) completed`)
+        await createSuccessJob(job.id, 'itemSync', job.data)
     })
 
     logger.debug('initialized item sync worker')

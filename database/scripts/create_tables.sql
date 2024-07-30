@@ -220,4 +220,16 @@ CREATE TABLE IF NOT EXISTS webhooks (
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+CREATE TABLE IF NOT EXISTS jobs (
+    id SERIAL PRIMARY KEY,
+    job_id TEXT,
+    type TEXT NOT NULL,
+    success BOOLEAN NOT NULL,
+    data JSON,
+    error_name TEXT,
+    error_message TEXT,
+    error_stack TEXT,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
+
 COMMIT;
