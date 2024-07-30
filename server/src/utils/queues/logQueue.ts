@@ -11,6 +11,7 @@ import {
 import { AppRequest, createAppRequest } from '../../models/request.js'
 import { logger } from '../logger.js'
 import { getRedis } from '../redis.js'
+import { workerOptions } from './index.js'
 
 let logQueue: Queue | null = null
 
@@ -55,8 +56,10 @@ export const addWebhookLogToQueue = async (webhook: object) => {
     })
 }
 
+let logWorker: Worker | null = null
+
 export const initializeLogWorker = () => {
-    const logWorker = new Worker(
+    logWorker = new Worker(
         'logs',
         async (job) => {
             const type: LogJobType = job.data.type
@@ -101,7 +104,7 @@ export const initializeLogWorker = () => {
                     break
             }
         },
-        { connection: getRedis() }
+        { connection: getRedis(), ...workerOptions }
     )
 
     logWorker.on('failed', (job, err) => {
@@ -113,4 +116,12 @@ export const initializeLogWorker = () => {
     })
 
     logger.debug('initialized log worker')
+}
+
+export const closeLogWorker = async () => {
+    if (!logWorker) {
+        throw Error('log worker not initialized')
+    }
+    await logWorker.close()
+    logger.debug('closed log worker')
 }
