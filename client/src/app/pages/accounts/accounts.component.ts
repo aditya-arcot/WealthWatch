@@ -11,7 +11,7 @@ import {
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
 import { ItemWithAccounts } from '../../models/item'
-import { LinkEvent } from '../../models/plaid'
+import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { ItemService } from '../../services/item.service'
@@ -114,7 +114,7 @@ export class AccountsComponent implements OnInit {
     handleLinkSuccess(token: string, metadata: PlaidSuccessMetadata): void {
         const type = 'success'
         this.logger.debug(type, token, metadata)
-        const event: LinkEvent = {
+        const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
             timestamp: new Date(),
@@ -154,7 +154,7 @@ export class AccountsComponent implements OnInit {
     ): void {
         const type = 'exit'
         this.logger.debug(type, error, metadata)
-        const event: LinkEvent = {
+        const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
             timestamp: new Date(),
@@ -174,7 +174,7 @@ export class AccountsComponent implements OnInit {
     handleLinkEvent(eventName: string, metadata: PlaidEventMetadata): void {
         const type = `event - ${eventName.toLowerCase()}`
         this.logger.debug(type, metadata)
-        const event: LinkEvent = {
+        const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
             timestamp: new Date(),

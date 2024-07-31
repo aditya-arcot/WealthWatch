@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
-import { LinkEvent } from '../models/plaid'
+import { PlaidLinkEvent } from '../models/plaidLinkEvent'
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +16,7 @@ export class LinkService {
         return this.http.post<{ linkToken: string }>(url, {})
     }
 
-    handleLinkEvent(event: LinkEvent) {
+    handleLinkEvent(event: PlaidLinkEvent) {
         const url = `${this.baseUrl}/link-event`
         return this.http.post<void>(url, { event })
     }
