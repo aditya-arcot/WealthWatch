@@ -1,21 +1,22 @@
 import { Queue, Worker } from 'bullmq'
-import {
-    createFailureJob,
-    createSuccessJob,
-    LogJobType,
-} from '../../models/job.js'
-import {
-    createPlaidApiRequest,
-    createPlaidLinkEvent,
-    createWebhook,
-    PlaidApiRequest,
-    PlaidLinkEvent,
-    Webhook,
-} from '../../models/plaid.js'
-import { AppRequest, createAppRequest } from '../../models/request.js'
-import { logger } from '../logger.js'
-import { getRedis } from '../redis.js'
-import { workerOptions } from './index.js'
+import { insertAppRequest } from '../database/appRequestQueries.js'
+import { insertPlaidApiRequest } from '../database/plaidApiRequestQueries.js'
+import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
+import { insertWebhook } from '../database/webhookQueries.js'
+import { AppRequest } from '../models/appRequest.js'
+import { PlaidApiRequest } from '../models/plaidApiRequest.js'
+import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
+import { Webhook } from '../models/webhook.js'
+import { logger } from '../utils/logger.js'
+import { getRedis } from '../utils/redis.js'
+import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
+
+enum LogJobType {
+    AppRequestLog = 'AppRequest',
+    PlaidLinkEventLog = 'PlaidLinkEvent',
+    PlaidApiRequestLog = 'PlaidApiRequest',
+    WebhookLog = 'Webhook',
+}
 
 let logQueue: Queue | null = null
 let logWorker: Worker | null = null
@@ -32,12 +33,12 @@ const getLogQueue = () => {
     return logQueue
 }
 
-export const addAppRequestToQueue = async (req: AppRequest) => {
+export const queueAppRequest = async (req: AppRequest) => {
     logger.debug('adding app request log job to queue')
     await getLogQueue().add('log', { type: LogJobType.AppRequestLog, log: req })
 }
 
-export const addPlaidLinkEventLogToQueue = async (event: PlaidLinkEvent) => {
+export const queuePlaidLinkEventLog = async (event: PlaidLinkEvent) => {
     logger.debug('adding plaid link event log job to queue')
     await getLogQueue().add('log', {
         type: LogJobType.PlaidLinkEventLog,
@@ -45,7 +46,7 @@ export const addPlaidLinkEventLogToQueue = async (event: PlaidLinkEvent) => {
     })
 }
 
-export const addPlaidApiRequestLogToQueue = async (req: PlaidApiRequest) => {
+export const queuePlaidApiRequestLog = async (req: PlaidApiRequest) => {
     logger.debug('adding plaid api request log job to queue')
     await getLogQueue().add('log', {
         type: LogJobType.PlaidApiRequestLog,
@@ -53,7 +54,7 @@ export const addPlaidApiRequestLogToQueue = async (req: PlaidApiRequest) => {
     })
 }
 
-export const addWebhookLogToQueue = async (webhook: object) => {
+export const queueWebhookLog = async (webhook: object) => {
     logger.debug('adding webhook log job to queue')
     await getLogQueue().add('log', {
         type: LogJobType.WebhookLog,
@@ -72,7 +73,7 @@ export const initializeLogWorker = () => {
                     const req: AppRequest | undefined = job.data.log
                     if (!req) throw Error('missing app request')
 
-                    const newReq = await createAppRequest(req)
+                    const newReq = await insertAppRequest(req)
                     if (!newReq) throw Error('failed to create app request log')
                     break
                 }
@@ -80,7 +81,7 @@ export const initializeLogWorker = () => {
                     const event: PlaidLinkEvent | undefined = job.data.log
                     if (!event) throw Error('missing plaid link event')
 
-                    const newEvent = await createPlaidLinkEvent(event)
+                    const newEvent = await insertPlaidLinkEvent(event)
                     if (!newEvent)
                         throw Error('failed to create plaid link event log')
                     break
@@ -89,7 +90,7 @@ export const initializeLogWorker = () => {
                     const req: PlaidApiRequest | undefined = job.data.log
                     if (!req) throw Error('missing plaid api request')
 
-                    const newReq = await createPlaidApiRequest(req)
+                    const newReq = await insertPlaidApiRequest(req)
                     if (!newReq)
                         throw Error('failed to create plaid api request log')
                     break
@@ -98,7 +99,7 @@ export const initializeLogWorker = () => {
                     const webhook: Webhook | undefined = job.data.log
                     if (!webhook) throw Error('missing webhook')
 
-                    const newWebhook = await createWebhook(webhook)
+                    const newWebhook = await insertWebhook(webhook)
                     if (!newWebhook) throw Error('failed to create webhook log')
                     break
                 }
@@ -110,14 +111,14 @@ export const initializeLogWorker = () => {
         { connection: getRedis(), ...workerOptions }
     )
 
-    logWorker.on('failed', async (job, err) => {
-        logger.error({ err }, `job (id ${job?.id}) failed`)
-        await createFailureJob(job?.id, 'log', job?.data, err)
-    })
-
     logWorker.on('completed', async (job) => {
         logger.debug(`job (id ${job.id}) completed`)
-        await createSuccessJob(job.id, 'log', job.data)
+        await handleJobSuccess(job.id, 'log', job.data)
+    })
+
+    logWorker.on('failed', async (job, err) => {
+        logger.error({ err }, `job (id ${job?.id}) failed`)
+        await handleJobFailure(job?.id, 'log', job?.data, err)
     })
 
     logger.debug('initialized log worker')

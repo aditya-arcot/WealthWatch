@@ -1,10 +1,9 @@
 import { Queue, Worker } from 'bullmq'
-import { Item } from '../../models/item.js'
-import { createFailureJob, createSuccessJob } from '../../models/job.js'
-import { syncItemData } from '../../services/plaidService.js'
-import { logger } from '../logger.js'
-import { getRedis } from '../redis.js'
-import { workerOptions } from './index.js'
+import { Item } from '../models/item.js'
+import { plaidSyncItemData } from '../plaid/itemMethods.js'
+import { logger } from '../utils/logger.js'
+import { getRedis } from '../utils/redis.js'
+import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 let itemSyncQueue: Queue | null = null
 let itemSyncWorker: Worker | null = null
@@ -21,7 +20,7 @@ export const getItemSyncQueue = () => {
     return itemSyncQueue
 }
 
-export const addItemSyncToQueue = async (item: Item) => {
+export const queueItemSync = async (item: Item) => {
     logger.debug('adding item sync job to queue')
     await getItemSyncQueue().add('sync', { item })
 }
@@ -35,19 +34,19 @@ export const initializeItemSyncWorker = () => {
             const item: Item | undefined = job.data.item
             if (!item) throw Error('missing item')
 
-            await syncItemData(item)
+            await plaidSyncItemData(item)
         },
         { connection: getRedis(), ...workerOptions }
     )
 
-    itemSyncWorker.on('failed', async (job, err) => {
-        logger.error({ err }, `job (id ${job?.id}) failed`)
-        await createFailureJob(job?.id, 'itemSync', job?.data, err)
-    })
-
     itemSyncWorker.on('completed', async (job) => {
         logger.debug(`job (id ${job.id}) completed`)
-        await createSuccessJob(job.id, 'itemSync', job.data)
+        await handleJobSuccess(job.id, 'itemSync', job.data)
+    })
+
+    itemSyncWorker.on('failed', async (job, err) => {
+        logger.error({ err }, `job (id ${job?.id}) failed`)
+        await handleJobFailure(job?.id, 'itemSync', job?.data, err)
     })
 
     logger.debug('initialized item sync worker')

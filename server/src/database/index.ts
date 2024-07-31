@@ -1,6 +1,6 @@
 import pg from 'pg'
 import { env } from 'process'
-import { logger } from './logger.js'
+import { logger } from '../utils/logger.js'
 
 let clientPool: pg.Pool | null = null
 
@@ -44,12 +44,6 @@ export const getPool = (): pg.Pool => {
     return clientPool
 }
 
-export const closePool = async (): Promise<void> => {
-    logger.debug('closing database pool')
-    await getPool().end()
-    logger.debug('closed database pool')
-}
-
 export const runQuery = async (query: string, params: unknown[] = []) => {
     if (!clientPool) {
         throw Error('pool not initialized')
@@ -74,4 +68,14 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
         logger.error({ queryLog }, 'failed to execute query')
         throw error
     }
+}
+
+export const stopPool = async (): Promise<void> => {
+    logger.debug('stopping database pool')
+    if (!clientPool) {
+        logger.warn('database pool not initialized')
+        return
+    }
+    clientPool.end()
+    logger.debug('stopped database pool')
 }

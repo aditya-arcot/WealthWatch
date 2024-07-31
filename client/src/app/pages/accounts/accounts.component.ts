@@ -77,7 +77,7 @@ export class AccountsComponent implements OnInit {
 
     linkAccount(): void {
         this.plaidSvc
-            .getLinkToken()
+            .createLinkToken()
             .pipe(
                 catchError((err) => {
                     this.logger.error('failed to create link token', err)

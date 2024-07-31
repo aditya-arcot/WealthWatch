@@ -1,110 +1,123 @@
 import { Request, Response } from 'express'
-import { SandboxItemFireWebhookRequestWebhookCodeEnum } from 'plaid'
+import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
+import {
+    fetchItemById,
+    fetchItemByUserIdAndInstitutionId,
+    fetchItemsByUserId,
+    insertItem,
+    modifyItemActiveById,
+} from '../database/itemQueries.js'
+import { fetchUsers, removeUserById } from '../database/userQueries.js'
 import { HttpError } from '../models/httpError.js'
+import { User } from '../models/user.js'
+import { plaidUnlinkItem } from '../plaid/itemMethods.js'
 import {
-    retrieveItemById,
-    retrieveItemByUserIdAndInstitutionId,
-    retrieveItemsByUserId,
-    updateItemToInactive,
-} from '../models/item.js'
-import { deleteUser, retrieveUsers, User } from '../models/user.js'
-import {
-    createPublicToken,
-    exchangePublicTokenAndCreateItemAndSync,
-    fireWebhook,
-    queueItemSync,
-    removeItem,
-} from '../services/plaidService.js'
+    plaidCreatePublicToken,
+    plaidExchangePublicToken,
+} from '../plaid/tokenMethods.js'
+import { plaidFireWebhook } from '../plaid/webhookMethods.js'
+import { queueItemSync } from '../queues/itemSyncQueue.js'
 import { logger } from '../utils/logger.js'
 
-export const deleteUsers = async (req: Request, res: Response) => {
+export const deleteAllUsers = async (req: Request, res: Response) => {
     logger.debug('deleting all users')
-
-    const users = await retrieveUsers()
-    await Promise.all(
-        users.map(async (user) => {
-            logger.debug({ user }, 'deleting user')
-            const items = await retrieveItemsByUserId(user.id)
-            await Promise.all(items.map((item) => removeItem(item)))
-            await deleteUser(user.id)
-        })
-    )
-
+    await deactivateItems(true)
     req.session.destroy(() => res.status(204).send())
 }
 
-export const deactivateItems = async (_req: Request, res: Response) => {
+export const deactivateAllItems = async (_req: Request, res: Response) => {
     logger.debug('deactivating all items')
-
-    const users = await retrieveUsers()
-    await Promise.all(
-        users.map(async (user) => {
-            logger.debug({ user }, 'deactivating items for user')
-
-            const items = await retrieveItemsByUserId(user.id)
-            await Promise.all(
-                items.map(async (item) => {
-                    await removeItem(item)
-                    await updateItemToInactive(item.id)
-                })
-            )
-        })
-    )
-
+    await deactivateItems(false)
     return res.status(204).send()
 }
 
-export const fireSandboxWebhook = async (req: Request, res: Response) => {
+const deactivateItems = async (deleteUsers: boolean) => {
+    const users = await fetchUsers()
+    await Promise.all(
+        users.map(async (user) => {
+            logger.debug({ user }, 'processing items for user')
+
+            const items = await fetchItemsByUserId(user.id)
+            await Promise.all(
+                items.map(async (item) => {
+                    logger.debug({ item }, 'unlinking & deactivating item')
+                    await plaidUnlinkItem(item)
+                    await modifyItemActiveById(item.id, false)
+                })
+            )
+
+            if (deleteUsers) {
+                logger.debug({ user }, 'deleting user')
+                await removeUserById(user.id)
+            }
+        })
+    )
+}
+
+export const syncItem = async (req: Request, res: Response) => {
+    logger.debug('syncing item')
+
     const itemId: string | undefined = req.query['itemId'] as string
     if (!itemId) throw new HttpError('missing item id', 400)
 
-    const item = await retrieveItemById(itemId)
+    const item = await fetchItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    const code: string | undefined = req.query['code'] as string
-    const codeEnum = code as SandboxItemFireWebhookRequestWebhookCodeEnum
-    if (
-        !codeEnum ||
-        !Object.values(SandboxItemFireWebhookRequestWebhookCodeEnum).includes(
-            codeEnum
-        )
-    ) {
-        throw new HttpError('invalid webhook code', 400)
-    }
-
-    await fireWebhook(item, codeEnum)
-    return res.status(204).send()
+    await queueItemSync(item)
+    return res.status(202).send()
 }
 
 export const createSandboxItem = async (req: Request, res: Response) => {
+    logger.debug('creating sandbox item')
+
     const user: User | undefined = req.session.user
     if (!user) throw new HttpError('missing user', 400)
 
     const institutionId = 'ins_56'
     const institutionName = 'Chase'
-    const item = await retrieveItemByUserIdAndInstitutionId(
+    const existingItem = await fetchItemByUserIdAndInstitutionId(
         user.id,
         institutionId
     )
-    if (item) throw new HttpError('account already exists', 409)
+    if (existingItem) throw new HttpError('account already exists', 409)
 
-    const publicToken = await createPublicToken(user, institutionId)
-    await exchangePublicTokenAndCreateItemAndSync(
-        user.id,
-        institutionId,
-        institutionName,
-        publicToken
+    const publicToken = await plaidCreatePublicToken(user, institutionId)
+    const { accessToken, itemId } = await plaidExchangePublicToken(
+        publicToken,
+        user.id
     )
+
+    const item = await insertItem(
+        user.id,
+        itemId,
+        accessToken,
+        institutionId,
+        institutionName
+    )
+    if (!item) throw Error('item not created')
+
+    await queueItemSync(item)
+
     return res.status(204).send()
 }
 
-export const syncItem = async (req: Request, res: Response) => {
+export const fireSandboxWebhook = async (req: Request, res: Response) => {
+    logger.debug('firing sandbox webhook')
+
     const itemId: string | undefined = req.query['itemId'] as string
     if (!itemId) throw new HttpError('missing item id', 400)
 
-    const item = await retrieveItemById(itemId)
+    const code: string | undefined = req.query['code'] as string
+    if (!code) throw new HttpError('missing webhook code', 400)
+
+    const item = await fetchItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    await queueItemSync(item)
+    const codeEnum = code as WebhookCodeEnum
+    if (!codeEnum || !Object.values(WebhookCodeEnum).includes(codeEnum)) {
+        throw new HttpError('invalid webhook code', 400)
+    }
+
+    await plaidFireWebhook(item, codeEnum)
     return res.status(204).send()
 }

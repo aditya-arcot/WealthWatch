@@ -11,9 +11,9 @@ export class PlaidService {
 
     constructor(private http: HttpClient) {}
 
-    getLinkToken() {
+    createLinkToken() {
         const url = `${this.baseUrl}/link-token`
-        return this.http.get<{ linkToken: string }>(url)
+        return this.http.post<{ linkToken: string }>(url, {})
     }
 
     handleLinkEvent(event: LinkEvent) {

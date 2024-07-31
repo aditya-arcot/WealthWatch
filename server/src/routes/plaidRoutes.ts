@@ -1,7 +1,7 @@
 import express from 'express'
 import {
+    createLinkToken,
     exchangePublicToken,
-    getLinkToken,
     handleLinkEvent,
 } from '../controllers/plaidController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -20,11 +20,11 @@ const router = express.Router()
  * @swagger
  * /plaid/link-token:
  *   get:
- *     summary: Get link token
+ *     summary: Create a link token
  *     tags: [Plaid]
  *     responses:
  *       200:
- *         description: The link token object
+ *         description: Created a link token
  *         content:
  *           application/json:
  *             schema:
@@ -32,13 +32,13 @@ const router = express.Router()
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/link-token').get(authenticate, catchAsync(getLinkToken))
+router.route('/link-token').post(authenticate, catchAsync(createLinkToken))
 
 /**
  * @swagger
  * /plaid/link-event:
  *   post:
- *     summary: Handle link event
+ *     summary: Handle a link event
  *     tags: [Plaid]
  *     parameters:
  *       - in: body
@@ -48,8 +48,8 @@ router.route('/link-token').get(authenticate, catchAsync(getLinkToken))
  *         required: true
  *         description: The link event
  *     responses:
- *       204:
- *         description: The link event was handled
+ *       202:
+ *         description: Handled the link event
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -59,7 +59,7 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
  * @swagger
  * /plaid/public-token:
  *   post:
- *     summary: Exchange public token for access token
+ *     summary: Exchange a public token
  *     tags: [Plaid]
  *     parameters:
  *       - in: body
@@ -76,7 +76,7 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
  *         description: The metadata
  *     responses:
  *       204:
- *         description: The public token was exchanged
+ *         description: Exchanged the public token, queued the item for sync
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

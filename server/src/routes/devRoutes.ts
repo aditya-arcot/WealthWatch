@@ -1,8 +1,8 @@
 import express from 'express'
 import {
     createSandboxItem,
-    deactivateItems,
-    deleteUsers,
+    deactivateAllItems,
+    deleteAllUsers,
     fireSandboxWebhook,
     syncItem,
 } from '../controllers/devController.js'
@@ -21,31 +21,61 @@ const router = express.Router()
  * @swagger
  * /dev/users:
  *   delete:
- *     summary: Unregister items, delete users and child data
+ *     summary: Delete all users and deactivate all items
  *     tags: [Dev]
  *     responses:
  *       204:
- *         description: All users deleted
+ *         description: Deleted all users and deactivated all items
  */
-router.route('/users').delete(catchAsync(deleteUsers))
+router.route('/users').delete(catchAsync(deleteAllUsers))
 
 /**
  * @swagger
  * /dev/items:
  *   delete:
- *     summary: Unregister & deactivate all items
+ *     summary: Deactivate all items
  *     tags: [Dev]
  *     responses:
  *       204:
- *         description: All items deactivated
+ *         description: Deactivated all items
  */
-router.route('/items').delete(catchAsync(deactivateItems))
+router.route('/items').delete(catchAsync(deactivateAllItems))
+
+/**
+ * @swagger
+ * /dev/item/sync:
+ *   post:
+ *     summary: Sync an item
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       202:
+ *         description: Queued the item for sync
+ */
+router.route('/item/sync').post(catchAsync(syncItem))
+
+/**
+ * @swagger
+ * /dev/item:
+ *   post:
+ *     summary: Create an item (Chase)
+ *     tags: [Dev]
+ *     responses:
+ *       204:
+ *         description: Created the item, queued it for sync
+ */
+router.route('/item').post(catchAsync(createSandboxItem))
 
 /**
  * @swagger
  * /dev/webhook:
  *   post:
- *     summary: Fire Plaid webhook
+ *     summary: Fire a webhook
  *     tags: [Dev]
  *     parameters:
  *       - in: query
@@ -62,41 +92,8 @@ router.route('/items').delete(catchAsync(deactivateItems))
  *         description: The webhook code
  *     responses:
  *       204:
- *         description: Webhook fired
+ *         description: Fired the webhook
  */
 router.route('/webhook').post(catchAsync(fireSandboxWebhook))
-
-/**
- * @swagger
- * /dev/item:
- *   post:
- *     summary: Create and sync item
- *     tags: [Dev]
- *     responses:
- *       204:
- *         description: Created and synced item
- */
-router.route('/item').post(catchAsync(createSandboxItem))
-
-/**
- * @swagger
- * /dev/item-sync:
- *   post:
- *     summary: Sync item
- *     tags: [Dev]
- *     parameters:
- *       - in: query
- *         name: itemId
- *         schema:
- *           type: string
- *         required: true
- *     responses:
- *       204:
- *         description: Synced item
- */
-router.route('/item-sync').post(catchAsync(syncItem))
-
-// TODO - reset item login
-// https://plaid.com/docs/api/sandbox/#sandboxitemreset_login
 
 export default router

@@ -2,8 +2,8 @@ import express from 'express'
 import {
     checkEmailExists,
     checkUsernameExists,
+    deleteCurrentUser,
     getCurrentUser,
-    removeCurrentUser,
 } from '../controllers/userController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -21,34 +21,34 @@ const router = express.Router()
  * @swagger
  * /users/current:
  *   get:
- *     summary: Get current user
+ *     summary: Retrieve the logged in user
  *     tags: [Users]
  *     responses:
  *       200:
- *         description: The current user (undefined if not logged in)
+ *         description: Retrieved the logged in user
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
  *   delete:
- *     summary: Remove current user
+ *     summary: Delete the logged in user
  *     tags: [Users]
  *     responses:
  *       204:
- *         description: The current user has been removed
+ *         description: Deleted the logged in user
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
     .route('/current')
     .get(getCurrentUser)
-    .delete(authenticate, catchAsync(removeCurrentUser))
+    .delete(authenticate, catchAsync(deleteCurrentUser))
 
 /**
  * @swagger
  * /users/username-in-use/{username}:
  *   get:
- *     summary: Check if username is in use
+ *     summary: Check if a username is in use
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -56,10 +56,10 @@ router
  *         schema:
  *           type: string
  *         required: true
- *         description: The username to check
+ *         description: The username
  *     responses:
  *       200:
- *         description: Whether the username is in use
+ *         description: Checked if the username is in use
  *         content:
  *           application/json:
  *             schema:
@@ -73,7 +73,7 @@ router.route('/username-in-use/:username').get(catchAsync(checkUsernameExists))
  * @swagger
  * /users/email-in-use/{email}:
  *   get:
- *     summary: Check if email is in use
+ *     summary: Check if an email is in use
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -81,10 +81,10 @@ router.route('/username-in-use/:username').get(catchAsync(checkUsernameExists))
  *         schema:
  *           type: string
  *         required: true
- *         description: The email to check
+ *         description: The email
  *     responses:
  *       200:
- *         description: Whether the email is in use
+ *         description: Checked if the email is in use
  *         content:
  *           application/json:
  *             schema:

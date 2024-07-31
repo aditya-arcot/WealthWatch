@@ -1,7 +1,7 @@
 import { exit, pid } from 'process'
-import { closePool } from './database.js'
+import { stopPool } from '../database/index.js'
+import { closeWorkers } from '../queues/index.js'
 import { logger } from './logger.js'
-import { closeWorkers } from './queues/index.js'
 import { closeRedis } from './redis.js'
 
 export const configureCleanup = (): void => {
@@ -32,7 +32,7 @@ const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
     try {
         await closeWorkers()
         closeRedis()
-        await closePool()
+        await stopPool()
     } catch (e) {
         logger.fatal(e, 'error during cleanup')
     } finally {

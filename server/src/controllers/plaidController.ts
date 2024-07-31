@@ -1,29 +1,31 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
+import {
+    fetchItemByUserIdAndInstitutionId,
+    insertItem,
+} from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
-import { retrieveItemByUserIdAndInstitutionId } from '../models/item.js'
-import { PlaidLinkEvent, Webhook } from '../models/plaid.js'
+import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
+import { Webhook } from '../models/webhook.js'
 import {
-    createLinkToken,
-    exchangePublicTokenAndCreateItemAndSync,
-    verifyWebhook,
-} from '../services/plaidService.js'
+    plaidCreateLinkToken,
+    plaidExchangePublicToken,
+} from '../plaid/tokenMethods.js'
+import { plaidVerifyWebhook } from '../plaid/webhookMethods.js'
+import { queueItemSync } from '../queues/itemSyncQueue.js'
+import { queuePlaidLinkEventLog, queueWebhookLog } from '../queues/logQueue.js'
 import { logger } from '../utils/logger.js'
-import {
-    addPlaidLinkEventLogToQueue,
-    addWebhookLogToQueue,
-} from '../utils/queues/logQueue.js'
 
-export const getLinkToken = async (req: Request, res: Response) => {
+export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
 
     const userId: number | undefined = req.session.user?.id
-    const itemId: string | undefined = req.body.itemId
-
     if (!userId) throw new HttpError('missing user id', 400)
 
+    const itemId: string | undefined = req.body.itemId
+
     try {
-        const token = await createLinkToken(userId, itemId)
+        const token = await plaidCreateLinkToken(userId, itemId)
         return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)
@@ -37,7 +39,7 @@ export const handleLinkEvent = async (req: Request, res: Response) => {
     const event: PlaidLinkEvent | undefined = req.body.event
     if (!event) throw new HttpError('missing event', 400)
 
-    await addPlaidLinkEventLogToQueue(event)
+    await queuePlaidLinkEventLog(event)
     return res.status(202).send()
 }
 
@@ -55,37 +57,49 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     if (!institution || !institution.institution_id || !institution.name)
         throw new HttpError('missing institution info', 400)
 
-    const item = await retrieveItemByUserIdAndInstitutionId(
-        userId,
-        institution.institution_id
-    )
-    if (item) throw new HttpError('account already exists', 409)
-
     try {
-        await exchangePublicTokenAndCreateItemAndSync(
+        const existingItem = await fetchItemByUserIdAndInstitutionId(
             userId,
-            institution.institution_id,
-            institution.name,
-            publicToken
+            institution.institution_id
         )
+        if (existingItem) throw new HttpError('account already exists', 409)
+
+        const { accessToken, itemId } = await plaidExchangePublicToken(
+            publicToken,
+            userId
+        )
+
+        const item = await insertItem(
+            userId,
+            itemId,
+            accessToken,
+            institution.institution_id,
+            institution.name
+        )
+        if (!item) throw Error('item not created')
+
+        await queueItemSync(item)
+
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to exchange public token')
     }
 }
 
 export const handleWebhook = async (req: Request, res: Response) => {
-    logger.debug('received webhook')
+    logger.debug('handling webhook')
 
     const token = req.headers['plaid-verification']
     if (typeof token !== 'string') {
         throw new HttpError('missing plaid signature', 400)
     }
+
     const body = JSON.stringify(req.body, null, 2)
 
     try {
-        await verifyWebhook(token, body)
+        await plaidVerifyWebhook(token, body)
         logger.debug('verified webhook')
     } catch (error) {
         if (error instanceof Error) {
@@ -99,7 +113,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
         timestamp: new Date(),
         data: req.body,
     }
-    await addWebhookLogToQueue(webhook)
+    await queueWebhookLog(webhook)
 
     // TODO add webhook to queue
 

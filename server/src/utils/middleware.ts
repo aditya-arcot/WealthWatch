@@ -4,11 +4,11 @@ import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
 import { env } from 'process'
+import { getPool } from '../database/index.js'
+import { AppRequest } from '../models/appRequest.js'
 import { HttpError } from '../models/httpError.js'
-import { AppRequest } from '../models/request.js'
-import { getPool } from './database.js'
+import { queueAppRequest } from '../queues/logQueue.js'
 import { logger } from './logger.js'
-import { addAppRequestToQueue } from './queues/logQueue.js'
 
 export const production = env['NODE_ENV'] === 'prod'
 
@@ -103,7 +103,7 @@ export const logRequestResponse = (
         appReq.responseBody = res._body
 
         logger.info(`sending response (id ${id})`)
-        await addAppRequestToQueue(appReq)
+        await queueAppRequest(appReq)
     })
     next()
 }
