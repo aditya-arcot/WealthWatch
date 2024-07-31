@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import {
-    fetchItemsByUserId,
+    fetchActiveItemsByUserId,
     modifyItemActiveById,
 } from '../database/itemQueries.js'
 import {
@@ -26,7 +26,7 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
     if (!user) throw new HttpError('missing user', 400)
 
     logger.debug('unlinking & deactivating items')
-    const items = await fetchItemsByUserId(user.id)
+    const items = await fetchActiveItemsByUserId(user.id)
     try {
         await Promise.all(
             items.map(async (item) => {

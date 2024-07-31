@@ -6,7 +6,7 @@ import {
     SandboxPublicTokenCreateRequest,
 } from 'plaid'
 import { env } from 'process'
-import { fetchItemById } from '../database/itemQueries.js'
+import { fetchActiveItemById } from '../database/itemQueries.js'
 import { Item } from '../models/item.js'
 import { User } from '../models/user.js'
 import { logger } from '../utils/logger.js'
@@ -29,7 +29,7 @@ export const plaidCreateLinkToken = async (
     let item: Item | undefined
     // link update mode
     if (itemId) {
-        item = await fetchItemById(itemId)
+        item = await fetchActiveItemById(itemId)
         if (!item) throw Error('item not found')
         accessToken = item.accessToken
         products = []

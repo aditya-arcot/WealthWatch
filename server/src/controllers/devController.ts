@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
 import {
-    fetchItemById,
-    fetchItemByUserIdAndInstitutionId,
-    fetchItemsByUserId,
+    fetchActiveItemById,
+    fetchActiveItemByUserIdAndInstitutionId,
+    fetchActiveItemsByUserId,
     insertItem,
     modifyItemActiveById,
 } from '../database/itemQueries.js'
@@ -37,7 +37,7 @@ const deactivateItems = async (deleteUsers: boolean) => {
         users.map(async (user) => {
             logger.debug({ user }, 'processing items for user')
 
-            const items = await fetchItemsByUserId(user.id)
+            const items = await fetchActiveItemsByUserId(user.id)
             await Promise.all(
                 items.map(async (item) => {
                     logger.debug({ item }, 'unlinking & deactivating item')
@@ -60,7 +60,7 @@ export const syncItem = async (req: Request, res: Response) => {
     const itemId: string | undefined = req.query['itemId'] as string
     if (!itemId) throw new HttpError('missing item id', 400)
 
-    const item = await fetchItemById(itemId)
+    const item = await fetchActiveItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     await queueItemSync(item)
@@ -75,7 +75,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
 
     const institutionId = 'ins_56'
     const institutionName = 'Chase'
-    const existingItem = await fetchItemByUserIdAndInstitutionId(
+    const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
         user.id,
         institutionId
     )
@@ -107,7 +107,7 @@ export const resetSandboxItemLogin = async (req: Request, res: Response) => {
     const itemId: string | undefined = req.query['itemId'] as string
     if (!itemId) throw new HttpError('missing item id', 400)
 
-    const item = await fetchItemById(itemId)
+    const item = await fetchActiveItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const reset = await plaidResetItemLogin(item)
@@ -124,7 +124,7 @@ export const fireSandboxWebhook = async (req: Request, res: Response) => {
     const code: string | undefined = req.query['code'] as string
     if (!code) throw new HttpError('missing webhook code', 400)
 
-    const item = await fetchItemById(itemId)
+    const item = await fetchActiveItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const codeEnum = code as WebhookCodeEnum

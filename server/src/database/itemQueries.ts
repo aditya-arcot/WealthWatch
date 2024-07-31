@@ -50,20 +50,22 @@ export const fetchActiveItems = async (): Promise<Item[]> => {
     return rows.map(mapDbItem)
 }
 
-export const fetchItemById = async (
+export const fetchActiveItemById = async (
     itemId: string
 ): Promise<Item | undefined> => {
     const query = `
         SELECT * 
         FROM active_items
         WHERE item_id = $1
-        `
+    `
     const rows: DbItem[] = (await runQuery(query, [itemId])).rows
     if (!rows[0]) return
     return mapDbItem(rows[0])
 }
 
-export const fetchItemsByUserId = async (userId: number): Promise<Item[]> => {
+export const fetchActiveItemsByUserId = async (
+    userId: number
+): Promise<Item[]> => {
     const query = `
         SELECT *
         FROM active_items
@@ -73,7 +75,7 @@ export const fetchItemsByUserId = async (userId: number): Promise<Item[]> => {
     return rows.map(mapDbItem)
 }
 
-export const fetchItemByUserIdAndInstitutionId = async (
+export const fetchActiveItemByUserIdAndInstitutionId = async (
     userId: number,
     institutionId: string
 ): Promise<Item | undefined> => {
@@ -82,7 +84,7 @@ export const fetchItemByUserIdAndInstitutionId = async (
         FROM active_items
         WHERE user_id = $1
             AND institution_id = $2
-        `
+    `
     const rows: DbItem[] = (await runQuery(query, [userId, institutionId])).rows
     if (!rows[0]) return
     return mapDbItem(rows[0])

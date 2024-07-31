@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { fetchTransactionsByUserId } from '../database/transactionQueries.js'
+import { fetchActiveTransactionsByUserId } from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { logger } from '../utils/logger.js'
 
@@ -10,7 +10,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     if (!userId) throw new HttpError('missing user id', 400)
 
     try {
-        const transactions = await fetchTransactionsByUserId(userId)
+        const transactions = await fetchActiveTransactionsByUserId(userId)
         return res.send(transactions)
     } catch (error) {
         logger.error(error)

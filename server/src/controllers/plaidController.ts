@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
-    fetchItemByUserIdAndInstitutionId,
+    fetchActiveItemByUserIdAndInstitutionId,
     insertItem,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
@@ -58,7 +58,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         throw new HttpError('missing institution info', 400)
 
     try {
-        const existingItem = await fetchItemByUserIdAndInstitutionId(
+        const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
             userId,
             institution.institution_id
         )

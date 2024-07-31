@@ -17,7 +17,8 @@ export const insertUser = async (
             password_hash
         ) 
         VALUES ($1, $2, $3, $4, $5) 
-        RETURNING *`
+        RETURNING *
+    `
     const rows: DbUser[] = (
         await runQuery(query, [
             username,

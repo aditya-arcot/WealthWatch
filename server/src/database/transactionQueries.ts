@@ -77,7 +77,7 @@ export const insertTransactions = async (
     return rows.map(mapDbTransaction)
 }
 
-export const fetchTransactionsByUserId = async (
+export const fetchActiveTransactionsByUserId = async (
     userId: number
 ): Promise<Transaction[]> => {
     const query = `

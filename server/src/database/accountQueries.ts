@@ -68,7 +68,7 @@ export const insertAccounts = async (
     return rows.map(mapDbAccount)
 }
 
-export const fetchAccountsByUserId = async (
+export const fetchActiveAccountsByUserId = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `

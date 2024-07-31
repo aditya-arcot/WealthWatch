@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import {
     fetchActiveItems,
-    fetchItemsByUserId,
+    fetchActiveItemsByUserId,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { plaidUpdateItemWebhook } from '../plaid/itemMethods.js'
@@ -14,7 +14,7 @@ export const getUserItems = async (req: Request, res: Response) => {
     if (!userId) throw new HttpError('missing user id', 400)
 
     try {
-        const items = await fetchItemsByUserId(userId)
+        const items = await fetchActiveItemsByUserId(userId)
         return res.send(items)
     } catch (error) {
         logger.error(error)
