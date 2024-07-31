@@ -3,7 +3,7 @@ import {
     createLinkToken,
     exchangePublicToken,
     handleLinkEvent,
-} from '../controllers/plaidController.js'
+} from '../controllers/linkController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -12,16 +12,16 @@ const router = express.Router()
 /**
  * @swagger
  * tags:
- *   name: Plaid
- *   description: Plaid management
+ *   name: Link
+ *   description: Link management
  */
 
 /**
  * @swagger
- * /plaid/link-token:
+ * /link/link-token:
  *   get:
  *     summary: Create a link token
- *     tags: [Plaid]
+ *     tags: [Link]
  *     responses:
  *       200:
  *         description: Created a link token
@@ -36,10 +36,10 @@ router.route('/link-token').post(authenticate, catchAsync(createLinkToken))
 
 /**
  * @swagger
- * /plaid/link-event:
+ * /link/link-event:
  *   post:
  *     summary: Handle a link event
- *     tags: [Plaid]
+ *     tags: [Link]
  *     parameters:
  *       - in: body
  *         name: event
@@ -57,10 +57,10 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
 
 /**
  * @swagger
- * /plaid/public-token:
+ * /link/public-token:
  *   post:
  *     summary: Exchange a public token
- *     tags: [Plaid]
+ *     tags: [Link]
  *     parameters:
  *       - in: body
  *         name: publicToken

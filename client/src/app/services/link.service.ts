@@ -6,8 +6,8 @@ import { LinkEvent } from '../models/plaid'
 @Injectable({
     providedIn: 'root',
 })
-export class PlaidService {
-    readonly baseUrl = `${env.apiUrl}/plaid`
+export class LinkService {
+    readonly baseUrl = `${env.apiUrl}/link`
 
     constructor(private http: HttpClient) {}
 

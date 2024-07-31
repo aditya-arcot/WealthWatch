@@ -1,5 +1,5 @@
 import express from 'express'
-import { handleWebhook } from '../controllers/plaidController.js'
+import { handleWebhook } from '../controllers/webhookController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { logger } from '../utils/logger.js'
 import {

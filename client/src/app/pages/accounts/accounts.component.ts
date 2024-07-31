@@ -15,8 +15,8 @@ import { LinkEvent } from '../../models/plaid'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { ItemService } from '../../services/item.service'
+import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
-import { PlaidService } from '../../services/plaid.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -30,7 +30,7 @@ export class AccountsComponent implements OnInit {
 
     constructor(
         private userSvc: UserService,
-        private plaidSvc: PlaidService,
+        private linkSvc: LinkService,
         private logger: LoggerService,
         private plaidLinkSvc: NgxPlaidLinkService,
         private alertSvc: AlertService,
@@ -76,7 +76,7 @@ export class AccountsComponent implements OnInit {
     }
 
     linkAccount(): void {
-        this.plaidSvc
+        this.linkSvc
             .createLinkToken()
             .pipe(
                 catchError((err) => {
@@ -125,9 +125,9 @@ export class AccountsComponent implements OnInit {
             publicToken: metadata.public_token,
             status: metadata.transfer_status,
         }
-        this.plaidSvc.handleLinkEvent(event).subscribe()
+        this.linkSvc.handleLinkEvent(event).subscribe()
 
-        this.plaidSvc.exchangePublicToken(token, metadata).subscribe({
+        this.linkSvc.exchangePublicToken(token, metadata).subscribe({
             next: () => {
                 this.logger.debug('exchanged public token')
                 this.alertSvc.addSuccessAlert('Success linking institution')
@@ -168,7 +168,7 @@ export class AccountsComponent implements OnInit {
             errorCode: error?.error_code,
             errorMessage: error?.error_message,
         }
-        this.plaidSvc.handleLinkEvent(event).subscribe()
+        this.linkSvc.handleLinkEvent(event).subscribe()
     }
 
     handleLinkEvent(eventName: string, metadata: PlaidEventMetadata): void {
@@ -188,6 +188,6 @@ export class AccountsComponent implements OnInit {
             errorCode: metadata.error_code,
             errorMessage: metadata.error_message,
         }
-        this.plaidSvc.handleLinkEvent(event).subscribe()
+        this.linkSvc.handleLinkEvent(event).subscribe()
     }
 }
