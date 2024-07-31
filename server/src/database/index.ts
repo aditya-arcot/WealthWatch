@@ -49,12 +49,38 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
         throw Error('pool not initialized')
     }
     const start = Date.now()
+
+    // replace whitespace with single space
     query = query.replace(/\s+/g, ' ').trim()
+
+    // replace parameterized values with placeholder
+    let collapsedQuery = query
+    if (query.startsWith('INSERT')) {
+        // parameterized value rows
+        const rows = query.match(/\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)/g)
+        if (rows) {
+            const rowCount = rows.length
+            const paramCount = rows[0]
+                .replace('(', '')
+                .replace(')', '')
+                .split(',').length
+
+            // replace parameterized values with placeholder
+            const parameterizedValues =
+                /VALUES\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)(\s*,\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\))*\s*/
+            const valuesPlaceholder = `VALUES (${rowCount} x ${paramCount}) `
+            collapsedQuery = query.replace(
+                parameterizedValues,
+                valuesPlaceholder
+            )
+        }
+    }
+
     try {
         const res = await clientPool.query(query, params)
         const queryLog = {
             duration: Date.now() - start,
-            query,
+            query: collapsedQuery,
             rowCount: res.rowCount,
         }
         logger.debug({ queryLog }, 'executed query')
@@ -62,7 +88,7 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
     } catch (error) {
         const queryLog = {
             duration: Date.now() - start,
-            query,
+            query: collapsedQuery,
             error,
         }
         logger.error({ queryLog }, 'failed to execute query')
