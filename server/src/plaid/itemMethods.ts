@@ -2,6 +2,7 @@ import {
     AccountBase,
     AccountsGetRequest,
     ItemRemoveRequest,
+    ItemWebhookUpdateRequest,
     Transaction as PlaidTransaction,
     SandboxItemResetLoginRequest,
 } from 'plaid'
@@ -92,6 +93,20 @@ export const plaidResetItemLogin = async (item: Item) => {
         item.id
     )
     return resp.data.reset_login
+}
+
+export const plaidUpdateItemWebhook = async (item: Item, webhook: string) => {
+    logger.debug({ item }, 'updating webhook')
+    const params: ItemWebhookUpdateRequest = {
+        access_token: item.accessToken,
+        webhook,
+    }
+    await executePlaidMethod(
+        plaidClient.itemWebhookUpdate,
+        params,
+        item.userId,
+        item.id
+    )
 }
 
 const mapPlaidAccount = (account: AccountBase, itemId: number): Account => {

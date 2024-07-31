@@ -41,6 +41,15 @@ export const insertItem = async (
     return mapDbItem(rows[0])
 }
 
+export const fetchActiveItems = async (): Promise<Item[]> => {
+    const query = `
+        SELECT *
+        FROM active_items
+    `
+    const rows: DbItem[] = (await runQuery(query)).rows
+    return rows.map(mapDbItem)
+}
+
 export const fetchItemById = async (
     itemId: string
 ): Promise<Item | undefined> => {
