@@ -3,6 +3,7 @@ import {
     AccountsGetRequest,
     ItemRemoveRequest,
     Transaction as PlaidTransaction,
+    SandboxItemResetLoginRequest,
 } from 'plaid'
 import { insertAccounts } from '../database/accountQueries.js'
 import { modifyItemCursorByItemId } from '../database/itemQueries.js'
@@ -77,6 +78,20 @@ export const plaidUnlinkItem = async (item: Item) => {
         item.userId,
         item.id
     )
+}
+
+export const plaidResetItemLogin = async (item: Item) => {
+    logger.debug({ item }, 'resetting item login')
+    const params: SandboxItemResetLoginRequest = {
+        access_token: item.accessToken,
+    }
+    const resp = await executePlaidMethod(
+        plaidClient.sandboxItemResetLogin,
+        params,
+        item.userId,
+        item.id
+    )
+    return resp.data.reset_login
 }
 
 const mapPlaidAccount = (account: AccountBase, itemId: number): Account => {

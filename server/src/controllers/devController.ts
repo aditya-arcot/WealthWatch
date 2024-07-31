@@ -10,7 +10,7 @@ import {
 import { fetchUsers, removeUserById } from '../database/userQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { User } from '../models/user.js'
-import { plaidUnlinkItem } from '../plaid/itemMethods.js'
+import { plaidResetItemLogin, plaidUnlinkItem } from '../plaid/itemMethods.js'
 import {
     plaidCreatePublicToken,
     plaidExchangePublicToken,
@@ -98,6 +98,20 @@ export const createSandboxItem = async (req: Request, res: Response) => {
 
     await queueItemSync(item)
 
+    return res.status(204).send()
+}
+
+export const resetSandboxItemLogin = async (req: Request, res: Response) => {
+    logger.debug('resetting sandbox item login')
+
+    const itemId: string | undefined = req.query['itemId'] as string
+    if (!itemId) throw new HttpError('missing item id', 400)
+
+    const item = await fetchItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    const reset = await plaidResetItemLogin(item)
+    if (!reset) throw Error('failed to reset item login')
     return res.status(204).send()
 }
 

@@ -4,6 +4,7 @@ import {
     deactivateAllItems,
     deleteAllUsers,
     fireSandboxWebhook,
+    resetSandboxItemLogin,
     syncItem,
 } from '../controllers/devController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -71,6 +72,23 @@ router.route('/item/sync').post(catchAsync(syncItem))
  */
 router.route('/item').post(catchAsync(createSandboxItem))
 
+/**
+ * @swagger
+ * /dev/item/reset-login:
+ *   post:
+ *     summary: Reset an item login
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       204:
+ *         description: Reset the item login
+ */
+router.route('/item/reset-login').post(catchAsync(resetSandboxItemLogin))
 /**
  * @swagger
  * /dev/webhook:
