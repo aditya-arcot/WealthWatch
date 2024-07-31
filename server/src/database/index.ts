@@ -50,12 +50,12 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
     }
     const start = Date.now()
 
-    // replace whitespace with single space
-    query = query.replace(/\s+/g, ' ').trim()
+    // replace whitespace with single space, lowercase, trim
+    query = query.replace(/\s+/g, ' ').toLowerCase().trim()
 
     // replace parameterized values with placeholder
     let collapsedQuery = query
-    if (query.startsWith('INSERT')) {
+    if (query.startsWith('insert')) {
         // parameterized value rows
         const rows = query.match(/\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)/g)
         if (rows) {
@@ -67,8 +67,8 @@ export const runQuery = async (query: string, params: unknown[] = []) => {
 
             // replace parameterized values with placeholder
             const parameterizedValues =
-                /VALUES\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)(\s*,\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\))*\s*/
-            const valuesPlaceholder = `VALUES (${rowCount} x ${paramCount}) `
+                /values\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)(\s*,\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\))*\s*/
+            const valuesPlaceholder = `values (${rowCount} x ${paramCount}) `
             collapsedQuery = query.replace(
                 parameterizedValues,
                 valuesPlaceholder
