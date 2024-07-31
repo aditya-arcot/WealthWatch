@@ -15,12 +15,13 @@ export const plaidFireWebhook = async (item: Item, code: WebhookCodeEnum) => {
         access_token: item.accessToken,
         webhook_code: code,
     }
-    await executePlaidMethod(
+    const resp = await executePlaidMethod(
         plaidClient.sandboxItemFireWebhook,
         params,
         item.userId,
         item.id
     )
+    return resp.data.webhook_fired
 }
 
 export const plaidVerifyWebhook = async (

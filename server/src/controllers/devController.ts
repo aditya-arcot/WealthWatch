@@ -118,6 +118,7 @@ export const fireSandboxWebhook = async (req: Request, res: Response) => {
         throw new HttpError('invalid webhook code', 400)
     }
 
-    await plaidFireWebhook(item, codeEnum)
+    const fired = await plaidFireWebhook(item, codeEnum)
+    if (!fired) throw new Error('failed to fire webhook')
     return res.status(204).send()
 }
