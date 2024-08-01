@@ -6,12 +6,11 @@ let redis: Redis | null = null
 
 export const createRedis = (): void => {
     logger.debug('creating redis client')
-    if (!env['REDIS_HOST'] || !env['REDIS_PORT']) {
-        throw Error('missing one or more redis secrets')
+    if (!env['REDIS_HOST']) {
+        throw Error('missing redis host')
     }
     redis = new Redis({
         host: env['REDIS_HOST'],
-        port: Number(env['REDIS_PORT']),
         maxRetriesPerRequest: null,
     })
     logger.debug('created redis client')
