@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
+import { fetchUserByUsername, insertUser } from '../database/userQueries.js'
 import { HttpError } from '../models/httpError.js'
-import { createUser, retrieveUserByUsername } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 
 export const login = async (req: Request, res: Response) => {
-    logger.debug('logging in user')
+    logger.debug('logging in')
 
     const username: string | undefined = req.body.username
     const password: string | undefined = req.body.password
@@ -15,9 +15,9 @@ export const login = async (req: Request, res: Response) => {
     }
 
     try {
-        const user = await retrieveUserByUsername(username)
+        const user = await fetchUserByUsername(username)
         if (!user) {
-            throw new HttpError('no matching user', 404)
+            throw new HttpError('incorrect username', 404)
         }
         if (!bcrypt.compareSync(password, user.passwordHash)) {
             throw new HttpError('incorrect password', 400)
@@ -27,22 +27,22 @@ export const login = async (req: Request, res: Response) => {
     } catch (error) {
         logger.error(error)
         if (error instanceof HttpError) throw error
-        throw new HttpError('failed to login')
+        throw Error('failed to log in')
     }
 }
 
 export const logout = (req: Request, res: Response) => {
-    logger.debug('logging out user')
+    logger.debug('logging out')
     req.session.destroy((err) => {
         if (err) {
-            throw new HttpError('failed to log out')
+            throw Error('failed to log out')
         }
         return res.status(204).send()
     })
 }
 
 export const register = async (req: Request, res: Response) => {
-    logger.debug('registering user')
+    logger.debug('registering')
 
     const username = req.body.username
     const email = req.body.email
@@ -54,10 +54,9 @@ export const register = async (req: Request, res: Response) => {
         throw new HttpError('missing user info', 400)
     }
 
-    const passwordHash = bcrypt.hashSync(password)
-
     try {
-        const user = await createUser(
+        const passwordHash = bcrypt.hashSync(password)
+        const user = await insertUser(
             username,
             email,
             firstName,
@@ -69,6 +68,6 @@ export const register = async (req: Request, res: Response) => {
         return res.status(201).send(user)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to register')
+        throw Error('failed to register')
     }
 }

@@ -1,6 +1,6 @@
 import pg from 'pg'
 import { env } from 'process'
-import { logger } from './logger.js'
+import { logger } from '../utils/logger.js'
 
 let clientPool: pg.Pool | null = null
 
@@ -44,36 +44,64 @@ export const getPool = (): pg.Pool => {
     return clientPool
 }
 
-export const closePool = async (): Promise<void> => {
-    logger.debug('closing database pool')
-    await getPool().end()
-    logger.debug('closed database pool')
-}
-
 export const runQuery = async (query: string, params: unknown[] = []) => {
     if (!clientPool) {
         throw Error('pool not initialized')
     }
     const start = Date.now()
-    query = query.replace(/\s+/g, ' ').trim()
+
+    // replace whitespace with single space, lowercase, trim
+    query = query.replace(/\s+/g, ' ').toLowerCase().trim()
+
+    // replace parameterized values with placeholder
+    let collapsedQuery = query
+    if (query.startsWith('insert')) {
+        // parameterized value rows
+        const rows = query.match(/\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)/g)
+        if (rows) {
+            const rowCount = rows.length
+            const paramCount = rows[0]
+                .replace('(', '')
+                .replace(')', '')
+                .split(',').length
+
+            // replace parameterized values with placeholder
+            const parameterizedValues =
+                /values\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)(\s*,\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\))*\s*/
+            const valuesPlaceholder = `values (${rowCount} x ${paramCount}) `
+            collapsedQuery = query.replace(
+                parameterizedValues,
+                valuesPlaceholder
+            )
+        }
+    }
+
     try {
         const res = await clientPool.query(query, params)
         const queryLog = {
-            query,
-            params,
             duration: Date.now() - start,
+            query: collapsedQuery,
             rowCount: res.rowCount,
-            rows: res.rows,
         }
         logger.debug({ queryLog }, 'executed query')
         return res
     } catch (error) {
         const queryLog = {
-            query,
-            params,
             duration: Date.now() - start,
+            query: collapsedQuery,
+            error,
         }
         logger.error({ queryLog }, 'failed to execute query')
         throw error
     }
+}
+
+export const stopPool = async (): Promise<void> => {
+    logger.debug('stopping database pool')
+    if (!clientPool) {
+        logger.warn('database pool not initialized')
+        return
+    }
+    clientPool.end()
+    logger.debug('stopped database pool')
 }

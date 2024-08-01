@@ -65,24 +65,28 @@ jobs:
                   echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
                   echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
 
+                  echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+
                   echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
                   echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
                   echo "DB_USER=${{ secrets.DB_USER }}" >> .env
                   echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
 
-                  echo "LOG_LEVEL=${{ secrets.LOG_LEVEL }}" >> .env
-                  echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
                   echo "CSRF_SECRET=${{ secrets.CSRF_SECRET }}" >> .env
                   echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
 
-                  echo "PLAID_ENV=${{ secrets.PLAID_ENV }}" >> .env
                   echo "PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }}" >> .env
                   echo "PLAID_SECRET=${{ secrets.PLAID_SECRET }}" >> .env
+                  echo "PLAID_WEBHOOK_URL=${{ secrets.PLAID_WEBHOOK_URL }}" >> .env
 
-                  echo "CLIENT_PORT=${{ secrets.CLIENT_PORT }}" >> .env
-                  echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
                   echo "DOCKER_REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> .env
                   echo "KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}" >> .env
+
+                  echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
+                  echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
+                  echo "PLAID_ENV=${{ vars.PLAID_ENV }}" >> .env
+                  echo "CLIENT_PORT=${{ vars.CLIENT_PORT }}" >> .env
+                  echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
 
             - name: copy files (server)
               run: |

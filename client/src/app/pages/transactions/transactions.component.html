@@ -1,11 +1,11 @@
+<app-loading-spinner [loading]="loading"></app-loading-spinner>
+
 <table class="table table-striped table-hover table-sm">
     <thead class="table-dark">
         <tr>
             <th scope="col">Date</th>
             <th scope="col">Name</th>
-            <th scope="col">Currency</th>
             <th scope="col">Amount</th>
-            <th scope="col">Pending</th>
             <th scope="col">Category</th>
         </tr>
     </thead>
@@ -13,11 +13,12 @@
         @for (t of transactions; track $index) {
             <tr>
                 <td>{{ t.date | date: 'shortDate' }}</td>
-                <td>{{ t.name }}</td>
-                <td>{{ t.isoCurrencyCode ?? t.unofficialCurrencyCode }}</td>
-                <td>{{ t.amount | number: '1.2-2' }}</td>
-                <td>{{ t.pending ? 'Yes' : 'No' }}</td>
-                <td>{{ t.category }} ({{ t.detailedCategory }})</td>
+                <td>
+                    {{ t.merchant ?? t.name }}
+                    {{ t.pending ? ' (Pending)' : '' }}
+                </td>
+                <td>{{ formatCurrency(t) }}</td>
+                <td>{{ formatCategory(t) }}</td>
             </tr>
         }
     </tbody>

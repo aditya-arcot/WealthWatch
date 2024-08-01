@@ -1,12 +1,15 @@
 import { Request, Response } from 'express'
-import { HttpError } from '../models/httpError.js'
-import { retrieveItemsByUserId } from '../models/item.js'
 import {
-    deleteUser,
-    retrieveUserByEmail,
-    retrieveUserByUsername,
-} from '../models/user.js'
-import { removeItem } from '../services/plaidService.js'
+    fetchActiveItemsByUserId,
+    modifyItemActiveById,
+} from '../database/itemQueries.js'
+import {
+    fetchUserByEmail,
+    fetchUserByUsername,
+    removeUserById,
+} from '../database/userQueries.js'
+import { HttpError } from '../models/httpError.js'
+import { plaidUnlinkItem } from '../plaid/itemMethods.js'
 import { logger } from '../utils/logger.js'
 import { logout } from './authController.js'
 
@@ -16,26 +19,32 @@ export const getCurrentUser = (req: Request, res: Response) => {
     return res.send(req.session.user)
 }
 
-export const removeCurrentUser = async (req: Request, res: Response) => {
-    logger.debug('removing user')
+export const deleteCurrentUser = async (req: Request, res: Response) => {
+    logger.debug('deleting current user')
 
     const user = req.session.user
     if (!user) throw new HttpError('missing user', 400)
 
-    const items = await retrieveItemsByUserId(user.id)
+    logger.debug('unlinking & deactivating items')
+    const items = await fetchActiveItemsByUserId(user.id)
     try {
-        await Promise.all(items.map((item) => removeItem(item)))
+        await Promise.all(
+            items.map(async (item) => {
+                await plaidUnlinkItem(item)
+                await modifyItemActiveById(item.id, false)
+            })
+        )
     } catch (error) {
         // ignore
         logger.error(error)
     }
 
     try {
-        await deleteUser(user.id)
+        await removeUserById(user.id)
         return logout(req, res)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to delete user')
+        throw Error('failed to delete current user')
     }
 }
 
@@ -46,11 +55,11 @@ export const checkUsernameExists = async (req: Request, res: Response) => {
     if (!username) throw new HttpError('missing username', 400)
 
     try {
-        const user = await retrieveUserByUsername(username)
+        const user = await fetchUserByUsername(username)
         return res.send(!!user)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to check if username exists')
+        throw Error('failed to check if user with username exists')
     }
 }
 
@@ -61,10 +70,10 @@ export const checkEmailExists = async (req: Request, res: Response) => {
     if (!email) throw new HttpError('missing email', 400)
 
     try {
-        const user = await retrieveUserByEmail(email)
+        const user = await fetchUserByEmail(email)
         return res.send(!!user)
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to check if email exists')
+        throw Error('failed to check if user with email exists')
     }
 }

@@ -1,9 +1,13 @@
-import express, { Request, Response } from 'express'
-import { retrieveItemsByUserId, updateItemToInactive } from '../models/item.js'
-import { deleteUser, retrieveUsers } from '../models/user.js'
-import { removeItem } from '../services/plaidService.js'
+import express from 'express'
+import {
+    createSandboxItem,
+    deactivateAllItems,
+    deleteAllUsers,
+    fireSandboxWebhook,
+    resetSandboxItemLogin,
+    syncItem,
+} from '../controllers/devController.js'
 import { catchAsync } from '../utils/catchAsync.js'
-import { logger } from '../utils/logger.js'
 
 const router = express.Router()
 
@@ -18,76 +22,96 @@ const router = express.Router()
  * @swagger
  * /dev/users:
  *   delete:
- *     summary: Unregister items, delete users and child data
+ *     summary: Delete all users and deactivate all items
  *     tags: [Dev]
  *     responses:
  *       204:
- *         description: All users deleted
+ *         description: Deleted all users and deactivated all items
  */
-router.route('/users').delete(
-    catchAsync(async (req: Request, res: Response) => {
-        logger.debug('deleting all users')
-
-        const users = await retrieveUsers()
-        await Promise.all(
-            users.map(async (user) => {
-                logger.debug({ user }, 'deleting user')
-
-                const items = await retrieveItemsByUserId(user.id)
-                try {
-                    await Promise.all(items.map((item) => removeItem(item)))
-                } catch (error) {
-                    logger.error(error)
-                }
-
-                await deleteUser(user.id)
-            })
-        )
-
-        req.session.destroy(() => res.status(204).send())
-    })
-)
+router.route('/users').delete(catchAsync(deleteAllUsers))
 
 /**
  * @swagger
  * /dev/items:
  *   delete:
- *     summary: Unregister & deactivate all items
+ *     summary: Deactivate all items
  *     tags: [Dev]
  *     responses:
  *       204:
- *         description: All items deactivated
+ *         description: Deactivated all items
  */
-router.route('/items').delete(
-    catchAsync(async (_req: Request, res: Response) => {
-        logger.debug('deactivating all items')
+router.route('/items').delete(catchAsync(deactivateAllItems))
 
-        const users = await retrieveUsers()
-        await Promise.all(
-            users.map(async (user) => {
-                logger.debug({ user }, 'deactivating items for user')
+/**
+ * @swagger
+ * /dev/item/sync:
+ *   post:
+ *     summary: Sync an item
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       202:
+ *         description: Queued the item for sync
+ */
+router.route('/item/sync').post(catchAsync(syncItem))
 
-                const items = await retrieveItemsByUserId(user.id)
-                await Promise.all(
-                    items.map(async (item) => {
-                        try {
-                            await removeItem(item)
-                            await updateItemToInactive(item.id)
-                        } catch (error) {
-                            logger.error(error)
-                        }
-                    })
-                )
-            })
-        )
+/**
+ * @swagger
+ * /dev/item:
+ *   post:
+ *     summary: Create an item (Chase)
+ *     tags: [Dev]
+ *     responses:
+ *       204:
+ *         description: Created the item, queued it for sync
+ */
+router.route('/item').post(catchAsync(createSandboxItem))
 
-        return res.status(204).send()
-    })
-)
-
-// TODO - plaid sandbox routes
-// create public token
-// reset login
-// fire webhook
+/**
+ * @swagger
+ * /dev/item/reset-login:
+ *   post:
+ *     summary: Reset an item login
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       204:
+ *         description: Reset the item login
+ */
+router.route('/item/reset-login').post(catchAsync(resetSandboxItemLogin))
+/**
+ * @swagger
+ * /dev/webhook:
+ *   post:
+ *     summary: Fire a webhook
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The item id
+ *       - in: query
+ *         name: code
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The webhook code
+ *     responses:
+ *       204:
+ *         description: Fired the webhook
+ */
+router.route('/webhook').post(catchAsync(fireSandboxWebhook))
 
 export default router

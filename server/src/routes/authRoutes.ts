@@ -16,7 +16,7 @@ const router = express.Router()
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Login using existing account
+ *     summary: Log in using an existing account
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -31,7 +31,7 @@ const router = express.Router()
  *                 type: string
  *     responses:
  *       200:
- *         description: The logged in user
+ *         description: Logged in the user
  *         content:
  *           application/json:
  *             schema:
@@ -43,11 +43,11 @@ router.route('/login').post(catchAsync(login))
  * @swagger
  * /auth/logout:
  *   post:
- *     summary: Logout user
+ *     summary: Log out
  *     tags: [Auth]
  *     responses:
  *       204:
- *         description: User was logged out
+ *         description: Logged out the current user
  *       401:
  *          $ref: '#/components/responses/Unauthorized'
  */
@@ -77,8 +77,8 @@ router.route('/logout').post(authenticate, logout)
  *               password:
  *                 type: string
  *     responses:
- *       200:
- *         description: The registered user
+ *       201:
+ *         description: Registered the user
  *         content:
  *           application/json:
  *             schema:

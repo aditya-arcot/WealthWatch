@@ -1,12 +1,13 @@
 import pgSession from 'connect-pg-simple'
 import cors from 'cors'
-import { randomUUID } from 'crypto'
 import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
 import { env } from 'process'
+import { getPool } from '../database/index.js'
+import { AppRequest } from '../models/appRequest.js'
 import { HttpError } from '../models/httpError.js'
-import { getPool } from './database.js'
+import { queueAppRequest } from '../queues/logQueue.js'
 import { logger } from './logger.js'
 
 export const production = env['NODE_ENV'] === 'prod'
@@ -67,20 +68,24 @@ export const logRequestResponse = (
     res: Response,
     next: NextFunction
 ) => {
-    const id = randomUUID()
-    const requestLog = {
+    const id = new Date().getTime()
+    const appReq: AppRequest = {
         id,
+        userId: req.session?.user?.id ?? null,
+        timestamp: new Date(),
+        duration: -1,
         method: req.method,
-        url: req.url,
-        query: req.query,
-        params: req.params,
-        headers: req.headers,
+        url: req.baseUrl + req.path,
+        queryParams: req.query,
+        routeParams: req.params,
+        requestHeaders: req.headers,
+        requestBody: req.body,
+        remoteAddress: req.socket.remoteAddress ?? null,
+        remotePort: req.socket.remotePort ?? null,
         session: req.session,
-        body: req.body,
-        remoteAddress: req.socket.remoteAddress,
-        remotePort: req.socket.remotePort,
+        responseStatus: -1,
     }
-    logger.info({ requestLog }, 'received request')
+    logger.info(`received request (id ${id})`)
 
     const send = res.send
     res.send = (body) => {
@@ -89,15 +94,16 @@ export const logRequestResponse = (
         res.send = send
         return res.send(body)
     }
-    res.on('finish', () => {
-        const responseLog = {
-            id,
-            statusCode: res.statusCode,
-            headers: res.getHeaders(),
-            // @ts-expect-error: custom property
-            body: res._body,
-        }
-        logger.info({ responseLog }, 'sending response')
+
+    res.on('finish', async () => {
+        appReq.duration = Date.now() - appReq.timestamp.getTime()
+        appReq.responseStatus = res.statusCode
+        appReq.responseHeaders = res.getHeaders()
+        // @ts-expect-error: custom property
+        appReq.responseBody = res._body
+
+        logger.info(`sending response (id ${id})`)
+        await queueAppRequest(appReq)
     })
     next()
 }
@@ -111,6 +117,14 @@ export const authenticate = (
         return next()
     }
     throw new HttpError('unauthorized', 401)
+}
+
+export const handleUnmatchedRoute = (
+    req: Request,
+    _res: Response,
+    _next: NextFunction
+) => {
+    throw new HttpError(`endpoint not found - ${req.url}`, 404)
 }
 
 export const handleError = (

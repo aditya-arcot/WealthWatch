@@ -1,6 +1,7 @@
-export interface LinkEvent {
+export interface PlaidLinkEvent {
     id: number
     userId: number
+    timestamp: Date
     type: string
     sessionId: string
     requestId?: string | null

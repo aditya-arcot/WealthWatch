@@ -16,6 +16,7 @@ import { env } from '../environments/env'
 import { routes } from './app.routes'
 import { AuthInterceptor } from './interceptors/auth-interceptor'
 import { CSRFInterceptor } from './interceptors/csrf-interceptor'
+import { ErrorInterceptor } from './interceptors/error-interceptor'
 import { StartupService } from './services/startup.service'
 
 export const appConfig: ApplicationConfig = {
@@ -46,6 +47,11 @@ export const appConfig: ApplicationConfig = {
         {
             provide: HTTP_INTERCEPTORS,
             useClass: CSRFInterceptor,
+            multi: true,
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: ErrorInterceptor,
             multi: true,
         },
         Title,

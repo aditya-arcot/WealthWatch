@@ -1,32 +1,33 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
+import {
+    fetchActiveItemByUserIdAndInstitutionId,
+    insertItem,
+} from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
+import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 import {
-    createItem,
-    retrieveItemByUserIdAndInstitutionId,
-} from '../models/item.js'
-import { createPlaidLinkEvent, PlaidLinkEvent } from '../models/plaid.js'
-import {
-    createLinkToken,
-    exchangePublicTokenForAccessToken,
-    syncItemData,
-} from '../services/plaidService.js'
+    plaidCreateLinkToken,
+    plaidExchangePublicToken,
+} from '../plaid/tokenMethods.js'
+import { queueItemSync } from '../queues/itemSyncQueue.js'
+import { queuePlaidLinkEventLog } from '../queues/logQueue.js'
 import { logger } from '../utils/logger.js'
 
-export const getLinkToken = async (req: Request, res: Response) => {
+export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
 
     const userId: number | undefined = req.session.user?.id
-    const itemId: string | undefined = req.body.itemId
-
     if (!userId) throw new HttpError('missing user id', 400)
 
+    const itemId: string | undefined = req.body.itemId
+
     try {
-        const token = await createLinkToken(userId, itemId)
+        const token = await plaidCreateLinkToken(userId, itemId)
         return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to create link token')
+        throw Error('failed to create link token')
     }
 }
 
@@ -36,14 +37,8 @@ export const handleLinkEvent = async (req: Request, res: Response) => {
     const event: PlaidLinkEvent | undefined = req.body.event
     if (!event) throw new HttpError('missing event', 400)
 
-    try {
-        const newEvent = await createPlaidLinkEvent(event)
-        if (!newEvent) throw Error('event not created')
-        return res.status(204).send()
-    } catch (error) {
-        logger.error(error)
-        throw new HttpError('failed to create link event')
-    }
+    await queuePlaidLinkEventLog(event)
+    return res.status(202).send()
 }
 
 export const exchangePublicToken = async (req: Request, res: Response) => {
@@ -60,32 +55,33 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     if (!institution || !institution.institution_id || !institution.name)
         throw new HttpError('missing institution info', 400)
 
-    if (
-        await retrieveItemByUserIdAndInstitutionId(
+    try {
+        const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
             userId,
             institution.institution_id
         )
-    ) {
-        throw new HttpError('account already exists', 409)
-    }
+        if (existingItem) throw new HttpError('account already exists', 409)
 
-    try {
-        const resp = await exchangePublicTokenForAccessToken(
+        const { accessToken, itemId } = await plaidExchangePublicToken(
             publicToken,
             userId
         )
-        const item = await createItem(
+
+        const item = await insertItem(
             userId,
-            resp.itemId,
-            resp.accessToken,
+            itemId,
+            accessToken,
             institution.institution_id,
             institution.name
         )
         if (!item) throw Error('item not created')
-        await syncItemData(item)
+
+        await queueItemSync(item)
+
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
-        throw new HttpError('failed to exchange public token')
+        if (error instanceof HttpError) throw error
+        throw Error('failed to exchange public token')
     }
 }

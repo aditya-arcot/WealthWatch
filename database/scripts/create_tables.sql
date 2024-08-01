@@ -3,8 +3,38 @@ START TRANSACTION;
 CREATE OR REPLACE FUNCTION set_update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
-    new.update_timestamp = NOW();
+    new.update_timestamp = TIMEZONE('UTC', NOW());
     RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TABLE IF NOT EXISTS audit (
+    id SERIAL PRIMARY KEY,
+    operation CHAR(1) NOT NULL CHECK (operation IN ('I', 'U', 'D')),
+    table_name TEXT NOT NULL,
+    row_id INTEGER NOT NULL,
+    row_data JSON NOT NULL,
+    user_id TEXT NOT NULL,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
+
+CREATE OR REPLACE FUNCTION insert_audit_record()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
+        VALUES ('I', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user, NOW());
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
+        VALUES ('U', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user, NOW());
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
+        VALUES ('D', TG_TABLE_NAME, OLD.id, row_to_json(OLD), current_user, NOW());
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -15,14 +45,19 @@ CREATE TABLE IF NOT EXISTS users (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TRIGGER trigger_users_update_timestamp
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_users_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON users
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
 
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
@@ -34,14 +69,19 @@ CREATE TABLE IF NOT EXISTS items (
     institution_name TEXT NOT NULL,
     healthy BOOLEAN NOT NULL,
     cursor TEXT,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TRIGGER trigger_items_update_timestamp
 BEFORE UPDATE ON items
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_items_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON items
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
 
 CREATE VIEW active_items AS
 SELECT *
@@ -62,9 +102,19 @@ CREATE TABLE IF NOT EXISTS accounts (
     credit_limit NUMERIC(28, 10),
     type TEXT NOT NULL,
     subtype TEXT NOT NULL,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
+
+CREATE TRIGGER trigger_accounts_update_timestamp
+BEFORE UPDATE ON accounts
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_accounts_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON accounts
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
 
 CREATE VIEW active_accounts AS
 SELECT a.*
@@ -72,11 +122,6 @@ FROM accounts a
 JOIN items i 
     ON a.item_id = i.id
 WHERE i.active = TRUE;
-
-CREATE TRIGGER trigger_accounts_update_timestamp
-BEFORE UPDATE ON accounts
-FOR EACH ROW
-EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TABLE IF NOT EXISTS transactions (
     id SERIAL PRIMARY KEY,
@@ -93,9 +138,19 @@ CREATE TABLE IF NOT EXISTS transactions (
     unofficial_currency_code TEXT,
     date DATE NOT NULL,
     pending BOOLEAN NOT NULL,
-    create_timestamp TIMESTAMP DEFAULT NOW(),
-    update_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    update_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
+
+CREATE TRIGGER trigger_transactions_update_timestamp
+BEFORE UPDATE ON transactions
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_transactions_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON transactions
+FOR EACH ROW 
+EXECUTE FUNCTION insert_audit_record();
 
 CREATE VIEW active_transactions AS
 SELECT t.*
@@ -106,14 +161,30 @@ JOIN items i
     ON a.item_id = i.id
 WHERE i.active = TRUE;
 
-CREATE TRIGGER trigger_transactions_update_timestamp
-BEFORE UPDATE ON transactions
-FOR EACH ROW
-EXECUTE PROCEDURE set_update_timestamp();
+CREATE TABLE IF NOT EXISTS app_requests (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER,
+    timestamp TIMESTAMP NOT NULL,
+    duration INTEGER NOT NULL,
+    method TEXT NOT NULL,
+    url TEXT NOT NULL,
+    query_params JSON,
+    route_params JSON,
+    request_headers JSON,
+    request_body TEXT,
+    remote_address TEXT,
+    remote_port INTEGER,
+    session JSON,
+    response_status INTEGER NOT NULL,
+    response_headers JSON,
+    response_body TEXT,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
 
 CREATE TABLE IF NOT EXISTS plaid_link_events (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER,
+    timestamp TIMESTAMP NOT NULL,
     type TEXT NOT NULL,
     session_id TEXT NOT NULL,
     request_id TEXT,
@@ -124,20 +195,42 @@ CREATE TABLE IF NOT EXISTS plaid_link_events (
     error_type TEXT,
     error_code TEXT,
     error_message TEXT,
-    create_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TABLE IF NOT EXISTS plaid_api_requests (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    user_id INTEGER,
+    item_id INTEGER,
+    timestamp TIMESTAMP NOT NULL,
+    duration INTEGER NOT NULL,
     method TEXT NOT NULL,
     params JSON NOT NULL,
     response JSON,
     error_name TEXT,
     error_message TEXT,
     error_stack TEXT,
-    create_timestamp TIMESTAMP DEFAULT NOW()
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
+
+CREATE TABLE IF NOT EXISTS webhooks (
+    id SERIAL PRIMARY KEY,
+    timestamp TIMESTAMP NOT NULL,
+    data JSON NOT NULL,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
+
+CREATE TABLE IF NOT EXISTS jobs (
+    id SERIAL PRIMARY KEY,
+    queue_name TEXT NOT NULL,
+    job_id TEXT,
+    job_name TEXT,
+    success BOOLEAN NOT NULL,
+    data JSON,
+    error_name TEXT,
+    error_message TEXT,
+    error_stack TEXT,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 COMMIT;

@@ -10,27 +10,29 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { ItemWithAccounts } from '../../models/item'
-import { LinkEvent } from '../../models/plaid'
+import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { ItemService } from '../../services/item.service'
+import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
-import { PlaidService } from '../../services/plaid.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-accounts',
     standalone: true,
-    imports: [],
+    imports: [LoadingSpinnerComponent],
     templateUrl: './accounts.component.html',
 })
 export class AccountsComponent implements OnInit {
     itemsWithAccounts: ItemWithAccounts[] = []
+    loading = false
 
     constructor(
         private userSvc: UserService,
-        private plaidSvc: PlaidService,
+        private linkSvc: LinkService,
         private logger: LoggerService,
         private plaidLinkSvc: NgxPlaidLinkService,
         private alertSvc: AlertService,
@@ -43,6 +45,7 @@ export class AccountsComponent implements OnInit {
     }
 
     loadAccounts(): void {
+        this.loading = true
         this.itemSvc
             .getItems()
             .pipe(
@@ -72,18 +75,21 @@ export class AccountsComponent implements OnInit {
                     item.accounts.push(account)
                 })
                 this.logger.debug('mapped accounts', this.itemsWithAccounts)
+                this.loading = false
             })
     }
 
     linkAccount(): void {
-        this.plaidSvc
-            .getLinkToken()
+        this.loading = true
+        this.linkSvc
+            .createLinkToken()
             .pipe(
                 catchError((err) => {
                     this.logger.error('failed to create link token', err)
                     this.alertSvc.addErrorAlert(
                         'Something went wrong. Please try again.'
                     )
+                    this.loading = false
                     return throwError(() => err)
                 }),
                 switchMap((resp) => {
@@ -108,15 +114,17 @@ export class AccountsComponent implements OnInit {
             )
             .subscribe((handler: PlaidLinkHandler) => {
                 handler.open()
+                this.loading = false
             })
     }
 
     handleLinkSuccess(token: string, metadata: PlaidSuccessMetadata): void {
         const type = 'success'
         this.logger.debug(type, token, metadata)
-        const event: LinkEvent = {
+        const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
             institutionId: metadata.institution?.institution_id,
@@ -124,13 +132,19 @@ export class AccountsComponent implements OnInit {
             publicToken: metadata.public_token,
             status: metadata.transfer_status,
         }
-        this.plaidSvc.handleLinkEvent(event).subscribe()
+        this.linkSvc.handleLinkEvent(event).subscribe()
 
-        this.plaidSvc.exchangePublicToken(token, metadata).subscribe({
+        this.loading = true
+        this.linkSvc.exchangePublicToken(token, metadata).subscribe({
             next: () => {
                 this.logger.debug('exchanged public token')
-                this.alertSvc.addSuccessAlert('Success linking institution')
-                this.loadAccounts()
+                this.alertSvc.addSuccessAlert('Success linking institution', [
+                    'Loading your accounts now',
+                ])
+                // TODO spinner
+                setTimeout(() => {
+                    this.loadAccounts()
+                }, 3000)
             },
             error: (err: HttpErrorResponse) => {
                 this.logger.error('failed to exchange public token', err)
@@ -143,6 +157,7 @@ export class AccountsComponent implements OnInit {
                         'Something went wrong. Please try again'
                     )
                 }
+                this.loading = false
             },
         })
     }
@@ -153,9 +168,10 @@ export class AccountsComponent implements OnInit {
     ): void {
         const type = 'exit'
         this.logger.debug(type, error, metadata)
-        const event: LinkEvent = {
+        const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,
@@ -166,15 +182,16 @@ export class AccountsComponent implements OnInit {
             errorCode: error?.error_code,
             errorMessage: error?.error_message,
         }
-        this.plaidSvc.handleLinkEvent(event).subscribe()
+        this.linkSvc.handleLinkEvent(event).subscribe()
     }
 
     handleLinkEvent(eventName: string, metadata: PlaidEventMetadata): void {
         const type = `event - ${eventName.toLowerCase()}`
         this.logger.debug(type, metadata)
-        const event: LinkEvent = {
+        const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,
@@ -185,6 +202,6 @@ export class AccountsComponent implements OnInit {
             errorCode: metadata.error_code,
             errorMessage: metadata.error_message,
         }
-        this.plaidSvc.handleLinkEvent(event).subscribe()
+        this.linkSvc.handleLinkEvent(event).subscribe()
     }
 }

@@ -38,7 +38,7 @@ export class LogoutComponent implements OnInit {
                         this.router.navigateByUrl('/login')
                         this.alertSvc.clearAlerts()
                         this.alertSvc.addSuccessAlert('Success signing out')
-                    })
+                    }, 3000)
                     return
                 }
                 this.userSvc.storeCurrentUser(user)

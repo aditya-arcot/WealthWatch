@@ -1,5 +1,8 @@
 import express from 'express'
-import { getItemsByUser } from '../controllers/itemController.js'
+import {
+    getUserItems,
+    updateActiveItemsWebhook,
+} from '../controllers/itemController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -16,11 +19,11 @@ const router = express.Router()
  * @swagger
  * /items:
  *   get:
- *     summary: Retrieve a user's items
+ *     summary: Retrieve the logged in user's items
  *     tags: [Items]
  *     responses:
  *       200:
- *         description: A list of user's items
+ *         description: Retrieved the logged in user's items
  *         content:
  *           application/json:
  *             schema:
@@ -30,6 +33,22 @@ const router = express.Router()
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/').get(authenticate, catchAsync(getItemsByUser))
+router.route('/').get(authenticate, catchAsync(getUserItems))
+
+/**
+ * @swagger
+ * /items/update-webhook:
+ *   post:
+ *     summary: Update webhook for active items
+ *     tags: [Items]
+ *     responses:
+ *       204:
+ *         description: Updated webhook for active items
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/update-webhook')
+    .post(authenticate, catchAsync(updateActiveItemsWebhook))
 
 export default router

@@ -1,3 +1,5 @@
+<app-loading-spinner [loading]="loading"></app-loading-spinner>
+
 <button (click)="linkAccount()" class="btn btn-primary mb-2">
     Link an Account
 </button>
@@ -9,7 +11,7 @@
         <div class="card mb-2">
             <div class="card-body">
                 <h5 class="card-title">{{ item.institutionName }}</h5>
-                <table class="table table-striped table-hover table-sm">
+                <table class="table table-striped table-hover table-sm mb-0">
                     <thead class="table-dark">
                         <tr>
                             <th scope="col">Name</th>

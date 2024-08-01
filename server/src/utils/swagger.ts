@@ -101,6 +101,10 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                                 description: 'The Plaid item ID',
                             },
+                            active: {
+                                type: 'boolean',
+                                description: 'The item active status',
+                            },
                             accessToken: {
                                 type: 'string',
                                 description: 'The item access token',

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getTransactionsByUser } from '../controllers/transactionController.js'
+import { getUserTransactions } from '../controllers/transactionController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -16,11 +16,11 @@ const router = express.Router()
  * @swagger
  * /transactions:
  *   get:
- *     summary: Retrieve a user's transactions
+ *     summary: Retrieve the logged in user's transactions
  *     tags: [Transactions]
  *     responses:
  *       200:
- *         description: A list of user's transactions
+ *         description: Retrieved a list of the logged in user's transactions
  *         content:
  *           application/json:
  *             schema:
@@ -30,6 +30,6 @@ const router = express.Router()
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/').get(authenticate, catchAsync(getTransactionsByUser))
+router.route('/').get(authenticate, catchAsync(getUserTransactions))
 
 export default router

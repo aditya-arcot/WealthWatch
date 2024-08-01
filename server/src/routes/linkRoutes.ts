@@ -1,9 +1,9 @@
 import express from 'express'
 import {
+    createLinkToken,
     exchangePublicToken,
-    getLinkToken,
     handleLinkEvent,
-} from '../controllers/plaidController.js'
+} from '../controllers/linkController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -12,19 +12,19 @@ const router = express.Router()
 /**
  * @swagger
  * tags:
- *   name: Plaid
- *   description: Plaid management
+ *   name: Link
+ *   description: Link management
  */
 
 /**
  * @swagger
- * /plaid/link-token:
+ * /link/link-token:
  *   get:
- *     summary: Get link token
- *     tags: [Plaid]
+ *     summary: Create a link token
+ *     tags: [Link]
  *     responses:
  *       200:
- *         description: The link token object
+ *         description: Created a link token
  *         content:
  *           application/json:
  *             schema:
@@ -32,14 +32,14 @@ const router = express.Router()
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/link-token').get(authenticate, catchAsync(getLinkToken))
+router.route('/link-token').post(authenticate, catchAsync(createLinkToken))
 
 /**
  * @swagger
- * /plaid/link-event:
+ * /link/link-event:
  *   post:
- *     summary: Handle link event
- *     tags: [Plaid]
+ *     summary: Handle a link event
+ *     tags: [Link]
  *     parameters:
  *       - in: body
  *         name: event
@@ -48,8 +48,8 @@ router.route('/link-token').get(authenticate, catchAsync(getLinkToken))
  *         required: true
  *         description: The link event
  *     responses:
- *       204:
- *         description: The link event was handled
+ *       202:
+ *         description: Handled the link event
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -57,10 +57,10 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
 
 /**
  * @swagger
- * /plaid/public-token:
+ * /link/public-token:
  *   post:
- *     summary: Exchange public token for access token
- *     tags: [Plaid]
+ *     summary: Exchange a public token
+ *     tags: [Link]
  *     parameters:
  *       - in: body
  *         name: publicToken
@@ -76,7 +76,7 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
  *         description: The metadata
  *     responses:
  *       204:
- *         description: The public token was exchanged
+ *         description: Exchanged the public token, queued the item for sync
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

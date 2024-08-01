@@ -1,5 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Transaction } from '../../models/transaction'
 import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
@@ -7,11 +8,18 @@ import { TransactionService } from '../../services/transaction.service'
 @Component({
     selector: 'app-transactions',
     standalone: true,
-    imports: [DecimalPipe, DatePipe],
+    imports: [DecimalPipe, DatePipe, LoadingSpinnerComponent],
     templateUrl: './transactions.component.html',
 })
 export class TransactionsComponent implements OnInit {
     transactions: Transaction[] = []
+    currencyFormatters: Record<string, Intl.NumberFormat> = {
+        USD: new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }),
+    }
+    loading = false
 
     constructor(
         private transactionSvc: TransactionService,
@@ -23,9 +31,34 @@ export class TransactionsComponent implements OnInit {
     }
 
     loadTransactions(): void {
+        this.loading = true
         this.transactionSvc.getTransactions().subscribe((t) => {
             this.logger.debug('loaded transactions', t)
             this.transactions = t
+            this.loading = false
         })
+    }
+
+    formatCurrency(t: Transaction): string {
+        const currency = t.unofficialCurrencyCode ?? t.isoCurrencyCode
+        if (!currency) return t.amount.toString()
+
+        if (!this.currencyFormatters[currency]) {
+            this.currencyFormatters[currency] = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency,
+            })
+        }
+
+        return this.currencyFormatters[currency].format(t.amount)
+    }
+
+    formatCategory(t: Transaction): string {
+        if (!t.category) return ''
+        return t.category
+            .toLowerCase()
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (c) => c.toUpperCase())
+            .replace(/\b(And|Or)\b/g, (c) => c.toLowerCase())
     }
 }

@@ -20,7 +20,7 @@ const router = express.Router()
  *     tags: [Secrets]
  *     responses:
  *       200:
- *         description: A list of client secrets
+ *         description: Retrieved a list of client secrets
  *         content:
  *           application/json:
  *             schema:

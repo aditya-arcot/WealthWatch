@@ -4,7 +4,7 @@ import accountRouter from './accountRoutes.js'
 import authRouter from './authRoutes.js'
 import devRouter from './devRoutes.js'
 import itemRouter from './itemRoutes.js'
-import plaidRouter from './plaidRoutes.js'
+import linkRouter from './linkRoutes.js'
 import secretsRouter from './secretsRoutes.js'
 import transactionRouter from './transactionRoutes.js'
 import userRouter from './userRoutes.js'
@@ -16,7 +16,7 @@ if (!production) {
     router.use('/dev', devRouter)
 }
 router.use('/items', itemRouter)
-router.use('/plaid', plaidRouter)
+router.use('/link', linkRouter)
 router.use('/secrets', secretsRouter)
 router.use('/transactions', transactionRouter)
 router.use('/users', userRouter)
