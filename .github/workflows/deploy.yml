@@ -65,6 +65,8 @@ jobs:
                   echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
                   echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
 
+                  echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+
                   echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
                   echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
                   echo "DB_USER=${{ secrets.DB_USER }}" >> .env
