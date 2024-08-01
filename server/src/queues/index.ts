@@ -30,29 +30,31 @@ export const workerOptions = {
 }
 
 export const handleJobSuccess = async (
+    queueName: string,
     jobId: string | undefined,
-    type: string,
+    jobName: string | undefined,
     data: object
 ) => {
     return insertJob({
         id: -1,
+        queueName,
         jobId: jobId ?? null,
-        type,
+        jobName: jobName ?? null,
         success: true,
         data,
     })
 }
 
 export const handleJobFailure = async (
+    queueName: string,
     jobId: string | undefined,
-    type: string,
     data: object | null,
     error: Error
 ) => {
     return insertJob({
         id: -1,
+        queueName,
         jobId: jobId ?? null,
-        type,
         success: false,
         data,
         errorName: error.name,

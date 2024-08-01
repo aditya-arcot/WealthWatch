@@ -1,7 +1,8 @@
 export interface Job {
     id: number
+    queueName: string
     jobId?: string | null
-    type: string
+    jobName?: string | null
     success: boolean
     data?: object | null
     errorName?: string | null

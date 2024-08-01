@@ -222,8 +222,9 @@ CREATE TABLE IF NOT EXISTS webhooks (
 
 CREATE TABLE IF NOT EXISTS jobs (
     id SERIAL PRIMARY KEY,
+    queue_name TEXT NOT NULL,
     job_id TEXT,
-    type TEXT NOT NULL,
+    job_name TEXT,
     success BOOLEAN NOT NULL,
     data JSON,
     error_name TEXT,

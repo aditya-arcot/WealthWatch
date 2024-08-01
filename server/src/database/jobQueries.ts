@@ -4,21 +4,23 @@ import { runQuery } from './index.js'
 export const insertJob = async (job: Job): Promise<Job | undefined> => {
     const query = `
         INSERT INTO jobs (
+            queue_name,
             job_id,
-            type,
+            job_name,
             success,
             data,
             error_name,
             error_message,
             error_stack
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
     `
     const rows: DbJob[] = (
         await runQuery(query, [
+            job.queueName,
             job.jobId,
-            job.type,
+            job.jobName,
             job.success,
             job.data,
             job.errorName,
@@ -32,7 +34,9 @@ export const insertJob = async (job: Job): Promise<Job | undefined> => {
 
 interface DbJob {
     id: number
+    queue_name: string
     job_id: string | null
+    job_name: string | null
     type: string
     success: boolean
     data: object | null
@@ -43,8 +47,9 @@ interface DbJob {
 
 const mapDbJob = (dbJob: DbJob): Job => ({
     id: dbJob.id,
+    queueName: dbJob.queue_name,
     jobId: dbJob.job_id,
-    type: dbJob.type,
+    jobName: dbJob.job_name,
     success: dbJob.success,
     data: dbJob.data,
     errorName: dbJob.error_name,

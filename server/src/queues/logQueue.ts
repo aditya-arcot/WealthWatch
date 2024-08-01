@@ -1,4 +1,5 @@
 import { Queue, Worker } from 'bullmq'
+import { env } from 'process'
 import { insertAppRequest } from '../database/appRequestQueries.js'
 import { insertPlaidApiRequest } from '../database/plaidApiRequestQueries.js'
 import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
@@ -18,11 +19,15 @@ enum LogJobType {
     WebhookLog = 'Webhook',
 }
 
+if (!env['NODE_ENV']) {
+    throw Error('missing node env')
+}
+const logQueueName = `log-${env['NODE_ENV']}`
 let logQueue: Queue | null = null
 let logWorker: Worker | null = null
 
 export const initializeLogQueue = () => {
-    logQueue = new Queue('logs', { connection: getRedis() })
+    logQueue = new Queue(logQueueName, { connection: getRedis() })
     logger.debug('initialized log queue')
 }
 
@@ -35,12 +40,15 @@ const getLogQueue = () => {
 
 export const queueAppRequest = async (req: AppRequest) => {
     logger.debug('adding app request log job to queue')
-    await getLogQueue().add('log', { type: LogJobType.AppRequestLog, log: req })
+    await getLogQueue().add('appRequestLog', {
+        type: LogJobType.AppRequestLog,
+        log: req,
+    })
 }
 
 export const queuePlaidLinkEventLog = async (event: PlaidLinkEvent) => {
     logger.debug('adding plaid link event log job to queue')
-    await getLogQueue().add('log', {
+    await getLogQueue().add('plaidLinkEventLog', {
         type: LogJobType.PlaidLinkEventLog,
         log: event,
     })
@@ -48,7 +56,7 @@ export const queuePlaidLinkEventLog = async (event: PlaidLinkEvent) => {
 
 export const queuePlaidApiRequestLog = async (req: PlaidApiRequest) => {
     logger.debug('adding plaid api request log job to queue')
-    await getLogQueue().add('log', {
+    await getLogQueue().add('plaidApiRequestLog', {
         type: LogJobType.PlaidApiRequestLog,
         log: req,
     })
@@ -56,7 +64,7 @@ export const queuePlaidApiRequestLog = async (req: PlaidApiRequest) => {
 
 export const queueWebhookLog = async (webhook: object) => {
     logger.debug('adding webhook log job to queue')
-    await getLogQueue().add('log', {
+    await getLogQueue().add('webhookLog', {
         type: LogJobType.WebhookLog,
         log: webhook,
     })
@@ -64,7 +72,7 @@ export const queueWebhookLog = async (webhook: object) => {
 
 export const initializeLogWorker = () => {
     logWorker = new Worker(
-        'logs',
+        logQueueName,
         async (job) => {
             const type: LogJobType = job.data.type
             logger.debug(`starting ${type} log job (id ${job.id})`)
@@ -113,12 +121,12 @@ export const initializeLogWorker = () => {
 
     logWorker.on('completed', async (job) => {
         logger.debug(`job (id ${job.id}) completed`)
-        await handleJobSuccess(job.id, 'log', job.data)
+        await handleJobSuccess(logQueueName, job.id, job.name, job.data)
     })
 
     logWorker.on('failed', async (job, err) => {
         logger.error({ err }, `job (id ${job?.id}) failed`)
-        await handleJobFailure(job?.id, 'log', job?.data, err)
+        await handleJobFailure(logQueueName, job?.id, job?.data, err)
     })
 
     logger.debug('initialized log worker')
