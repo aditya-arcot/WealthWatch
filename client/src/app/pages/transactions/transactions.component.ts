@@ -1,5 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Transaction } from '../../models/transaction'
 import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
@@ -7,7 +8,7 @@ import { TransactionService } from '../../services/transaction.service'
 @Component({
     selector: 'app-transactions',
     standalone: true,
-    imports: [DecimalPipe, DatePipe],
+    imports: [DecimalPipe, DatePipe, LoadingSpinnerComponent],
     templateUrl: './transactions.component.html',
 })
 export class TransactionsComponent implements OnInit {
@@ -18,6 +19,7 @@ export class TransactionsComponent implements OnInit {
             currency: 'USD',
         }),
     }
+    loading = false
 
     constructor(
         private transactionSvc: TransactionService,
@@ -29,9 +31,11 @@ export class TransactionsComponent implements OnInit {
     }
 
     loadTransactions(): void {
+        this.loading = true
         this.transactionSvc.getTransactions().subscribe((t) => {
             this.logger.debug('loaded transactions', t)
             this.transactions = t
+            this.loading = false
         })
     }
 

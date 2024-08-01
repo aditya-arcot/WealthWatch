@@ -10,6 +10,7 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { ItemWithAccounts } from '../../models/item'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
@@ -22,11 +23,12 @@ import { UserService } from '../../services/user.service'
 @Component({
     selector: 'app-accounts',
     standalone: true,
-    imports: [],
+    imports: [LoadingSpinnerComponent],
     templateUrl: './accounts.component.html',
 })
 export class AccountsComponent implements OnInit {
     itemsWithAccounts: ItemWithAccounts[] = []
+    loading = false
 
     constructor(
         private userSvc: UserService,
@@ -43,6 +45,7 @@ export class AccountsComponent implements OnInit {
     }
 
     loadAccounts(): void {
+        this.loading = true
         this.itemSvc
             .getItems()
             .pipe(
@@ -72,10 +75,12 @@ export class AccountsComponent implements OnInit {
                     item.accounts.push(account)
                 })
                 this.logger.debug('mapped accounts', this.itemsWithAccounts)
+                this.loading = false
             })
     }
 
     linkAccount(): void {
+        this.loading = true
         this.linkSvc
             .createLinkToken()
             .pipe(
@@ -84,6 +89,7 @@ export class AccountsComponent implements OnInit {
                     this.alertSvc.addErrorAlert(
                         'Something went wrong. Please try again.'
                     )
+                    this.loading = false
                     return throwError(() => err)
                 }),
                 switchMap((resp) => {
@@ -108,6 +114,7 @@ export class AccountsComponent implements OnInit {
             )
             .subscribe((handler: PlaidLinkHandler) => {
                 handler.open()
+                this.loading = false
             })
     }
 
@@ -127,12 +134,14 @@ export class AccountsComponent implements OnInit {
         }
         this.linkSvc.handleLinkEvent(event).subscribe()
 
+        this.loading = true
         this.linkSvc.exchangePublicToken(token, metadata).subscribe({
             next: () => {
                 this.logger.debug('exchanged public token')
                 this.alertSvc.addSuccessAlert('Success linking institution', [
                     'Loading your accounts now',
                 ])
+                // TODO spinner
                 setTimeout(() => {
                     this.loadAccounts()
                 }, 3000)
@@ -148,6 +157,7 @@ export class AccountsComponent implements OnInit {
                         'Something went wrong. Please try again'
                     )
                 }
+                this.loading = false
             },
         })
     }
