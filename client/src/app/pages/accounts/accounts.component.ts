@@ -130,8 +130,12 @@ export class AccountsComponent implements OnInit {
         this.linkSvc.exchangePublicToken(token, metadata).subscribe({
             next: () => {
                 this.logger.debug('exchanged public token')
-                this.alertSvc.addSuccessAlert('Success linking institution')
-                this.loadAccounts()
+                this.alertSvc.addSuccessAlert('Success linking institution', [
+                    'Loading your accounts now',
+                ])
+                setTimeout(() => {
+                    this.loadAccounts()
+                }, 3000)
             },
             error: (err: HttpErrorResponse) => {
                 this.logger.error('failed to exchange public token', err)
