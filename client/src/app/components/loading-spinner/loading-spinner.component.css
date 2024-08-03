@@ -10,7 +10,7 @@
     align-items: center;
     z-index: 1000;
     pointer-events: all;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .spinner-border {
