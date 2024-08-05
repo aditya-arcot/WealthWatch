@@ -7,7 +7,7 @@ import { env } from 'process'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
 import { HttpError } from '../models/httpError.js'
-import { queueAppRequest } from '../queues/logQueue.js'
+import { queueAppRequestLog } from '../queues/logQueue.js'
 import { logger } from './logger.js'
 
 export const production = env['NODE_ENV'] === 'prod'
@@ -105,7 +105,7 @@ export const logRequestResponse = (
         appReq.responseBody = res._body
 
         logger.info(`sending response (id ${requestId})`)
-        await queueAppRequest(appReq)
+        await queueAppRequestLog(appReq)
     })
     next()
 }

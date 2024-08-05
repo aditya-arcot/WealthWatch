@@ -38,94 +38,85 @@ const getLogQueue = () => {
     return logQueue
 }
 
-export const queueAppRequest = async (req: AppRequest) => {
-    logger.debug('adding app request log job to queue')
-    await getLogQueue().add('appRequestLog', {
-        type: LogJobType.AppRequestLog,
-        log: req,
-    })
+export const queueAppRequestLog = async (req: AppRequest) => {
+    await queueLog(LogJobType.AppRequestLog, req)
 }
 
 export const queuePlaidLinkEventLog = async (event: PlaidLinkEvent) => {
-    logger.debug('adding plaid link event log job to queue')
-    await getLogQueue().add('plaidLinkEventLog', {
-        type: LogJobType.PlaidLinkEventLog,
-        log: event,
-    })
+    await queueLog(LogJobType.PlaidLinkEventLog, event)
 }
 
 export const queuePlaidApiRequestLog = async (req: PlaidApiRequest) => {
-    logger.debug('adding plaid api request log job to queue')
-    await getLogQueue().add('plaidApiRequestLog', {
-        type: LogJobType.PlaidApiRequestLog,
-        log: req,
-    })
+    await queueLog(LogJobType.PlaidApiRequestLog, req)
 }
 
 export const queueWebhookLog = async (webhook: object) => {
-    logger.debug('adding webhook log job to queue')
-    await getLogQueue().add('webhookLog', {
-        type: LogJobType.WebhookLog,
-        log: webhook,
-    })
+    await queueLog(LogJobType.WebhookLog, webhook)
+}
+
+const queueLog = async (type: LogJobType, log: object) => {
+    logger.debug(`${logQueueName} queue - adding job (${type})`)
+    await getLogQueue().add(type, { log })
 }
 
 export const initializeLogWorker = () => {
     logWorker = new Worker(
         logQueueName,
         async (job) => {
-            const type: LogJobType = job.data.type
-            logger.debug(`starting ${type} log job (id ${job.id})`)
+            const type: LogJobType = job.name as LogJobType
+            logger.debug(
+                `${logQueueName} queue - starting job (id ${job.id}, ${type})`
+            )
             switch (type) {
                 case LogJobType.AppRequestLog: {
                     const req: AppRequest | undefined = job.data.log
-                    if (!req) throw Error('missing app request')
+                    if (!req) throw Error(`missing ${type}`)
 
                     const newReq = await insertAppRequest(req)
-                    if (!newReq) throw Error('failed to create app request log')
+                    if (!newReq) throw Error(`failed to insert ${type}`)
                     break
                 }
                 case LogJobType.PlaidLinkEventLog: {
                     const event: PlaidLinkEvent | undefined = job.data.log
-                    if (!event) throw Error('missing plaid link event')
+                    if (!event) throw Error(`missing ${type}`)
 
                     const newEvent = await insertPlaidLinkEvent(event)
-                    if (!newEvent)
-                        throw Error('failed to create plaid link event log')
+                    if (!newEvent) throw Error(`failed to insert ${type}`)
                     break
                 }
                 case LogJobType.PlaidApiRequestLog: {
                     const req: PlaidApiRequest | undefined = job.data.log
-                    if (!req) throw Error('missing plaid api request')
+                    if (!req) throw Error(`missing ${type}`)
 
                     const newReq = await insertPlaidApiRequest(req)
-                    if (!newReq)
-                        throw Error('failed to create plaid api request log')
+                    if (!newReq) throw Error(`failed to insert ${type}`)
                     break
                 }
                 case LogJobType.WebhookLog: {
                     const webhook: Webhook | undefined = job.data.log
-                    if (!webhook) throw Error('missing webhook')
+                    if (!webhook) throw Error(`missing ${type}`)
 
                     const newWebhook = await insertWebhook(webhook)
-                    if (!newWebhook) throw Error('failed to create webhook log')
+                    if (!newWebhook) throw Error(`failed to insert ${type}`)
                     break
                 }
                 default:
-                    logger.error('unknown log job type: ' + type)
-                    break
+                    throw Error(`unknown log job type: ${type}`)
             }
         },
         { connection: getRedis(), ...workerOptions }
     )
 
     logWorker.on('completed', async (job) => {
-        logger.debug(`job (id ${job.id}) completed`)
+        logger.debug(`${logQueueName} queue - completed job (id ${job.id})`)
         await handleJobSuccess(logQueueName, job.id, job.name, job.data)
     })
 
     logWorker.on('failed', async (job, err) => {
-        logger.error({ err }, `job (id ${job?.id}) failed`)
+        logger.error(
+            { err },
+            `${logQueueName} queue - failed job (id ${job?.id})`
+        )
         await handleJobFailure(logQueueName, job?.id, job?.data, err)
     })
 

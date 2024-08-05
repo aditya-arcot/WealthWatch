@@ -26,15 +26,17 @@ export const getItemSyncQueue = () => {
 }
 
 export const queueItemSync = async (item: Item) => {
-    logger.debug('adding item sync job to queue')
-    await getItemSyncQueue().add('itemSync', { item })
+    logger.debug(`${itemSyncQueueName} queue - adding job`)
+    await getItemSyncQueue().add('ItemSync', { item })
 }
 
 export const initializeItemSyncWorker = () => {
     itemSyncWorker = new Worker(
         itemSyncQueueName,
         async (job) => {
-            logger.debug(`starting item sync job (id ${job.id})`)
+            logger.debug(
+                `${itemSyncQueueName} queue - starting job (id ${job.id})`
+            )
 
             const item: Item | undefined = job.data.item
             if (!item) throw Error('missing item')
@@ -45,12 +47,17 @@ export const initializeItemSyncWorker = () => {
     )
 
     itemSyncWorker.on('completed', async (job) => {
-        logger.debug(`job (id ${job.id}) completed`)
+        logger.debug(
+            `${itemSyncQueueName} queue - completed job (id ${job.id})`
+        )
         await handleJobSuccess(itemSyncQueueName, job.id, job.name, job.data)
     })
 
     itemSyncWorker.on('failed', async (job, err) => {
-        logger.error({ err }, `job (id ${job?.id}) failed`)
+        logger.error(
+            { err },
+            `${itemSyncQueueName} queue - failed job (id ${job?.id})`
+        )
         await handleJobFailure(itemSyncQueueName, job?.id, job?.data, err)
     })
 
