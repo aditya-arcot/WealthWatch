@@ -68,9 +68,11 @@ export const logRequestResponse = (
     res: Response,
     next: NextFunction
 ) => {
-    const id = new Date().getTime()
+    const timestamp = new Date()
+    const requestId = timestamp.getTime().toString()
     const appReq: AppRequest = {
-        id,
+        id: -1,
+        requestId,
         userId: req.session?.user?.id ?? null,
         timestamp: new Date(),
         duration: -1,
@@ -85,7 +87,7 @@ export const logRequestResponse = (
         session: req.session,
         responseStatus: -1,
     }
-    logger.info(`received request (id ${id})`)
+    logger.info(`received request (id ${requestId})`)
 
     const send = res.send
     res.send = (body) => {
@@ -102,7 +104,7 @@ export const logRequestResponse = (
         // @ts-expect-error: custom property
         appReq.responseBody = res._body
 
-        logger.info(`sending response (id ${id})`)
+        logger.info(`sending response (id ${requestId})`)
         await queueAppRequest(appReq)
     })
     next()

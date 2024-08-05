@@ -1,5 +1,6 @@
 export interface AppRequest {
     id: number
+    requestId: string
     userId?: number | null
     timestamp: Date
     duration: number

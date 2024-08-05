@@ -185,6 +185,7 @@ WHERE i.active = TRUE;
 -- APP REQUESTS TABLE
 CREATE TABLE IF NOT EXISTS app_requests (
     id SERIAL PRIMARY KEY,
+    request_id TEXT NOT NULL,
     user_id INTEGER,
     timestamp TIMESTAMP NOT NULL,
     duration INTEGER NOT NULL,
