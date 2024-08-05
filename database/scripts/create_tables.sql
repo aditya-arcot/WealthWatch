@@ -47,7 +47,8 @@ $$ LANGUAGE plpgsql;
 -- CATEGORIES TABLE
 CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    name TEXT UNIQUE NOT NULL,
+    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 
