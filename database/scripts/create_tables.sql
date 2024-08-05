@@ -27,16 +27,16 @@ CREATE OR REPLACE FUNCTION insert_audit_record()
 RETURNS TRIGGER AS $$
 BEGIN
     IF (TG_OP = 'INSERT') THEN
-        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
-        VALUES ('I', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user, NOW());
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id)
+        VALUES ('I', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user);
         RETURN NEW;
     ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
-        VALUES ('U', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user, NOW());
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id)
+        VALUES ('U', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user);
         RETURN NEW;
     ELSIF (TG_OP = 'DELETE') THEN
-        INSERT INTO audit (operation, table_name, row_id, row_data, user_id, create_timestamp)
-        VALUES ('D', TG_TABLE_NAME, OLD.id, row_to_json(OLD), current_user, NOW());
+        INSERT INTO audit (operation, table_name, row_id, row_data, user_id)
+        VALUES ('D', TG_TABLE_NAME, OLD.id, row_to_json(OLD), current_user);
         RETURN OLD;
     END IF;
     RETURN NULL;
