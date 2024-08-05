@@ -12,8 +12,8 @@ export const insertWebhook = async (
         VALUES ($1, $2)
         RETURNING *
     `
-    const rows: Webhook[] = (
-        await runQuery(query, [webhook.timestamp, webhook.data])
+    const rows = (
+        await runQuery<Webhook>(query, [webhook.timestamp, webhook.data])
     ).rows
     if (!rows[0]) return
     return rows[0]

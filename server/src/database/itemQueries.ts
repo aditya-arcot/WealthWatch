@@ -25,8 +25,8 @@ export const insertItem = async (
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
     `
-    const rows: DbItem[] = (
-        await runQuery(query, [
+    const rows = (
+        await runQuery<DbItem>(query, [
             userId,
             itemId,
             active,
@@ -46,7 +46,7 @@ export const fetchActiveItems = async (): Promise<Item[]> => {
         SELECT *
         FROM active_items
     `
-    const rows: DbItem[] = (await runQuery(query)).rows
+    const rows = (await runQuery<DbItem>(query)).rows
     return rows.map(mapDbItem)
 }
 
@@ -58,7 +58,7 @@ export const fetchActiveItemById = async (
         FROM active_items
         WHERE item_id = $1
     `
-    const rows: DbItem[] = (await runQuery(query, [itemId])).rows
+    const rows = (await runQuery<DbItem>(query, [itemId])).rows
     if (!rows[0]) return
     return mapDbItem(rows[0])
 }
@@ -71,7 +71,7 @@ export const fetchActiveItemsByUserId = async (
         FROM active_items
         WHERE user_id = $1
     `
-    const rows: DbItem[] = (await runQuery(query, [userId])).rows
+    const rows = (await runQuery<DbItem>(query, [userId])).rows
     return rows.map(mapDbItem)
 }
 
@@ -85,7 +85,7 @@ export const fetchActiveItemByUserIdAndInstitutionId = async (
         WHERE user_id = $1
             AND institution_id = $2
     `
-    const rows: DbItem[] = (await runQuery(query, [userId, institutionId])).rows
+    const rows = (await runQuery<DbItem>(query, [userId, institutionId])).rows
     if (!rows[0]) return
     return mapDbItem(rows[0])
 }

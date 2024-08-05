@@ -22,8 +22,8 @@ export const insertPlaidLinkEvent = async (
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         RETURNING *
     `
-    const rows: DbPlaidLinkEvent[] = (
-        await runQuery(query, [
+    const rows = (
+        await runQuery<DbPlaidLinkEvent>(query, [
             event.userId,
             event.timestamp,
             event.type,

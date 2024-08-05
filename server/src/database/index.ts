@@ -1,4 +1,4 @@
-import pg from 'pg'
+import pg, { QueryResult, QueryResultRow } from 'pg'
 import { env } from 'process'
 import { logger } from '../utils/logger.js'
 
@@ -44,7 +44,10 @@ export const getPool = (): pg.Pool => {
     return clientPool
 }
 
-export const runQuery = async (query: string, params: unknown[] = []) => {
+export const runQuery = async <T extends QueryResultRow>(
+    query: string,
+    params: unknown[] = []
+): Promise<QueryResult<T>> => {
     if (!clientPool) {
         throw Error('pool not initialized')
     }

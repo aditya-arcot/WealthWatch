@@ -73,7 +73,7 @@ export const insertTransactions = async (
             pending = EXCLUDED.pending
         RETURNING *
     `
-    const rows: DbTransaction[] = (await runQuery(query, values)).rows
+    const rows = (await runQuery<DbTransaction>(query, values)).rows
     return rows.map(mapDbTransaction)
 }
 
@@ -95,7 +95,7 @@ export const fetchActiveTransactionsByUserId = async (
             )
         ORDER BY date DESC
     `
-    const rows: DbTransaction[] = (await runQuery(query, [userId])).rows
+    const rows = (await runQuery<DbTransaction>(query, [userId])).rows
     return rows.map(mapDbTransaction)
 }
 
@@ -109,7 +109,7 @@ export const removeTransactionsByTransactionIds = async (
             (${transactionIds.map((_id, idx) => `$${idx + 1}`).join(', ')})
         RETURNING *
     `
-    const rows: DbTransaction[] = (await runQuery(query, transactionIds)).rows
+    const rows = (await runQuery<DbTransaction>(query, transactionIds)).rows
     return rows.map(mapDbTransaction)
 }
 

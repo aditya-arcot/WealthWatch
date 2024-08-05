@@ -26,8 +26,8 @@ export const insertAppRequest = async (
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
         RETURNING *
     `
-    const rows: DbAppRequest[] = (
-        await runQuery(query, [
+    const rows = (
+        await runQuery<DbAppRequest>(query, [
             request.requestId,
             request.userId,
             request.timestamp,
