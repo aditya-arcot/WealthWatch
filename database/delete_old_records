@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+
+show_help() {
+    echo "Usage: delete_old_records [options]"
+    echo ""
+    echo "Options:"
+    echo "  --env file     Specify the environment file"
+    echo "  -h, --help     Display this help message"
+}
+
+ENV_FILE="../.env.dev"
+
+while [[ "$1" != "" ]]; do
+    case $1 in
+        --env)
+            shift
+            ENV_FILE=$1
+            ;;
+        -h | --help)
+            show_help
+            exit
+            ;;
+        *)
+            echo "Invalid option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+echo "Environment file: $ENV_FILE"
+echo
+
+source ./load_env
+
+echo "deleting old records..."
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/delete_old_records.sql -v ON_ERROR_STOP=1
+echo
