@@ -86,6 +86,19 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    Category: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'string',
+                                description: 'The category ID',
+                            },
+                            name: {
+                                type: 'string',
+                                description: 'The category name',
+                            },
+                        },
+                    },
                     Item: {
                         type: 'object',
                         properties: {
@@ -200,6 +213,15 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    LinkToken: {
+                        type: 'object',
+                        properties: {
+                            linkToken: {
+                                type: 'string',
+                                description: 'The link token',
+                            },
+                        },
+                    },
                     User: {
                         type: 'object',
                         properties: {
@@ -226,15 +248,6 @@ export const createSwaggerSpec = () => {
                             passwordHash: {
                                 type: 'string',
                                 description: 'The user password hash',
-                            },
-                        },
-                    },
-                    LinkToken: {
-                        type: 'object',
-                        properties: {
-                            linkToken: {
-                                type: 'string',
-                                description: 'The link token',
                             },
                         },
                     },

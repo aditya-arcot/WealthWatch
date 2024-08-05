@@ -1,5 +1,6 @@
 START TRANSACTION;
 
+-- UPDATE TIMESTAMP FUNCTION
 CREATE OR REPLACE FUNCTION set_update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -8,6 +9,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+-- AUDIT TABLE
 CREATE TABLE IF NOT EXISTS audit (
     id SERIAL PRIMARY KEY,
     operation CHAR(1) NOT NULL CHECK (operation IN ('I', 'U', 'D')),
@@ -18,6 +21,8 @@ CREATE TABLE IF NOT EXISTS audit (
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+
+-- INSERT AUDIT FUNCTION
 CREATE OR REPLACE FUNCTION insert_audit_record()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -38,6 +43,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+-- CATEGORIES TABLE
+CREATE TABLE IF NOT EXISTS categories (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL
+);
+
+
+-- USERS TABLE, TRIGGERS
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
@@ -59,6 +73,8 @@ AFTER INSERT OR UPDATE OR DELETE ON users
 FOR EACH ROW 
 EXECUTE FUNCTION insert_audit_record();
 
+
+-- ITEMS TABLE, TRIGGERS, VIEW
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
@@ -88,6 +104,8 @@ SELECT *
 FROM items
 WHERE active = TRUE;
 
+
+-- ACCOUNTS TABLE, TRIGGERS, VIEW
 CREATE TABLE IF NOT EXISTS accounts (
     id SERIAL PRIMARY KEY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
@@ -123,6 +141,8 @@ JOIN items i
     ON a.item_id = i.id
 WHERE i.active = TRUE;
 
+
+-- TRANSACTIONS TABLE, TRIGGERS, VIEW
 CREATE TABLE IF NOT EXISTS transactions (
     id SERIAL PRIMARY KEY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
@@ -131,7 +151,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     amount NUMERIC(28, 10) NOT NULL,
     merchant TEXT,
     merchant_id TEXT,
-    category TEXT,
+    category_id INTEGER REFERENCES categories(id),
     detailed_category TEXT,
     payment_channel TEXT NOT NULL,
     iso_currency_code TEXT,
@@ -161,6 +181,8 @@ JOIN items i
     ON a.item_id = i.id
 WHERE i.active = TRUE;
 
+
+-- APP REQUESTS TABLE
 CREATE TABLE IF NOT EXISTS app_requests (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
@@ -181,6 +203,8 @@ CREATE TABLE IF NOT EXISTS app_requests (
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+
+-- PLAID LINK EVENTS TABLE
 CREATE TABLE IF NOT EXISTS plaid_link_events (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
@@ -198,6 +222,8 @@ CREATE TABLE IF NOT EXISTS plaid_link_events (
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+
+-- PLAID API REQUESTS TABLE
 CREATE TABLE IF NOT EXISTS plaid_api_requests (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
@@ -213,6 +239,8 @@ CREATE TABLE IF NOT EXISTS plaid_api_requests (
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+
+-- WEBHOOKS TABLE
 CREATE TABLE IF NOT EXISTS webhooks (
     id SERIAL PRIMARY KEY,
     timestamp TIMESTAMP NOT NULL,
@@ -220,6 +248,8 @@ CREATE TABLE IF NOT EXISTS webhooks (
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+
+-- JOBS TABLE
 CREATE TABLE IF NOT EXISTS jobs (
     id SERIAL PRIMARY KEY,
     queue_name TEXT NOT NULL,
