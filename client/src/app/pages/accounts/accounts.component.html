@@ -1,11 +1,27 @@
 <app-loading-spinner [loading]="loading"></app-loading-spinner>
 
-<button (click)="linkAccount()" class="btn btn-primary mb-2">
-    Link an Account
-</button>
+<div class="container-fluid position-relative mb-3">
+    <h2 class="text-center mb-0">Accounts</h2>
+    <button
+        (click)="linkAccount()"
+        class="btn btn-primary d-none d-sm-block position-absolute"
+    >
+        Link an Account
+    </button>
+    <button
+        (click)="linkAccount()"
+        class="btn btn-primary d-block d-sm-none position-absolute"
+    >
+        +
+    </button>
+</div>
 
 @if (!itemsWithAccounts.length) {
-    <p>No accounts</p>
+    <div class="card mb-2">
+        <div class="card-body">
+            <h4 class="text-center mb-0">No accounts linked yet</h4>
+        </div>
+    </div>
 } @else {
     @for (item of itemsWithAccounts; track $index) {
         <div class="card mb-2">

@@ -1,7 +1,16 @@
 import { DatePipe, DecimalPipe } from '@angular/common'
+import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
+import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { Account } from '../../models/account'
+import { Category } from '../../models/category'
+import { Item } from '../../models/item'
 import { Transaction } from '../../models/transaction'
+import { AccountService } from '../../services/account.service'
+import { AlertService } from '../../services/alert.service'
+import { CategoryService } from '../../services/category.service'
+import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
 
@@ -13,6 +22,9 @@ import { TransactionService } from '../../services/transaction.service'
 })
 export class TransactionsComponent implements OnInit {
     transactions: Transaction[] = []
+    categories: Category[] = []
+    accounts: Account[] = []
+    items: Item[] = []
     currencyFormatters: Record<string, Intl.NumberFormat> = {
         USD: new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -23,20 +35,89 @@ export class TransactionsComponent implements OnInit {
 
     constructor(
         private transactionSvc: TransactionService,
-        private logger: LoggerService
+        private categorySvc: CategoryService,
+        private accountSvc: AccountService,
+        private itemSvc: ItemService,
+        private logger: LoggerService,
+        private alertSvc: AlertService
     ) {}
 
     ngOnInit(): void {
-        this.loadTransactions()
+        this.loadData()
     }
 
-    loadTransactions(): void {
+    loadData(): void {
         this.loading = true
-        this.transactionSvc.getTransactions().subscribe((t) => {
-            this.logger.debug('loaded transactions', t)
-            this.transactions = t
-            this.loading = false
-        })
+        this.loadCategories()
+            .pipe(
+                switchMap(() => this.loadAccounts()),
+                switchMap(() => this.loadItems()),
+                switchMap(() => this.loadTransactions()),
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert('Failed to load data', [
+                        err.message,
+                    ])
+                    this.loading = false
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => (this.loading = false))
+    }
+
+    loadCategories(): Observable<void> {
+        return this.categorySvc.getCategories().pipe(
+            switchMap((categories) => {
+                this.logger.debug('loaded categories', categories)
+                this.categories = categories
+                return of(undefined)
+            }),
+            catchError((err: HttpErrorResponse) => {
+                this.logger.error('failed to load categories', err)
+                return throwError(() => err)
+            })
+        )
+    }
+
+    loadAccounts(): Observable<void> {
+        return this.accountSvc.getAccounts().pipe(
+            switchMap((accounts) => {
+                this.logger.debug('loaded accounts', accounts)
+                this.accounts = accounts
+                return of(undefined)
+            }),
+            catchError((err: HttpErrorResponse) => {
+                this.logger.error('failed to load accounts', err)
+                return throwError(() => err)
+            })
+        )
+    }
+
+    loadItems(): Observable<void> {
+        return this.itemSvc.getItems().pipe(
+            switchMap((items) => {
+                this.logger.debug('loaded items', items)
+                this.items = items
+                return of(undefined)
+            }),
+            catchError((err: HttpErrorResponse) => {
+                this.logger.error('failed to load items', err)
+                return throwError(() => err)
+            })
+        )
+    }
+
+    loadTransactions(): Observable<void> {
+        return this.transactionSvc.getTransactions().pipe(
+            switchMap((transactions) => {
+                this.logger.debug('loaded transactions', transactions)
+                this.transactions = transactions
+                return of(undefined)
+            }),
+            catchError((err: HttpErrorResponse) => {
+                this.logger.error('failed to load transactions', err)
+                return throwError(() => err)
+            })
+        )
     }
 
     formatCurrency(t: Transaction): string {
@@ -53,12 +134,28 @@ export class TransactionsComponent implements OnInit {
         return this.currencyFormatters[currency].format(t.amount)
     }
 
-    formatCategory(t: Transaction): string {
-        if (!t.category) return ''
-        return t.category
-            .toLowerCase()
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (c) => c.toUpperCase())
-            .replace(/\b(And|Or)\b/g, (c) => c.toLowerCase())
+    getCategory(t: Transaction): string {
+        const category = this.categories.find((c) => c.id === t.categoryId)
+        if (!category) {
+            this.logger.error('unrecognized category id', t.categoryId)
+            return ''
+        }
+        return category.name
+    }
+
+    getAccount(t: Transaction): string {
+        const account = this.accounts.find((a) => a.id === t.accountId)
+        if (!account) {
+            this.logger.error('unrecognized account id', t.accountId)
+            return ''
+        }
+
+        const item = this.items.find((i) => i.id === account.itemId)
+        if (!item) {
+            this.logger.error('unrecognized item id', account.itemId)
+            return account.name
+        }
+
+        return `${account.name} (${item.institutionName})`
     }
 }

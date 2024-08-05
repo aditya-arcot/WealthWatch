@@ -13,7 +13,7 @@ export const insertTransactions = async (
             amount, 
             merchant, 
             merchant_id, 
-            category,
+            category_id,
             detailed_category,
             payment_channel,
             iso_currency_code, 
@@ -48,7 +48,7 @@ export const insertTransactions = async (
             transaction.amount,
             transaction.merchant,
             transaction.merchantId,
-            transaction.category,
+            transaction.categoryId,
             transaction.detailedCategory,
             transaction.paymentChannel,
             transaction.isoCurrencyCode,
@@ -64,7 +64,7 @@ export const insertTransactions = async (
             amount = EXCLUDED.amount,
             merchant = EXCLUDED.merchant,
             merchant_id = EXCLUDED.merchant_id,
-            category = EXCLUDED.category,
+            category_id = EXCLUDED.category_id,
             detailed_category = EXCLUDED.detailed_category,
             payment_channel = EXCLUDED.payment_channel,
             iso_currency_code = EXCLUDED.iso_currency_code,
@@ -73,7 +73,7 @@ export const insertTransactions = async (
             pending = EXCLUDED.pending
         RETURNING *
     `
-    const rows: DbTransaction[] = (await runQuery(query, values)).rows
+    const rows = (await runQuery<DbTransaction>(query, values)).rows
     return rows.map(mapDbTransaction)
 }
 
@@ -95,7 +95,7 @@ export const fetchActiveTransactionsByUserId = async (
             )
         ORDER BY date DESC
     `
-    const rows: DbTransaction[] = (await runQuery(query, [userId])).rows
+    const rows = (await runQuery<DbTransaction>(query, [userId])).rows
     return rows.map(mapDbTransaction)
 }
 
@@ -109,7 +109,7 @@ export const removeTransactionsByTransactionIds = async (
             (${transactionIds.map((_id, idx) => `$${idx + 1}`).join(', ')})
         RETURNING *
     `
-    const rows: DbTransaction[] = (await runQuery(query, transactionIds)).rows
+    const rows = (await runQuery<DbTransaction>(query, transactionIds)).rows
     return rows.map(mapDbTransaction)
 }
 
@@ -121,7 +121,7 @@ interface DbTransaction {
     amount: number
     merchant: string | null
     merchant_id: string | null
-    category: string | null
+    category_id: number
     detailed_category: string | null
     payment_channel: string
     iso_currency_code: string | null
@@ -138,7 +138,7 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     amount: dbTransaction.amount,
     merchant: dbTransaction.merchant,
     merchantId: dbTransaction.merchant_id,
-    category: dbTransaction.category,
+    categoryId: dbTransaction.category_id,
     detailedCategory: dbTransaction.detailed_category,
     paymentChannel: dbTransaction.payment_channel,
     isoCurrencyCode: dbTransaction.iso_currency_code,

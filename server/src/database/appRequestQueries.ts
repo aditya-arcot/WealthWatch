@@ -6,6 +6,7 @@ export const insertAppRequest = async (
 ): Promise<AppRequest | undefined> => {
     const query = `
         INSERT INTO app_requests (
+            request_id,
             user_id,
             timestamp,
             duration,
@@ -22,11 +23,12 @@ export const insertAppRequest = async (
             response_headers,
             response_body
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
         RETURNING *
     `
-    const rows: DbAppRequest[] = (
-        await runQuery(query, [
+    const rows = (
+        await runQuery<DbAppRequest>(query, [
+            request.requestId,
             request.userId,
             request.timestamp,
             request.duration,
@@ -50,6 +52,7 @@ export const insertAppRequest = async (
 
 interface DbAppRequest {
     id: number
+    request_id: string
     user_id: number | null
     timestamp: Date
     duration: number
@@ -69,6 +72,7 @@ interface DbAppRequest {
 
 const mapDbAppRequest = (dbAppRequest: DbAppRequest): AppRequest => ({
     id: dbAppRequest.id,
+    requestId: dbAppRequest.request_id,
     userId: dbAppRequest.user_id,
     timestamp: dbAppRequest.timestamp,
     duration: dbAppRequest.duration,

@@ -25,6 +25,7 @@ import { UserService } from '../../services/user.service'
     standalone: true,
     imports: [LoadingSpinnerComponent],
     templateUrl: './accounts.component.html',
+    styleUrl: './accounts.component.css',
 })
 export class AccountsComponent implements OnInit {
     itemsWithAccounts: ItemWithAccounts[] = []

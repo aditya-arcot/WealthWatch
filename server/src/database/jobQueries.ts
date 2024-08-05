@@ -16,8 +16,8 @@ export const insertJob = async (job: Job): Promise<Job | undefined> => {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
     `
-    const rows: DbJob[] = (
-        await runQuery(query, [
+    const rows = (
+        await runQuery<DbJob>(query, [
             job.queueName,
             job.jobId,
             job.jobName,

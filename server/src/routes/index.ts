@@ -2,6 +2,7 @@ import express from 'express'
 import { production } from '../utils/middleware.js'
 import accountRouter from './accountRoutes.js'
 import authRouter from './authRoutes.js'
+import categoryRouter from './categoryRoutes.js'
 import devRouter from './devRoutes.js'
 import itemRouter from './itemRoutes.js'
 import linkRouter from './linkRoutes.js'
@@ -12,6 +13,7 @@ import userRouter from './userRoutes.js'
 const router = express.Router()
 router.use('/accounts', accountRouter)
 router.use('/auth', authRouter)
+router.use('/categories', categoryRouter)
 if (!production) {
     router.use('/dev', devRouter)
 }

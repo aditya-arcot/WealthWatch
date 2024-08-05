@@ -63,7 +63,7 @@ export const insertAccounts = async (
             credit_limit = EXCLUDED.credit_limit
         RETURNING *
     `
-    const rows: DbAccount[] = (await runQuery(query, values)).rows
+    const rows = (await runQuery<DbAccount>(query, values)).rows
     if (!rows.length) return
     return rows.map(mapDbAccount)
 }
@@ -81,7 +81,7 @@ export const fetchActiveAccountsByUserId = async (
                 WHERE user_id = $1
             )
     `
-    const rows: DbAccount[] = (await runQuery(query, [userId])).rows
+    const rows = (await runQuery<DbAccount>(query, [userId])).rows
     return rows.map(mapDbAccount)
 }
 

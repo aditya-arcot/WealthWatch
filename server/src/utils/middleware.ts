@@ -7,7 +7,7 @@ import { env } from 'process'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
 import { HttpError } from '../models/httpError.js'
-import { queueAppRequest } from '../queues/logQueue.js'
+import { queueAppRequestLog } from '../queues/logQueue.js'
 import { logger } from './logger.js'
 
 export const production = env['NODE_ENV'] === 'prod'
@@ -68,9 +68,11 @@ export const logRequestResponse = (
     res: Response,
     next: NextFunction
 ) => {
-    const id = new Date().getTime()
+    const timestamp = new Date()
+    const requestId = timestamp.getTime().toString()
     const appReq: AppRequest = {
-        id,
+        id: -1,
+        requestId,
         userId: req.session?.user?.id ?? null,
         timestamp: new Date(),
         duration: -1,
@@ -85,7 +87,7 @@ export const logRequestResponse = (
         session: req.session,
         responseStatus: -1,
     }
-    logger.info(`received request (id ${id})`)
+    logger.info(`received request (id ${requestId})`)
 
     const send = res.send
     res.send = (body) => {
@@ -102,8 +104,8 @@ export const logRequestResponse = (
         // @ts-expect-error: custom property
         appReq.responseBody = res._body
 
-        logger.info(`sending response (id ${id})`)
-        await queueAppRequest(appReq)
+        logger.info(`sending response (id ${requestId})`)
+        await queueAppRequestLog(appReq)
     })
     next()
 }

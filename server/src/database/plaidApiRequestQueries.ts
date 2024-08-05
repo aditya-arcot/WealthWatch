@@ -20,8 +20,8 @@ export const insertPlaidApiRequest = async (
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *
     `
-    const rows: DbPlaidApiRequest[] = (
-        await runQuery(query, [
+    const rows = (
+        await runQuery<DbPlaidApiRequest>(query, [
             request.userId,
             request.itemId,
             request.timestamp,
