@@ -1,10 +1,12 @@
 import { Request, Response } from 'express'
 import {
+    fetchActiveItemById,
     fetchActiveItems,
     fetchActiveItemsByUserId,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { plaidUpdateItemWebhook } from '../plaid/itemMethods.js'
+import { plaidRefreshTransactions } from '../plaid/transactionMethods.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserItems = async (req: Request, res: Response) => {
@@ -37,5 +39,22 @@ export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
     } catch (error) {
         logger.error(error)
         throw Error('failed to update webhook')
+    }
+}
+
+export const refreshItemTransactions = async (req: Request, res: Response) => {
+    logger.debug('refreshing item transactions')
+
+    const itemId: string | undefined = req.params['itemId']
+    if (!itemId) throw new HttpError('missing item id', 400)
+
+    try {
+        const item = await fetchActiveItemById(itemId)
+        if (!item) throw new HttpError('item not found', 404)
+        await plaidRefreshTransactions(item)
+        return res.status(204).send()
+    } catch (error) {
+        logger.error(error)
+        throw Error('failed to refresh item transactions')
     }
 }

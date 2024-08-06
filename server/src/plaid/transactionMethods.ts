@@ -1,6 +1,7 @@
 import {
     RemovedTransaction as PlaidRemovedTransaction,
     Transaction as PlaidTransaction,
+    TransactionsRefreshRequest,
     TransactionsSyncRequest,
 } from 'plaid'
 import { CategoryEnum } from '../models/category.js'
@@ -8,6 +9,19 @@ import { Item } from '../models/item.js'
 import { Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, plaidClient } from './index.js'
+
+export const plaidRefreshTransactions = async (item: Item) => {
+    logger.debug({ item }, 'refreshing item transactions')
+    const params: TransactionsRefreshRequest = {
+        access_token: item.accessToken,
+    }
+    await executePlaidMethod(
+        plaidClient.transactionsRefresh,
+        params,
+        item.userId,
+        item.id
+    )
+}
 
 export const plaidRetrieveTransactionUpdates = async (item: Item) => {
     logger.debug({ item }, 'retrieving transaction updates')
