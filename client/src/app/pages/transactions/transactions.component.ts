@@ -122,11 +122,47 @@ export class TransactionsComponent implements OnInit {
     }
 
     formatName(t: Transaction): string {
-        let name = t.merchant ?? t.name
+        let name = t.customName ?? t.merchant ?? t.name
         if (name.length > this.maxNameLength)
             name = name.substring(0, this.maxNameLength) + '...'
-        if (t.pending) name += ' (Pending)'
+        name = name.trim()
+        if (t.pending) name += ' | Pending'
         return name
+    }
+
+    showFullName(event: FocusEvent, t: Transaction): void {
+        ;(event.target as HTMLInputElement).value = (
+            t.customName ??
+            t.merchant ??
+            t.name
+        ).trim()
+    }
+
+    hideFullName(event: FocusEvent, t: Transaction): void {
+        ;(event.target as HTMLInputElement).value = this.formatName(t)
+    }
+
+    updateName(event: Event, t: Transaction): void {
+        let newName: string | null = (
+            event.target as HTMLInputElement
+        ).value.trim()
+        if (!newName.length) newName = null
+
+        const currentName = t.merchant ?? t.name
+        if (newName === currentName) return
+
+        t.customName = newName
+        this.transactionSvc
+            .updateTransactionCustomName(t)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to update transaction name'
+                    )
+                    return throwError(() => err)
+                })
+            )
+            .subscribe()
     }
 
     formatCurrency(t: Transaction): string {
@@ -146,7 +182,6 @@ export class TransactionsComponent implements OnInit {
     getCategory(t: Transaction): string {
         const category = this.categories.find((c) => c.id === t.categoryId)
         if (!category) {
-            this.logger.error('unrecognized category id', t.categoryId)
             return ''
         }
         return category.name

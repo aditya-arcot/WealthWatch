@@ -2,6 +2,7 @@ import express from 'express'
 import {
     getUserTransactions,
     refreshUserTransactions,
+    updateTransactionCustomName,
 } from '../controllers/transactionController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -34,6 +35,38 @@ const router = express.Router()
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.route('/').get(authenticate, catchAsync(getUserTransactions))
+
+/**
+ * @swagger
+ * /transactions/{transactionId}/name:
+ *   patch:
+ *     summary: Update a transaction's custom name
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: transactionId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The transaction ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: Updated the transaction's custom name
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/:transactionId/name')
+    .patch(authenticate, catchAsync(updateTransactionCustomName))
 
 /**
  * @swagger
