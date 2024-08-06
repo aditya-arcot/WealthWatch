@@ -30,8 +30,10 @@
                 <tbody class="table-group-divider">
                     @for (t of transactions; track $index) {
                         <tr>
-                            <td>{{ t.date | date: 'shortDate' }}</td>
-                            <td>
+                            <td class="align-middle">
+                                {{ t.date | date: 'shortDate' }}
+                            </td>
+                            <td class="align-middle">
                                 <input
                                     class="form-control form-control-sm"
                                     type="text"
@@ -41,9 +43,11 @@
                                     (change)="updateName($event, t)"
                                 />
                             </td>
-                            <td>{{ formatCurrency(t) }}</td>
-                            <td>{{ getCategory(t) }}</td>
-                            <td>{{ getAccount(t) }}</td>
+                            <td class="align-middle">
+                                {{ formatCurrency(t) }}
+                            </td>
+                            <td class="align-middle">{{ getCategory(t) }}</td>
+                            <td class="align-middle">{{ getAccount(t) }}</td>
                         </tr>
                     }
                 </tbody>
