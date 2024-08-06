@@ -121,7 +121,7 @@ export class TransactionsComponent implements OnInit {
         )
     }
 
-    formatName(t: Transaction): string {
+    getDisplayName(t: Transaction): string {
         let name = t.customName ?? t.merchant ?? t.name
         if (name.length > this.maxNameLength)
             name = name.substring(0, this.maxNameLength) + '...'
@@ -130,28 +130,32 @@ export class TransactionsComponent implements OnInit {
         return name
     }
 
-    showFullName(event: FocusEvent, t: Transaction): void {
-        ;(event.target as HTMLInputElement).value = (
-            t.customName ??
-            t.merchant ??
-            t.name
-        ).trim()
+    showFullName(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        element.value = (t.customName ?? t.merchant ?? t.name).trim()
     }
 
-    hideFullName(event: FocusEvent, t: Transaction): void {
-        ;(event.target as HTMLInputElement).value = this.formatName(t)
+    showDisplayName(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        element.value = this.getDisplayName(t)
     }
 
-    updateName(event: Event, t: Transaction): void {
-        let newName: string | null = (
-            event.target as HTMLInputElement
-        ).value.trim()
+    updateName(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        let newName: string | null = element.value.trim()
         if (!newName.length) newName = null
 
         const currentName = t.merchant ?? t.name
         if (newName === currentName) return
 
         t.customName = newName
+        this.updateCustomName(t)
+    }
+
+    private updateCustomName(t: Transaction): void {
         this.transactionSvc
             .updateTransactionCustomName(t)
             .pipe(
@@ -165,7 +169,7 @@ export class TransactionsComponent implements OnInit {
             .subscribe()
     }
 
-    formatCurrency(t: Transaction): string {
+    getDisplayCurrency(t: Transaction): string {
         const currency = t.unofficialCurrencyCode ?? t.isoCurrencyCode
         if (!currency) return t.amount.toString()
 
@@ -179,15 +183,43 @@ export class TransactionsComponent implements OnInit {
         return this.currencyFormatters[currency].format(t.amount)
     }
 
-    getCategory(t: Transaction): string {
-        const category = this.categories.find((c) => c.id === t.categoryId)
-        if (!category) {
-            return ''
-        }
-        return category.name
+    getDisplayCategory(t: Transaction): number | null {
+        return t.customCategoryId ?? t.categoryId
     }
 
-    getAccount(t: Transaction): string {
+    updateCategory(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        let newCategoryId: number | null = parseInt(element.value.trim())
+        if (isNaN(newCategoryId)) newCategoryId = null
+
+        if (t.categoryId === newCategoryId) return
+
+        t.customCategoryId = newCategoryId
+        this.updateCustomCategoryId(t)
+    }
+
+    resetCategory(t: Transaction): void {
+        if (t.customCategoryId === null) return
+        t.customCategoryId = null
+        this.updateCustomCategoryId(t)
+    }
+
+    updateCustomCategoryId(t: Transaction): void {
+        this.transactionSvc
+            .updateTransactionCustomCategoryId(t)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to update transaction category'
+                    )
+                    return throwError(() => err)
+                })
+            )
+            .subscribe()
+    }
+
+    getDisplayAccount(t: Transaction): string {
         const account = this.accounts.find((a) => a.id === t.accountId)
         if (!account) {
             this.logger.error('unrecognized account id', t.accountId)

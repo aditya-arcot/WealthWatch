@@ -14,9 +14,10 @@ export const insertTransactions = async (
             name,
             custom_name,
             amount,
-            category_id,
             primary_category,
             detailed_category,
+            category_id,
+            custom_category_id,
             payment_channel,
             iso_currency_code,
             unofficial_currency_code,
@@ -27,7 +28,7 @@ export const insertTransactions = async (
     const values: unknown[] = []
     transactions.forEach((transaction, idx) => {
         if (idx !== 0) query += ', '
-        const startIdx = idx * 15
+        const startIdx = idx * 16
         query += `(
                 $${startIdx + 1},
                 $${startIdx + 2},
@@ -43,7 +44,8 @@ export const insertTransactions = async (
                 $${startIdx + 12},
                 $${startIdx + 13},
                 $${startIdx + 14},
-                $${startIdx + 15}
+                $${startIdx + 15},
+                $${startIdx + 16}
             )`
         values.push(
             transaction.accountId,
@@ -53,9 +55,10 @@ export const insertTransactions = async (
             transaction.name,
             transaction.customName,
             transaction.amount,
-            transaction.categoryId,
             transaction.primaryCategory,
             transaction.detailedCategory,
+            transaction.categoryId,
+            transaction.customCategoryId,
             transaction.paymentChannel,
             transaction.isoCurrencyCode,
             transaction.unofficialCurrencyCode,
@@ -123,6 +126,23 @@ export const updateTransactionCustomNameById = async (
     return mapDbTransaction(rows[0])
 }
 
+export const updateTransactionCustomCategoryIdById = async (
+    transactionId: string,
+    categoryId: number | null
+): Promise<Transaction | undefined> => {
+    const query = `
+        UPDATE transactions
+        SET custom_category_id = $2
+        WHERE transaction_id = $1
+        RETURNING *
+    `
+    const rows = (
+        await runQuery<DbTransaction>(query, [transactionId, categoryId])
+    ).rows
+    if (!rows[0]) return
+    return mapDbTransaction(rows[0])
+}
+
 export const removeTransactionsByTransactionIds = async (
     transactionIds: string[]
 ): Promise<Transaction[] | undefined> => {
@@ -146,9 +166,10 @@ interface DbTransaction {
     name: string
     custom_name: string | null
     amount: number
-    category_id: number | null
     primary_category: string | null
     detailed_category: string | null
+    category_id: number | null
+    custom_category_id: number | null
     payment_channel: string
     iso_currency_code: string | null
     unofficial_currency_code: string | null
@@ -165,9 +186,10 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     name: dbTransaction.name,
     customName: dbTransaction.custom_name,
     amount: dbTransaction.amount,
-    categoryId: dbTransaction.category_id,
     primaryCategory: dbTransaction.primary_category,
     detailedCategory: dbTransaction.detailed_category,
+    categoryId: dbTransaction.category_id,
+    customCategoryId: dbTransaction.custom_category_id,
     paymentChannel: dbTransaction.payment_channel,
     isoCurrencyCode: dbTransaction.iso_currency_code,
     unofficialCurrencyCode: dbTransaction.unofficial_currency_code,

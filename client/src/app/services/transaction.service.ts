@@ -19,4 +19,9 @@ export class TransactionService {
         const url = `${this.baseUrl}/${t.transactionId}/name`
         return this.http.patch(url, { name: t.customName })
     }
+
+    updateTransactionCustomCategoryId(t: Transaction) {
+        const url = `${this.baseUrl}/${t.transactionId}/category`
+        return this.http.patch(url, { categoryId: t.customCategoryId })
+    }
 }

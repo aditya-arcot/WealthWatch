@@ -7,9 +7,10 @@ export interface Transaction {
     name: string
     customName: string | null
     amount: number
-    categoryId: number | null
     primaryCategory: string | null
     detailedCategory: string | null
+    categoryId: number | null
+    customCategoryId: number | null
     paymentChannel: string
     isoCurrencyCode: string | null
     unofficialCurrencyCode: string | null

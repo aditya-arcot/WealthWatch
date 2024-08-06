@@ -37,17 +37,60 @@
                                 <input
                                     class="form-control form-control-sm"
                                     type="text"
-                                    [value]="formatName(t)"
-                                    (focus)="showFullName($event, t)"
-                                    (blur)="hideFullName($event, t)"
-                                    (change)="updateName($event, t)"
+                                    [value]="getDisplayName(t)"
+                                    (focus)="showFullName($event.target, t)"
+                                    (blur)="showDisplayName($event.target, t)"
+                                    (change)="updateName($event.target, t)"
                                 />
                             </td>
                             <td class="align-middle">
-                                {{ formatCurrency(t) }}
+                                {{ getDisplayCurrency(t) }}
                             </td>
-                            <td class="align-middle">{{ getCategory(t) }}</td>
-                            <td class="align-middle">{{ getAccount(t) }}</td>
+                            <td class="align-middle">
+                                <div class="input-group input-group-sm">
+                                    <select
+                                        class="form-select"
+                                        (change)="
+                                            updateCategory($event.target, t)
+                                        "
+                                    >
+                                        <option
+                                            [selected]="
+                                                getDisplayCategory(t) === null
+                                            "
+                                        >
+                                            Uncategorized
+                                        </option>
+                                        @for (
+                                            category of categories;
+                                            track $index
+                                        ) {
+                                            <option
+                                                [value]="category.id"
+                                                [selected]="
+                                                    category.id ===
+                                                    getDisplayCategory(t)
+                                                "
+                                            >
+                                                {{ category.name }}
+                                            </option>
+                                        }
+                                    </select>
+                                    <button
+                                        class="btn btn-outline-danger"
+                                        type="button"
+                                        title="Reset category"
+                                        (click)="resetCategory(t)"
+                                    >
+                                        <i
+                                            class="bi bi-arrow-counterclockwise"
+                                        ></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                {{ getDisplayAccount(t) }}
+                            </td>
                         </tr>
                     }
                 </tbody>

@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { fetchActiveItemsByUserId } from '../database/itemQueries.js'
 import {
     fetchActiveTransactionsByUserId,
+    updateTransactionCustomCategoryIdById,
     updateTransactionCustomNameById,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
@@ -42,6 +43,32 @@ export const updateTransactionCustomName = async (
     } catch (error) {
         logger.error(error)
         throw Error('failed to update transaction custom name')
+    }
+}
+
+export const updateTransactionCustomCategoryId = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('updating transaction custom category id')
+
+    const transactionId: string | undefined = req.params['transactionId']
+    if (!transactionId) throw new HttpError('missing transaction id', 400)
+
+    const categoryId: number | null | undefined = req.body.categoryId
+    if (categoryId === undefined)
+        throw new HttpError('missing category id', 400)
+
+    try {
+        const t = await updateTransactionCustomCategoryIdById(
+            transactionId,
+            categoryId
+        )
+        if (!t) throw Error('transaction not updated')
+        return res.status(204).send()
+    } catch (error) {
+        logger.error(error)
+        throw Error('failed to update transaction custom category id')
     }
 }
 

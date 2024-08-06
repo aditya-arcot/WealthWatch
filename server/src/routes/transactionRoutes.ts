@@ -2,6 +2,7 @@ import express from 'express'
 import {
     getUserTransactions,
     refreshUserTransactions,
+    updateTransactionCustomCategoryId,
     updateTransactionCustomName,
 } from '../controllers/transactionController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -67,6 +68,38 @@ router.route('/').get(authenticate, catchAsync(getUserTransactions))
 router
     .route('/:transactionId/name')
     .patch(authenticate, catchAsync(updateTransactionCustomName))
+
+/**
+ * @swagger
+ * /transactions/{transactionId}/category:
+ *   patch:
+ *     summary: Update a transaction's custom category id
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: transactionId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The transaction ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               categoryId:
+ *                 type: number
+ *     responses:
+ *       204:
+ *         description: Updated the transaction's custom category id
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/:transactionId/category')
+    .patch(catchAsync(updateTransactionCustomCategoryId))
 
 /**
  * @swagger
