@@ -54,7 +54,7 @@ router
 
 /**
  * @swagger
- * /items/:itemId/refresh-transactions:
+ * /items/{itemId}/refresh-transactions:
  *   post:
  *     summary: Refresh an item's transactions
  *     tags: [Items]
