@@ -21,6 +21,7 @@ import { TransactionService } from '../../services/transaction.service'
     templateUrl: './transactions.component.html',
 })
 export class TransactionsComponent implements OnInit {
+    maxNameLength = 30
     transactions: Transaction[] = []
     categories: Category[] = []
     accounts: Account[] = []
@@ -118,6 +119,14 @@ export class TransactionsComponent implements OnInit {
                 return throwError(() => err)
             })
         )
+    }
+
+    formatName(t: Transaction): string {
+        let name = t.merchant ?? t.name
+        if (name.length > this.maxNameLength)
+            name = name.substring(0, this.maxNameLength) + '...'
+        if (t.pending) name += ' (Pending)'
+        return name
     }
 
     formatCurrency(t: Transaction): string {

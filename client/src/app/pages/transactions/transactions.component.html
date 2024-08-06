@@ -31,10 +31,7 @@
                     @for (t of transactions; track $index) {
                         <tr>
                             <td>{{ t.date | date: 'shortDate' }}</td>
-                            <td>
-                                {{ t.merchant ?? t.name }}
-                                {{ t.pending ? ' (Pending)' : '' }}
-                            </td>
+                            <td>{{ formatName(t) }}</td>
                             <td>{{ formatCurrency(t) }}</td>
                             <td>{{ getCategory(t) }}</td>
                             <td>{{ getAccount(t) }}</td>
