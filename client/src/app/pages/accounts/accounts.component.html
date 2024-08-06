@@ -17,9 +17,15 @@
 </div>
 
 @if (!itemsWithAccounts.length) {
-    <div class="card mb-2">
-        <div class="card-body">
-            <h4 class="text-center mb-0">No accounts linked yet</h4>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-10 col-sm-8 col-md-6 col-xl-4">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h4 class="text-center mb-0">No accounts linked</h4>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 } @else {
