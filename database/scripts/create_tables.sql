@@ -153,6 +153,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     merchant TEXT,
     merchant_id TEXT,
     category_id INTEGER REFERENCES categories(id),
+    primary_category TEXT,
     detailed_category TEXT,
     payment_channel TEXT NOT NULL,
     iso_currency_code TEXT,

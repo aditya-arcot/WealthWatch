@@ -6,7 +6,8 @@ export interface Transaction {
     amount: number
     merchant: string | null
     merchantId: string | null
-    categoryId: number
+    categoryId: number | null
+    primaryCategory: string | null
     detailedCategory: string | null
     paymentChannel: string
     isoCurrencyCode: string | null

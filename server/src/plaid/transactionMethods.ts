@@ -3,7 +3,7 @@ import {
     Transaction as PlaidTransaction,
     TransactionsSyncRequest,
 } from 'plaid'
-import { CategoryEnum, PlaidCategoryEnum } from '../models/category.js'
+import { CategoryEnum } from '../models/category.js'
 import { Item } from '../models/item.js'
 import { Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
@@ -55,9 +55,9 @@ export const mapPlaidTransaction = (
     transaction: PlaidTransaction,
     accountId: number
 ): Transaction => {
-    const categoryId = mapPlaidCategory(
-        transaction.personal_finance_category?.primary
-    )
+    const primaryCategory = transaction.personal_finance_category?.primary
+    const detailedCategory = transaction.personal_finance_category?.detailed
+    const categoryId = mapPlaidCategory(primaryCategory, detailedCategory)
     return {
         id: 0,
         accountId,
@@ -67,8 +67,8 @@ export const mapPlaidTransaction = (
         merchant: transaction.merchant_name ?? null,
         merchantId: transaction.merchant_entity_id ?? null,
         categoryId,
-        detailedCategory:
-            transaction.personal_finance_category?.detailed ?? null,
+        primaryCategory: primaryCategory ?? null,
+        detailedCategory: detailedCategory ?? null,
         paymentChannel: transaction.payment_channel,
         isoCurrencyCode: transaction.iso_currency_code,
         unofficialCurrencyCode: transaction.unofficial_currency_code,
@@ -77,31 +77,89 @@ export const mapPlaidTransaction = (
     }
 }
 
-const mapPlaidCategory = (plaidCategory: string | null | undefined): number => {
-    const plaidCategoryEnum = plaidCategory as PlaidCategoryEnum
-    if (!Object.values(PlaidCategoryEnum).includes(plaidCategoryEnum)) {
-        return CategoryEnum.Other
+const mapPlaidCategory = (
+    primary: string | undefined,
+    detailed: string | undefined
+): number | null => {
+    const detailedEnum = detailed as PlaidDetailedCategoryEnum
+    if (Object.values(PlaidDetailedCategoryEnum).indexOf(detailedEnum) >= 0) {
+        return detailedCategoryMap[detailedEnum]
     }
-    return plaidCategoryMap[plaidCategoryEnum]
+
+    const primaryEnum = primary as PlaidPrimaryCategoryEnum
+    if (Object.values(PlaidPrimaryCategoryEnum).indexOf(primaryEnum) >= 0) {
+        return primaryCategoryMap[primaryEnum]
+    }
+
+    return null
 }
 
-const plaidCategoryMap: { [key in PlaidCategoryEnum]: CategoryEnum } = {
-    [PlaidCategoryEnum.Income]: CategoryEnum.Income,
-    [PlaidCategoryEnum.TransferIn]: CategoryEnum.TransferIn,
-    [PlaidCategoryEnum.TransferOut]: CategoryEnum.TransferOut,
-    [PlaidCategoryEnum.LoanPayments]: CategoryEnum.LoanPayment,
-    [PlaidCategoryEnum.BankFees]: CategoryEnum.Fees,
-    [PlaidCategoryEnum.Entertainment]: CategoryEnum.Entertainment,
-    [PlaidCategoryEnum.FoodAndDrink]: CategoryEnum.FoodAndDrink,
-    [PlaidCategoryEnum.GeneralMerchandise]: CategoryEnum.Merchandise,
-    [PlaidCategoryEnum.HomeImprovement]: CategoryEnum.Merchandise,
-    [PlaidCategoryEnum.Medical]: CategoryEnum.Medical,
-    [PlaidCategoryEnum.PersonalCare]: CategoryEnum.PersonalCare,
-    [PlaidCategoryEnum.GeneralServices]: CategoryEnum.Services,
-    [PlaidCategoryEnum.GovernmentAndNonProfit]:
-        CategoryEnum.GovernmentAndCharity,
-    [PlaidCategoryEnum.Transportation]: CategoryEnum.Transportation,
-    [PlaidCategoryEnum.Travel]: CategoryEnum.Travel,
-    [PlaidCategoryEnum.RentAndUtilities]: CategoryEnum.BillsAndUtilities,
-    [PlaidCategoryEnum.Other]: CategoryEnum.Other,
+enum PlaidDetailedCategoryEnum {
+    TransferInDeposit = 'TRANSFER_IN_DEPOSIT',
+    TransferInInvestment = 'TRANSFER_IN_INVESTMENT_AND_RETIREMENT_FUNDS',
+    TransferInSavings = 'TRANSFER_IN_SAVINGS',
+    TransferOutInvestment = 'TRANSFER_OUT_INVESTMENT_AND_RETIREMENT_FUNDS',
+    TransferOutSavings = 'TRANSFER_OUT_SAVINGS',
+    LoanPaymentsCreditCard = 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT',
+    FoodAndDrinkGroceries = 'FOOD_AND_DRINK_GROCERIES',
+    GovernmentAndNonProfitDonation = 'GOVERNMENT_AND_NON_PROFIT_DONATIONS',
+    GovernmentAndNonProfitTaxes = 'GOVERNMENT_AND_NON_PROFIT_TAX_PAYMENT',
+}
+
+const detailedCategoryMap: {
+    [key in PlaidDetailedCategoryEnum]: CategoryEnum
+} = {
+    [PlaidDetailedCategoryEnum.TransferInDeposit]: CategoryEnum.Deposit,
+    [PlaidDetailedCategoryEnum.TransferInInvestment]: CategoryEnum.Investment,
+    [PlaidDetailedCategoryEnum.TransferInSavings]: CategoryEnum.Savings,
+    [PlaidDetailedCategoryEnum.TransferOutInvestment]: CategoryEnum.Investment,
+    [PlaidDetailedCategoryEnum.TransferOutSavings]: CategoryEnum.Savings,
+    [PlaidDetailedCategoryEnum.LoanPaymentsCreditCard]:
+        CategoryEnum.CreditCardPayment,
+    [PlaidDetailedCategoryEnum.FoodAndDrinkGroceries]: CategoryEnum.Groceries,
+    [PlaidDetailedCategoryEnum.GovernmentAndNonProfitDonation]:
+        CategoryEnum.Donations,
+    [PlaidDetailedCategoryEnum.GovernmentAndNonProfitTaxes]: CategoryEnum.Taxes,
+}
+
+enum PlaidPrimaryCategoryEnum {
+    Income = 'INCOME',
+    TransferIn = 'TRANSFER_IN',
+    TransferOut = 'TRANSFER_OUT',
+    LoanPayments = 'LOAN_PAYMENTS',
+    BankFees = 'BANK_FEES',
+    Entertainment = 'ENTERTAINMENT',
+    FoodAndDrink = 'FOOD_AND_DRINK',
+    GeneralMerchandise = 'GENERAL_MERCHANDISE',
+    HomeImprovement = 'HOME_IMPROVEMENT',
+    Medical = 'MEDICAL',
+    PersonalCare = 'PERSONAL_CARE',
+    GeneralServices = 'GENERAL_SERVICES',
+    GovernmentAndNonProfit = 'GOVERNMENT_AND_NON_PROFIT',
+    Transportation = 'TRANSPORTATION',
+    Travel = 'TRAVEL',
+    RentAndUtilities = 'RENT_AND_UTILITIES',
+    Other = 'OTHER',
+}
+
+const primaryCategoryMap: {
+    [key in PlaidPrimaryCategoryEnum]: CategoryEnum | null
+} = {
+    [PlaidPrimaryCategoryEnum.Income]: CategoryEnum.Income,
+    [PlaidPrimaryCategoryEnum.TransferIn]: CategoryEnum.Transfer,
+    [PlaidPrimaryCategoryEnum.TransferOut]: CategoryEnum.Transfer,
+    [PlaidPrimaryCategoryEnum.LoanPayments]: CategoryEnum.LoanPayment,
+    [PlaidPrimaryCategoryEnum.BankFees]: CategoryEnum.Fees,
+    [PlaidPrimaryCategoryEnum.Entertainment]: CategoryEnum.Entertainment,
+    [PlaidPrimaryCategoryEnum.FoodAndDrink]: CategoryEnum.FoodAndDrink,
+    [PlaidPrimaryCategoryEnum.GeneralMerchandise]: CategoryEnum.Merchandise,
+    [PlaidPrimaryCategoryEnum.HomeImprovement]: CategoryEnum.Merchandise,
+    [PlaidPrimaryCategoryEnum.Medical]: CategoryEnum.Medical,
+    [PlaidPrimaryCategoryEnum.PersonalCare]: CategoryEnum.PersonalCare,
+    [PlaidPrimaryCategoryEnum.GeneralServices]: CategoryEnum.Services,
+    [PlaidPrimaryCategoryEnum.GovernmentAndNonProfit]: CategoryEnum.Government,
+    [PlaidPrimaryCategoryEnum.Transportation]: CategoryEnum.Transportation,
+    [PlaidPrimaryCategoryEnum.Travel]: CategoryEnum.Travel,
+    [PlaidPrimaryCategoryEnum.RentAndUtilities]: CategoryEnum.Bills,
+    [PlaidPrimaryCategoryEnum.Other]: null,
 }

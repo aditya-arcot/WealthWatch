@@ -14,6 +14,7 @@ export const insertTransactions = async (
             merchant, 
             merchant_id, 
             category_id,
+            primary_category,
             detailed_category,
             payment_channel,
             iso_currency_code, 
@@ -25,7 +26,7 @@ export const insertTransactions = async (
     const values: unknown[] = []
     transactions.forEach((transaction, idx) => {
         if (idx !== 0) query += ', '
-        const startIdx = idx * 13
+        const startIdx = idx * 14
         query += `(
                 $${startIdx + 1}, 
                 $${startIdx + 2}, 
@@ -39,7 +40,8 @@ export const insertTransactions = async (
                 $${startIdx + 10}, 
                 $${startIdx + 11}, 
                 $${startIdx + 12}, 
-                $${startIdx + 13}
+                $${startIdx + 13}, 
+                $${startIdx + 14}
             )`
         values.push(
             transaction.accountId,
@@ -49,6 +51,7 @@ export const insertTransactions = async (
             transaction.merchant,
             transaction.merchantId,
             transaction.categoryId,
+            transaction.primaryCategory,
             transaction.detailedCategory,
             transaction.paymentChannel,
             transaction.isoCurrencyCode,
@@ -65,6 +68,7 @@ export const insertTransactions = async (
             merchant = EXCLUDED.merchant,
             merchant_id = EXCLUDED.merchant_id,
             category_id = EXCLUDED.category_id,
+            primary_category = EXCLUDED.primary_category,
             detailed_category = EXCLUDED.detailed_category,
             payment_channel = EXCLUDED.payment_channel,
             iso_currency_code = EXCLUDED.iso_currency_code,
@@ -121,7 +125,8 @@ interface DbTransaction {
     amount: number
     merchant: string | null
     merchant_id: string | null
-    category_id: number
+    category_id: number | null
+    primary_category: string | null
     detailed_category: string | null
     payment_channel: string
     iso_currency_code: string | null
@@ -139,6 +144,7 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     merchant: dbTransaction.merchant,
     merchantId: dbTransaction.merchant_id,
     categoryId: dbTransaction.category_id,
+    primaryCategory: dbTransaction.primary_category,
     detailedCategory: dbTransaction.detailed_category,
     paymentChannel: dbTransaction.payment_channel,
     isoCurrencyCode: dbTransaction.iso_currency_code,
