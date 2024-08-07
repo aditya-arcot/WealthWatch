@@ -35,7 +35,7 @@ jobs:
         uses: ./.github/workflows/deploy.yml
         secrets: inherit
         with:
-            runner: mbp-14
+            runner: mbp-13
             repo: ${{ needs.set-vars.outputs.repo }}
             server_image: ${{ needs.set-vars.outputs.server_image }}
             client_image: ${{ needs.set-vars.outputs.client_image }}
