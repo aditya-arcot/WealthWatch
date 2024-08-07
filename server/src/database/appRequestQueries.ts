@@ -48,7 +48,7 @@ export const insertAppRequest = async (
         RETURNING *
     `
 
-    const rows = (await runQuery<DbAppRequest>(query)).rows
+    const rows = (await runQuery<DbAppRequest>(query, values)).rows
     if (!rows[0]) return
     return mapDbAppRequest(rows[0])
 }
