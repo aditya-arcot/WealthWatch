@@ -8,10 +8,10 @@ on:
             repo:
                 required: true
                 type: string
-            server_image:
+            server_container:
                 required: true
                 type: string
-            client_image:
+            client_container:
                 required: true
                 type: string
             image_tag:
@@ -45,7 +45,7 @@ jobs:
               if: github.ref_name == 'test'
               run: |
                   cd client/src/environments/
-                  sed -e "s/{SERVER_PORT}/${{ secrets.SERVER_PORT}}/g" env.test.ts > env.test.ts.tmp
+                  sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT}}/g" env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
             - name: install, build (client)
@@ -65,24 +65,28 @@ jobs:
                   echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
                   echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
 
+                  echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+
                   echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
                   echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
                   echo "DB_USER=${{ secrets.DB_USER }}" >> .env
                   echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
 
-                  echo "LOG_LEVEL=${{ secrets.LOG_LEVEL }}" >> .env
-                  echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
                   echo "CSRF_SECRET=${{ secrets.CSRF_SECRET }}" >> .env
                   echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
 
-                  echo "PLAID_ENV=${{ secrets.PLAID_ENV }}" >> .env
                   echo "PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }}" >> .env
                   echo "PLAID_SECRET=${{ secrets.PLAID_SECRET }}" >> .env
+                  echo "PLAID_WEBHOOK_URL=${{ secrets.PLAID_WEBHOOK_URL }}" >> .env
 
-                  echo "CLIENT_PORT=${{ secrets.CLIENT_PORT }}" >> .env
-                  echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
                   echo "DOCKER_REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> .env
                   echo "KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}" >> .env
+
+                  echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
+                  echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
+                  echo "PLAID_ENV=${{ vars.PLAID_ENV }}" >> .env
+                  echo "CLIENT_PORT=${{ vars.CLIENT_PORT }}" >> .env
+                  echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
 
             - name: copy files (server)
               run: |
@@ -99,7 +103,7 @@ jobs:
             - name: build, push docker image (server)
               run: |
                   cd server/stage/
-                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_image }}:${{ inputs.image_tag }}
+                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_container }}:${{ inputs.image_tag }}
                   docker build -t $IMAGE .
                   docker push $IMAGE
                   echo "SERVER_IMAGE=${IMAGE}" >> $GITHUB_ENV
@@ -107,7 +111,7 @@ jobs:
             - name: build, push docker image (client)
               run: |
                   cd client/stage/
-                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_image }}:${{ inputs.image_tag }}
+                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_container }}:${{ inputs.image_tag }}
                   docker build -t $IMAGE .
                   docker push $IMAGE
                   echo "CLIENT_IMAGE=${IMAGE}" >> $GITHUB_ENV
@@ -116,16 +120,18 @@ jobs:
               run: |
                   REPO=${{ inputs.repo }} \
                   SERVER_IMAGE=${{ env.SERVER_IMAGE }} \
-                  SERVER_PORT=${{ secrets.SERVER_PORT }} \
+                  SERVER_PORT=${{ vars.SERVER_PORT }} \
+                  SERVER_CONTAINER=${{ inputs.server_container }} \
                   CLIENT_IMAGE=${{ env.CLIENT_IMAGE }} \
-                  CLIENT_PORT=${{ secrets.CLIENT_PORT }} \
+                  CLIENT_PORT=${{ vars.CLIENT_PORT }} \
+                  CLIENT_CONTAINER=${{ inputs.client_container }} \
                   docker compose up -d
 
             - name: configure, restart nginx
               if: github.ref_name == 'main'
               run: |
-                  sed -e "s/{SERVER_PORT}/${{ secrets.SERVER_PORT }}/g" \
-                    -e "s/{CLIENT_PORT}/${{ secrets.CLIENT_PORT }}/g" \
+                  sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT }}/g" \
+                    -e "s/{CLIENT_PORT}/${{ vars.CLIENT_PORT }}/g" \
                     wealthwatch.conf > wealthwatch.conf.tmp
                   mv wealthwatch.conf.tmp wealthwatch.conf
                   cp wealthwatch.conf /usr/local/etc/nginx/servers/
