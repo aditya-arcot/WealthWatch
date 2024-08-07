@@ -19,6 +19,7 @@ import { TransactionService } from '../../services/transaction.service'
     standalone: true,
     imports: [DecimalPipe, DatePipe, LoadingSpinnerComponent],
     templateUrl: './transactions.component.html',
+    styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent implements OnInit {
     maxNameLength = 30
@@ -125,9 +126,7 @@ export class TransactionsComponent implements OnInit {
         let name = t.customName ?? t.merchant ?? t.name
         if (name.length > this.maxNameLength)
             name = name.substring(0, this.maxNameLength) + '...'
-        name = name.trim()
-        if (t.pending) name += ' | Pending'
-        return name
+        return name.trim()
     }
 
     showFullName(target: EventTarget | null, t: Transaction): void {

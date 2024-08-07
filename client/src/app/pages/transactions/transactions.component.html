@@ -17,7 +17,9 @@
 } @else {
     <div class="card mb-2">
         <div class="card-body">
-            <table class="table table-striped table-hover table-sm mb-0">
+            <table
+                class="table table-striped table-hover table-sm table-bordered align-middle text-center mb-0"
+            >
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">Date</th>
@@ -30,10 +32,10 @@
                 <tbody class="table-group-divider">
                     @for (t of transactions; track $index) {
                         <tr>
-                            <td class="align-middle">
+                            <td>
                                 {{ t.date | date: 'shortDate' }}
                             </td>
-                            <td class="align-middle">
+                            <td>
                                 <input
                                     class="form-control form-control-sm"
                                     type="text"
@@ -43,10 +45,13 @@
                                     (change)="updateName($event.target, t)"
                                 />
                             </td>
-                            <td class="align-middle">
+                            <td>
                                 {{ getDisplayCurrency(t) }}
+                                @if (t.pending) {
+                                    <span class="pending-text">(Pending)</span>
+                                }
                             </td>
-                            <td class="align-middle">
+                            <td>
                                 <div class="input-group input-group-sm">
                                     <select
                                         class="form-select"
@@ -88,7 +93,7 @@
                                     </button>
                                 </div>
                             </td>
-                            <td class="align-middle">
+                            <td>
                                 {{ getDisplayAccount(t) }}
                             </td>
                         </tr>
