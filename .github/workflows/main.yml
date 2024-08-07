@@ -23,8 +23,8 @@ jobs:
               run: |
                   repo_lowercase=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')
                   echo "repo_lowercase=$repo_lowercase" >> $GITHUB_OUTPUT
-                  echo "server_image=${repo_lowercase}-server" >> $GITHUB_OUTPUT
-                  echo "client_image=${repo_lowercase}-client" >> $GITHUB_OUTPUT
+                  echo "server_image=${repo_lowercase}-${github.ref_name}-server" >> $GITHUB_OUTPUT
+                  echo "client_image=${repo_lowercase}-${github.ref_name}-client" >> $GITHUB_OUTPUT
                   echo "image_tag=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_OUTPUT
 
     run-test:
