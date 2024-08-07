@@ -12,6 +12,8 @@ env:
 jobs:
     set-vars:
         runs-on: mbp-13
+        env:
+            BRANCH_NAME: ${{ github.ref_name }}
         outputs:
             repo: ${{ steps.vars.outputs.repo_lowercase }}
             server_image: ${{ steps.vars.outputs.server_image }}
@@ -23,8 +25,8 @@ jobs:
               run: |
                   repo_lowercase=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')
                   echo "repo_lowercase=$repo_lowercase" >> $GITHUB_OUTPUT
-                  echo "server_image=${repo_lowercase}-${github.ref_name}-server" >> $GITHUB_OUTPUT
-                  echo "client_image=${repo_lowercase}-${github.ref_name}-client" >> $GITHUB_OUTPUT
+                  echo "server_image=${repo_lowercase}-${{ env.BRANCH_NAME }}-server" >> $GITHUB_OUTPUT
+                  echo "client_image=${repo_lowercase}-${{ env.BRANCH_NAME }}-client" >> $GITHUB_OUTPUT
                   echo "image_tag=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_OUTPUT
 
     run-test:
