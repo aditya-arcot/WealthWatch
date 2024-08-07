@@ -10,7 +10,7 @@ import { Item } from '../models/item.js'
 import { TransactionsWebhookCodeEnum } from '../models/webhook.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, plaidClient } from './index.js'
-import { plaidRetrieveTransactionUpdates } from './transactionMethods.js'
+import { plaidSyncItemData } from './itemMethods.js'
 
 export const plaidFireWebhook = async (item: Item, code: WebhookCodeEnum) => {
     logger.debug({ item, code }, 'firing webhook')
@@ -31,7 +31,7 @@ export const plaidVerifyWebhook = async (
     token: string,
     body: string
 ): Promise<void> => {
-    logger.debug({ token, body }, 'verifying webhook')
+    logger.debug('verifying webhook')
 
     const decodedTokenHeader = jwtDecode(token, { header: true })
     if (
@@ -85,7 +85,7 @@ export const plaidHandleTransactionsWebhook = async (
         case TransactionsWebhookCodeEnum.SyncUpdatesAvailable: {
             const item = await fetchActiveItemById(itemId)
             if (!item) throw Error('item not found')
-            await plaidRetrieveTransactionUpdates(item)
+            await plaidSyncItemData(item)
             logger.debug({ itemId }, 'handled transactions sync webhook')
             break
         }
@@ -97,7 +97,7 @@ export const plaidHandleTransactionsWebhook = async (
         case TransactionsWebhookCodeEnum.HistoricalUpdate:
         case TransactionsWebhookCodeEnum.DefaultUpdate:
         case TransactionsWebhookCodeEnum.TransactionsRemoved:
-            logger.debug('ignoring legacy transaction webhook')
+            logger.debug('ignoring legacy transactions webhook')
             break
 
         default:

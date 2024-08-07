@@ -94,5 +94,5 @@ const processWebhook = async (webhook: Webhook) => {
             throw Error(`unhandled webhook type: ${webhookType}`)
     }
 
-    logger.debug({ webhook }, 'processed webhook')
+    logger.debug('processed webhook')
 }
