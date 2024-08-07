@@ -2,12 +2,15 @@ export interface Transaction {
     id: number
     accountId: number
     transactionId: string
-    name: string
-    amount: number
-    merchant: string | null
     merchantId: string | null
-    categoryId: number
+    merchant: string | null
+    name: string
+    customName: string | null
+    amount: number
+    primaryCategory: string | null
     detailedCategory: string | null
+    categoryId: number
+    customCategoryId: number | null
     paymentChannel: string
     isoCurrencyCode: string | null
     unofficialCurrencyCode: string | null

@@ -5,6 +5,7 @@ import {
     insertItem,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
+import { Item } from '../models/item.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 import {
     plaidCreateLinkToken,
@@ -67,16 +68,21 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
             userId
         )
 
-        const item = await insertItem(
+        const item: Item = {
+            id: -1,
             userId,
             itemId,
+            active: true,
             accessToken,
-            institution.institution_id,
-            institution.name
-        )
-        if (!item) throw Error('item not created')
+            institutionId: institution.institution_id,
+            institutionName: institution.name,
+            healthy: true,
+            cursor: null,
+        }
+        const newItem = await insertItem(item)
+        if (!newItem) throw Error('item not created')
 
-        await queueItemSync(item)
+        await queueItemSync(newItem)
 
         return res.status(204).send()
     } catch (error) {

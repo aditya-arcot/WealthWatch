@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { HttpError } from '../models/httpError.js'
 import { Webhook } from '../models/webhook.js'
 import { plaidVerifyWebhook } from '../plaid/webhookMethods.js'
-import { queueWebhookLog } from '../queues/logQueue.js'
+import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utils/logger.js'
 
 export const handleWebhook = async (req: Request, res: Response) => {
@@ -30,9 +30,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
         timestamp: new Date(),
         data: req.body,
     }
-    await queueWebhookLog(webhook)
-
-    // TODO add webhook to queue
+    await queueWebhook(webhook)
 
     return res.status(202).send()
 }

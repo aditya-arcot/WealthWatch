@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
-import { Category } from '../../models/category'
+import { Category, CategoryEnum } from '../../models/category'
 import { Item } from '../../models/item'
 import { Transaction } from '../../models/transaction'
 import { AccountService } from '../../services/account.service'
@@ -19,8 +19,10 @@ import { TransactionService } from '../../services/transaction.service'
     standalone: true,
     imports: [DecimalPipe, DatePipe, LoadingSpinnerComponent],
     templateUrl: './transactions.component.html',
+    styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent implements OnInit {
+    maxNameLength = 30
     transactions: Transaction[] = []
     categories: Category[] = []
     accounts: Account[] = []
@@ -120,7 +122,53 @@ export class TransactionsComponent implements OnInit {
         )
     }
 
-    formatCurrency(t: Transaction): string {
+    getDisplayName(t: Transaction): string {
+        let name = t.customName ?? t.merchant ?? t.name
+        if (name.length > this.maxNameLength)
+            name = name.substring(0, this.maxNameLength) + '...'
+        return name.trim()
+    }
+
+    showFullName(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        element.value = (t.customName ?? t.merchant ?? t.name).trim()
+    }
+
+    showDisplayName(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        element.value = this.getDisplayName(t)
+    }
+
+    updateName(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        let newName: string | null = element.value.trim()
+        if (!newName.length) newName = null
+
+        const currentName = t.merchant ?? t.name
+        if (newName === currentName) return
+
+        t.customName = newName
+        this.updateCustomName(t)
+    }
+
+    private updateCustomName(t: Transaction): void {
+        this.transactionSvc
+            .updateTransactionCustomName(t)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to update transaction name'
+                    )
+                    return throwError(() => err)
+                })
+            )
+            .subscribe()
+    }
+
+    getDisplayCurrency(t: Transaction): string {
         const currency = t.unofficialCurrencyCode ?? t.isoCurrencyCode
         if (!currency) return t.amount.toString()
 
@@ -134,16 +182,79 @@ export class TransactionsComponent implements OnInit {
         return this.currencyFormatters[currency].format(t.amount)
     }
 
-    getCategory(t: Transaction): string {
-        const category = this.categories.find((c) => c.id === t.categoryId)
-        if (!category) {
-            this.logger.error('unrecognized category id', t.categoryId)
-            return ''
-        }
-        return category.name
+    getDisplayCategory(t: Transaction): number {
+        return t.customCategoryId ?? t.categoryId
     }
 
-    getAccount(t: Transaction): string {
+    updateCategory(target: EventTarget | null, t: Transaction): void {
+        if (!target) return
+        const element = target as HTMLInputElement
+        const newCategoryId = parseInt(element.value.trim())
+
+        if (isNaN(newCategoryId) || t.categoryId === newCategoryId) {
+            t.customCategoryId = null
+        } else {
+            t.customCategoryId = newCategoryId
+        }
+
+        this.updateCustomCategoryId(t)
+    }
+
+    resetCategory(t: Transaction): void {
+        if (t.customCategoryId === null) return
+        t.customCategoryId = null
+        this.updateCustomCategoryId(t)
+    }
+
+    updateCustomCategoryId(t: Transaction): void {
+        this.transactionSvc
+            .updateTransactionCustomCategoryId(t)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to update transaction category'
+                    )
+                    return throwError(() => err)
+                })
+            )
+            .subscribe()
+    }
+
+    getCategoryClasses(t: Transaction): string {
+        const categoryId = this.getDisplayCategory(t) as CategoryEnum
+        return `bi ${this.icons[categoryId]}`
+    }
+
+    getCategoryClassesTest(id: CategoryEnum): string {
+        return `bi ${this.icons[id]}`
+    }
+
+    private icons: Record<CategoryEnum, string> = {
+        [CategoryEnum.Uncategorized]: 'bi-question-circle',
+        [CategoryEnum.Income]: 'bi-cash',
+        [CategoryEnum.Transfer]: 'bi-arrow-left-right',
+        [CategoryEnum.Deposit]: 'bi-bank',
+        [CategoryEnum.Investment]: 'bi-graph-up',
+        [CategoryEnum.Savings]: 'bi-piggy-bank',
+        [CategoryEnum.LoanPayment]: 'bi-wallet',
+        [CategoryEnum.CreditCardPayment]: 'bi-credit-card-2-front',
+        [CategoryEnum.Fees]: 'bi-file-earmark-text',
+        [CategoryEnum.Entertainment]: 'bi-controller',
+        [CategoryEnum.FoodAndDrink]: 'bi-cup-straw',
+        [CategoryEnum.Groceries]: 'bi-basket',
+        [CategoryEnum.Merchandise]: 'bi-bag',
+        [CategoryEnum.Medical]: 'bi-heart-pulse',
+        [CategoryEnum.PersonalCare]: 'bi-person',
+        [CategoryEnum.Services]: 'bi-tools',
+        [CategoryEnum.Government]: 'bi-building',
+        [CategoryEnum.Donations]: 'bi-heart',
+        [CategoryEnum.Taxes]: 'bi-percent',
+        [CategoryEnum.Transportation]: 'bi-car-front',
+        [CategoryEnum.Travel]: 'bi-airplane',
+        [CategoryEnum.Bills]: 'bi-receipt-cutoff',
+    }
+
+    getDisplayAccount(t: Transaction): string {
         const account = this.accounts.find((a) => a.id === t.accountId)
         if (!account) {
             this.logger.error('unrecognized account id', t.accountId)

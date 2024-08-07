@@ -1,5 +1,10 @@
 import express from 'express'
-import { getUserTransactions } from '../controllers/transactionController.js'
+import {
+    getUserTransactions,
+    refreshUserTransactions,
+    updateTransactionCustomCategoryId,
+    updateTransactionCustomName,
+} from '../controllers/transactionController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -31,5 +36,83 @@ const router = express.Router()
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.route('/').get(authenticate, catchAsync(getUserTransactions))
+
+/**
+ * @swagger
+ * /transactions/{transactionId}/name:
+ *   patch:
+ *     summary: Update a transaction's custom name
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: transactionId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The transaction ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: Updated the transaction's custom name
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/:transactionId/name')
+    .patch(authenticate, catchAsync(updateTransactionCustomName))
+
+/**
+ * @swagger
+ * /transactions/{transactionId}/category:
+ *   patch:
+ *     summary: Update a transaction's custom category id
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: transactionId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The transaction ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               categoryId:
+ *                 type: number
+ *     responses:
+ *       204:
+ *         description: Updated the transaction's custom category id
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/:transactionId/category')
+    .patch(catchAsync(updateTransactionCustomCategoryId))
+
+/**
+ * @swagger
+ * /transactions/refresh:
+ *   post:
+ *     summary: Refresh the logged in user's transactions
+ *     tags: [Transactions]
+ *     responses:
+ *       204:
+ *         description: Refreshed the logged in user's transactions
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/refresh').post(authenticate, catchAsync(refreshUserTransactions))
 
 export default router

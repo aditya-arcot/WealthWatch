@@ -2,12 +2,24 @@
 
 <h2 class="text-center mb-3">Transactions</h2>
 
-<div class="card mb-2">
-    <div class="card-body">
-        @if (!transactions.length) {
-            <h4 class="text-center mb-0">No transactions synced yet</h4>
-        } @else {
-            <table class="table table-striped table-hover table-sm mb-0">
+@if (!transactions.length) {
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-10 col-sm-8 col-md-6 col-xl-4">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h4 class="text-center mb-0">No transactions synced</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+} @else {
+    <div class="card mb-2">
+        <div class="card-body">
+            <table
+                class="table table-striped table-hover table-sm table-bordered align-middle text-center mb-0"
+            >
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">Date</th>
@@ -20,18 +32,75 @@
                 <tbody class="table-group-divider">
                     @for (t of transactions; track $index) {
                         <tr>
-                            <td>{{ t.date | date: 'shortDate' }}</td>
                             <td>
-                                {{ t.merchant ?? t.name }}
-                                {{ t.pending ? ' (Pending)' : '' }}
+                                {{ t.date | date: 'shortDate' }}
                             </td>
-                            <td>{{ formatCurrency(t) }}</td>
-                            <td>{{ getCategory(t) }}</td>
-                            <td>{{ getAccount(t) }}</td>
+                            <td>
+                                <input
+                                    class="form-control form-control-sm"
+                                    type="text"
+                                    [value]="getDisplayName(t)"
+                                    (focus)="showFullName($event.target, t)"
+                                    (blur)="showDisplayName($event.target, t)"
+                                    (change)="updateName($event.target, t)"
+                                />
+                            </td>
+                            <td>
+                                {{ getDisplayCurrency(t) }}
+                                @if (t.pending) {
+                                    <span class="pending-text">(Pending)</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="input-group input-group-sm">
+                                    <button
+                                        class="btn btn-outline-primary icon-btn"
+                                        type="button"
+                                    >
+                                        <i
+                                            [classList]="getCategoryClasses(t)"
+                                        ></i>
+                                    </button>
+                                    <select
+                                        class="form-select"
+                                        (change)="
+                                            updateCategory($event.target, t)
+                                        "
+                                    >
+                                        @for (
+                                            category of categories;
+                                            track $index
+                                        ) {
+                                            <option
+                                                [value]="category.id"
+                                                [selected]="
+                                                    category.id ===
+                                                    getDisplayCategory(t)
+                                                "
+                                            >
+                                                {{ category.name }}
+                                            </option>
+                                        }
+                                    </select>
+                                    <button
+                                        class="btn btn-outline-dark"
+                                        type="button"
+                                        title="Reset category"
+                                        (click)="resetCategory(t)"
+                                    >
+                                        <i
+                                            class="bi bi-arrow-counterclockwise"
+                                        ></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                {{ getDisplayAccount(t) }}
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
+        </div>
     </div>
-</div>
+}

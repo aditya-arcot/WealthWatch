@@ -1,0 +1,11 @@
+.pending-text {
+    color: grey;
+}
+
+td {
+    font-size: 14px;
+}
+
+.icon-btn {
+    pointer-events: none;
+}

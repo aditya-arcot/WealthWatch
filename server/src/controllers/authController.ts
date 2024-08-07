@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import { fetchUserByUsername, insertUser } from '../database/userQueries.js'
 import { HttpError } from '../models/httpError.js'
+import { User } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 
 export const login = async (req: Request, res: Response) => {
@@ -56,16 +57,18 @@ export const register = async (req: Request, res: Response) => {
 
     try {
         const passwordHash = bcrypt.hashSync(password)
-        const user = await insertUser(
+        const user: User = {
+            id: -1,
             username,
             email,
             firstName,
             lastName,
-            passwordHash
-        )
-        if (!user) throw Error('user not created')
-        req.session.user = user
-        return res.status(201).send(user)
+            passwordHash,
+        }
+        const newUser = await insertUser(user)
+        if (!newUser) throw Error('user not created')
+        req.session.user = newUser
+        return res.status(201).send(newUser)
     } catch (error) {
         logger.error(error)
         throw Error('failed to register')

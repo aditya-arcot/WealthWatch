@@ -1,9 +1,24 @@
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
-import { runQuery } from './index.js'
+import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertPlaidApiRequest = async (
     request: PlaidApiRequest
 ): Promise<PlaidApiRequest | undefined> => {
+    const values: unknown[] = [
+        request.userId,
+        request.itemId,
+        request.timestamp,
+        request.duration,
+        request.method,
+        request.params,
+        request.response,
+        request.errorName,
+        request.errorMessage,
+        request.errorStack,
+    ]
+
+    const rowCount = 1
+    const paramCount = values.length
     const query = `
         INSERT INTO plaid_api_requests (
             user_id,
@@ -17,23 +32,11 @@ export const insertPlaidApiRequest = async (
             error_message,
             error_stack
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
     `
-    const rows = (
-        await runQuery<DbPlaidApiRequest>(query, [
-            request.userId,
-            request.itemId,
-            request.timestamp,
-            request.duration,
-            request.method,
-            request.params,
-            request.response,
-            request.errorName,
-            request.errorMessage,
-            request.errorStack,
-        ])
-    ).rows
+
+    const rows = (await runQuery<DbPlaidApiRequest>(query, values, true)).rows
     if (!rows[0]) return
     return mapDbPlaidApiRequest(rows[0])
 }

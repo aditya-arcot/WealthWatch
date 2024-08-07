@@ -1,45 +1,13 @@
 import { Account } from '../models/account.js'
-import { runQuery } from './index.js'
+import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
     accounts: Account[]
 ): Promise<Account[] | undefined> => {
     if (!accounts.length) return
-    let query = `
-        INSERT INTO accounts 
-        (
-            item_id, 
-            account_id, 
-            name, 
-            mask, 
-            official_name, 
-            current_balance, 
-            available_balance, 
-            iso_currency_code, 
-            unofficial_currency_code, 
-            credit_limit, 
-            type, 
-            subtype
-        ) 
-        VALUES `
+
     const values: unknown[] = []
-    accounts.forEach((account, idx) => {
-        if (idx !== 0) query += ', '
-        const startIdx = idx * 12
-        query += `(
-                $${startIdx + 1}, 
-                $${startIdx + 2}, 
-                $${startIdx + 3}, 
-                $${startIdx + 4}, 
-                $${startIdx + 5}, 
-                $${startIdx + 6}, 
-                $${startIdx + 7}, 
-                $${startIdx + 8}, 
-                $${startIdx + 9}, 
-                $${startIdx + 10}, 
-                $${startIdx + 11},
-                $${startIdx + 12}
-            )`
+    accounts.forEach((account) => {
         values.push(
             account.itemId,
             account.accountId,
@@ -55,7 +23,26 @@ export const insertAccounts = async (
             account.subtype
         )
     })
-    query += `
+
+    const rowCount = accounts.length
+    const paramCount = Math.floor(values.length / rowCount)
+    const query = `
+        INSERT INTO accounts 
+        (
+            item_id,
+            account_id,
+            name,
+            mask,
+            official_name,
+            current_balance,
+            available_balance,
+            iso_currency_code,
+            unofficial_currency_code,
+            credit_limit,
+            type,
+            subtype
+        ) 
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         ON CONFLICT (account_id)
         DO UPDATE SET
             current_balance = EXCLUDED.current_balance,
@@ -63,6 +50,7 @@ export const insertAccounts = async (
             credit_limit = EXCLUDED.credit_limit
         RETURNING *
     `
+
     const rows = (await runQuery<DbAccount>(query, values)).rows
     if (!rows.length) return
     return rows.map(mapDbAccount)

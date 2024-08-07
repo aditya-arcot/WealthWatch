@@ -148,12 +148,15 @@ CREATE TABLE IF NOT EXISTS transactions (
     id SERIAL PRIMARY KEY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     transaction_id TEXT UNIQUE NOT NULL,
-    name TEXT NOT NULL,
-    amount NUMERIC(28, 10) NOT NULL,
-    merchant TEXT,
     merchant_id TEXT,
-    category_id INTEGER REFERENCES categories(id),
+    merchant TEXT,
+    name TEXT NOT NULL,
+    custom_name TEXT,
+    amount NUMERIC(28, 10) NOT NULL,
+    primary_category TEXT,
     detailed_category TEXT,
+    category_id INTEGER REFERENCES categories(id) NOT NULL,
+    custom_category_id INTEGER REFERENCES categories(id),
     payment_channel TEXT NOT NULL,
     iso_currency_code TEXT,
     unofficial_currency_code TEXT,
@@ -238,15 +241,6 @@ CREATE TABLE IF NOT EXISTS plaid_api_requests (
     error_name TEXT,
     error_message TEXT,
     error_stack TEXT,
-    create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
-);
-
-
--- WEBHOOKS TABLE
-CREATE TABLE IF NOT EXISTS webhooks (
-    id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMP NOT NULL,
-    data JSON NOT NULL,
     create_timestamp TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 

@@ -44,9 +44,29 @@ export const getPool = (): pg.Pool => {
     return clientPool
 }
 
+export const constructInsertQueryParamsPlaceholder = (
+    rowCount: number,
+    paramCount: number,
+    counter: number = 1
+): string => {
+    if (rowCount < 1 || paramCount < 1)
+        throw Error('cannot construct parameters placeholder')
+
+    const placeholders: string[] = []
+    for (let i = 0; i < rowCount; i++) {
+        const paramList: string[] = []
+        for (let j = 0; j < paramCount; j++) {
+            paramList.push(`$${counter++}`)
+        }
+        placeholders.push(`(${paramList.join(', ')})`)
+    }
+    return ` ${placeholders.join(', ')} `
+}
+
 export const runQuery = async <T extends QueryResultRow>(
     query: string,
-    params: unknown[] = []
+    params: unknown[] = [],
+    skipSuccessLog: boolean = false
 ): Promise<QueryResult<T>> => {
     if (!clientPool) {
         throw Error('pool not initialized')
@@ -86,7 +106,7 @@ export const runQuery = async <T extends QueryResultRow>(
             query: collapsedQuery,
             rowCount: res.rowCount,
         }
-        logger.debug({ queryLog }, 'executed query')
+        if (!skipSuccessLog) logger.debug({ queryLog }, 'executed query')
         return res
     } catch (error) {
         const queryLog = {

@@ -10,17 +10,24 @@ import {
     initializeLogQueue,
     initializeLogWorker,
 } from './logQueue.js'
+import {
+    closeWebhookWorker,
+    initializeWebhookQueue,
+    initializeWebhookWorker,
+} from './webhookQueue.js'
 
 export const initializeQueues = () => {
     logger.debug('initializing queues')
-    initializeLogQueue()
     initializeItemSyncQueue()
+    initializeLogQueue()
+    initializeWebhookQueue()
 }
 
 export const initializeWorkers = () => {
     logger.debug('initializing workers')
-    initializeLogWorker()
     initializeItemSyncWorker()
+    initializeLogWorker()
+    initializeWebhookWorker()
 }
 
 export const workerOptions = {
@@ -65,6 +72,7 @@ export const handleJobFailure = async (
 
 export const closeWorkers = async () => {
     logger.debug('closing workers')
-    await closeLogWorker()
     await closeItemSyncWorker()
+    await closeLogWorker()
+    await closeWebhookWorker()
 }
