@@ -1,9 +1,30 @@
 import { AppRequest } from '../models/appRequest.js'
-import { runQuery } from './index.js'
+import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAppRequest = async (
     request: AppRequest
 ): Promise<AppRequest | undefined> => {
+    const values: unknown[] = [
+        request.requestId,
+        request.userId,
+        request.timestamp,
+        request.duration,
+        request.method,
+        request.url,
+        request.queryParams,
+        request.routeParams,
+        request.requestHeaders,
+        request.requestBody,
+        request.remoteAddress,
+        request.remotePort,
+        request.session,
+        request.responseStatus,
+        request.responseHeaders,
+        request.responseBody,
+    ]
+
+    const rowCount = 1
+    const paramCount = values.length
     const query = `
         INSERT INTO app_requests (
             request_id,
@@ -23,29 +44,11 @@ export const insertAppRequest = async (
             response_headers,
             response_body
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
     `
-    const rows = (
-        await runQuery<DbAppRequest>(query, [
-            request.requestId,
-            request.userId,
-            request.timestamp,
-            request.duration,
-            request.method,
-            request.url,
-            request.queryParams,
-            request.routeParams,
-            request.requestHeaders,
-            request.requestBody,
-            request.remoteAddress,
-            request.remotePort,
-            request.session,
-            request.responseStatus,
-            request.responseHeaders,
-            request.responseBody,
-        ])
-    ).rows
+
+    const rows = (await runQuery<DbAppRequest>(query)).rows
     if (!rows[0]) return
     return mapDbAppRequest(rows[0])
 }

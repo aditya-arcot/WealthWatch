@@ -9,6 +9,7 @@ import {
 } from '../database/itemQueries.js'
 import { fetchUsers, removeUserById } from '../database/userQueries.js'
 import { HttpError } from '../models/httpError.js'
+import { Item } from '../models/item.js'
 import { User } from '../models/user.js'
 import { plaidResetItemLogin, plaidUnlinkItem } from '../plaid/itemMethods.js'
 import {
@@ -87,16 +88,21 @@ export const createSandboxItem = async (req: Request, res: Response) => {
         user.id
     )
 
-    const item = await insertItem(
-        user.id,
+    const item: Item = {
+        id: -1,
+        userId: user.id,
         itemId,
+        active: true,
         accessToken,
         institutionId,
-        institutionName
-    )
-    if (!item) throw Error('item not created')
+        institutionName,
+        healthy: true,
+        cursor: null,
+    }
+    const newItem = await insertItem(item)
+    if (!newItem) throw Error('item not created')
 
-    await queueItemSync(item)
+    await queueItemSync(newItem)
 
     return res.status(204).send()
 }

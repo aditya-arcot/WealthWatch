@@ -1,52 +1,13 @@
 import { Transaction } from '../models/transaction.js'
-import { runQuery } from './index.js'
+import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
     transactions: Transaction[]
 ): Promise<Transaction[] | undefined> => {
     if (!transactions.length) return
-    let query = `
-        INSERT INTO transactions (
-            account_id,
-            transaction_id,
-            merchant_id,
-            merchant,
-            name,
-            custom_name,
-            amount,
-            primary_category,
-            detailed_category,
-            category_id,
-            custom_category_id,
-            payment_channel,
-            iso_currency_code,
-            unofficial_currency_code,
-            date,
-            pending
-        )
-        VALUES `
+
     const values: unknown[] = []
-    transactions.forEach((transaction, idx) => {
-        if (idx !== 0) query += ', '
-        const startIdx = idx * 16
-        query += `(
-                $${startIdx + 1},
-                $${startIdx + 2},
-                $${startIdx + 3},
-                $${startIdx + 4},
-                $${startIdx + 5},
-                $${startIdx + 6},
-                $${startIdx + 7},
-                $${startIdx + 8},
-                $${startIdx + 9},
-                $${startIdx + 10},
-                $${startIdx + 11},
-                $${startIdx + 12},
-                $${startIdx + 13},
-                $${startIdx + 14},
-                $${startIdx + 15},
-                $${startIdx + 16}
-            )`
+    transactions.forEach((transaction) => {
         values.push(
             transaction.accountId,
             transaction.transactionId,
@@ -66,7 +27,29 @@ export const insertTransactions = async (
             transaction.pending
         )
     })
-    query += `
+
+    const rowCount = transactions.length
+    const paramCount = Math.floor(values.length / rowCount)
+    const query = `
+        INSERT INTO transactions (
+            account_id,
+            transaction_id,
+            merchant_id,
+            merchant,
+            name,
+            custom_name,
+            amount,
+            primary_category,
+            detailed_category,
+            category_id,
+            custom_category_id,
+            payment_channel,
+            iso_currency_code,
+            unofficial_currency_code,
+            date,
+            pending
+        )
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         ON CONFLICT (transaction_id)
         DO UPDATE SET
             merchant_id = EXCLUDED.merchant_id,
@@ -84,6 +67,7 @@ export const insertTransactions = async (
             pending = EXCLUDED.pending
         RETURNING *
     `
+
     const rows = (await runQuery<DbTransaction>(query, values)).rows
     return rows.map(mapDbTransaction)
 }

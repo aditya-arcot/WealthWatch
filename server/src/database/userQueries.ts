@@ -1,33 +1,30 @@
 import { User } from '../models/user.js'
-import { runQuery } from './index.js'
+import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertUser = async (
-    username: string,
-    email: string,
-    firstName: string,
-    lastName: string,
-    passwordHash: string
-): Promise<User | undefined> => {
+export const insertUser = async (user: User): Promise<User | undefined> => {
+    const values: unknown[] = [
+        user.username,
+        user.email,
+        user.firstName,
+        user.lastName,
+        user.passwordHash,
+    ]
+
+    const rowCount = 1
+    const paramCount = values.length
     const query = `
         INSERT INTO users (
-            username, 
-            email, 
-            first_name, 
-            last_name, 
-            password_hash
-        ) 
-        VALUES ($1, $2, $3, $4, $5) 
-        RETURNING *
-    `
-    const rows = (
-        await runQuery<DbUser>(query, [
             username,
             email,
-            firstName,
-            lastName,
-            passwordHash,
-        ])
-    ).rows
+            first_name,
+            last_name,
+            password_hash
+        ) 
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
+        RETURNING *
+    `
+
+    const rows = (await runQuery<DbUser>(query, values)).rows
     if (!rows[0]) return
     return mapDbUser(rows[0])
 }

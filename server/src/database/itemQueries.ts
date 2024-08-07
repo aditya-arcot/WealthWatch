@@ -1,16 +1,20 @@
 import { Item } from '../models/item.js'
-import { runQuery } from './index.js'
+import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertItem = async (
-    userId: number,
-    itemId: string,
-    accessToken: string,
-    institutionId: string,
-    institutionName: string,
-    active: boolean = true,
-    healthy: boolean = true,
-    cursor?: string
-): Promise<Item | undefined> => {
+export const insertItem = async (item: Item): Promise<Item | undefined> => {
+    const values: unknown[] = [
+        item.userId,
+        item.itemId,
+        item.active,
+        item.accessToken,
+        item.institutionId,
+        item.institutionName,
+        item.healthy,
+        item.cursor,
+    ]
+
+    const rowCount = 1
+    const paramCount = values.length
     const query = `
         INSERT INTO items (
             user_id,
@@ -22,21 +26,11 @@ export const insertItem = async (
             healthy,
             cursor
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
     `
-    const rows = (
-        await runQuery<DbItem>(query, [
-            userId,
-            itemId,
-            active,
-            accessToken,
-            institutionId,
-            institutionName,
-            healthy,
-            cursor ?? null,
-        ])
-    ).rows
+
+    const rows = (await runQuery<DbItem>(query, values)).rows
     if (!rows[0]) return
     return mapDbItem(rows[0])
 }

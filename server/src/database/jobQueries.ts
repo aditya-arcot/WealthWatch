@@ -1,7 +1,20 @@
 import { Job } from '../models/job.js'
-import { runQuery } from './index.js'
+import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertJob = async (job: Job): Promise<Job | undefined> => {
+    const values: unknown[] = [
+        job.queueName,
+        job.jobId,
+        job.jobName,
+        job.success,
+        job.data,
+        job.errorName,
+        job.errorMessage,
+        job.errorStack,
+    ]
+
+    const rowCount = 1
+    const paramCount = values.length
     const query = `
         INSERT INTO jobs (
             queue_name,
@@ -13,21 +26,11 @@ export const insertJob = async (job: Job): Promise<Job | undefined> => {
             error_message,
             error_stack
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
     `
-    const rows = (
-        await runQuery<DbJob>(query, [
-            job.queueName,
-            job.jobId,
-            job.jobName,
-            job.success,
-            job.data,
-            job.errorName,
-            job.errorMessage,
-            job.errorStack,
-        ])
-    ).rows
+
+    const rows = (await runQuery<DbJob>(query, values)).rows
     if (!rows[0]) return
     return mapDbJob(rows[0])
 }

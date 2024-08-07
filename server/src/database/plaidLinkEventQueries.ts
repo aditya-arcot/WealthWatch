@@ -1,9 +1,29 @@
-import { runQuery } from '../database/index.js'
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '../database/index.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 
 export const insertPlaidLinkEvent = async (
     event: PlaidLinkEvent
 ): Promise<PlaidLinkEvent | undefined> => {
+    const values: unknown[] = [
+        event.userId,
+        event.timestamp,
+        event.type,
+        event.sessionId,
+        event.requestId,
+        event.institutionId,
+        event.institutionName,
+        event.publicToken,
+        event.status,
+        event.errorType,
+        event.errorCode,
+        event.errorMessage,
+    ]
+
+    const rowCount = 1
+    const paramCount = values.length
     const query = `
         INSERT INTO plaid_link_events (
             user_id,
@@ -19,25 +39,11 @@ export const insertPlaidLinkEvent = async (
             error_code,
             error_message
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
     `
-    const rows = (
-        await runQuery<DbPlaidLinkEvent>(query, [
-            event.userId,
-            event.timestamp,
-            event.type,
-            event.sessionId,
-            event.requestId,
-            event.institutionId,
-            event.institutionName,
-            event.publicToken,
-            event.status,
-            event.errorType,
-            event.errorCode,
-            event.errorMessage,
-        ])
-    ).rows
+
+    const rows = (await runQuery<DbPlaidLinkEvent>(query, values)).rows
     if (!rows[0]) return
     return mapDbLinkEvent(rows[0])
 }
