@@ -8,10 +8,10 @@ on:
             repo:
                 required: true
                 type: string
-            server_image:
+            server_container:
                 required: true
                 type: string
-            client_image:
+            client_container:
                 required: true
                 type: string
             image_tag:
@@ -103,7 +103,7 @@ jobs:
             - name: build, push docker image (server)
               run: |
                   cd server/stage/
-                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_image }}:${{ inputs.image_tag }}
+                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_container }}:${{ inputs.image_tag }}
                   docker build -t $IMAGE .
                   docker push $IMAGE
                   echo "SERVER_IMAGE=${IMAGE}" >> $GITHUB_ENV
@@ -111,7 +111,7 @@ jobs:
             - name: build, push docker image (client)
               run: |
                   cd client/stage/
-                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_image }}:${{ inputs.image_tag }}
+                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_container }}:${{ inputs.image_tag }}
                   docker build -t $IMAGE .
                   docker push $IMAGE
                   echo "CLIENT_IMAGE=${IMAGE}" >> $GITHUB_ENV
@@ -121,8 +121,10 @@ jobs:
                   REPO=${{ inputs.repo }} \
                   SERVER_IMAGE=${{ env.SERVER_IMAGE }} \
                   SERVER_PORT=${{ vars.SERVER_PORT }} \
+                  SERVER_CONTAINER=${{ inputs.server_container }} \
                   CLIENT_IMAGE=${{ env.CLIENT_IMAGE }} \
                   CLIENT_PORT=${{ vars.CLIENT_PORT }} \
+                  CLIENT_CONTAINER=${{ inputs.client_container }} \
                   docker compose up -d
 
             - name: configure, restart nginx

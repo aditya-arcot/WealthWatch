@@ -20,13 +20,13 @@ jobs:
               run: |
                   repo_lowercase=$(echo ${{ env.REPO }} | tr '[:upper:]' '[:lower:]')
                   echo "repo_lowercase=$repo_lowercase" >> $GITHUB_OUTPUT
-                  echo "server_image=${repo_lowercase}-${{ env.BRANCH_NAME }}-server" >> $GITHUB_OUTPUT
-                  echo "client_image=${repo_lowercase}-${{ env.BRANCH_NAME }}-client" >> $GITHUB_OUTPUT
+                  echo "server_container=${repo_lowercase}-${{ env.BRANCH_NAME }}-server" >> $GITHUB_OUTPUT
+                  echo "client_container=${repo_lowercase}-${{ env.BRANCH_NAME }}-client" >> $GITHUB_OUTPUT
                   echo "image_tag=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_OUTPUT
         outputs:
             repo: ${{ steps.vars.outputs.repo_lowercase }}-${{ env.BRANCH_NAME }}
-            server_image: ${{ steps.vars.outputs.server_image }}
-            client_image: ${{ steps.vars.outputs.client_image }}
+            server_container: ${{ steps.vars.outputs.server_container }}
+            client_container: ${{ steps.vars.outputs.client_container }}
             image_tag: ${{ steps.vars.outputs.image_tag }}
 
     run-test:
@@ -37,8 +37,8 @@ jobs:
         with:
             runner: mbp-13
             repo: ${{ needs.set-vars.outputs.repo }}
-            server_image: ${{ needs.set-vars.outputs.server_image }}
-            client_image: ${{ needs.set-vars.outputs.client_image }}
+            server_container: ${{ needs.set-vars.outputs.server_container }}
+            client_container: ${{ needs.set-vars.outputs.client_container }}
             image_tag: ${{ needs.set-vars.outputs.image_tag }}
 
     run-main:
@@ -49,6 +49,6 @@ jobs:
         with:
             runner: mbp-13
             repo: ${{ needs.set-vars.outputs.repo }}
-            server_image: ${{ needs.set-vars.outputs.server_image }}
-            client_image: ${{ needs.set-vars.outputs.client_image }}
+            server_container: ${{ needs.set-vars.outputs.server_container }}
+            client_container: ${{ needs.set-vars.outputs.client_container }}
             image_tag: ${{ needs.set-vars.outputs.image_tag }}

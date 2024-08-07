@@ -5,11 +5,11 @@ services:
         ports:
             - '${SERVER_PORT}:3000'
         restart: always
-        container_name: server
+        container_name: ${SERVER_CONTAINER}
 
     client:
         image: ${CLIENT_IMAGE}
         ports:
             - '${CLIENT_PORT}:80'
         restart: always
-        container_name: client
+        container_name: ${CLIENT_CONTAINER}
