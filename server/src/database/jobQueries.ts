@@ -30,7 +30,7 @@ export const insertJob = async (job: Job): Promise<Job | undefined> => {
         RETURNING *
     `
 
-    const rows = (await runQuery<DbJob>(query, values)).rows
+    const rows = (await runQuery<DbJob>(query, values, true)).rows
     if (!rows[0]) return
     return mapDbJob(rows[0])
 }

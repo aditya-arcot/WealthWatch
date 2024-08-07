@@ -48,7 +48,7 @@ export const queuePlaidApiRequestLog = async (req: PlaidApiRequest) => {
 }
 
 const queueLog = async (type: LogJobType, log: object) => {
-    logger.debug(`${logQueueName} queue - adding job (${type})`)
+    // logger.debug(`${logQueueName} queue - adding job (${type})`)
     await getLogQueue().add(type, { log })
 }
 
@@ -57,9 +57,9 @@ export const initializeLogWorker = () => {
         logQueueName,
         async (job) => {
             const type: LogJobType = job.name as LogJobType
-            logger.debug(
-                `${logQueueName} queue - starting job (id ${job.id}, ${type})`
-            )
+            // logger.debug(
+            //     `${logQueueName} queue - starting job (id ${job.id}, ${type})`
+            // )
             switch (type) {
                 case LogJobType.AppRequestLog: {
                     const req: AppRequest | undefined = job.data.log
@@ -93,7 +93,7 @@ export const initializeLogWorker = () => {
     )
 
     logWorker.on('completed', async (job) => {
-        logger.debug(`${logQueueName} queue - completed job (id ${job.id})`)
+        // logger.debug(`${logQueueName} queue - completed job (id ${job.id})`)
         await handleJobSuccess(logQueueName, job.id, job.name, job.data)
     })
 

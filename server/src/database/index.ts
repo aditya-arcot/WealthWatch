@@ -65,7 +65,8 @@ export const constructInsertQueryParamsPlaceholder = (
 
 export const runQuery = async <T extends QueryResultRow>(
     query: string,
-    params: unknown[] = []
+    params: unknown[] = [],
+    skipSuccessLog: boolean = false
 ): Promise<QueryResult<T>> => {
     if (!clientPool) {
         throw Error('pool not initialized')
@@ -105,7 +106,7 @@ export const runQuery = async <T extends QueryResultRow>(
             query: collapsedQuery,
             rowCount: res.rowCount,
         }
-        logger.debug({ queryLog }, 'executed query')
+        if (!skipSuccessLog) logger.debug({ queryLog }, 'executed query')
         return res
     } catch (error) {
         const queryLog = {

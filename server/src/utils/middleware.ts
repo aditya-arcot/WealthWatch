@@ -1,5 +1,6 @@
 import pgSession from 'connect-pg-simple'
 import cors from 'cors'
+import { randomInt } from 'crypto'
 import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
@@ -69,7 +70,7 @@ export const logRequestResponse = (
     next: NextFunction
 ) => {
     const timestamp = new Date()
-    const requestId = timestamp.getTime().toString()
+    const requestId = `${timestamp.getTime().toString()}-${randomInt(0, 100)}`
     const appReq: AppRequest = {
         id: -1,
         requestId,
@@ -87,7 +88,7 @@ export const logRequestResponse = (
         session: req.session,
         responseStatus: -1,
     }
-    logger.info(`received request (id ${requestId})`)
+    logger.info(`received request (id ${requestId}) - ${req.method} ${req.url}`)
 
     const send = res.send
     res.send = (body) => {

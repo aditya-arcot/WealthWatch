@@ -36,7 +36,7 @@ export const insertPlaidApiRequest = async (
         RETURNING *
     `
 
-    const rows = (await runQuery<DbPlaidApiRequest>(query, values)).rows
+    const rows = (await runQuery<DbPlaidApiRequest>(query, values, true)).rows
     if (!rows[0]) return
     return mapDbPlaidApiRequest(rows[0])
 }

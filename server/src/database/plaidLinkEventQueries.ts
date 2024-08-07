@@ -43,7 +43,7 @@ export const insertPlaidLinkEvent = async (
         RETURNING *
     `
 
-    const rows = (await runQuery<DbPlaidLinkEvent>(query, values)).rows
+    const rows = (await runQuery<DbPlaidLinkEvent>(query, values, true)).rows
     if (!rows[0]) return
     return mapDbLinkEvent(rows[0])
 }
