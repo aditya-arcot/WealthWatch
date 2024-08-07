@@ -45,7 +45,9 @@ jobs:
               if: github.ref_name == 'test'
               run: |
                   cd client/src/environments/
-                  sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT}}/g" env.test.ts > env.test.ts.tmp
+                  sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT}}/g" \
+                      -e "s/{SERVER_HOST}/${{ secrets.SERVER_HOST}}/g" \
+                      env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
             - name: install, build (client)

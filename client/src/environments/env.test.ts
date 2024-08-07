@@ -1,4 +1,4 @@
 export const env = {
     name: 'test',
-    apiUrl: 'http://localhost:{SERVER_PORT}',
+    apiUrl: 'http://{SERVER_HOST}:{SERVER_PORT}',
 }
