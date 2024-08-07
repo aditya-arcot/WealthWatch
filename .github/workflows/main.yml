@@ -14,11 +14,6 @@ jobs:
         runs-on: mbp-13
         env:
             BRANCH_NAME: ${{ github.ref_name }}
-        outputs:
-            repo: ${{ steps.vars.outputs.repo_lowercase }}
-            server_image: ${{ steps.vars.outputs.server_image }}
-            client_image: ${{ steps.vars.outputs.client_image }}
-            image_tag: ${{ steps.vars.outputs.image_tag }}
         steps:
             - name: set docker vars
               id: vars
@@ -28,6 +23,11 @@ jobs:
                   echo "server_image=${repo_lowercase}-${{ env.BRANCH_NAME }}-server" >> $GITHUB_OUTPUT
                   echo "client_image=${repo_lowercase}-${{ env.BRANCH_NAME }}-client" >> $GITHUB_OUTPUT
                   echo "image_tag=$(date +%Y-%m-%d).${{ env.VERSION }}" >> $GITHUB_OUTPUT
+        outputs:
+            repo: ${{ steps.vars.outputs.repo_lowercase }}-${{ env.BRANCH_NAME }}
+            server_image: ${{ steps.vars.outputs.server_image }}
+            client_image: ${{ steps.vars.outputs.client_image }}
+            image_tag: ${{ steps.vars.outputs.image_tag }}
 
     run-test:
         needs: set-vars
