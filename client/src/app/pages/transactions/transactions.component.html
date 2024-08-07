@@ -53,19 +53,20 @@
                             </td>
                             <td>
                                 <div class="input-group input-group-sm">
+                                    <button
+                                        class="btn btn-outline-primary icon-btn"
+                                        type="button"
+                                    >
+                                        <i
+                                            [classList]="getCategoryClasses(t)"
+                                        ></i>
+                                    </button>
                                     <select
                                         class="form-select"
                                         (change)="
                                             updateCategory($event.target, t)
                                         "
                                     >
-                                        <option
-                                            [selected]="
-                                                getDisplayCategory(t) === null
-                                            "
-                                        >
-                                            Uncategorized
-                                        </option>
                                         @for (
                                             category of categories;
                                             track $index
@@ -82,7 +83,7 @@
                                         }
                                     </select>
                                     <button
-                                        class="btn btn-outline-danger"
+                                        class="btn btn-outline-dark"
                                         type="button"
                                         title="Reset category"
                                         (click)="resetCategory(t)"

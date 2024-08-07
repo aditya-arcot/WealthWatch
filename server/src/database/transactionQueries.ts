@@ -152,7 +152,7 @@ interface DbTransaction {
     amount: number
     primary_category: string | null
     detailed_category: string | null
-    category_id: number | null
+    category_id: number
     custom_category_id: number | null
     payment_channel: string
     iso_currency_code: string | null

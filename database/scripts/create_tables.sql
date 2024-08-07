@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     amount NUMERIC(28, 10) NOT NULL,
     primary_category TEXT,
     detailed_category TEXT,
-    category_id INTEGER REFERENCES categories(id),
+    category_id INTEGER REFERENCES categories(id) NOT NULL,
     custom_category_id INTEGER REFERENCES categories(id),
     payment_channel TEXT NOT NULL,
     iso_currency_code TEXT,

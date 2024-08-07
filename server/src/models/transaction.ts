@@ -9,7 +9,7 @@ export interface Transaction {
     amount: number
     primaryCategory: string | null
     detailedCategory: string | null
-    categoryId: number | null
+    categoryId: number
     customCategoryId: number | null
     paymentChannel: string
     isoCurrencyCode: string | null

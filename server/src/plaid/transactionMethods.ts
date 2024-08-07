@@ -96,7 +96,7 @@ export const mapPlaidTransaction = (
 const mapPlaidCategory = (
     primary: string | undefined,
     detailed: string | undefined
-): number | null => {
+): number => {
     const detailedEnum = detailed as PlaidDetailedCategoryEnum
     if (Object.values(PlaidDetailedCategoryEnum).indexOf(detailedEnum) >= 0) {
         return detailedCategoryMap[detailedEnum]
@@ -107,7 +107,7 @@ const mapPlaidCategory = (
         return primaryCategoryMap[primaryEnum]
     }
 
-    return null
+    return CategoryEnum.Uncategorized
 }
 
 enum PlaidDetailedCategoryEnum {
@@ -159,7 +159,7 @@ enum PlaidPrimaryCategoryEnum {
 }
 
 const primaryCategoryMap: {
-    [key in PlaidPrimaryCategoryEnum]: CategoryEnum | null
+    [key in PlaidPrimaryCategoryEnum]: CategoryEnum
 } = {
     [PlaidPrimaryCategoryEnum.Income]: CategoryEnum.Income,
     [PlaidPrimaryCategoryEnum.TransferIn]: CategoryEnum.Transfer,
@@ -177,5 +177,5 @@ const primaryCategoryMap: {
     [PlaidPrimaryCategoryEnum.Transportation]: CategoryEnum.Transportation,
     [PlaidPrimaryCategoryEnum.Travel]: CategoryEnum.Travel,
     [PlaidPrimaryCategoryEnum.RentAndUtilities]: CategoryEnum.Bills,
-    [PlaidPrimaryCategoryEnum.Other]: null,
+    [PlaidPrimaryCategoryEnum.Other]: CategoryEnum.Uncategorized,
 }

@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
-import { Category } from '../../models/category'
+import { Category, CategoryEnum } from '../../models/category'
 import { Item } from '../../models/item'
 import { Transaction } from '../../models/transaction'
 import { AccountService } from '../../services/account.service'
@@ -182,19 +182,21 @@ export class TransactionsComponent implements OnInit {
         return this.currencyFormatters[currency].format(t.amount)
     }
 
-    getDisplayCategory(t: Transaction): number | null {
+    getDisplayCategory(t: Transaction): number {
         return t.customCategoryId ?? t.categoryId
     }
 
     updateCategory(target: EventTarget | null, t: Transaction): void {
         if (!target) return
         const element = target as HTMLInputElement
-        let newCategoryId: number | null = parseInt(element.value.trim())
-        if (isNaN(newCategoryId)) newCategoryId = null
+        const newCategoryId = parseInt(element.value.trim())
 
-        if (t.categoryId === newCategoryId) return
+        if (isNaN(newCategoryId) || t.categoryId === newCategoryId) {
+            t.customCategoryId = null
+        } else {
+            t.customCategoryId = newCategoryId
+        }
 
-        t.customCategoryId = newCategoryId
         this.updateCustomCategoryId(t)
     }
 
@@ -216,6 +218,40 @@ export class TransactionsComponent implements OnInit {
                 })
             )
             .subscribe()
+    }
+
+    getCategoryClasses(t: Transaction): string {
+        const categoryId = this.getDisplayCategory(t) as CategoryEnum
+        return `bi ${this.icons[categoryId]}`
+    }
+
+    getCategoryClassesTest(id: CategoryEnum): string {
+        return `bi ${this.icons[id]}`
+    }
+
+    private icons: Record<CategoryEnum, string> = {
+        [CategoryEnum.Uncategorized]: 'bi-question-circle',
+        [CategoryEnum.Income]: 'bi-cash',
+        [CategoryEnum.Transfer]: 'bi-arrow-left-right',
+        [CategoryEnum.Deposit]: 'bi-bank',
+        [CategoryEnum.Investment]: 'bi-graph-up',
+        [CategoryEnum.Savings]: 'bi-piggy-bank',
+        [CategoryEnum.LoanPayment]: 'bi-wallet',
+        [CategoryEnum.CreditCardPayment]: 'bi-credit-card-2-front',
+        [CategoryEnum.Fees]: 'bi-file-earmark-text',
+        [CategoryEnum.Entertainment]: 'bi-controller',
+        [CategoryEnum.FoodAndDrink]: 'bi-cup-straw',
+        [CategoryEnum.Groceries]: 'bi-basket',
+        [CategoryEnum.Merchandise]: 'bi-bag',
+        [CategoryEnum.Medical]: 'bi-heart-pulse',
+        [CategoryEnum.PersonalCare]: 'bi-person',
+        [CategoryEnum.Services]: 'bi-tools',
+        [CategoryEnum.Government]: 'bi-building',
+        [CategoryEnum.Donations]: 'bi-heart',
+        [CategoryEnum.Taxes]: 'bi-percent',
+        [CategoryEnum.Transportation]: 'bi-car-front',
+        [CategoryEnum.Travel]: 'bi-airplane',
+        [CategoryEnum.Bills]: 'bi-receipt-cutoff',
     }
 
     getDisplayAccount(t: Transaction): string {

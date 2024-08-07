@@ -4,7 +4,8 @@ export interface Category {
 }
 
 export enum CategoryEnum {
-    Income = 1,
+    Uncategorized = 1,
+    Income,
     Transfer,
     Deposit,
     Investment,

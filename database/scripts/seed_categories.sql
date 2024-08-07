@@ -3,6 +3,7 @@ START TRANSACTION;
 INSERT INTO
     categories (name)
 VALUES
+    ('Uncategorized'),
     ('Income'),
     ('Transfer'),
     ('Deposit'),
