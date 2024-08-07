@@ -3,11 +3,9 @@ import { env } from 'process'
 import { insertAppRequest } from '../database/appRequestQueries.js'
 import { insertPlaidApiRequest } from '../database/plaidApiRequestQueries.js'
 import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
-import { insertWebhook } from '../database/webhookQueries.js'
 import { AppRequest } from '../models/appRequest.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
-import { Webhook } from '../models/webhook.js'
 import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
@@ -16,7 +14,6 @@ enum LogJobType {
     AppRequestLog = 'AppRequest',
     PlaidLinkEventLog = 'PlaidLinkEvent',
     PlaidApiRequestLog = 'PlaidApiRequest',
-    WebhookLog = 'Webhook',
 }
 
 if (!env['NODE_ENV']) {
@@ -48,10 +45,6 @@ export const queuePlaidLinkEventLog = async (event: PlaidLinkEvent) => {
 
 export const queuePlaidApiRequestLog = async (req: PlaidApiRequest) => {
     await queueLog(LogJobType.PlaidApiRequestLog, req)
-}
-
-export const queueWebhookLog = async (webhook: object) => {
-    await queueLog(LogJobType.WebhookLog, webhook)
 }
 
 const queueLog = async (type: LogJobType, log: object) => {
@@ -90,14 +83,6 @@ export const initializeLogWorker = () => {
 
                     const newReq = await insertPlaidApiRequest(req)
                     if (!newReq) throw Error(`failed to insert ${type}`)
-                    break
-                }
-                case LogJobType.WebhookLog: {
-                    const webhook: Webhook | undefined = job.data.log
-                    if (!webhook) throw Error(`missing ${type}`)
-
-                    const newWebhook = await insertWebhook(webhook)
-                    if (!newWebhook) throw Error(`failed to insert ${type}`)
                     break
                 }
                 default:
