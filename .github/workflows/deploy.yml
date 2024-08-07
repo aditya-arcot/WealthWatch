@@ -89,6 +89,7 @@ jobs:
                   echo "PLAID_ENV=${{ vars.PLAID_ENV }}" >> .env
                   echo "CLIENT_PORT=${{ vars.CLIENT_PORT }}" >> .env
                   echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
+                  echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
 
             - name: copy files (server)
               run: |
@@ -123,6 +124,7 @@ jobs:
                   REPO=${{ inputs.repo }} \
                   SERVER_IMAGE=${{ env.SERVER_IMAGE }} \
                   SERVER_PORT=${{ vars.SERVER_PORT }} \
+                  WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }} \
                   SERVER_CONTAINER=${{ inputs.server_container }} \
                   CLIENT_IMAGE=${{ env.CLIENT_IMAGE }} \
                   CLIENT_PORT=${{ vars.CLIENT_PORT }} \

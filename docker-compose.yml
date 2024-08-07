@@ -4,6 +4,7 @@ services:
         image: ${SERVER_IMAGE}
         ports:
             - '${SERVER_PORT}:3000'
+            - '${WEBHOOK_PORT}:3001'
         restart: always
         container_name: ${SERVER_CONTAINER}
 
