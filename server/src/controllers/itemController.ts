@@ -20,6 +20,7 @@ export const getUserItems = async (req: Request, res: Response) => {
         return res.send(items)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to get items')
     }
 }
@@ -38,6 +39,7 @@ export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to update webhook')
     }
 }
@@ -55,6 +57,7 @@ export const refreshItemTransactions = async (req: Request, res: Response) => {
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to refresh item transactions')
     }
 }

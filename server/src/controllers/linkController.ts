@@ -28,6 +28,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
         return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to create link token')
     }
 }

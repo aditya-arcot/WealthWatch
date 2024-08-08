@@ -71,6 +71,7 @@ export const register = async (req: Request, res: Response) => {
         return res.status(201).send(newUser)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to register')
     }
 }

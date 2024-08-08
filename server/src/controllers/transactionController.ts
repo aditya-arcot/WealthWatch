@@ -20,6 +20,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
         return res.send(transactions)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to get transactions')
     }
 }
@@ -42,6 +43,7 @@ export const updateTransactionCustomName = async (
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to update transaction custom name')
     }
 }
@@ -68,6 +70,7 @@ export const updateTransactionCustomCategoryId = async (
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to update transaction custom category id')
     }
 }
@@ -86,6 +89,7 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to refresh transactions')
     }
 }

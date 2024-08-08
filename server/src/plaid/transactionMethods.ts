@@ -32,37 +32,32 @@ export const plaidRetrieveTransactionUpdates = async (item: Item) => {
     let removed: Array<PlaidRemovedTransaction> = []
     let hasMore = true
 
-    try {
-        while (hasMore) {
-            let params: TransactionsSyncRequest
-            if (cursor) {
-                params = {
-                    access_token: item.accessToken,
-                    cursor,
-                }
-            } else {
-                params = {
-                    access_token: item.accessToken,
-                }
+    while (hasMore) {
+        let params: TransactionsSyncRequest
+        if (cursor) {
+            params = {
+                access_token: item.accessToken,
+                cursor,
             }
-            const resp = await executePlaidMethod(
-                plaidClient.transactionsSync,
-                params,
-                item.userId,
-                item.id
-            )
-
-            added = added.concat(resp.data.added)
-            modified = modified.concat(resp.data.modified)
-            removed = removed.concat(resp.data.removed)
-            hasMore = resp.data.has_more
-            cursor = resp.data.next_cursor
+        } else {
+            params = {
+                access_token: item.accessToken,
+            }
         }
-        return { added, modified, removed, cursor }
-    } catch (error) {
-        logger.error(error)
-        throw Error('failed to retrieve transaction updates')
+        const resp = await executePlaidMethod(
+            plaidClient.transactionsSync,
+            params,
+            item.userId,
+            item.id
+        )
+
+        added = added.concat(resp.data.added)
+        modified = modified.concat(resp.data.modified)
+        removed = removed.concat(resp.data.removed)
+        hasMore = resp.data.has_more
+        cursor = resp.data.next_cursor
     }
+    return { added, modified, removed, cursor }
 }
 
 export const mapPlaidTransaction = (
