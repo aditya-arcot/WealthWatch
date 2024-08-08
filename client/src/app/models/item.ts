@@ -10,6 +10,7 @@ export interface Item {
     institutionName: string
     healthy: boolean
     cursor: string | null
+    lastSynced: Date | null
 }
 
 export interface ItemWithAccounts extends Item {

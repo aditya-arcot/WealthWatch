@@ -98,6 +98,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
         institutionName,
         healthy: true,
         cursor: null,
+        lastSynced: null,
     }
     const newItem = await insertItem(item)
     if (!newItem) throw Error('item not created')

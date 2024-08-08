@@ -78,6 +78,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
             institutionName: institution.name,
             healthy: true,
             cursor: null,
+            lastSynced: null,
         }
         const newItem = await insertItem(item)
         if (!newItem) throw Error('item not created')

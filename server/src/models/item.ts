@@ -8,4 +8,5 @@ export interface Item {
     institutionName: string
     healthy: boolean
     cursor: string | null
+    lastSynced: Date | null
 }

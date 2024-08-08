@@ -11,6 +11,7 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
         item.institutionName,
         item.healthy,
         item.cursor,
+        item.lastSynced,
     ]
 
     const rowCount = 1
@@ -24,7 +25,8 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
             institution_id,
             institution_name,
             healthy,
-            cursor
+            cursor,
+            last_synced
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
@@ -105,6 +107,18 @@ export const modifyItemCursorByItemId = async (
     await runQuery(query, [cursor, itemId])
 }
 
+export const modifyItemLastSyncedByItemId = async (
+    itemId: string,
+    lastSynced: Date
+) => {
+    const query = `
+        UPDATE items 
+        SET last_synced = $1 
+        WHERE item_id = $2
+    `
+    await runQuery(query, [lastSynced, itemId])
+}
+
 interface DbItem {
     id: number
     user_id: number
@@ -115,6 +129,7 @@ interface DbItem {
     institution_name: string
     healthy: boolean
     cursor: string | null
+    last_synced: Date | null
 }
 
 const mapDbItem = (dbItem: DbItem): Item => ({
@@ -127,4 +142,5 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     institutionName: dbItem.institution_name,
     healthy: dbItem.healthy,
     cursor: dbItem.cursor,
+    lastSynced: dbItem.last_synced,
 })

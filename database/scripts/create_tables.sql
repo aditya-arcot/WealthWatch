@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS items (
     institution_name TEXT NOT NULL,
     healthy BOOLEAN NOT NULL,
     cursor TEXT,
+    last_synced TIMESTAMPTZ,
     create_timestamp TIMESTAMPTZ DEFAULT NOW(),
     update_timestamp TIMESTAMPTZ DEFAULT NOW()
 );
