@@ -32,7 +32,17 @@
     @for (item of itemsWithAccounts; track $index) {
         <div class="card mb-2">
             <div class="card-body">
-                <h5 class="card-title">{{ item.institutionName }}</h5>
+                <h5 class="card-title mb-1">{{ item.institutionName }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    @if (!item.lastSynced) {
+                        Never synced
+                    } @else {
+                        Last synced:
+                        {{
+                            convertDateToLocal(item.lastSynced) | date: 'short'
+                        }}
+                    }
+                </h6>
                 <table class="table table-striped table-hover table-sm mb-0">
                     <thead class="table-dark">
                         <tr>

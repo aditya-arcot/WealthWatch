@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import {
@@ -23,7 +24,7 @@ import { UserService } from '../../services/user.service'
 @Component({
     selector: 'app-accounts',
     standalone: true,
-    imports: [LoadingSpinnerComponent],
+    imports: [LoadingSpinnerComponent, DatePipe],
     templateUrl: './accounts.component.html',
     styleUrl: './accounts.component.css',
 })
@@ -204,5 +205,9 @@ export class AccountsComponent implements OnInit {
             errorMessage: metadata.error_message,
         }
         this.linkSvc.handleLinkEvent(event).subscribe()
+    }
+
+    convertDateToLocal(date: Date): string {
+        return new Date(date).toLocaleString()
     }
 }
