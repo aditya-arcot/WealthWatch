@@ -7,8 +7,8 @@ import { production } from './middleware.js'
 export const swaggerOptions: SwaggerUiOptions = {
     swaggerOptions: {
         requestInterceptor: async (req: Request) => {
-            const port = req.url.split('/')[2]?.split(':')[1]
-            const serverUrl = `http://localhost:${port}`
+            const url = req.url.split('/')[2]
+            const serverUrl = `http://${url}`
             const response = await fetch(`${serverUrl}/csrf-token`)
             const data = (await response.json()) as { csrfToken: string }
             req.headers['x-csrf-token'] = data.csrfToken
