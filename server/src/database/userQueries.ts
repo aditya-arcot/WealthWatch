@@ -19,7 +19,7 @@ export const insertUser = async (user: User): Promise<User | undefined> => {
             first_name,
             last_name,
             password_hash
-        ) 
+        )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
     `

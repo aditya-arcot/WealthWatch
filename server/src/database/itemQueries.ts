@@ -50,7 +50,7 @@ export const fetchActiveItemById = async (
     itemId: string
 ): Promise<Item | undefined> => {
     const query = `
-        SELECT * 
+        SELECT *
         FROM active_items
         WHERE item_id = $1
     `
@@ -76,7 +76,7 @@ export const fetchActiveItemByUserIdAndInstitutionId = async (
     institutionId: string
 ): Promise<Item | undefined> => {
     const query = `
-        SELECT * 
+        SELECT *
         FROM active_items
         WHERE user_id = $1
             AND institution_id = $2
@@ -88,8 +88,8 @@ export const fetchActiveItemByUserIdAndInstitutionId = async (
 
 export const modifyItemActiveById = async (id: number, active: boolean) => {
     const query = `
-        UPDATE items 
-        SET active = $1 
+        UPDATE items
+        SET active = $1
         WHERE id = $2
     `
     await runQuery(query, [active, id])
@@ -100,8 +100,8 @@ export const modifyItemCursorByItemId = async (
     cursor: string | null
 ) => {
     const query = `
-        UPDATE items 
-        SET cursor = $1 
+        UPDATE items
+        SET cursor = $1
         WHERE item_id = $2
     `
     await runQuery(query, [cursor, itemId])
@@ -112,8 +112,8 @@ export const modifyItemLastSyncedByItemId = async (
     lastSynced: Date
 ) => {
     const query = `
-        UPDATE items 
-        SET last_synced = $1 
+        UPDATE items
+        SET last_synced = $1
         WHERE item_id = $2
     `
     await runQuery(query, [lastSynced, itemId])

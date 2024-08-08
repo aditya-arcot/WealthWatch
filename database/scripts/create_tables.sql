@@ -71,7 +71,7 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TRIGGER trigger_users_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON users
-FOR EACH ROW 
+FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
 
@@ -98,7 +98,7 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TRIGGER trigger_items_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON items
-FOR EACH ROW 
+FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
 CREATE VIEW active_items AS
@@ -133,13 +133,13 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TRIGGER trigger_accounts_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON accounts
-FOR EACH ROW 
+FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
 CREATE VIEW active_accounts AS
 SELECT a.*
 FROM accounts a
-JOIN items i 
+JOIN items i
     ON a.item_id = i.id
 WHERE i.active = TRUE;
 
@@ -174,15 +174,15 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 CREATE TRIGGER trigger_transactions_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON transactions
-FOR EACH ROW 
+FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
 CREATE VIEW active_transactions AS
 SELECT t.*
 FROM transactions t
-JOIN accounts a 
+JOIN accounts a
     ON t.account_id = a.id
-JOIN items i 
+JOIN items i
     ON a.item_id = i.id
 WHERE i.active = TRUE;
 
