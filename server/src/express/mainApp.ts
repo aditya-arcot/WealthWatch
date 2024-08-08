@@ -24,7 +24,13 @@ export const startMainApp = () => {
     }
 
     logger.debug('configuring middleware')
-    app.use(helmet())
+    app.use(
+        helmet({
+            contentSecurityPolicy: {
+                reportOnly: !production,
+            },
+        })
+    )
     app.use(corsMiddleware)
     app.use(methodOverride('_method'))
     app.use(express.json())
