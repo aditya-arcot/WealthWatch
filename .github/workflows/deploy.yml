@@ -68,6 +68,7 @@ jobs:
                   echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
 
                   echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+                  echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> .env
 
                   echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
                   echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
@@ -85,8 +86,10 @@ jobs:
                   echo "KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}" >> .env
 
                   echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
+
                   echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
                   echo "PLAID_ENV=${{ vars.PLAID_ENV }}" >> .env
+
                   echo "CLIENT_PORT=${{ vars.CLIENT_PORT }}" >> .env
                   echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
                   echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
