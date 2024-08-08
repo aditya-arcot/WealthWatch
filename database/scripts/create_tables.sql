@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS items (
     healthy BOOLEAN NOT NULL,
     cursor TEXT,
     last_synced TIMESTAMPTZ,
+    last_refreshed TIMESTAMPTZ,
     create_timestamp TIMESTAMPTZ DEFAULT NOW(),
     update_timestamp TIMESTAMPTZ DEFAULT NOW()
 );

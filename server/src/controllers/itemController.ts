@@ -3,8 +3,10 @@ import {
     fetchActiveItemById,
     fetchActiveItems,
     fetchActiveItemsByUserId,
+    modifyItemLastRefreshedByItemId,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
+import { refreshCooldown } from '../models/item.js'
 import { plaidUpdateItemWebhook } from '../plaid/itemMethods.js'
 import { plaidRefreshTransactions } from '../plaid/transactionMethods.js'
 import { logger } from '../utils/logger.js'
@@ -53,7 +55,14 @@ export const refreshItemTransactions = async (req: Request, res: Response) => {
     try {
         const item = await fetchActiveItemById(itemId)
         if (!item) throw new HttpError('item not found', 404)
+
+        const lastRefresh = item.lastRefreshed?.getTime() || 0
+        if (Date.now() - lastRefresh < refreshCooldown) {
+            throw new HttpError('refresh cooldown', 429)
+        }
+
         await plaidRefreshTransactions(item)
+        await modifyItemLastRefreshedByItemId(item.itemId, new Date())
         return res.status(204).send()
     } catch (error) {
         logger.error(error)

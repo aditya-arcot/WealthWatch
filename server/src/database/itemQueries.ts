@@ -12,6 +12,7 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
         item.healthy,
         item.cursor,
         item.lastSynced,
+        item.lastRefreshed,
     ]
 
     const rowCount = 1
@@ -26,7 +27,8 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
             institution_name,
             healthy,
             cursor,
-            last_synced
+            last_synced,
+            last_refreshed
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
@@ -95,28 +97,32 @@ export const modifyItemActiveById = async (id: number, active: boolean) => {
     await runQuery(query, [active, id])
 }
 
-export const modifyItemCursorByItemId = async (
+export const modifyItemLastRefreshedByItemId = async (
     itemId: string,
-    cursor: string | null
+    lastRefreshed: Date
 ) => {
     const query = `
         UPDATE items
-        SET cursor = $1
+        SET last_refreshed = $1
         WHERE item_id = $2
     `
-    await runQuery(query, [cursor, itemId])
+    await runQuery(query, [lastRefreshed, itemId])
 }
 
-export const modifyItemLastSyncedByItemId = async (
+export const modifyItemDataByItemId = async (
     itemId: string,
+    cursor: string | null,
     lastSynced: Date
 ) => {
     const query = `
         UPDATE items
-        SET last_synced = $1
-        WHERE item_id = $2
+        SET
+            cursor = $1,
+            last_synced = $2,
+            last_refreshed = $2
+        WHERE item_id = $3
     `
-    await runQuery(query, [lastSynced, itemId])
+    await runQuery(query, [cursor, lastSynced, itemId])
 }
 
 interface DbItem {
@@ -130,6 +136,7 @@ interface DbItem {
     healthy: boolean
     cursor: string | null
     last_synced: Date | null
+    last_refreshed: Date | null
 }
 
 const mapDbItem = (dbItem: DbItem): Item => ({
@@ -143,4 +150,5 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     healthy: dbItem.healthy,
     cursor: dbItem.cursor,
     lastSynced: dbItem.last_synced,
+    lastRefreshed: dbItem.last_refreshed,
 })

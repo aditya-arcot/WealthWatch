@@ -12,7 +12,7 @@ import {
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { ItemWithAccounts } from '../../models/item'
+import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
@@ -205,6 +205,43 @@ export class AccountsComponent implements OnInit {
             errorMessage: metadata.error_message,
         }
         this.linkSvc.handleLinkEvent(event).subscribe()
+    }
+
+    refreshItemTransactions(item: Item): void {
+        const lastRefreshed = item.lastRefreshed
+            ? new Date(item.lastRefreshed)
+            : null
+        const lastRefreshTime = lastRefreshed ? lastRefreshed.getTime() : 0
+        if (Date.now() - lastRefreshTime < refreshCooldown) {
+            const nextRefresh = new Date(
+                lastRefreshTime + refreshCooldown
+            ).toLocaleTimeString(undefined, { timeStyle: 'short' })
+            this.alertSvc.addErrorAlert(
+                `${item.institutionName} data was recently synced`,
+                [`Please wait until ${nextRefresh} before syncing again`]
+            )
+            return
+        }
+
+        this.loading = true
+        this.itemSvc
+            .refreshItemTransactions(item.itemId)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        `Failed to sync ${item.institutionName} data`
+                    )
+                    this.loading = false
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert(
+                    `Syncing ${item.institutionName} data`,
+                    ['Please check back later']
+                )
+                this.loading = false
+            })
     }
 
     convertDateToLocal(date: Date): string {

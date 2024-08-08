@@ -122,6 +122,27 @@ export class TransactionsComponent implements OnInit {
         )
     }
 
+    refreshTransactions(): void {
+        this.loading = true
+        this.transactionSvc
+            .refreshTransactions()
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to refresh transactions'
+                    )
+                    this.loading = false
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert('Refreshing transactions', [
+                    'Please check back later',
+                ])
+                this.loading = false
+            })
+    }
+
     getDisplayName(t: Transaction): string {
         let name = t.customName ?? t.merchant ?? t.name
         if (name.length > this.maxNameLength)

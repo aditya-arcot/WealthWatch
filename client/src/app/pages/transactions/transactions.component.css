@@ -1,3 +1,9 @@
+.position-absolute {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 .pending-text {
     color: grey;
 }
