@@ -96,6 +96,11 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
                         item.itemId,
                         new Date()
                     )
+                } else {
+                    logger.debug(
+                        { itemId: item.itemId },
+                        'skipping item refresh (cooldown)'
+                    )
                 }
             })
         )

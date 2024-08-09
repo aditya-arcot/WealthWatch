@@ -58,7 +58,7 @@ export const refreshItemTransactions = async (req: Request, res: Response) => {
 
         const lastRefresh = item.lastRefreshed?.getTime() || 0
         if (Date.now() - lastRefresh < refreshCooldown) {
-            throw new HttpError('refresh cooldown', 429)
+            throw new HttpError('item refresh cooldown', 429)
         }
 
         await plaidRefreshTransactions(item)
