@@ -228,6 +228,9 @@ export class AccountsComponent implements OnInit {
             .refreshItemTransactions(item.itemId)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
+                    if (err.status === 429) {
+                        item.lastRefreshed = new Date()
+                    }
                     this.alertSvc.addErrorAlert(
                         `Failed to sync ${item.institutionName} data`
                     )
@@ -236,6 +239,7 @@ export class AccountsComponent implements OnInit {
                 })
             )
             .subscribe(() => {
+                item.lastRefreshed = new Date()
                 this.alertSvc.addSuccessAlert(
                     `Syncing ${item.institutionName} data`,
                     ['Please check back later']
