@@ -1,4 +1,10 @@
-.position-absolute {
+.top-left {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.top-right {
     right: 0;
     top: 50%;
     transform: translateY(-50%);

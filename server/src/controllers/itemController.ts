@@ -3,11 +3,15 @@ import {
     fetchActiveItemById,
     fetchActiveItems,
     fetchActiveItemsByUserId,
+    modifyItemActiveById,
     modifyItemLastRefreshedByItemId,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { refreshCooldown } from '../models/item.js'
-import { plaidUpdateItemWebhook } from '../plaid/itemMethods.js'
+import {
+    plaidUnlinkItem,
+    plaidUpdateItemWebhook,
+} from '../plaid/itemMethods.js'
 import { plaidRefreshTransactions } from '../plaid/transactionMethods.js'
 import { logger } from '../utils/logger.js'
 
@@ -68,5 +72,25 @@ export const refreshItemTransactions = async (req: Request, res: Response) => {
         logger.error(error)
         if (error instanceof HttpError) throw error
         throw Error('failed to refresh item transactions')
+    }
+}
+
+export const deactivateItem = async (req: Request, res: Response) => {
+    logger.debug('deactivating item')
+
+    const itemId: string | undefined = req.params['itemId']
+    if (!itemId) throw new HttpError('missing item id', 400)
+
+    try {
+        const item = await fetchActiveItemById(itemId)
+        if (!item) throw new HttpError('item not found', 404)
+
+        await plaidUnlinkItem(item)
+        await modifyItemActiveById(item.id, false)
+        return res.status(204).send()
+    } catch (error) {
+        logger.error(error)
+        if (error instanceof HttpError) throw error
+        throw Error('failed to deactivate item')
     }
 }

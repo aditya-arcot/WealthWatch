@@ -252,7 +252,7 @@ export class TransactionsComponent implements OnInit {
 
     private icons: Record<CategoryEnum, string> = {
         [CategoryEnum.Uncategorized]: 'bi-question-circle',
-        [CategoryEnum.Income]: 'bi-cash',
+        [CategoryEnum.Income]: 'bi-currency-dollar',
         [CategoryEnum.Transfer]: 'bi-arrow-left-right',
         [CategoryEnum.Deposit]: 'bi-bank',
         [CategoryEnum.Investment]: 'bi-graph-up',

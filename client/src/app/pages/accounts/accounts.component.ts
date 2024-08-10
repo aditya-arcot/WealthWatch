@@ -43,6 +43,12 @@ export class AccountsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        const institution = sessionStorage.getItem('deactivatedInstitution')
+        if (institution) {
+            this.alertSvc.addSuccessAlert(`Deleted ${institution} data`)
+            sessionStorage.removeItem('deactivatedInstitution')
+        }
+
         this.loadAccounts()
     }
 
@@ -245,6 +251,29 @@ export class AccountsComponent implements OnInit {
                     ['Please check back later']
                 )
                 this.loading = false
+            })
+    }
+
+    deactivateItem(item: Item): void {
+        this.loading = true
+        this.itemSvc
+            .deactivateItem(item.itemId)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        `Failed to delete ${item.institutionName}`
+                    )
+                    this.loading = false
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.loading = false
+                sessionStorage.setItem(
+                    'deactivatedInstitution',
+                    item.institutionName
+                )
+                window.location.reload()
             })
     }
 

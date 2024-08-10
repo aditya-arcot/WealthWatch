@@ -21,4 +21,8 @@ export class ItemService {
             {}
         )
     }
+
+    deactivateItem(itemId: string) {
+        return this.http.delete(`${this.baseUrl}/${itemId}`)
+    }
 }
