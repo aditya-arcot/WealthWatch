@@ -27,7 +27,7 @@ export const insertAccounts = async (
     const rowCount = accounts.length
     const paramCount = Math.floor(values.length / rowCount)
     const query = `
-        INSERT INTO accounts 
+        INSERT INTO accounts
         (
             item_id,
             account_id,
@@ -41,7 +41,7 @@ export const insertAccounts = async (
             credit_limit,
             type,
             subtype
-        ) 
+        )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         ON CONFLICT (account_id)
         DO UPDATE SET
@@ -60,11 +60,11 @@ export const fetchActiveAccountsByUserId = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `
-        SELECT a.* 
+        SELECT a.*
         FROM accounts a
-        WHERE 
+        WHERE
             a.item_id IN (
-                SELECT id 
+                SELECT id
                 FROM active_items
                 WHERE user_id = $1
             )

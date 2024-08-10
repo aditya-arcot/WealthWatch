@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+    deactivateItem,
     getUserItems,
     refreshItemTransactions,
     updateActiveItemsWebhook,
@@ -74,5 +75,26 @@ router
 router
     .route('/:itemId/refresh-transactions')
     .post(authenticate, catchAsync(refreshItemTransactions))
+
+/**
+ * @swagger
+ * /items/{itemId}:
+ *   delete:
+ *     summary: Deactivate an item
+ *     tags: [Items]
+ *     parameters:
+ *       - in: path
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The item ID
+ *     responses:
+ *       204:
+ *         description: Deactivated the item
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/:itemId').delete(authenticate, catchAsync(deactivateItem))
 
 export default router

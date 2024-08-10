@@ -1,11 +1,15 @@
 import { Request, Response } from 'express'
-import { fetchActiveItemsByUserId } from '../database/itemQueries.js'
+import {
+    fetchActiveItemsByUserId,
+    modifyItemLastRefreshedByItemId,
+} from '../database/itemQueries.js'
 import {
     fetchActiveTransactionsByUserId,
     updateTransactionCustomCategoryIdById,
     updateTransactionCustomNameById,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
+import { refreshCooldown } from '../models/item.js'
 import { plaidRefreshTransactions } from '../plaid/transactionMethods.js'
 import { logger } from '../utils/logger.js'
 
@@ -20,6 +24,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
         return res.send(transactions)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to get transactions')
     }
 }
@@ -42,6 +47,7 @@ export const updateTransactionCustomName = async (
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to update transaction custom name')
     }
 }
@@ -68,6 +74,7 @@ export const updateTransactionCustomCategoryId = async (
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to update transaction custom category id')
     }
 }
@@ -81,11 +88,26 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
     try {
         const items = await fetchActiveItemsByUserId(userId)
         await Promise.all(
-            items.map(async (item) => await plaidRefreshTransactions(item))
+            items.map(async (item) => {
+                const lastRefresh = item.lastRefreshed?.getTime() || 0
+                if (Date.now() - lastRefresh >= refreshCooldown) {
+                    await plaidRefreshTransactions(item)
+                    await modifyItemLastRefreshedByItemId(
+                        item.itemId,
+                        new Date()
+                    )
+                } else {
+                    logger.debug(
+                        { itemId: item.itemId },
+                        'skipping item refresh (cooldown)'
+                    )
+                }
+            })
         )
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to refresh transactions')
     }
 }

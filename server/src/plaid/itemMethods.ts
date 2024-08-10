@@ -5,7 +5,7 @@ import {
     SandboxItemResetLoginRequest,
 } from 'plaid'
 import { insertAccounts } from '../database/accountQueries.js'
-import { modifyItemCursorByItemId } from '../database/itemQueries.js'
+import { modifyItemDataByItemId } from '../database/itemQueries.js'
 import {
     insertTransactions,
     removeTransactionsByTransactionIds,
@@ -64,7 +64,7 @@ export const plaidSyncItemData = async (item: Item) => {
         }
 
         logger.debug('updating cursor')
-        await modifyItemCursorByItemId(item.itemId, cursor)
+        await modifyItemDataByItemId(item.itemId, cursor, new Date())
     } else {
         logger.debug('no accounts found. skipping transaction updates')
     }

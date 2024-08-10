@@ -11,6 +11,8 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
         item.institutionName,
         item.healthy,
         item.cursor,
+        item.lastSynced,
+        item.lastRefreshed,
     ]
 
     const rowCount = 1
@@ -24,7 +26,9 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
             institution_id,
             institution_name,
             healthy,
-            cursor
+            cursor,
+            last_synced,
+            last_refreshed
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
@@ -48,7 +52,7 @@ export const fetchActiveItemById = async (
     itemId: string
 ): Promise<Item | undefined> => {
     const query = `
-        SELECT * 
+        SELECT *
         FROM active_items
         WHERE item_id = $1
     `
@@ -74,7 +78,7 @@ export const fetchActiveItemByUserIdAndInstitutionId = async (
     institutionId: string
 ): Promise<Item | undefined> => {
     const query = `
-        SELECT * 
+        SELECT *
         FROM active_items
         WHERE user_id = $1
             AND institution_id = $2
@@ -86,23 +90,39 @@ export const fetchActiveItemByUserIdAndInstitutionId = async (
 
 export const modifyItemActiveById = async (id: number, active: boolean) => {
     const query = `
-        UPDATE items 
-        SET active = $1 
+        UPDATE items
+        SET active = $1
         WHERE id = $2
     `
     await runQuery(query, [active, id])
 }
 
-export const modifyItemCursorByItemId = async (
+export const modifyItemLastRefreshedByItemId = async (
     itemId: string,
-    cursor: string | null
+    lastRefreshed: Date
 ) => {
     const query = `
-        UPDATE items 
-        SET cursor = $1 
+        UPDATE items
+        SET last_refreshed = $1
         WHERE item_id = $2
     `
-    await runQuery(query, [cursor, itemId])
+    await runQuery(query, [lastRefreshed, itemId])
+}
+
+export const modifyItemDataByItemId = async (
+    itemId: string,
+    cursor: string | null,
+    lastSynced: Date
+) => {
+    const query = `
+        UPDATE items
+        SET
+            cursor = $1,
+            last_synced = $2,
+            last_refreshed = $2
+        WHERE item_id = $3
+    `
+    await runQuery(query, [cursor, lastSynced, itemId])
 }
 
 interface DbItem {
@@ -115,6 +135,8 @@ interface DbItem {
     institution_name: string
     healthy: boolean
     cursor: string | null
+    last_synced: Date | null
+    last_refreshed: Date | null
 }
 
 const mapDbItem = (dbItem: DbItem): Item => ({
@@ -127,4 +149,6 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     institutionName: dbItem.institution_name,
     healthy: dbItem.healthy,
     cursor: dbItem.cursor,
+    lastSynced: dbItem.last_synced,
+    lastRefreshed: dbItem.last_refreshed,
 })

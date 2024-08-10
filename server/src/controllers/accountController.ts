@@ -14,6 +14,7 @@ export const getUserAccounts = async (req: Request, res: Response) => {
         return res.send(accounts)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to get accounts')
     }
 }

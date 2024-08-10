@@ -44,6 +44,7 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
         return logout(req, res)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to delete current user')
     }
 }
@@ -59,6 +60,7 @@ export const checkUsernameExists = async (req: Request, res: Response) => {
         return res.send(!!user)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to check if user with username exists')
     }
 }
@@ -74,6 +76,7 @@ export const checkEmailExists = async (req: Request, res: Response) => {
         return res.send(!!user)
     } catch (error) {
         logger.error(error)
+        if (error instanceof HttpError) throw error
         throw Error('failed to check if user with email exists')
     }
 }

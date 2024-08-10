@@ -75,7 +75,7 @@ export const logRequestResponse = (
         id: -1,
         requestId,
         userId: req.session?.user?.id ?? null,
-        timestamp: new Date(),
+        timestamp,
         duration: -1,
         method: req.method,
         url: req.baseUrl + req.path,

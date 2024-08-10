@@ -1,6 +1,22 @@
 <app-loading-spinner [loading]="loading"></app-loading-spinner>
 
-<h2 class="text-center mb-3">Transactions</h2>
+<div class="container-fluid position-relative mb-3">
+    <h2 class="text-center mb-0">Transactions</h2>
+    <button
+        (click)="refreshTransactions()"
+        class="btn btn-primary d-none d-sm-block position-absolute top-left"
+        type="button"
+    >
+        Refresh Transactions
+    </button>
+    <button
+        (click)="refreshTransactions()"
+        class="btn btn-primary d-block d-sm-none position-absolute top-left"
+        type="button"
+    >
+        <i class="bi bi-arrow-clockwise"></i>
+    </button>
+</div>
 
 @if (!transactions.length) {
     <div class="container-fluid">
