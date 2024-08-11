@@ -17,3 +17,10 @@ export interface Transaction {
     date: Date
     pending: boolean
 }
+
+export interface PaginatedTransactions {
+    transactions: Transaction[]
+    limit: number
+    offset: number
+    total: number
+}

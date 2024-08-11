@@ -1,4 +1,4 @@
-import { Transaction } from '../models/transaction.js'
+import { PaginatedTransactions, Transaction } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
@@ -88,10 +88,65 @@ export const fetchActiveTransactionsByUserId = async (
                     WHERE user_id = $1
                 )
             )
-        ORDER BY date DESC
+        ORDER BY t.date DESC, t.transaction_id
     `
     const rows = (await runQuery<DbTransaction>(query, [userId])).rows
     return rows.map(mapDbTransaction)
+}
+
+const fetchTotalActiveTransactionsByUserId = async (
+    userId: number
+): Promise<number | undefined> => {
+    const query = `
+        SELECT COUNT(*)
+        FROM transactions t
+        WHERE
+            t.account_id IN (
+                SELECT id
+                FROM accounts
+                WHERE item_id IN (
+                    SELECT id
+                    FROM active_items
+                    WHERE user_id = $1
+                )
+            )
+    `
+    const rows = (await runQuery<{ count: number }>(query, [userId])).rows
+    if (!rows[0]) return
+    return rows[0].count
+}
+
+export const fetchPaginatedActiveTransactionsByUserId = async (
+    userId: number,
+    limit: number,
+    offset: number
+): Promise<PaginatedTransactions> => {
+    const query = `
+        SELECT t.*
+        FROM transactions t
+        WHERE
+            t.account_id IN (
+                SELECT id
+                FROM accounts
+                WHERE item_id IN (
+                    SELECT id
+                    FROM active_items
+                    WHERE user_id = $1
+                )
+            )
+        ORDER BY t.date DESC, t.transaction_id
+        LIMIT $2
+        OFFSET $3
+    `
+    const rows = (await runQuery<DbTransaction>(query, [userId, limit, offset]))
+        .rows
+    const total = (await fetchTotalActiveTransactionsByUserId(userId)) ?? -1
+    return {
+        transactions: rows.map(mapDbTransaction),
+        limit,
+        offset,
+        total,
+    }
 }
 
 export const updateTransactionCustomNameById = async (

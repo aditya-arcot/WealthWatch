@@ -22,18 +22,24 @@ import { TransactionService } from '../../services/transaction.service'
     styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent implements OnInit {
-    maxNameLength = 30
+    loading = false
     transactions: Transaction[] = []
     categories: Category[] = []
     accounts: Account[] = []
     items: Item[] = []
+
+    pageSizes = [10, 25, 50, 100]
+    pageSizeIndex = 0
+    currentPage = 1
+    totalTransactions = -1
+
+    maxNameLength = 30
     currencyFormatters: Record<string, Intl.NumberFormat> = {
         USD: new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD',
         }),
     }
-    loading = false
 
     constructor(
         private transactionSvc: TransactionService,
@@ -109,10 +115,13 @@ export class TransactionsComponent implements OnInit {
     }
 
     loadTransactions(): Observable<void> {
-        return this.transactionSvc.getTransactions().pipe(
-            switchMap((transactions) => {
-                this.logger.debug('loaded transactions', transactions)
-                this.transactions = transactions
+        const limit = this.pageSizes[this.pageSizeIndex]
+        const offset = (this.currentPage - 1) * limit
+        return this.transactionSvc.getPaginatedTransactions(limit, offset).pipe(
+            switchMap((paginatedTransactions) => {
+                this.logger.debug('loaded transactions', paginatedTransactions)
+                this.transactions = paginatedTransactions.transactions
+                this.totalTransactions = paginatedTransactions.total
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -141,6 +150,60 @@ export class TransactionsComponent implements OnInit {
                 ])
                 this.loading = false
             })
+    }
+
+    getPageSize(): number {
+        return this.pageSizes[this.pageSizeIndex]
+    }
+
+    updatePageSize(target: EventTarget | null): void {
+        if (!target) return
+        const element = target as HTMLSelectElement
+        this.pageSizeIndex = element.selectedIndex
+        this.currentPage = 1
+        this.loadTransactions().subscribe()
+    }
+
+    getTotalPages(): number {
+        return Math.ceil(this.totalTransactions / this.getPageSize())
+    }
+
+    getStartTransactionNumber(): number {
+        return this.getPageSize() * (this.currentPage - 1) + 1
+    }
+
+    getEndTransactionNumber(): number {
+        if (this.currentPage === this.getTotalPages()) {
+            return this.totalTransactions
+        }
+        return this.getPageSize() * this.currentPage
+    }
+
+    navigateToFirstPage(): void {
+        if (this.currentPage === 1) return
+        this.currentPage = 1
+        this.loadTransactions().subscribe()
+    }
+
+    navigateToPreviousPage(): void {
+        if (this.currentPage === 1) return
+        this.currentPage--
+        if (this.currentPage < 1) this.currentPage = 1
+        this.loadTransactions().subscribe()
+    }
+
+    navigateToNextPage(): void {
+        if (this.currentPage === this.getTotalPages()) return
+        this.currentPage++
+        if (this.currentPage > this.getTotalPages())
+            this.currentPage = this.getTotalPages()
+        this.loadTransactions().subscribe()
+    }
+
+    navigateToLastPage(): void {
+        if (this.currentPage === this.getTotalPages()) return
+        this.currentPage = this.getTotalPages()
+        this.loadTransactions().subscribe()
     }
 
     getDisplayName(t: Transaction): string {
@@ -189,7 +252,7 @@ export class TransactionsComponent implements OnInit {
             .subscribe()
     }
 
-    getDisplayCurrency(t: Transaction): string {
+    getDisplayAmount(t: Transaction): string {
         const currency = t.unofficialCurrencyCode ?? t.isoCurrencyCode
         if (!currency) return t.amount.toString()
 
@@ -281,6 +344,15 @@ export class TransactionsComponent implements OnInit {
             this.logger.error('unrecognized account id', t.accountId)
             return ''
         }
+        return account.name
+    }
+
+    getDisplayInstitution(t: Transaction): string {
+        const account = this.accounts.find((a) => a.id === t.accountId)
+        if (!account) {
+            this.logger.error('unrecognized account id', t.accountId)
+            return ''
+        }
 
         const item = this.items.find((i) => i.id === account.itemId)
         if (!item) {
@@ -288,6 +360,6 @@ export class TransactionsComponent implements OnInit {
             return account.name
         }
 
-        return `${account.name} (${item.institutionName})`
+        return item.institutionName
     }
 }

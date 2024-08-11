@@ -5,6 +5,7 @@ import {
 } from '../database/itemQueries.js'
 import {
     fetchActiveTransactionsByUserId,
+    fetchPaginatedActiveTransactionsByUserId,
     updateTransactionCustomCategoryIdById,
     updateTransactionCustomNameById,
 } from '../database/transactionQueries.js'
@@ -26,6 +27,39 @@ export const getUserTransactions = async (req: Request, res: Response) => {
         logger.error(error)
         if (error instanceof HttpError) throw error
         throw Error('failed to get transactions')
+    }
+}
+
+export const getPaginatedUserTransactions = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('getting paginated transactions')
+
+    const userId: number | undefined = req.session.user?.id
+    if (!userId) throw new HttpError('missing user id', 400)
+
+    const limit: string | undefined = req.query['limit'] as string
+    if (!limit) throw new HttpError('missing limit', 400)
+    const limitNum = parseInt(limit)
+    if (isNaN(limitNum)) throw new HttpError('invalid limit', 400)
+
+    const offset: string | undefined = req.query['offset'] as string
+    if (!offset) throw new HttpError('missing offset', 400)
+    const offsetNum = parseInt(offset)
+    if (isNaN(offsetNum)) throw new HttpError('invalid offset', 400)
+
+    try {
+        const transactions = await fetchPaginatedActiveTransactionsByUserId(
+            userId,
+            limitNum,
+            offsetNum
+        )
+        return res.send(transactions)
+    } catch (error) {
+        logger.error(error)
+        if (error instanceof HttpError) throw error
+        throw Error('failed to get paginated transactions')
     }
 }
 

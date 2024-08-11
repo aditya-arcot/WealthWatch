@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
-import { Transaction } from '../models/transaction'
+import { PaginatedTransactions, Transaction } from '../models/transaction'
 
 @Injectable({
     providedIn: 'root',
@@ -11,8 +11,9 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
-    getTransactions() {
-        return this.http.get<Transaction[]>(this.baseUrl)
+    getPaginatedTransactions(limit: number, offset: number) {
+        const url = `${this.baseUrl}/paginated?limit=${limit}&offset=${offset}`
+        return this.http.get<PaginatedTransactions>(url)
     }
 
     updateTransactionCustomName(t: Transaction) {

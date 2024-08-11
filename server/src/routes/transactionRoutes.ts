@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+    getPaginatedUserTransactions,
     getUserTransactions,
     refreshUserTransactions,
     updateTransactionCustomCategoryId,
@@ -36,6 +37,53 @@ const router = express.Router()
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.route('/').get(authenticate, catchAsync(getUserTransactions))
+
+/**
+ * @swagger
+ * /transactions/paginated:
+ *   get:
+ *     summary: Retrieve the logged in user's paginated transactions
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The number of transactions to retrieve
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The number of transactions to skip
+ *     responses:
+ *       200:
+ *         description: Retrieved a list of the logged in user's paginated transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Transaction'
+ *                 limit:
+ *                   type: integer
+ *                   description: The number of transactions retrieved
+ *                 offset:
+ *                   type: integer
+ *                   description: The number of transactions skipped
+ *                 total:
+ *                   type: integer
+ *                   description: The total number of transactions
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/paginated')
+    .get(authenticate, catchAsync(getPaginatedUserTransactions))
 
 /**
  * @swagger
