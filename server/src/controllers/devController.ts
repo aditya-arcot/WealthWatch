@@ -19,6 +19,7 @@ import {
 import { plaidFireWebhook } from '../plaid/webhookMethods.js'
 import { queueItemSync } from '../queues/itemSyncQueue.js'
 import { logger } from '../utils/logger.js'
+import { refreshItemTransactionsMain } from './itemController.js'
 
 export const deleteAllUsers = async (req: Request, res: Response) => {
     logger.debug('deleting all users')
@@ -53,19 +54,6 @@ const deactivateItems = async (deleteUsers: boolean) => {
             }
         })
     )
-}
-
-export const syncItem = async (req: Request, res: Response) => {
-    logger.debug('syncing item')
-
-    const itemId: string | undefined = req.query['itemId'] as string
-    if (!itemId) throw new HttpError('missing item id', 400)
-
-    const item = await fetchActiveItemById(itemId)
-    if (!item) throw new HttpError('item not found', 404)
-
-    await queueItemSync(item)
-    return res.status(202).send()
 }
 
 export const createSandboxItem = async (req: Request, res: Response) => {
@@ -106,6 +94,32 @@ export const createSandboxItem = async (req: Request, res: Response) => {
 
     await queueItemSync(newItem)
 
+    return res.status(204).send()
+}
+
+export const syncItem = async (req: Request, res: Response) => {
+    logger.debug('syncing item')
+
+    const itemId: string | undefined = req.query['itemId'] as string
+    if (!itemId) throw new HttpError('missing item id', 400)
+
+    const item = await fetchActiveItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    await queueItemSync(item)
+    return res.status(202).send()
+}
+
+export const forceRefreshItemTransactions = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('force refreshing item transactions')
+
+    const itemId: string | undefined = req.query['itemId'] as string
+    if (!itemId) throw new HttpError('missing item id', 400)
+
+    await refreshItemTransactionsMain(itemId, false)
     return res.status(204).send()
 }
 

@@ -57,22 +57,31 @@ export const refreshItemTransactions = async (req: Request, res: Response) => {
     if (!itemId) throw new HttpError('missing item id', 400)
 
     try {
-        const item = await fetchActiveItemById(itemId)
-        if (!item) throw new HttpError('item not found', 404)
-
-        const lastRefresh = item.lastRefreshed?.getTime() || 0
-        if (Date.now() - lastRefresh < refreshCooldown) {
-            throw new HttpError('item refresh cooldown', 429)
-        }
-
-        await plaidRefreshTransactions(item)
-        await modifyItemLastRefreshedByItemId(item.itemId, new Date())
+        await refreshItemTransactionsMain(itemId)
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
         if (error instanceof HttpError) throw error
         throw Error('failed to refresh item transactions')
     }
+}
+
+export const refreshItemTransactionsMain = async (
+    itemId: string,
+    checkCooldown = true
+) => {
+    const item = await fetchActiveItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    if (checkCooldown) {
+        const lastRefresh = item.lastRefreshed?.getTime() || 0
+        if (Date.now() - lastRefresh < refreshCooldown) {
+            throw new HttpError('item refresh cooldown', 429)
+        }
+    }
+
+    await plaidRefreshTransactions(item)
+    await modifyItemLastRefreshedByItemId(item.itemId, new Date())
 }
 
 export const deactivateItem = async (req: Request, res: Response) => {

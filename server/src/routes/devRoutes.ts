@@ -4,6 +4,7 @@ import {
     deactivateAllItems,
     deleteAllUsers,
     fireSandboxWebhook,
+    forceRefreshItemTransactions,
     resetSandboxItemLogin,
     syncItem,
 } from '../controllers/devController.js'
@@ -44,6 +45,18 @@ router.route('/items').delete(catchAsync(deactivateAllItems))
 
 /**
  * @swagger
+ * /dev/item:
+ *   post:
+ *     summary: Create an item (Chase)
+ *     tags: [Dev]
+ *     responses:
+ *       204:
+ *         description: Created the item, queued it for sync
+ */
+router.route('/item').post(catchAsync(createSandboxItem))
+
+/**
+ * @swagger
  * /dev/item/sync:
  *   post:
  *     summary: Sync an item
@@ -62,15 +75,22 @@ router.route('/item/sync').post(catchAsync(syncItem))
 
 /**
  * @swagger
- * /dev/item:
+ * /dev/item/refresh-transactions:
  *   post:
- *     summary: Create an item (Chase)
+ *     summary: Force refresh an item's transactions (ignore cooldown)
  *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
  *     responses:
  *       204:
- *         description: Created the item, queued it for sync
+ *         description: Refreshed the item's transactions
  */
-router.route('/item').post(catchAsync(createSandboxItem))
+router
+    .route('/item/refresh-transactions')
+    .post(catchAsync(forceRefreshItemTransactions))
 
 /**
  * @swagger
