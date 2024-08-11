@@ -7,6 +7,7 @@ import {
 import { insertAccounts } from '../database/accountQueries.js'
 import { modifyItemDataByItemId } from '../database/itemQueries.js'
 import {
+    fetchActiveTransactionsByUserId,
     insertTransactions,
     removeTransactionsByTransactionIds,
 } from '../database/transactionQueries.js'
@@ -41,16 +42,25 @@ export const plaidSyncItemData = async (item: Item) => {
         logger.debug('updating transactions')
         const { added, modified, removed, cursor } =
             await plaidRetrieveTransactionUpdates(item)
-        added.concat(modified)
 
+        // modified transactions handled by on conflict in insert
+        added.concat(modified)
         if (added.length) {
+            const existingTransactions = await fetchActiveTransactionsByUserId(
+                item.userId
+            )
             const transactions = await insertTransactions(
                 added.map((t) => {
-                    const id = accounts.find(
+                    const accountId = accounts.find(
                         (acc) => acc.accountId === t.account_id
                     )?.id
-                    if (!id) throw Error('transaction has no matching account')
-                    return mapPlaidTransaction(t, id)
+                    if (!accountId)
+                        throw Error('transaction has no matching account')
+                    return mapPlaidTransaction(
+                        t,
+                        accountId,
+                        existingTransactions
+                    )
                 })
             )
             if (!transactions) throw Error('transactions not created')
