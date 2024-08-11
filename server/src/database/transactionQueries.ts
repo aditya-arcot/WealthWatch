@@ -30,6 +30,7 @@ export const insertTransactions = async (
 
     const rowCount = transactions.length
     const paramCount = Math.floor(values.length / rowCount)
+    // preserve custom name, custom category id
     const query = `
         INSERT INTO transactions (
             account_id,
@@ -55,11 +56,10 @@ export const insertTransactions = async (
             merchant_id = EXCLUDED.merchant_id,
             merchant = EXCLUDED.merchant,
             name = EXCLUDED.name,
-            custom_name = EXCLUDED.custom_name,
             amount = EXCLUDED.amount,
-            category_id = EXCLUDED.category_id,
             primary_category = EXCLUDED.primary_category,
             detailed_category = EXCLUDED.detailed_category,
+            category_id = EXCLUDED.category_id,
             payment_channel = EXCLUDED.payment_channel,
             iso_currency_code = EXCLUDED.iso_currency_code,
             unofficial_currency_code = EXCLUDED.unofficial_currency_code,

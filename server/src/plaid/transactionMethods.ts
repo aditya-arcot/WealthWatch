@@ -62,11 +62,24 @@ export const plaidRetrieveTransactionUpdates = async (item: Item) => {
 
 export const mapPlaidTransaction = (
     transaction: PlaidTransaction,
-    accountId: number
+    accountId: number,
+    existingTransactions: Transaction[]
 ): Transaction => {
+    let customName = null
+    let customCategoryId = null
     const primaryCategory = transaction.personal_finance_category?.primary
     const detailedCategory = transaction.personal_finance_category?.detailed
     const categoryId = mapPlaidCategory(primaryCategory, detailedCategory)
+
+    // link previous pending transaction
+    const pendingTransaction = existingTransactions.find(
+        (t) => t.transactionId === transaction.pending_transaction_id
+    )
+    if (pendingTransaction) {
+        customName = pendingTransaction.customName
+        customCategoryId = pendingTransaction.customCategoryId
+    }
+
     return {
         id: 0,
         accountId,
@@ -74,12 +87,12 @@ export const mapPlaidTransaction = (
         merchantId: transaction.merchant_entity_id ?? null,
         merchant: transaction.merchant_name ?? null,
         name: transaction.name,
-        customName: null,
+        customName,
         amount: transaction.amount,
         primaryCategory: primaryCategory ?? null,
         detailedCategory: detailedCategory ?? null,
         categoryId,
-        customCategoryId: null,
+        customCategoryId,
         paymentChannel: transaction.payment_channel,
         isoCurrencyCode: transaction.iso_currency_code,
         unofficialCurrencyCode: transaction.unofficial_currency_code,

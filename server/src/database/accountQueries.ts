@@ -45,9 +45,16 @@ export const insertAccounts = async (
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         ON CONFLICT (account_id)
         DO UPDATE SET
+            name = EXCLUDED.name,
+            mask = EXCLUDED.mask,
+            official_name = EXCLUDED.official_name,
             current_balance = EXCLUDED.current_balance,
             available_balance = EXCLUDED.available_balance,
-            credit_limit = EXCLUDED.credit_limit
+            iso_currency_code = EXCLUDED.iso_currency_code,
+            unofficial_currency_code = EXCLUDED.unofficial_currency_code,
+            credit_limit = EXCLUDED.credit_limit,
+            type = EXCLUDED.type,
+            subtype = EXCLUDED.subtype
         RETURNING *
     `
 
