@@ -64,7 +64,7 @@ export class TransactionsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.searchSubject.pipe(debounceTime(100)).subscribe(() => {
+        this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
             this.performSearch()
         })
         this.loadData()
