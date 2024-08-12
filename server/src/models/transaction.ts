@@ -18,9 +18,10 @@ export interface Transaction {
     pending: boolean
 }
 
-export interface PaginatedTransactions {
+export interface TransactionsResponse {
     transactions: Transaction[]
-    limit: number
-    offset: number
+    searchQuery: string | null
+    limit: number | null
+    offset: number | null
     total: number
 }

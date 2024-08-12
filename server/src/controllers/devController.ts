@@ -100,7 +100,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
 export const syncItem = async (req: Request, res: Response) => {
     logger.debug('syncing item')
 
-    const itemId: string | undefined = req.query['itemId'] as string
+    const itemId = req.query['itemId'] as string | undefined
     if (!itemId) throw new HttpError('missing item id', 400)
 
     const item = await fetchActiveItemById(itemId)
@@ -116,7 +116,7 @@ export const forceRefreshItemTransactions = async (
 ) => {
     logger.debug('force refreshing item transactions')
 
-    const itemId: string | undefined = req.query['itemId'] as string
+    const itemId = req.query['itemId'] as string | undefined
     if (!itemId) throw new HttpError('missing item id', 400)
 
     await refreshItemTransactionsMain(itemId, false)
@@ -126,7 +126,7 @@ export const forceRefreshItemTransactions = async (
 export const resetSandboxItemLogin = async (req: Request, res: Response) => {
     logger.debug('resetting sandbox item login')
 
-    const itemId: string | undefined = req.query['itemId'] as string
+    const itemId = req.query['itemId'] as string | undefined
     if (!itemId) throw new HttpError('missing item id', 400)
 
     const item = await fetchActiveItemById(itemId)
@@ -140,10 +140,10 @@ export const resetSandboxItemLogin = async (req: Request, res: Response) => {
 export const fireSandboxWebhook = async (req: Request, res: Response) => {
     logger.debug('firing sandbox webhook')
 
-    const itemId: string | undefined = req.query['itemId'] as string
+    const itemId = req.query['itemId'] as string | undefined
     if (!itemId) throw new HttpError('missing item id', 400)
 
-    const code: string | undefined = req.query['code'] as string
+    const code = req.query['code'] as string | undefined
     if (!code) throw new HttpError('missing webhook code', 400)
 
     const item = await fetchActiveItemById(itemId)

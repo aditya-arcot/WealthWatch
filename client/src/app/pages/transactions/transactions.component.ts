@@ -1,12 +1,21 @@
 import { DatePipe, DecimalPipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
+import { FormsModule } from '@angular/forms'
+import {
+    catchError,
+    debounceTime,
+    Observable,
+    of,
+    Subject,
+    switchMap,
+    throwError,
+} from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import { Category, CategoryEnum } from '../../models/category'
 import { Item } from '../../models/item'
-import { Transaction } from '../../models/transaction'
+import { Transaction, TransactionsRequest } from '../../models/transaction'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
@@ -17,7 +26,7 @@ import { TransactionService } from '../../services/transaction.service'
 @Component({
     selector: 'app-transactions',
     standalone: true,
-    imports: [DecimalPipe, DatePipe, LoadingSpinnerComponent],
+    imports: [DecimalPipe, DatePipe, LoadingSpinnerComponent, FormsModule],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
 })
@@ -32,6 +41,10 @@ export class TransactionsComponent implements OnInit {
     pageSizeIndex = 0
     currentPage = 1
     totalTransactions = -1
+
+    searchSubject = new Subject<string>()
+    previousSearchText = ''
+    searchText: string | null = null
 
     maxNameLength = 30
     currencyFormatters: Record<string, Intl.NumberFormat> = {
@@ -51,6 +64,9 @@ export class TransactionsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        this.searchSubject.pipe(debounceTime(100)).subscribe(() => {
+            this.performSearch()
+        })
         this.loadData()
     }
 
@@ -117,7 +133,12 @@ export class TransactionsComponent implements OnInit {
     loadTransactions(): Observable<void> {
         const limit = this.pageSizes[this.pageSizeIndex]
         const offset = (this.currentPage - 1) * limit
-        return this.transactionSvc.getPaginatedTransactions(limit, offset).pipe(
+        const req: TransactionsRequest = {
+            searchQuery: this.searchText,
+            limit,
+            offset,
+        }
+        return this.transactionSvc.getTransactions(req).pipe(
             switchMap((paginatedTransactions) => {
                 this.logger.debug('loaded transactions', paginatedTransactions)
                 this.transactions = paginatedTransactions.transactions
@@ -203,6 +224,25 @@ export class TransactionsComponent implements OnInit {
     navigateToLastPage(): void {
         if (this.currentPage === this.getTotalPages()) return
         this.currentPage = this.getTotalPages()
+        this.loadTransactions().subscribe()
+    }
+
+    search(): void {
+        const modifiedSearchText = this.searchText?.trim().toLowerCase() ?? ''
+        if (modifiedSearchText === this.previousSearchText) return
+        this.previousSearchText = modifiedSearchText
+
+        this.currentPage = 1
+
+        this.searchSubject.next(modifiedSearchText)
+    }
+
+    clearSearch(): void {
+        this.searchText = ''
+        this.search()
+    }
+
+    private performSearch(): void {
         this.loadTransactions().subscribe()
     }
 

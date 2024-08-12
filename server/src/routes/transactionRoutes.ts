@@ -1,6 +1,5 @@
 import express from 'express'
 import {
-    getPaginatedUserTransactions,
     getUserTransactions,
     refreshUserTransactions,
     updateTransactionCustomCategoryId,
@@ -24,42 +23,25 @@ const router = express.Router()
  *   get:
  *     summary: Retrieve the logged in user's transactions
  *     tags: [Transactions]
- *     responses:
- *       200:
- *         description: Retrieved a list of the logged in user's transactions
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Transaction'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.route('/').get(authenticate, catchAsync(getUserTransactions))
-
-/**
- * @swagger
- * /transactions/paginated:
- *   get:
- *     summary: Retrieve the logged in user's paginated transactions
- *     tags: [Transactions]
  *     parameters:
+ *       - in: query
+ *         name: searchQuery
+ *         schema:
+ *           type: string
+ *         description: The search query
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         required: true
  *         description: The number of transactions to retrieve
  *       - in: query
  *         name: offset
  *         schema:
  *           type: integer
- *         required: true
  *         description: The number of transactions to skip
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's paginated transactions
+ *         description: Retrieved a list of the logged in user's transactions
  *         content:
  *           application/json:
  *             schema:
@@ -81,9 +63,7 @@ router.route('/').get(authenticate, catchAsync(getUserTransactions))
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router
-    .route('/paginated')
-    .get(authenticate, catchAsync(getPaginatedUserTransactions))
+router.route('/').get(authenticate, catchAsync(getUserTransactions))
 
 /**
  * @swagger
