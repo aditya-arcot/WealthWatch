@@ -1,3 +1,9 @@
+export interface TransactionsRequest {
+    searchQuery?: string | null
+    limit?: number
+    offset?: number
+}
+
 export interface Transaction {
     id: number
     accountId: number
@@ -16,4 +22,12 @@ export interface Transaction {
     unofficialCurrencyCode: string | null
     date: Date
     pending: boolean
+}
+
+export interface TransactionsResponse {
+    transactions: Transaction[]
+    searchQuery: string | null
+    limit: number | null
+    offset: number | null
+    total: number
 }

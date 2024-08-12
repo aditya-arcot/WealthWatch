@@ -19,8 +19,31 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     const userId: number | undefined = req.session.user?.id
     if (!userId) throw new HttpError('missing user id', 400)
 
+    const searchQuery = req.query['searchQuery'] as string | undefined
+
+    const limit = req.query['limit'] as string | undefined
+    let limitNum: number | undefined
+    if (limit) {
+        limitNum = parseInt(limit)
+        if (isNaN(limitNum) || limitNum < 0)
+            throw new HttpError('invalid limit', 400)
+    }
+
+    const offset = req.query['offset'] as string | undefined
+    let offsetNum: number | undefined
+    if (offset) {
+        offsetNum = parseInt(offset)
+        if (isNaN(offsetNum) || offsetNum < 0)
+            throw new HttpError('invalid offset', 400)
+    }
+
     try {
-        const transactions = await fetchActiveTransactionsByUserId(userId)
+        const transactions = await fetchActiveTransactionsByUserId(
+            userId,
+            searchQuery,
+            limitNum,
+            offsetNum
+        )
         return res.send(transactions)
     } catch (error) {
         logger.error(error)

@@ -75,6 +75,7 @@ export const fetchActiveAccountsByUserId = async (
                 FROM active_items
                 WHERE user_id = $1
             )
+        ORDER BY a.account_id
     `
     const rows = (await runQuery<DbAccount>(query, [userId])).rows
     return rows.map(mapDbAccount)

@@ -1,7 +1,11 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
-import { Transaction } from '../models/transaction'
+import {
+    Transaction,
+    TransactionsRequest,
+    TransactionsResponse,
+} from '../models/transaction'
 
 @Injectable({
     providedIn: 'root',
@@ -11,8 +15,18 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
-    getTransactions() {
-        return this.http.get<Transaction[]>(this.baseUrl)
+    getTransactions(req: TransactionsRequest) {
+        let params = new HttpParams()
+        if (req.searchQuery) {
+            params = params.set('searchQuery', req.searchQuery)
+        }
+        if (req.limit) {
+            params = params.set('limit', req.limit)
+        }
+        if (req.offset) {
+            params = params.set('offset', req.offset)
+        }
+        return this.http.get<TransactionsResponse>(this.baseUrl, { params })
     }
 
     updateTransactionCustomName(t: Transaction) {

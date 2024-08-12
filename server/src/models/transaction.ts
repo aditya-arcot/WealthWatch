@@ -17,3 +17,11 @@ export interface Transaction {
     date: Date
     pending: boolean
 }
+
+export interface TransactionsResponse {
+    transactions: Transaction[]
+    searchQuery: string | null
+    limit: number | null
+    offset: number | null
+    total: number
+}

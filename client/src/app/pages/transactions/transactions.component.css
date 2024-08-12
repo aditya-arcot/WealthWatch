@@ -4,12 +4,34 @@
     transform: translateY(-50%);
 }
 
-.pending-text {
-    color: grey;
+.small-text {
+    font-size: 14px;
+}
+
+.center-span {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.pagination .page-item .page-link {
+    color: black;
+}
+
+.pagination .page-item .page-link.current-page {
+    pointer-events: none;
+}
+
+.pagination .page-item .page-link:not(.current-page) {
+    cursor: pointer;
 }
 
 td {
     font-size: 14px;
+}
+
+.pending-text {
+    color: grey;
 }
 
 .icon-btn {

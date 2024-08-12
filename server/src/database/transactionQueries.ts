@@ -1,4 +1,4 @@
-import { Transaction } from '../models/transaction.js'
+import { Transaction, TransactionsResponse } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
@@ -72,11 +72,11 @@ export const insertTransactions = async (
     return rows.map(mapDbTransaction)
 }
 
-export const fetchActiveTransactionsByUserId = async (
+const fetchTotalActiveTransactionsByUserId = async (
     userId: number
-): Promise<Transaction[]> => {
+): Promise<number | undefined> => {
     const query = `
-        SELECT t.*
+        SELECT COUNT(*)
         FROM transactions t
         WHERE
             t.account_id IN (
@@ -88,10 +88,84 @@ export const fetchActiveTransactionsByUserId = async (
                     WHERE user_id = $1
                 )
             )
-        ORDER BY date DESC
     `
-    const rows = (await runQuery<DbTransaction>(query, [userId])).rows
-    return rows.map(mapDbTransaction)
+    const rows = (await runQuery<{ count: number }>(query, [userId])).rows
+    if (!rows[0]) return
+    return rows[0].count
+}
+
+export const fetchActiveTransactionsByUserId = async (
+    userId: number,
+    searchQuery?: string,
+    limit?: number,
+    offset?: number
+): Promise<TransactionsResponse> => {
+    const total = (await fetchTotalActiveTransactionsByUserId(userId)) ?? -1
+
+    let placeholder = 1
+    const values: unknown[] = []
+
+    // main query
+    let query = `
+        SELECT t.*
+        FROM transactions t
+        WHERE
+            t.account_id IN (
+                SELECT id
+                FROM accounts
+                WHERE item_id IN (
+                    SELECT id
+                    FROM active_items
+                    WHERE user_id = $${placeholder}
+                )
+            )`
+    values.push(userId)
+    placeholder++
+
+    // search
+    if (searchQuery) {
+        query += `
+            AND (
+                LOWER(t.custom_name) LIKE $${placeholder} OR
+                LOWER(t.merchant) LIKE $${placeholder} OR
+                LOWER(t."name") LIKE $${placeholder}
+            )
+        `
+        values.push(`%${searchQuery.toLowerCase()}%`)
+        placeholder++
+    }
+
+    // sort
+    query += `
+        ORDER BY t.date DESC, t.transaction_id
+    `
+
+    // limit
+    if (limit) {
+        query += `
+            LIMIT $${placeholder}
+        `
+        values.push(limit)
+        placeholder++
+
+        // offset
+        if (offset) {
+            query += `
+                OFFSET $${placeholder}
+            `
+            values.push(offset)
+            placeholder++
+        }
+    }
+
+    const rows = (await runQuery<DbTransaction>(query, values)).rows
+    return {
+        transactions: rows.map(mapDbTransaction),
+        searchQuery: searchQuery ?? null,
+        limit: limit ?? null,
+        offset: limit ? (offset ?? null) : null,
+        total,
+    }
 }
 
 export const updateTransactionCustomNameById = async (

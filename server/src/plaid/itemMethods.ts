@@ -46,9 +46,9 @@ export const plaidSyncItemData = async (item: Item) => {
         // modified transactions handled by on conflict in insert
         added.concat(modified)
         if (added.length) {
-            const existingTransactions = await fetchActiveTransactionsByUserId(
-                item.userId
-            )
+            const existingTransactions = (
+                await fetchActiveTransactionsByUserId(item.userId)
+            ).transactions
             const transactions = await insertTransactions(
                 added.map((t) => {
                     const accountId = accounts.find(

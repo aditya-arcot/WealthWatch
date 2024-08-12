@@ -18,7 +18,7 @@
     </button>
 </div>
 
-@if (!transactions.length) {
+@if (!totalTransactions) {
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-10 col-sm-8 col-md-6 col-xl-4">
@@ -33,90 +33,237 @@
 } @else {
     <div class="card mb-2">
         <div class="card-body">
-            <table
-                class="table table-striped table-hover table-sm table-bordered align-middle text-center mb-0"
+            <div
+                class="d-flex justify-content-center justify-content-sm-between align-items-center mb-2"
             >
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Account</th>
-                    </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                    @for (t of transactions; track $index) {
-                        <tr>
-                            <td>
-                                {{ t.date | date: 'shortDate' }}
-                            </td>
-                            <td>
-                                <input
-                                    class="form-control form-control-sm"
-                                    type="text"
-                                    [value]="getDisplayName(t)"
-                                    (focus)="showFullName($event.target, t)"
-                                    (blur)="showDisplayName($event.target, t)"
-                                    (change)="updateName($event.target, t)"
-                                />
-                            </td>
-                            <td>
-                                {{ getDisplayCurrency(t) }}
-                                @if (t.pending) {
-                                    <span class="pending-text">(Pending)</span>
+                <div class="d-none d-sm-block">
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <label
+                                for="pageSize"
+                                class="col-form-label col-form-label-sm"
+                            >
+                                Page size:
+                            </label>
+                        </div>
+                        <div class="col-auto">
+                            <select
+                                id="pageSize"
+                                class="form-select form-select-sm"
+                                (change)="updatePageSize($event.target)"
+                            >
+                                @for (size of pageSizes; track $index) {
+                                    <option
+                                        [value]="size"
+                                        [selected]="size === getPageSize()"
+                                    >
+                                        {{ size }}
+                                    </option>
                                 }
-                            </td>
-                            <td>
-                                <div class="input-group input-group-sm">
-                                    <button
-                                        class="btn btn-outline-primary icon-btn"
-                                        type="button"
-                                    >
-                                        <i
-                                            [classList]="getCategoryClasses(t)"
-                                        ></i>
-                                    </button>
-                                    <select
-                                        class="form-select"
-                                        (change)="
-                                            updateCategory($event.target, t)
-                                        "
-                                    >
-                                        @for (
-                                            category of categories;
-                                            track $index
-                                        ) {
-                                            <option
-                                                [value]="category.id"
-                                                [selected]="
-                                                    category.id ===
-                                                    getDisplayCategory(t)
-                                                "
-                                            >
-                                                {{ category.name }}
-                                            </option>
-                                        }
-                                    </select>
-                                    <button
-                                        class="btn btn-outline-dark"
-                                        type="button"
-                                        title="Reset category"
-                                        (click)="resetCategory(t)"
-                                    >
-                                        <i
-                                            class="bi bi-arrow-counterclockwise"
-                                        ></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td>
-                                {{ getDisplayAccount(t) }}
-                            </td>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <span class="d-none d-md-inline small-text center-span">
+                    Transactions <b>{{ getStartTransactionNumber() }}</b> to
+                    <b>{{ getEndTransactionNumber() }}</b> of
+                    <b>{{ totalTransactions }}</b>
+                </span>
+
+                <ul class="pagination pagination-sm mb-0">
+                    <li
+                        class="page-item {{
+                            currentPage === 1 ? 'disabled' : ''
+                        }}"
+                        (click)="navigateToFirstPage()"
+                        (keydown.enter)="navigateToFirstPage()"
+                        (keydown.space)="navigateToFirstPage()"
+                        tabindex="0"
+                    >
+                        <a class="page-link">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+
+                    <li
+                        class="page-item {{
+                            currentPage === 1 ? 'disabled' : ''
+                        }}"
+                        (click)="navigateToPreviousPage()"
+                        (keydown.enter)="navigateToPreviousPage()"
+                        (keydown.space)="navigateToPreviousPage()"
+                        tabindex="0"
+                    >
+                        <a class="page-link">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item">
+                        <a class="page-link current-page"
+                            >Page {{ currentPage }} of {{ getTotalPages() }}</a
+                        >
+                    </li>
+
+                    <li
+                        class="page-item {{
+                            currentPage === getTotalPages() ? 'disabled' : ''
+                        }}"
+                        (click)="navigateToNextPage()"
+                        (keydown.enter)="navigateToNextPage()"
+                        (keydown.space)="navigateToNextPage()"
+                        tabindex="0"
+                    >
+                        <a class="page-link">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    <li
+                        class="page-item {{
+                            currentPage === getTotalPages() ? 'disabled' : ''
+                        }}"
+                        (click)="navigateToLastPage()"
+                        (keydown.enter)="navigateToLastPage()"
+                        (keydown.space)="navigateToLastPage()"
+                        tabindex="0"
+                    >
+                        <a class="page-link">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="input-group input-group-sm mb-3">
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Search by transaction name"
+                    [(ngModel)]="searchText"
+                    (input)="search()"
+                />
+                <button
+                    class="btn btn-outline-danger"
+                    type="button"
+                    title="Clear search"
+                    (click)="clearSearch()"
+                >
+                    <i class="bi bi-x-circle"></i> Clear
+                </button>
+            </div>
+
+            @if (!transactions.length) {
+                <h4 class="text-center mb-0">No results</h4>
+            } @else {
+                <table
+                    class="table table-striped table-hover table-sm table-bordered align-middle text-center mb-0"
+                >
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col" class="d-none d-sm-table-cell">
+                                Category
+                            </th>
+                            <th scope="col" class="d-none d-md-table-cell">
+                                Account
+                            </th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        @for (t of transactions; track $index) {
+                            <tr>
+                                <td>
+                                    {{ t.date | date: 'shortDate' }}
+                                </td>
+                                <td>
+                                    <input
+                                        class="form-control form-control-sm"
+                                        type="text"
+                                        [value]="getDisplayName(t)"
+                                        (focus)="showFullName($event.target, t)"
+                                        (blur)="
+                                            showDisplayName($event.target, t)
+                                        "
+                                        (change)="updateName($event.target, t)"
+                                    />
+                                </td>
+                                <td>
+                                    <div class="d-none d-lg-inline">
+                                        {{ getDisplayAmount(t) }}
+                                        @if (t.pending) {
+                                            <span class="pending-text"
+                                                >(Pending)</span
+                                            >
+                                        }
+                                    </div>
+                                    <div
+                                        class="d-inline d-lg-none {{
+                                            t.pending ? 'pending-text' : ''
+                                        }}"
+                                    >
+                                        {{ getDisplayAmount(t) }}
+                                    </div>
+                                </td>
+                                <td class="d-none d-sm-table-cell">
+                                    <div class="input-group input-group-sm">
+                                        <button
+                                            class="btn btn-outline-primary icon-btn d-none d-md-inline"
+                                            type="button"
+                                        >
+                                            <i
+                                                [classList]="
+                                                    getCategoryClasses(t)
+                                                "
+                                            ></i>
+                                        </button>
+                                        <select
+                                            class="form-select"
+                                            (change)="
+                                                updateCategory($event.target, t)
+                                            "
+                                        >
+                                            @for (
+                                                category of categories;
+                                                track $index
+                                            ) {
+                                                <option
+                                                    [value]="category.id"
+                                                    [selected]="
+                                                        category.id ===
+                                                        getDisplayCategory(t)
+                                                    "
+                                                >
+                                                    {{ category.name }}
+                                                </option>
+                                            }
+                                        </select>
+                                        <button
+                                            class="btn btn-outline-dark"
+                                            type="button"
+                                            title="Reset category"
+                                            (click)="resetCategory(t)"
+                                        >
+                                            <i
+                                                class="bi bi-arrow-counterclockwise"
+                                            ></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="d-none d-md-table-cell">
+                                    {{ getDisplayAccount(t) }}
+                                    <span class="d-none d-lg-inline"
+                                        >({{ getDisplayInstitution(t) }})</span
+                                    >
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
         </div>
     </div>
 }
