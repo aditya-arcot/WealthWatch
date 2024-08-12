@@ -89,9 +89,10 @@ const fetchTotalActiveTransactionsByUserId = async (
                 )
             )
     `
-    const rows = (await runQuery<{ count: number }>(query, [userId])).rows
+    const rows = (await runQuery<{ count: string }>(query, [userId])).rows
     if (!rows[0]) return
-    return rows[0].count
+    const countNum = parseInt(rows[0].count)
+    return isNaN(countNum) ? undefined : countNum
 }
 
 export const fetchActiveTransactionsByUserId = async (
