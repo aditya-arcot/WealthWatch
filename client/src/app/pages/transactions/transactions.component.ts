@@ -249,7 +249,9 @@ export class TransactionsComponent implements OnInit {
                     return throwError(() => err)
                 })
             )
-            .subscribe()
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert('Updated transaction name')
+            })
     }
 
     getDisplayAmount(t: Transaction): string {
@@ -290,7 +292,7 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomCategoryId(t)
     }
 
-    updateCustomCategoryId(t: Transaction): void {
+    private updateCustomCategoryId(t: Transaction): void {
         this.transactionSvc
             .updateTransactionCustomCategoryId(t)
             .pipe(
@@ -301,7 +303,9 @@ export class TransactionsComponent implements OnInit {
                     return throwError(() => err)
                 })
             )
-            .subscribe()
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert('Updated transaction category')
+            })
     }
 
     getCategoryClasses(t: Transaction): string {
