@@ -272,7 +272,7 @@ export class TransactionsComponent implements OnInit {
         if (!newName.length) newName = null
 
         const currentName = t.merchant ?? t.name
-        if (newName === currentName) return
+        if (newName === currentName) newName = null
 
         t.customName = newName
         this.updateCustomName(t)
