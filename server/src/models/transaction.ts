@@ -24,4 +24,5 @@ export interface TransactionsResponse {
     limit: number | null
     offset: number | null
     total: number
+    filteredTotal: number
 }

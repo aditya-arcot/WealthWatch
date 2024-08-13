@@ -33,108 +33,130 @@
 } @else {
     <div class="card mb-2">
         <div class="card-body">
-            <div
-                class="d-flex justify-content-center justify-content-sm-between align-items-center mb-2"
-            >
-                <div class="d-none d-sm-block">
-                    <div class="row g-2">
-                        <div class="col-auto">
-                            <label
-                                for="pageSize"
-                                class="col-form-label col-form-label-sm"
-                            >
-                                Page size:
-                            </label>
-                        </div>
-                        <div class="col-auto">
-                            <select
-                                id="pageSize"
-                                class="form-select form-select-sm"
-                                (change)="updatePageSize($event.target)"
-                            >
-                                @for (size of pageSizes; track $index) {
-                                    <option
-                                        [value]="size"
-                                        [selected]="size === getPageSize()"
-                                    >
-                                        {{ size }}
-                                    </option>
-                                }
-                            </select>
+            @if (transactions.length) {
+                <div
+                    class="d-flex justify-content-center justify-content-sm-between align-items-center mb-2"
+                >
+                    <div class="d-none d-sm-block">
+                        <div class="row g-2">
+                            <div class="col-auto">
+                                <label
+                                    for="pageSize"
+                                    class="col-form-label col-form-label-sm"
+                                >
+                                    Page size:
+                                </label>
+                            </div>
+                            <div class="col-auto">
+                                <select
+                                    id="pageSize"
+                                    class="form-select form-select-sm"
+                                    (change)="updatePageSize($event.target)"
+                                >
+                                    @for (size of pageSizes; track $index) {
+                                        <option
+                                            [value]="size"
+                                            [selected]="size === getPageSize()"
+                                        >
+                                            {{ size }}
+                                        </option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <span class="d-none d-md-inline small-text center-span">
-                    Transactions <b>{{ getStartTransactionNumber() }}</b> to
-                    <b>{{ getEndTransactionNumber() }}</b> of
-                    <b>{{ totalTransactions }}</b>
-                </span>
+                    <span class="d-none d-md-inline small-text center-span">
+                        Transactions <b>{{ getStartTransactionNumber() }}</b> to
+                        <b>{{ getEndTransactionNumber() }}</b> of
+                        <b>{{
+                            isFiltered()
+                                ? filteredTotalTransactions
+                                : totalTransactions
+                        }}</b>
+                        @if (isFiltered()) {
+                            @if (doneFiltering) {
+                                (<b>{{
+                                    totalTransactions -
+                                        filteredTotalTransactions
+                                }}</b>
+                                excluded)
+                            } @else {
+                                (...)
+                            }
+                        }
+                    </span>
 
-                <ul class="pagination pagination-sm mb-0">
-                    <li
-                        class="page-item {{
-                            currentPage === 1 ? 'disabled' : ''
-                        }}"
-                        (click)="navigateToFirstPage()"
-                        (keydown.enter)="navigateToFirstPage()"
-                        (keydown.space)="navigateToFirstPage()"
-                        tabindex="0"
-                    >
-                        <a class="page-link">
-                            <i class="bi bi-chevron-double-left"></i>
-                        </a>
-                    </li>
-
-                    <li
-                        class="page-item {{
-                            currentPage === 1 ? 'disabled' : ''
-                        }}"
-                        (click)="navigateToPreviousPage()"
-                        (keydown.enter)="navigateToPreviousPage()"
-                        (keydown.space)="navigateToPreviousPage()"
-                        tabindex="0"
-                    >
-                        <a class="page-link">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-
-                    <li class="page-item">
-                        <a class="page-link current-page"
-                            >Page {{ currentPage }} of {{ getTotalPages() }}</a
+                    <ul class="pagination pagination-sm mb-0">
+                        <li
+                            class="page-item {{
+                                currentPage === 1 ? 'disabled' : ''
+                            }}"
+                            (click)="navigateToFirstPage()"
+                            (keydown.enter)="navigateToFirstPage()"
+                            (keydown.space)="navigateToFirstPage()"
+                            tabindex="0"
                         >
-                    </li>
+                            <a class="page-link">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </a>
+                        </li>
 
-                    <li
-                        class="page-item {{
-                            currentPage === getTotalPages() ? 'disabled' : ''
-                        }}"
-                        (click)="navigateToNextPage()"
-                        (keydown.enter)="navigateToNextPage()"
-                        (keydown.space)="navigateToNextPage()"
-                        tabindex="0"
-                    >
-                        <a class="page-link">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
+                        <li
+                            class="page-item {{
+                                currentPage === 1 ? 'disabled' : ''
+                            }}"
+                            (click)="navigateToPreviousPage()"
+                            (keydown.enter)="navigateToPreviousPage()"
+                            (keydown.space)="navigateToPreviousPage()"
+                            tabindex="0"
+                        >
+                            <a class="page-link">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
 
-                    <li
-                        class="page-item {{
-                            currentPage === getTotalPages() ? 'disabled' : ''
-                        }}"
-                        (click)="navigateToLastPage()"
-                        (keydown.enter)="navigateToLastPage()"
-                        (keydown.space)="navigateToLastPage()"
-                        tabindex="0"
-                    >
-                        <a class="page-link">
-                            <i class="bi bi-chevron-double-right"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                        <li class="page-item">
+                            <a class="page-link current-page"
+                                >Page {{ currentPage }} of
+                                {{ getTotalPages() }}</a
+                            >
+                        </li>
+
+                        <li
+                            class="page-item {{
+                                currentPage === getTotalPages()
+                                    ? 'disabled'
+                                    : ''
+                            }}"
+                            (click)="navigateToNextPage()"
+                            (keydown.enter)="navigateToNextPage()"
+                            (keydown.space)="navigateToNextPage()"
+                            tabindex="0"
+                        >
+                            <a class="page-link">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+
+                        <li
+                            class="page-item {{
+                                currentPage === getTotalPages()
+                                    ? 'disabled'
+                                    : ''
+                            }}"
+                            (click)="navigateToLastPage()"
+                            (keydown.enter)="navigateToLastPage()"
+                            (keydown.space)="navigateToLastPage()"
+                            tabindex="0"
+                        >
+                            <a class="page-link">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
 
             <div class="input-group input-group-sm mb-3">
                 <input

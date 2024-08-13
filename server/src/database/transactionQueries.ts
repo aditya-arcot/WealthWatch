@@ -72,9 +72,9 @@ export const insertTransactions = async (
     return rows.map(mapDbTransaction)
 }
 
-const fetchTotalActiveTransactionsByUserId = async (
+const fetchActiveTransactionsByUserIdCount = async (
     userId: number
-): Promise<number | undefined> => {
+): Promise<number> => {
     const query = `
         SELECT COUNT(*)
         FROM transactions t
@@ -90,9 +90,9 @@ const fetchTotalActiveTransactionsByUserId = async (
             )
     `
     const rows = (await runQuery<{ count: string }>(query, [userId])).rows
-    if (!rows[0]) return
+    if (!rows[0]) return -1
     const countNum = parseInt(rows[0].count)
-    return isNaN(countNum) ? undefined : countNum
+    return isNaN(countNum) ? -1 : countNum
 }
 
 export const fetchActiveTransactionsByUserId = async (
@@ -101,13 +101,12 @@ export const fetchActiveTransactionsByUserId = async (
     limit?: number,
     offset?: number
 ): Promise<TransactionsResponse> => {
-    const total = (await fetchTotalActiveTransactionsByUserId(userId)) ?? -1
+    const total = await fetchActiveTransactionsByUserIdCount(userId)
 
     let placeholder = 1
     const values: unknown[] = []
 
-    // main query
-    let query = `
+    let baseQuery = `
         SELECT t.*
         FROM transactions t
         WHERE
@@ -123,9 +122,8 @@ export const fetchActiveTransactionsByUserId = async (
     values.push(userId)
     placeholder++
 
-    // search
     if (searchQuery) {
-        query += `
+        baseQuery += `
             AND (
                 LOWER(t.custom_name) LIKE $${placeholder} OR
                 LOWER(t.merchant) LIKE $${placeholder} OR
@@ -136,14 +134,24 @@ export const fetchActiveTransactionsByUserId = async (
         placeholder++
     }
 
-    // sort
-    query += `
+    const countQuery = `
+        SELECT COUNT(*)
+        FROM (${baseQuery}) AS t
+    `
+    const countRows = (await runQuery<{ count: string }>(countQuery, values))
+        .rows
+    if (!countRows[0]) throw Error('failed to fetch count')
+    const countNum = parseInt(countRows[0].count)
+    const count = isNaN(countNum) ? -1 : countNum
+
+    let mainQuery = baseQuery
+    mainQuery += `
         ORDER BY t.date DESC, t.transaction_id
     `
 
     // limit
     if (limit) {
-        query += `
+        mainQuery += `
             LIMIT $${placeholder}
         `
         values.push(limit)
@@ -151,7 +159,7 @@ export const fetchActiveTransactionsByUserId = async (
 
         // offset
         if (offset) {
-            query += `
+            mainQuery += `
                 OFFSET $${placeholder}
             `
             values.push(offset)
@@ -159,13 +167,14 @@ export const fetchActiveTransactionsByUserId = async (
         }
     }
 
-    const rows = (await runQuery<DbTransaction>(query, values)).rows
+    const rows = (await runQuery<DbTransaction>(mainQuery, values)).rows
     return {
         transactions: rows.map(mapDbTransaction),
         searchQuery: searchQuery ?? null,
         limit: limit ?? null,
         offset: limit ? (offset ?? null) : null,
         total,
+        filteredTotal: count,
     }
 }
 

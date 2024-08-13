@@ -9,6 +9,7 @@ import {
     of,
     Subject,
     switchMap,
+    tap,
     throwError,
 } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
@@ -32,6 +33,8 @@ import { TransactionService } from '../../services/transaction.service'
 })
 export class TransactionsComponent implements OnInit {
     loading = false
+    doneFiltering = true
+
     transactions: Transaction[] = []
     categories: Category[] = []
     accounts: Account[] = []
@@ -40,11 +43,13 @@ export class TransactionsComponent implements OnInit {
     pageSizes = [10, 25, 50, 100]
     pageSizeIndex = 0
     currentPage = 1
-    totalTransactions = -1
 
     searchSubject = new Subject<string>()
     previousSearchText = ''
     searchText: string | null = null
+
+    totalTransactions = -1
+    filteredTotalTransactions = -1
 
     maxNameLength = 30
     currencyFormatters: Record<string, Intl.NumberFormat> = {
@@ -64,9 +69,15 @@ export class TransactionsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
-            this.performSearch()
-        })
+        this.searchSubject
+            .pipe(
+                tap(() => (this.doneFiltering = false)),
+                debounceTime(300)
+            )
+            .subscribe(() => {
+                this.performSearch()
+                this.doneFiltering = true
+            })
         this.loadData()
     }
 
@@ -143,6 +154,8 @@ export class TransactionsComponent implements OnInit {
                 this.logger.debug('loaded transactions', paginatedTransactions)
                 this.transactions = paginatedTransactions.transactions
                 this.totalTransactions = paginatedTransactions.total
+                this.filteredTotalTransactions =
+                    paginatedTransactions.filteredTotal
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -186,6 +199,10 @@ export class TransactionsComponent implements OnInit {
     }
 
     getTotalPages(): number {
+        if (this.isFiltered())
+            return Math.ceil(
+                this.filteredTotalTransactions / this.getPageSize()
+            )
         return Math.ceil(this.totalTransactions / this.getPageSize())
     }
 
@@ -195,6 +212,9 @@ export class TransactionsComponent implements OnInit {
 
     getEndTransactionNumber(): number {
         if (this.currentPage === this.getTotalPages()) {
+            if (this.isFiltered()) {
+                return this.filteredTotalTransactions
+            }
             return this.totalTransactions
         }
         return this.getPageSize() * this.currentPage
@@ -243,7 +263,12 @@ export class TransactionsComponent implements OnInit {
     }
 
     private performSearch(): void {
-        this.loadTransactions().subscribe()
+        this.loading = true
+        this.loadTransactions().subscribe(() => (this.loading = false))
+    }
+
+    isFiltered(): boolean {
+        return !!this.searchText
     }
 
     getDisplayName(t: Transaction): string {
