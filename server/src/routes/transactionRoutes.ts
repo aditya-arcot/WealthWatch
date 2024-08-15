@@ -30,6 +30,16 @@ const router = express.Router()
  *           type: string
  *         description: The search query
  *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *         description: The start date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *         description: The end date
+ *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
@@ -47,19 +57,16 @@ const router = express.Router()
  *             schema:
  *               type: object
  *               properties:
+ *                 totalCount:
+ *                   type: integer
+ *                   description: The total number of transactions
+ *                 filteredCount:
+ *                   type: integer
+ *                   description: The number of filtered transactions
  *                 transactions:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Transaction'
- *                 limit:
- *                   type: integer
- *                   description: The number of transactions retrieved
- *                 offset:
- *                   type: integer
- *                   description: The number of transactions skipped
- *                 total:
- *                   type: integer
- *                   description: The total number of transactions
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

@@ -19,9 +19,7 @@ export interface Transaction {
 }
 
 export interface TransactionsResponse {
+    totalCount: number
+    filteredCount: number | null
     transactions: Transaction[]
-    searchQuery: string | null
-    limit: number | null
-    offset: number | null
-    total: number
 }

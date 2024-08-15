@@ -11,9 +11,11 @@ import {
     switchMap,
     throwError,
 } from 'rxjs'
+import { DateFilterComponent } from '../../components/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import { Category, CategoryEnum } from '../../models/category'
+import { DateFilterEnum } from '../../models/dateFilter'
 import { Item } from '../../models/item'
 import { Transaction, TransactionsRequest } from '../../models/transaction'
 import { AccountService } from '../../services/account.service'
@@ -26,12 +28,19 @@ import { TransactionService } from '../../services/transaction.service'
 @Component({
     selector: 'app-transactions',
     standalone: true,
-    imports: [DecimalPipe, DatePipe, LoadingSpinnerComponent, FormsModule],
+    imports: [
+        DecimalPipe,
+        DatePipe,
+        LoadingSpinnerComponent,
+        FormsModule,
+        DateFilterComponent,
+    ],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent implements OnInit {
     loading = false
+
     transactions: Transaction[] = []
     categories: Category[] = []
     accounts: Account[] = []
@@ -40,11 +49,20 @@ export class TransactionsComponent implements OnInit {
     pageSizes = [10, 25, 50, 100]
     pageSizeIndex = 0
     currentPage = 1
-    totalTransactions = -1
 
     searchSubject = new Subject<string>()
     previousSearchText = ''
     searchText: string | null = null
+
+    dateFilterType = DateFilterEnum
+    selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
+    previousStartDate: string | null = null
+    startDate: string | null = null
+    previousEndDate: string | null = null
+    endDate: string | null = null
+
+    totalCount = -1
+    filteredCount: number | null = null
 
     maxNameLength = 30
     currencyFormatters: Record<string, Intl.NumberFormat> = {
@@ -64,9 +82,9 @@ export class TransactionsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
-            this.performSearch()
-        })
+        this.searchSubject
+            .pipe(debounceTime(300))
+            .subscribe(() => this.reloadTransactions())
         this.loadData()
     }
 
@@ -135,14 +153,17 @@ export class TransactionsComponent implements OnInit {
         const offset = (this.currentPage - 1) * limit
         const req: TransactionsRequest = {
             searchQuery: this.searchText,
+            startDate: this.startDate,
+            endDate: this.endDate,
             limit,
             offset,
         }
         return this.transactionSvc.getTransactions(req).pipe(
-            switchMap((paginatedTransactions) => {
-                this.logger.debug('loaded transactions', paginatedTransactions)
-                this.transactions = paginatedTransactions.transactions
-                this.totalTransactions = paginatedTransactions.total
+            switchMap((t) => {
+                this.logger.debug('loaded transactions', t)
+                this.totalCount = t.totalCount
+                this.filteredCount = t.filteredCount
+                this.transactions = t.transactions
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -150,6 +171,19 @@ export class TransactionsComponent implements OnInit {
                 return throwError(() => err)
             })
         )
+    }
+
+    reloadTransactions(): void {
+        this.loading = true
+        this.loadTransactions()
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert('Failed to reload transactions')
+                    this.loading = false
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => (this.loading = false))
     }
 
     refreshTransactions(): void {
@@ -173,6 +207,38 @@ export class TransactionsComponent implements OnInit {
             })
     }
 
+    updateCustomName(t: Transaction): void {
+        this.transactionSvc
+            .updateTransactionCustomName(t)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to update transaction name'
+                    )
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert('Updated transaction name')
+            })
+    }
+
+    updateCustomCategoryId(t: Transaction): void {
+        this.transactionSvc
+            .updateTransactionCustomCategoryId(t)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to update transaction category'
+                    )
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert('Updated transaction category')
+            })
+    }
+
     getPageSize(): number {
         return this.pageSizes[this.pageSizeIndex]
     }
@@ -182,11 +248,14 @@ export class TransactionsComponent implements OnInit {
         const element = target as HTMLSelectElement
         this.pageSizeIndex = element.selectedIndex
         this.currentPage = 1
-        this.loadTransactions().subscribe()
+        this.reloadTransactions()
     }
 
     getTotalPages(): number {
-        return Math.ceil(this.totalTransactions / this.getPageSize())
+        if (this.resultsFiltered()) {
+            return Math.ceil(this.filteredCount! / this.getPageSize())
+        }
+        return Math.ceil(this.totalCount / this.getPageSize())
     }
 
     getStartTransactionNumber(): number {
@@ -195,7 +264,10 @@ export class TransactionsComponent implements OnInit {
 
     getEndTransactionNumber(): number {
         if (this.currentPage === this.getTotalPages()) {
-            return this.totalTransactions
+            if (this.resultsFiltered()) {
+                return this.filteredCount!
+            }
+            return this.totalCount
         }
         return this.getPageSize() * this.currentPage
     }
@@ -203,14 +275,14 @@ export class TransactionsComponent implements OnInit {
     navigateToFirstPage(): void {
         if (this.currentPage === 1) return
         this.currentPage = 1
-        this.loadTransactions().subscribe()
+        this.reloadTransactions()
     }
 
     navigateToPreviousPage(): void {
         if (this.currentPage === 1) return
         this.currentPage--
         if (this.currentPage < 1) this.currentPage = 1
-        this.loadTransactions().subscribe()
+        this.reloadTransactions()
     }
 
     navigateToNextPage(): void {
@@ -218,13 +290,13 @@ export class TransactionsComponent implements OnInit {
         this.currentPage++
         if (this.currentPage > this.getTotalPages())
             this.currentPage = this.getTotalPages()
-        this.loadTransactions().subscribe()
+        this.reloadTransactions()
     }
 
     navigateToLastPage(): void {
         if (this.currentPage === this.getTotalPages()) return
         this.currentPage = this.getTotalPages()
-        this.loadTransactions().subscribe()
+        this.reloadTransactions()
     }
 
     search(): void {
@@ -237,13 +309,51 @@ export class TransactionsComponent implements OnInit {
         this.searchSubject.next(modifiedSearchText)
     }
 
-    clearSearch(): void {
-        this.searchText = ''
-        this.search()
+    applyDateFilter(
+        selected: DateFilterEnum,
+        startDate: string | null,
+        endDate: string | null
+    ): void {
+        this.selectedDateFilter = selected
+        let reload = false
+        if (startDate !== this.previousStartDate) {
+            this.previousStartDate = startDate
+            this.startDate = startDate
+            reload = true
+        }
+        if (endDate !== this.previousEndDate) {
+            this.previousEndDate = endDate
+            this.endDate = endDate
+            reload = true
+        }
+        if (reload) {
+            this.reloadTransactions()
+        }
     }
 
-    private performSearch(): void {
-        this.loadTransactions().subscribe()
+    resultsFiltered(): boolean {
+        return this.filteredCount !== null
+    }
+
+    filterActive(): boolean {
+        return (
+            !!this.searchText || this.selectedDateFilter !== DateFilterEnum.ALL
+        )
+    }
+
+    clearFilters(): void {
+        this.selectedDateFilter = DateFilterEnum.ALL
+        this.previousStartDate = this.startDate
+        this.startDate = null
+        this.previousEndDate = this.endDate
+        this.endDate = null
+
+        this.previousSearchText = this.searchText ?? ''
+        this.searchText = ''
+
+        this.currentPage = 1
+
+        this.reloadTransactions()
     }
 
     getDisplayName(t: Transaction): string {
@@ -272,26 +382,10 @@ export class TransactionsComponent implements OnInit {
         if (!newName.length) newName = null
 
         const currentName = t.merchant ?? t.name
-        if (newName === currentName) return
+        if (newName === currentName) newName = null
 
         t.customName = newName
         this.updateCustomName(t)
-    }
-
-    private updateCustomName(t: Transaction): void {
-        this.transactionSvc
-            .updateTransactionCustomName(t)
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert(
-                        'Failed to update transaction name'
-                    )
-                    return throwError(() => err)
-                })
-            )
-            .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Updated transaction name')
-            })
     }
 
     getDisplayAmount(t: Transaction): string {
@@ -332,29 +426,9 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomCategoryId(t)
     }
 
-    private updateCustomCategoryId(t: Transaction): void {
-        this.transactionSvc
-            .updateTransactionCustomCategoryId(t)
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert(
-                        'Failed to update transaction category'
-                    )
-                    return throwError(() => err)
-                })
-            )
-            .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Updated transaction category')
-            })
-    }
-
     getCategoryClasses(t: Transaction): string {
         const categoryId = this.getDisplayCategory(t) as CategoryEnum
         return `bi ${this.icons[categoryId]}`
-    }
-
-    getCategoryClassesTest(id: CategoryEnum): string {
-        return `bi ${this.icons[id]}`
     }
 
     private icons: Record<CategoryEnum, string> = {
