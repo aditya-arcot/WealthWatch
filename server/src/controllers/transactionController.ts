@@ -34,11 +34,9 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     let maxAmountNum: number | undefined
     if (maxAmount !== undefined) {
         maxAmountNum = parseFloat(maxAmount)
-        if (
-            isNaN(maxAmountNum) ||
-            (minAmountNum ? maxAmountNum < minAmountNum : false)
-        )
-            throw new HttpError('invalid maxAmount', 400)
+        if (isNaN(maxAmountNum)) throw new HttpError('invalid maxAmount', 400)
+        if (minAmountNum !== undefined && maxAmountNum < minAmountNum)
+            throw new HttpError('maxAmount must be greater than minAmount', 400)
     }
 
     const limit = req.query['limit'] as string | undefined
