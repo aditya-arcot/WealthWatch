@@ -85,7 +85,9 @@
                     </div>
 
                     <div
-                        class="d-inline d-xl-none col-lg-auto text-center mb-2 mb-lg-0"
+                        class="d-inline d-xl-none text-center mb-lg-0 {{
+                            getTotalPages() ? 'col-lg-auto mb-2' : ''
+                        }}"
                     >
                         <span
                             class="align-middle {{
