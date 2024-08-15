@@ -149,7 +149,6 @@ export class AccountsComponent implements OnInit {
                 this.alertSvc.addSuccessAlert('Success linking institution', [
                     'Loading your accounts now',
                 ])
-                // TODO spinner
                 setTimeout(() => {
                     this.loadAccounts()
                 }, 3000)
