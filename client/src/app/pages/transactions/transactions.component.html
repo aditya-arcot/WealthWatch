@@ -267,9 +267,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">
-                            <div
-                                class="d-flex align-items-center justify-content-center"
-                            >
+                            <div class="d-flex justify-content-center">
                                 <span class="ps-1 me-1">Date</span>
                                 <button
                                     class="btn btn-sm btn-dark p-0 ps-1 pe-1"
@@ -289,7 +287,26 @@
                             </div>
                         </th>
                         <th scope="col">Name</th>
-                        <th scope="col">Amount</th>
+                        <th scope="col">
+                            <div class="d-flex justify-content-center">
+                                <span class="ps-1 me-1">Amount</span>
+                                <button
+                                    class="btn btn-sm btn-dark p-0 ps-1 pe-1"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#amountFilterModal"
+                                >
+                                    @if (
+                                        selectedAmountFilter ===
+                                        amountFilterType.ALL
+                                    ) {
+                                        <i class="bi bi-funnel"></i>
+                                    } @else {
+                                        <i class="bi bi-funnel-fill"></i>
+                                    }
+                                </button>
+                            </div>
+                        </th>
                         <th scope="col" class="d-none d-sm-table-cell">
                             Category
                         </th>
@@ -398,5 +415,18 @@
     [endDate]="endDate"
     (filterInputsChanged)="
         applyDateFilter($event.selectedFilter, $event.startDate, $event.endDate)
+    "
+/>
+
+<app-amount-filter
+    [selectedFilter]="selectedAmountFilter"
+    [minAmount]="minAmount"
+    [maxAmount]="maxAmount"
+    (filterInputsChanged)="
+        applyAmountFilter(
+            $event.selectedFilter,
+            $event.minAmount,
+            $event.maxAmount
+        )
     "
 />

@@ -10,7 +10,7 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { DateFilterEnum } from '../../models/dateFilter'
+import { DateFilterEnum } from '../../../models/dateFilter'
 
 @Component({
     selector: 'app-date-filter',
@@ -21,9 +21,10 @@ import { DateFilterEnum } from '../../models/dateFilter'
 export class DateFilterComponent implements OnInit, OnChanges {
     @ViewChild('dateFilterModal', { static: true }) dateFilterModal!: ElementRef
 
-    @Input() selectedFilter: DateFilterEnum = DateFilterEnum.ALL
-    @Input() startDate: string | null = null
-    @Input() endDate: string | null = null
+    @Input({ required: true }) selectedFilter: DateFilterEnum =
+        DateFilterEnum.ALL
+    @Input({ required: true }) startDate: string | null = null
+    @Input({ required: true }) endDate: string | null = null
 
     @Output() filterInputsChanged = new EventEmitter<{
         selectedFilter: DateFilterEnum
@@ -181,18 +182,16 @@ export class DateFilterComponent implements OnInit, OnChanges {
             return true
         }
         if (this.selectedFilter === DateFilterEnum.CUSTOM) {
-            if (
+            return (
                 this.originalStartDate !== this.startDate ||
                 this.originalEndDate !== this.endDate
-            ) {
-                return true
-            }
+            )
         }
         return false
     }
 
     filterApplied(): boolean {
-        return this.originalSelectedFilter !== this.dateFilterType.ALL
+        return this.originalSelectedFilter !== DateFilterEnum.ALL
     }
 
     clear() {

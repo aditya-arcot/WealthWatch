@@ -5,10 +5,11 @@
                 <h5 class="modal-title w-100">Filter by Date</h5>
             </div>
             <div class="modal-body p-3 py-2">
-                <label for="dateRange" class="form-label m-0"
-                    >Select Date Range</label
+                <label for="dateRange" class="form-label m-0 small-text"
+                    ><b>Date Range</b></label
                 >
                 <select
+                    id="dateRange"
                     class="form-select form-select-sm"
                     [(ngModel)]="selectedFilter"
                     (change)="handleFilterChange()"
@@ -42,20 +43,22 @@
                 </select>
                 @if (selectedFilter === dateFilterType.CUSTOM) {
                     <div class="p-0">
-                        <label for="startDate" class="form-label m-0"
-                            >Start Date</label
+                        <label for="startDate" class="form-label m-0 small-text"
+                            ><b>Start Date</b></label
                         >
                         <input
+                            id="startDate"
                             type="date"
                             class="form-control form-control-sm m-0"
                             [(ngModel)]="startDate"
                         />
                     </div>
                     <div class="p-0">
-                        <label for="endDate" class="form-label m-0"
-                            >End Date</label
+                        <label for="endDate" class="form-label m-0 small-text"
+                            ><b>End Date</b></label
                         >
                         <input
+                            id="endDate"
                             type="date"
                             class="form-control form-control-sm m-0"
                             [(ngModel)]="endDate"

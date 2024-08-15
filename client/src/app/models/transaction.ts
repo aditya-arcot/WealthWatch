@@ -2,6 +2,8 @@ export interface TransactionsRequest {
     searchQuery?: string | null
     startDate?: string | null
     endDate?: string | null
+    minAmount?: number | null
+    maxAmount?: number | null
     limit?: number
     offset?: number
 }

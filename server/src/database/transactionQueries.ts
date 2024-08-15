@@ -100,6 +100,8 @@ export const fetchActiveTransactionsByUserId = async (
     searchQuery?: string,
     startDate?: string,
     endDate?: string,
+    minAmount?: number,
+    maxAmount?: number,
     limit?: number,
     offset?: number
 ): Promise<TransactionsResponse> => {
@@ -126,7 +128,7 @@ export const fetchActiveTransactionsByUserId = async (
     placeholder++
 
     let filtered = false
-    if (searchQuery) {
+    if (searchQuery !== undefined) {
         filtered = true
         baseQuery += `
             AND LOWER (
@@ -165,6 +167,30 @@ export const fetchActiveTransactionsByUserId = async (
         placeholder++
     }
 
+    if (minAmount !== undefined && maxAmount !== undefined) {
+        filtered = true
+        baseQuery += `
+            AND t.amount BETWEEN $${placeholder} AND $${placeholder + 1}
+        `
+        values.push(minAmount)
+        values.push(maxAmount)
+        placeholder += 2
+    } else if (minAmount !== undefined) {
+        filtered = true
+        baseQuery += `
+            AND t.amount >= $${placeholder}
+        `
+        values.push(minAmount)
+        placeholder++
+    } else if (maxAmount !== undefined) {
+        filtered = true
+        baseQuery += `
+            AND t.amount <= $${placeholder}
+        `
+        values.push(maxAmount)
+        placeholder++
+    }
+
     let filteredCount: number | null = null
     if (filtered) {
         const countQuery = `
@@ -184,14 +210,14 @@ export const fetchActiveTransactionsByUserId = async (
         ORDER BY t.date DESC, t.transaction_id
     `
 
-    if (limit) {
+    if (limit !== undefined) {
         mainQuery += `
             LIMIT $${placeholder}
         `
         values.push(limit)
         placeholder++
 
-        if (offset) {
+        if (offset !== undefined) {
             mainQuery += `
                 OFFSET $${placeholder}
             `

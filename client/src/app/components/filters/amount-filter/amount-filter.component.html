@@ -1,0 +1,126 @@
+<div #amountFilterModal class="modal modal-sm fade" id="amountFilterModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-center p-2">
+                <h5 class="modal-title w-100">Filter by Amount</h5>
+            </div>
+            <div class="modal-body p-3 py-2">
+                <label for="filterType" class="form-label m-0 small-text"
+                    ><b>Filter Type</b></label
+                >
+                <select
+                    id="filterType"
+                    class="form-select form-select-sm"
+                    [(ngModel)]="selectedFilter"
+                    (change)="handleFilterChange()"
+                >
+                    <option value="{{ amountFilterType.ALL }}">
+                        All Amounts
+                    </option>
+                    <option value="{{ amountFilterType.EXACTLY }}">
+                        Exactly
+                    </option>
+                    <option value="{{ amountFilterType.GREATER_THAN }}">
+                        Greater Than
+                    </option>
+                    <option value="{{ amountFilterType.LESS_THAN }}">
+                        Less Than
+                    </option>
+                    <option value="{{ amountFilterType.BETWEEN }}">
+                        Between
+                    </option>
+                </select>
+                @if (
+                    selectedFilter !== amountFilterType.ALL &&
+                    selectedFilter !== amountFilterType.LESS_THAN
+                ) {
+                    <div class="p-0">
+                        @if (selectedFilter === amountFilterType.BETWEEN) {
+                            <label
+                                for="minAmount"
+                                class="form-label m-0 small-text"
+                                ><b>Min Amount</b></label
+                            >
+                        }
+                        <div
+                            class="input-group input-group-sm {{
+                                selectedFilter !== amountFilterType.BETWEEN
+                                    ? 'mt-1'
+                                    : ''
+                            }}"
+                        >
+                            <span class="input-group-text">$</span>
+                            <input
+                                id="minAmount"
+                                type="number"
+                                class="form-control m-0"
+                                [(ngModel)]="minAmount"
+                            />
+                        </div>
+                    </div>
+                }
+                @if (
+                    selectedFilter === amountFilterType.LESS_THAN ||
+                    selectedFilter === amountFilterType.BETWEEN
+                ) {
+                    <div class="p-0">
+                        @if (selectedFilter === amountFilterType.BETWEEN) {
+                            <label
+                                for="maxAmount"
+                                class="form-label m-0 small-text"
+                                ><b>Max Amount</b></label
+                            >
+                        }
+                        <div
+                            class="input-group input-group-sm {{
+                                selectedFilter !== amountFilterType.BETWEEN
+                                    ? 'mt-1'
+                                    : ''
+                            }}"
+                        >
+                            <span class="input-group-text">$</span>
+                            <input
+                                id="maxAmount"
+                                type="number"
+                                class="form-control m-0"
+                                [(ngModel)]="maxAmount"
+                            />
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer justify-content-center p-1">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    (click)="apply()"
+                    data-bs-dismiss="modal"
+                    [disabled]="!inputsChanged()"
+                >
+                    <i class="bi bi-check2"></i>
+                    Apply
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    (click)="clear()"
+                    data-bs-dismiss="modal"
+                    [disabled]="!filterApplied()"
+                >
+                    <i class="bi bi-trash"></i>
+                    Clear
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-warning"
+                    data-bs-dismiss="modal"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

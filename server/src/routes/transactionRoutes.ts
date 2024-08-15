@@ -40,6 +40,16 @@ const router = express.Router()
  *           type: string
  *         description: The end date
  *       - in: query
+ *         name: minAmount
+ *         schema:
+ *           type: number
+ *         description: The minimum amount
+ *       - in: query
+ *         name: maxAmount
+ *         schema:
+ *           type: number
+ *         description: The maximum amount
+ *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
