@@ -4,21 +4,22 @@
     <h2 class="text-center mb-0">Transactions</h2>
     <button
         (click)="refreshTransactions()"
-        class="btn btn-primary d-none d-sm-block position-absolute top-left"
+        class="btn btn-primary d-none d-md-block position-absolute top-left"
         type="button"
     >
+        <i class="bi bi-arrow-clockwise"></i>
         Refresh Transactions
     </button>
     <button
         (click)="refreshTransactions()"
-        class="btn btn-primary d-block d-sm-none position-absolute top-left"
+        class="btn btn-primary d-block d-md-none position-absolute top-left"
         type="button"
     >
         <i class="bi bi-arrow-clockwise"></i>
     </button>
 </div>
 
-@if (totalTransactions < 1) {
+@if (totalCount < 1) {
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-10 col-sm-8 col-md-6 col-xl-4">
@@ -33,259 +34,367 @@
 } @else {
     <div class="card mb-2">
         <div class="card-body">
-            @if (transactions.length) {
+            <div class="mb-3 small-text">
                 <div
-                    class="d-flex justify-content-center justify-content-sm-between align-items-center mb-2"
+                    class="d-none d-xl-inline center-div d-flex {{
+                        !filterActive() ? 'center-div-unfiltered' : ''
+                    }}"
                 >
-                    <div class="d-none d-sm-block">
-                        <div class="row g-2">
-                            <div class="col-auto">
-                                <label
-                                    for="pageSize"
-                                    class="col-form-label col-form-label-sm"
-                                >
-                                    Page size:
-                                </label>
-                            </div>
-                            <div class="col-auto">
-                                <select
-                                    id="pageSize"
-                                    class="form-select form-select-sm"
-                                    (change)="updatePageSize($event.target)"
-                                >
-                                    @for (size of pageSizes; track $index) {
-                                        <option
-                                            [value]="size"
-                                            [selected]="size === getPageSize()"
-                                        >
-                                            {{ size }}
-                                        </option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <span class="d-none d-md-inline small-text center-span">
-                        Transactions <b>{{ getStartTransactionNumber() }}</b> to
-                        <b>{{ getEndTransactionNumber() }}</b> of
-                        <b>{{
-                            isFiltered()
-                                ? filteredTotalTransactions
-                                : totalTransactions
-                        }}</b>
-                        @if (isFiltered()) {
-                            @if (doneFiltering) {
-                                (<b>{{
-                                    totalTransactions -
-                                        filteredTotalTransactions
-                                }}</b>
+                    <span
+                        class="align-middle {{
+                            filterActive() ? 'pe-2' : 'pe-0'
+                        }}"
+                    >
+                        @if (transactions.length) {
+                            Transactions
+                            <b>{{ getStartTransactionNumber() }}</b> to
+                            <b>{{ getEndTransactionNumber() }}</b> of
+                            <b>{{
+                                resultsFiltered() ? filteredCount : totalCount
+                            }}</b>
+                            @if (resultsFiltered()) {
+                                (<b>{{ totalCount - filteredCount! }}</b>
                                 excluded)
-                            } @else {
-                                (...)
                             }
+                        } @else if (resultsFiltered()) {
+                            <b>{{ totalCount - filteredCount! }}</b> excluded
                         }
                     </span>
-
-                    <ul class="pagination pagination-sm mb-0">
-                        <li
-                            class="page-item {{
-                                currentPage === 1 ? 'disabled' : ''
-                            }}"
-                            (click)="navigateToFirstPage()"
-                            (keydown.enter)="navigateToFirstPage()"
-                            (keydown.space)="navigateToFirstPage()"
-                            tabindex="0"
+                    @if (filterActive()) {
+                        <button
+                            class="btn btn-sm btn-danger"
+                            type="button"
+                            title="Clear filters"
+                            (click)="clearFilters()"
                         >
-                            <a class="page-link">
-                                <i class="bi bi-chevron-double-left"></i>
-                            </a>
-                        </li>
-
-                        <li
-                            class="page-item {{
-                                currentPage === 1 ? 'disabled' : ''
-                            }}"
-                            (click)="navigateToPreviousPage()"
-                            (keydown.enter)="navigateToPreviousPage()"
-                            (keydown.space)="navigateToPreviousPage()"
-                            tabindex="0"
-                        >
-                            <a class="page-link">
-                                <i class="bi bi-chevron-left"></i>
-                            </a>
-                        </li>
-
-                        <li class="page-item">
-                            <a class="page-link current-page"
-                                >Page {{ currentPage }} of
-                                {{ getTotalPages() }}</a
-                            >
-                        </li>
-
-                        <li
-                            class="page-item {{
-                                currentPage === getTotalPages()
-                                    ? 'disabled'
-                                    : ''
-                            }}"
-                            (click)="navigateToNextPage()"
-                            (keydown.enter)="navigateToNextPage()"
-                            (keydown.space)="navigateToNextPage()"
-                            tabindex="0"
-                        >
-                            <a class="page-link">
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </li>
-
-                        <li
-                            class="page-item {{
-                                currentPage === getTotalPages()
-                                    ? 'disabled'
-                                    : ''
-                            }}"
-                            (click)="navigateToLastPage()"
-                            (keydown.enter)="navigateToLastPage()"
-                            (keydown.space)="navigateToLastPage()"
-                            tabindex="0"
-                        >
-                            <a class="page-link">
-                                <i class="bi bi-chevron-double-right"></i>
-                            </a>
-                        </li>
-                    </ul>
+                            <i class="bi bi-trash"></i>
+                            Clear Filters
+                        </button>
+                    }
                 </div>
-            }
 
-            <div class="input-group input-group-sm mb-3">
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Search by transaction name"
-                    [(ngModel)]="searchText"
-                    (input)="search()"
-                />
-                <button
-                    class="btn btn-outline-danger"
-                    type="button"
-                    title="Clear search"
-                    (click)="clearSearch()"
-                >
-                    <i class="bi bi-x-circle"></i> Clear
-                </button>
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-xl-4 mb-2 mb-xl-0">
+                        <input
+                            type="text"
+                            class="form-control form-control-sm"
+                            placeholder="Search by transaction name"
+                            [(ngModel)]="searchText"
+                            (input)="search()"
+                        />
+                    </div>
+
+                    <div
+                        class="d-inline d-xl-none col-lg-auto text-center mb-2 mb-lg-0"
+                    >
+                        <span
+                            class="align-middle {{
+                                filterActive() ? 'pe-2' : 'pe-0'
+                            }}"
+                        >
+                            @if (transactions.length) {
+                                Transactions
+                                <b>{{ getStartTransactionNumber() }}</b> to
+                                <b>{{ getEndTransactionNumber() }}</b> of
+                                <b>{{
+                                    resultsFiltered()
+                                        ? filteredCount
+                                        : totalCount
+                                }}</b>
+                                @if (resultsFiltered()) {
+                                    (<b>{{ totalCount - filteredCount! }}</b>
+                                    excluded)
+                                }
+                            } @else if (resultsFiltered()) {
+                                <b>{{ totalCount - filteredCount! }}</b>
+                                excluded
+                            }
+                        </span>
+                        @if (filterActive()) {
+                            <button
+                                class="btn btn-sm btn-danger"
+                                type="button"
+                                title="Clear filters"
+                                (click)="clearFilters()"
+                            >
+                                <i class="bi bi-x-circle"></i>
+                                Clear Filters
+                            </button>
+                        }
+                    </div>
+
+                    @if (getTotalPages()) {
+                        <div class="col-lg-auto">
+                            <div
+                                class="row float-lg-end align-items-center justify-content-center"
+                            >
+                                <div class="col-auto pe-1">
+                                    <label
+                                        for="pageSize"
+                                        class="col-form-label p-0"
+                                    >
+                                        Page size:</label
+                                    >
+                                </div>
+
+                                <div class="col-auto ps-0 pe-1">
+                                    <select
+                                        id="pageSize"
+                                        class="form-select form-select-sm"
+                                        (change)="updatePageSize($event.target)"
+                                    >
+                                        @for (size of pageSizes; track $index) {
+                                            <option
+                                                [value]="size"
+                                                [selected]="
+                                                    size === getPageSize()
+                                                "
+                                            >
+                                                {{ size }}
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-auto ps-0 ps-md-1">
+                                    <ul class="pagination pagination-sm mb-0">
+                                        <li
+                                            class="page-item {{
+                                                currentPage === 1
+                                                    ? 'disabled'
+                                                    : ''
+                                            }}"
+                                            (click)="navigateToFirstPage()"
+                                            (keydown.enter)="
+                                                navigateToFirstPage()
+                                            "
+                                            (keydown.space)="
+                                                navigateToFirstPage()
+                                            "
+                                            tabindex="0"
+                                        >
+                                            <a class="page-link">
+                                                <i
+                                                    class="bi bi-chevron-double-left"
+                                                ></i>
+                                            </a>
+                                        </li>
+
+                                        <li
+                                            class="page-item {{
+                                                currentPage === 1
+                                                    ? 'disabled'
+                                                    : ''
+                                            }}"
+                                            (click)="navigateToPreviousPage()"
+                                            (keydown.enter)="
+                                                navigateToPreviousPage()
+                                            "
+                                            (keydown.space)="
+                                                navigateToPreviousPage()
+                                            "
+                                            tabindex="0"
+                                        >
+                                            <a class="page-link">
+                                                <i
+                                                    class="bi bi-chevron-left"
+                                                ></i>
+                                            </a>
+                                        </li>
+
+                                        <li class="page-item">
+                                            <a class="page-link current-page">
+                                                Page {{ currentPage }} of
+                                                {{ getTotalPages() }}
+                                            </a>
+                                        </li>
+
+                                        <li
+                                            class="page-item {{
+                                                currentPage === getTotalPages()
+                                                    ? 'disabled'
+                                                    : ''
+                                            }}"
+                                            (click)="navigateToNextPage()"
+                                            (keydown.enter)="
+                                                navigateToNextPage()
+                                            "
+                                            (keydown.space)="
+                                                navigateToNextPage()
+                                            "
+                                            tabindex="0"
+                                        >
+                                            <a class="page-link">
+                                                <i
+                                                    class="bi bi-chevron-right"
+                                                ></i>
+                                            </a>
+                                        </li>
+
+                                        <li
+                                            class="page-item {{
+                                                currentPage === getTotalPages()
+                                                    ? 'disabled'
+                                                    : ''
+                                            }}"
+                                            (click)="navigateToLastPage()"
+                                            (keydown.enter)="
+                                                navigateToLastPage()
+                                            "
+                                            (keydown.space)="
+                                                navigateToLastPage()
+                                            "
+                                            tabindex="0"
+                                        >
+                                            <a class="page-link">
+                                                <i
+                                                    class="bi bi-chevron-double-right"
+                                                ></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
             </div>
 
-            @if (!transactions.length) {
-                <h4 class="text-center mb-0">No results</h4>
-            } @else {
-                <table
-                    class="table table-striped table-hover table-sm table-bordered align-middle text-center mb-0"
-                >
-                    <thead class="table-dark">
+            <table
+                class="table table-striped table-hover table-sm table-bordered align-middle text-center mb-0"
+            >
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">
+                            <div
+                                class="d-flex align-items-center justify-content-center"
+                            >
+                                <span class="ps-1 me-1">Date</span>
+                                <button
+                                    class="btn btn-sm btn-dark p-0 ps-1 pe-1"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#dateFilterModal"
+                                >
+                                    @if (
+                                        selectedDateFilter ===
+                                        dateFilterType.ALL
+                                    ) {
+                                        <i class="bi bi-funnel"></i>
+                                    } @else {
+                                        <i class="bi bi-funnel-fill"></i>
+                                    }
+                                </button>
+                            </div>
+                        </th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col" class="d-none d-sm-table-cell">
+                            Category
+                        </th>
+                        <th scope="col" class="d-none d-md-table-cell">
+                            Account
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    @for (t of transactions; track $index) {
                         <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Amount</th>
-                            <th scope="col" class="d-none d-sm-table-cell">
-                                Category
-                            </th>
-                            <th scope="col" class="d-none d-md-table-cell">
-                                Account
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-group-divider">
-                        @for (t of transactions; track $index) {
-                            <tr>
-                                <td>
-                                    {{ t.date | date: 'shortDate' }}
-                                </td>
-                                <td>
-                                    <input
-                                        class="form-control form-control-sm"
-                                        type="text"
-                                        [value]="getDisplayName(t)"
-                                        (focus)="showFullName($event.target, t)"
-                                        (blur)="
-                                            showDisplayName($event.target, t)
+                            <td>
+                                {{ t.date | date: 'shortDate' }}
+                            </td>
+                            <td>
+                                <input
+                                    class="form-control form-control-sm"
+                                    type="text"
+                                    [value]="getDisplayName(t)"
+                                    (focus)="showFullName($event.target, t)"
+                                    (blur)="showDisplayName($event.target, t)"
+                                    (change)="updateName($event.target, t)"
+                                />
+                            </td>
+                            <td>
+                                <div class="d-none d-lg-inline">
+                                    {{ getDisplayAmount(t) }}
+                                    @if (t.pending) {
+                                        <span class="pending-text"
+                                            >(Pending)</span
+                                        >
+                                    }
+                                </div>
+                                <div
+                                    class="d-inline d-lg-none {{
+                                        t.pending ? 'pending-text' : ''
+                                    }}"
+                                >
+                                    {{ getDisplayAmount(t) }}
+                                </div>
+                            </td>
+                            <td class="d-none d-sm-table-cell">
+                                <div class="input-group input-group-sm">
+                                    <button
+                                        class="btn btn-outline-primary icon-btn d-none d-md-inline"
+                                        type="button"
+                                    >
+                                        <i
+                                            [classList]="getCategoryClasses(t)"
+                                        ></i>
+                                    </button>
+                                    <select
+                                        class="form-select"
+                                        (change)="
+                                            updateCategory($event.target, t)
                                         "
-                                        (change)="updateName($event.target, t)"
-                                    />
-                                </td>
-                                <td>
-                                    <div class="d-none d-lg-inline">
-                                        {{ getDisplayAmount(t) }}
-                                        @if (t.pending) {
-                                            <span class="pending-text"
-                                                >(Pending)</span
-                                            >
-                                        }
-                                    </div>
-                                    <div
-                                        class="d-inline d-lg-none {{
-                                            t.pending ? 'pending-text' : ''
-                                        }}"
                                     >
-                                        {{ getDisplayAmount(t) }}
-                                    </div>
-                                </td>
-                                <td class="d-none d-sm-table-cell">
-                                    <div class="input-group input-group-sm">
-                                        <button
-                                            class="btn btn-outline-primary icon-btn d-none d-md-inline"
-                                            type="button"
-                                        >
-                                            <i
-                                                [classList]="
-                                                    getCategoryClasses(t)
+                                        @for (
+                                            category of categories;
+                                            track $index
+                                        ) {
+                                            <option
+                                                [value]="category.id"
+                                                [selected]="
+                                                    category.id ===
+                                                    getDisplayCategory(t)
                                                 "
-                                            ></i>
-                                        </button>
-                                        <select
-                                            class="form-select"
-                                            (change)="
-                                                updateCategory($event.target, t)
-                                            "
-                                        >
-                                            @for (
-                                                category of categories;
-                                                track $index
-                                            ) {
-                                                <option
-                                                    [value]="category.id"
-                                                    [selected]="
-                                                        category.id ===
-                                                        getDisplayCategory(t)
-                                                    "
-                                                >
-                                                    {{ category.name }}
-                                                </option>
-                                            }
-                                        </select>
-                                        <button
-                                            class="btn btn-outline-dark"
-                                            type="button"
-                                            title="Reset category"
-                                            (click)="resetCategory(t)"
-                                        >
-                                            <i
-                                                class="bi bi-arrow-counterclockwise"
-                                            ></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td class="d-none d-md-table-cell">
-                                    {{ getDisplayAccount(t) }}
-                                    <span class="d-none d-lg-inline"
-                                        >({{ getDisplayInstitution(t) }})</span
+                                            >
+                                                {{ category.name }}
+                                            </option>
+                                        }
+                                    </select>
+                                    <button
+                                        class="btn btn-outline-dark"
+                                        type="button"
+                                        title="Reset category"
+                                        (click)="resetCategory(t)"
                                     >
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                        <i
+                                            class="bi bi-arrow-counterclockwise"
+                                        ></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                {{ getDisplayAccount(t) }}
+                                <span class="d-none d-lg-inline"
+                                    >({{ getDisplayInstitution(t) }})</span
+                                >
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (!transactions.length) {
+                <h4 class="text-center mb-0 mt-3">No results</h4>
             }
         </div>
     </div>
 }
+
+<app-date-filter
+    [selectedFilter]="selectedDateFilter"
+    [startDate]="startDate"
+    [endDate]="endDate"
+    (filterInputsChanged)="
+        applyDateFilter($event.selectedFilter, $event.startDate, $event.endDate)
+    "
+/>

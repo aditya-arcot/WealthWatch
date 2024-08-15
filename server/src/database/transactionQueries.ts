@@ -98,10 +98,12 @@ const fetchActiveTransactionsByUserIdCount = async (
 export const fetchActiveTransactionsByUserId = async (
     userId: number,
     searchQuery?: string,
+    startDate?: string,
+    endDate?: string,
     limit?: number,
     offset?: number
 ): Promise<TransactionsResponse> => {
-    const total = await fetchActiveTransactionsByUserIdCount(userId)
+    const totalCount = await fetchActiveTransactionsByUserIdCount(userId)
 
     let placeholder = 1
     const values: unknown[] = []
@@ -118,38 +120,70 @@ export const fetchActiveTransactionsByUserId = async (
                     FROM active_items
                     WHERE user_id = $${placeholder}
                 )
-            )`
+            )
+    `
     values.push(userId)
     placeholder++
 
+    let filtered = false
     if (searchQuery) {
+        filtered = true
         baseQuery += `
-            AND (
-                LOWER(t.custom_name) LIKE $${placeholder} OR
-                LOWER(t.merchant) LIKE $${placeholder} OR
-                LOWER(t."name") LIKE $${placeholder}
-            )
+            AND LOWER (
+                COALESCE (
+                    t.custom_name,
+                    t.merchant,
+                    t.name
+                )
+            ) LIKE $${placeholder}
         `
         values.push(`%${searchQuery.toLowerCase()}%`)
         placeholder++
     }
 
-    const countQuery = `
-        SELECT COUNT(*)
-        FROM (${baseQuery}) AS t
-    `
-    const countRows = (await runQuery<{ count: string }>(countQuery, values))
-        .rows
-    if (!countRows[0]) throw Error('failed to fetch count')
-    const countNum = parseInt(countRows[0].count)
-    const count = isNaN(countNum) ? -1 : countNum
+    if (startDate && endDate) {
+        filtered = true
+        baseQuery += `
+            AND t.date BETWEEN $${placeholder} AND $${placeholder + 1}
+        `
+        values.push(startDate)
+        values.push(endDate)
+        placeholder += 2
+    } else if (startDate) {
+        filtered = true
+        baseQuery += `
+            AND t.date >= $${placeholder}
+        `
+        values.push(startDate)
+        placeholder++
+    } else if (endDate) {
+        filtered = true
+        baseQuery += `
+            AND t.date <= $${placeholder}
+        `
+        values.push(endDate)
+        placeholder++
+    }
+
+    let filteredCount: number | null = null
+    if (filtered) {
+        const countQuery = `
+            SELECT COUNT(*)
+            FROM (${baseQuery}) AS t
+        `
+        const countRows = (
+            await runQuery<{ count: string }>(countQuery, values)
+        ).rows
+        if (!countRows[0]) throw Error('failed to fetch count')
+        const countNum = parseInt(countRows[0].count)
+        filteredCount = isNaN(countNum) ? -1 : countNum
+    }
 
     let mainQuery = baseQuery
     mainQuery += `
         ORDER BY t.date DESC, t.transaction_id
     `
 
-    // limit
     if (limit) {
         mainQuery += `
             LIMIT $${placeholder}
@@ -157,7 +191,6 @@ export const fetchActiveTransactionsByUserId = async (
         values.push(limit)
         placeholder++
 
-        // offset
         if (offset) {
             mainQuery += `
                 OFFSET $${placeholder}
@@ -169,12 +202,9 @@ export const fetchActiveTransactionsByUserId = async (
 
     const rows = (await runQuery<DbTransaction>(mainQuery, values)).rows
     return {
+        totalCount,
+        filteredCount,
         transactions: rows.map(mapDbTransaction),
-        searchQuery: searchQuery ?? null,
-        limit: limit ?? null,
-        offset: limit ? (offset ?? null) : null,
-        total,
-        filteredTotal: count,
     }
 }
 

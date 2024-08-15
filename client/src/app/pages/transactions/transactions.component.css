@@ -8,10 +8,14 @@
     font-size: 14px;
 }
 
-.center-span {
+.center-div {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+}
+
+.center-div-unfiltered {
+    top: 20px;
 }
 
 .pagination .page-item .page-link {

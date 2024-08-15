@@ -20,6 +20,8 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     if (!userId) throw new HttpError('missing user id', 400)
 
     const searchQuery = req.query['searchQuery'] as string | undefined
+    const startDate = req.query['startDate'] as string | undefined
+    const endDate = req.query['endDate'] as string | undefined
 
     const limit = req.query['limit'] as string | undefined
     let limitNum: number | undefined
@@ -41,6 +43,8 @@ export const getUserTransactions = async (req: Request, res: Response) => {
         const transactions = await fetchActiveTransactionsByUserId(
             userId,
             searchQuery,
+            startDate,
+            endDate,
             limitNum,
             offsetNum
         )

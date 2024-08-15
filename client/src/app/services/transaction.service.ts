@@ -20,6 +20,12 @@ export class TransactionService {
         if (req.searchQuery) {
             params = params.set('searchQuery', req.searchQuery)
         }
+        if (req.startDate) {
+            params = params.set('startDate', req.startDate)
+        }
+        if (req.endDate) {
+            params = params.set('endDate', req.endDate)
+        }
         if (req.limit) {
             params = params.set('limit', req.limit)
         }
