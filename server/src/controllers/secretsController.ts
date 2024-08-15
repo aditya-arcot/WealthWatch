@@ -7,7 +7,7 @@ export const getSecrets = async (_req: Request, res: Response) => {
     logger.debug('getting secrets')
 
     const logtailToken = env['CLIENT_LOGTAIL_TOKEN']
-    if (!logtailToken) throw Error('missing one or more secrets')
+    if (logtailToken === undefined) throw Error('missing one or more secrets')
 
     const secrets: Secrets = {
         logtailToken,

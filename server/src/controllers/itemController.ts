@@ -19,7 +19,7 @@ export const getUserItems = async (req: Request, res: Response) => {
     logger.debug('getting items')
 
     const userId: number | undefined = req.session.user?.id
-    if (!userId) throw new HttpError('missing user id', 400)
+    if (userId === undefined) throw new HttpError('missing user id', 400)
 
     try {
         const items = await fetchActiveItemsByUserId(userId)
@@ -35,7 +35,7 @@ export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
     logger.debug('updating webhook for active items')
 
     const url: string | undefined = req.body.url
-    if (!url) throw new HttpError('missing url', 400)
+    if (url === undefined) throw new HttpError('missing url', 400)
 
     try {
         const items = await fetchActiveItems()
@@ -54,7 +54,7 @@ export const refreshItemTransactions = async (req: Request, res: Response) => {
     logger.debug('refreshing item transactions')
 
     const itemId: string | undefined = req.params['itemId']
-    if (!itemId) throw new HttpError('missing item id', 400)
+    if (itemId === undefined) throw new HttpError('missing item id', 400)
 
     try {
         await refreshItemTransactionsMain(itemId)
@@ -88,7 +88,7 @@ export const deactivateItem = async (req: Request, res: Response) => {
     logger.debug('deactivating item')
 
     const itemId: string | undefined = req.params['itemId']
-    if (!itemId) throw new HttpError('missing item id', 400)
+    if (itemId === undefined) throw new HttpError('missing item id', 400)
 
     try {
         const item = await fetchActiveItemById(itemId)

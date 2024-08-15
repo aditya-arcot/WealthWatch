@@ -53,7 +53,7 @@ export const checkUsernameExists = async (req: Request, res: Response) => {
     logger.debug('checking if user with username exists')
 
     const username: string | undefined = req.params['username']
-    if (!username) throw new HttpError('missing username', 400)
+    if (username === undefined) throw new HttpError('missing username', 400)
 
     try {
         const user = await fetchUserByUsername(username)
@@ -69,7 +69,7 @@ export const checkEmailExists = async (req: Request, res: Response) => {
     logger.debug('checking if user with email exists')
 
     const email: string | undefined = req.params['email']
-    if (!email) throw new HttpError('missing email', 400)
+    if (email === undefined) throw new HttpError('missing email', 400)
 
     try {
         const user = await fetchUserByEmail(email)

@@ -34,7 +34,7 @@ export const plaidRetrieveTransactionUpdates = async (item: Item) => {
 
     while (hasMore) {
         let params: TransactionsSyncRequest
-        if (cursor) {
+        if (cursor !== null) {
             params = {
                 access_token: item.accessToken,
                 cursor,

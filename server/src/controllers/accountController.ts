@@ -7,7 +7,7 @@ export const getUserAccounts = async (req: Request, res: Response) => {
     logger.debug('getting accounts')
 
     const userId: number | undefined = req.session.user?.id
-    if (!userId) throw new HttpError('missing user id', 400)
+    if (userId === undefined) throw new HttpError('missing user id', 400)
 
     try {
         const accounts = await fetchActiveAccountsByUserId(userId)

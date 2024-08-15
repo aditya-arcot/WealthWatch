@@ -54,7 +54,7 @@ export const plaidSyncItemData = async (item: Item) => {
                     const accountId = accounts.find(
                         (acc) => acc.accountId === t.account_id
                     )?.id
-                    if (!accountId)
+                    if (accountId === undefined)
                         throw Error('transaction has no matching account')
                     return mapPlaidTransaction(
                         t,

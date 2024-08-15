@@ -34,7 +34,7 @@
                 </a>
             </div>
             <div class="navbar-nav ms-auto">
-                @if (userName) {
+                @if (userName !== undefined) {
                     <span class="navbar-text d-none d-lg-block p-2">
                         Welcome, {{ userName }}
                     </span>

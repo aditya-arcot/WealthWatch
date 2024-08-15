@@ -6,7 +6,7 @@ let redis: Redis | null = null
 
 export const createRedis = (): void => {
     logger.debug('creating redis client')
-    if (!env['REDIS_HOST']) {
+    if (env['REDIS_HOST'] === undefined) {
         throw Error('missing redis host')
     }
     redis = new Redis({

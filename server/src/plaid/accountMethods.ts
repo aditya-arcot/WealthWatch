@@ -24,7 +24,7 @@ export const mapPlaidAccount = (
 }
 
 const mapAccountSubtype = (subtype: string | null): string | null => {
-    if (!subtype) return null
+    if (subtype === null) return null
 
     if (plaidLowercaseSubtypes.includes(subtype)) return subtype.toLowerCase()
     if (plaidUppercaseSubtypes.includes(subtype)) return subtype.toUpperCase()

@@ -6,7 +6,7 @@ import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
-if (!env['NODE_ENV']) {
+if (env['NODE_ENV'] === undefined) {
     throw Error('missing node env')
 }
 const itemSyncQueueName = `itemSync-${env['NODE_ENV']}`

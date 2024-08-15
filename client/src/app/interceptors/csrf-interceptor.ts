@@ -17,7 +17,7 @@ export class CSRFInterceptor implements HttpInterceptor {
         next: HttpHandler
     ): Observable<HttpEvent<unknown>> {
         const csrfToken = this.csrfSvc.getStoredCsrfToken()
-        if (csrfToken) {
+        if (csrfToken !== null) {
             req = req.clone({
                 setHeaders: {
                     'x-csrf-token': csrfToken,

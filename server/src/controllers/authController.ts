@@ -11,7 +11,7 @@ export const login = async (req: Request, res: Response) => {
     const username: string | undefined = req.body.username
     const password: string | undefined = req.body.password
 
-    if (!username || !password) {
+    if (username === undefined || password === undefined) {
         throw new HttpError('missing username or password', 400)
     }
 
@@ -45,13 +45,19 @@ export const logout = (req: Request, res: Response) => {
 export const register = async (req: Request, res: Response) => {
     logger.debug('registering')
 
-    const username = req.body.username
-    const email = req.body.email
-    const firstName = req.body.firstName
-    const lastName = req.body.lastName
-    const password = req.body.password
+    const username: string | undefined = req.body.username
+    const email: string | undefined = req.body.email
+    const firstName: string | undefined = req.body.firstName
+    const lastName: string | undefined = req.body.lastName
+    const password: string | undefined = req.body.password
 
-    if (!username || !email || !firstName || !lastName || !password) {
+    if (
+        username === undefined ||
+        email === undefined ||
+        firstName === undefined ||
+        lastName === undefined ||
+        password === undefined
+    ) {
         throw new HttpError('missing user info', 400)
     }
 

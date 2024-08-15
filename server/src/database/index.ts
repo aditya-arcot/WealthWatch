@@ -7,10 +7,10 @@ let clientPool: pg.Pool | null = null
 export const createPool = async (): Promise<void> => {
     logger.debug('creating database pool')
     if (
-        !env['DB_HOST'] ||
-        !env['DB_NAME'] ||
-        !env['DB_USER'] ||
-        !env['DB_PASSWORD']
+        env['DB_HOST'] === undefined ||
+        env['DB_NAME'] === undefined ||
+        env['DB_USER'] === undefined ||
+        env['DB_PASSWORD'] === undefined
     ) {
         throw Error('missing one or more database secrets')
     }

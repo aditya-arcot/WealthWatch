@@ -35,9 +35,9 @@ export const plaidVerifyWebhook = async (
 
     const decodedTokenHeader = jwtDecode(token, { header: true })
     if (
-        !decodedTokenHeader.kid ||
-        !decodedTokenHeader.alg ||
-        !decodedTokenHeader.typ
+        decodedTokenHeader.kid === undefined ||
+        decodedTokenHeader.alg === undefined ||
+        decodedTokenHeader.typ === undefined
     ) {
         throw Error('invalid jwt header')
     }
