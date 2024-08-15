@@ -191,6 +191,7 @@ export class TransactionsComponent implements OnInit {
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert('Failed to reload transactions')
+                    this.clearFilters()
                     this.loading = false
                     return throwError(() => err)
                 })
