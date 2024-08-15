@@ -1,10 +1,13 @@
 import { formatDate } from '@angular/common'
 import {
     Component,
+    ElementRef,
     EventEmitter,
     Input,
     OnChanges,
+    OnInit,
     Output,
+    ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { DateFilterEnum } from '../../models/dateFilter'
@@ -15,22 +18,38 @@ import { DateFilterEnum } from '../../models/dateFilter'
     imports: [FormsModule],
     templateUrl: './date-filter.component.html',
 })
-export class DateFilterComponent implements OnChanges {
-    dateFilterType = DateFilterEnum
+export class DateFilterComponent implements OnInit, OnChanges {
+    @ViewChild('dateFilterModal', { static: true }) dateFilterModal!: ElementRef
 
     @Input() selectedFilter: DateFilterEnum = DateFilterEnum.ALL
     @Input() startDate: string | null = null
     @Input() endDate: string | null = null
-
-    private originalSelectedFilter: DateFilterEnum = this.selectedFilter
-    private originalStartDate: string | null = this.startDate
-    private originalEndDate: string | null = this.endDate
 
     @Output() filterInputsChanged = new EventEmitter<{
         selectedFilter: DateFilterEnum
         startDate: string | null
         endDate: string | null
     }>()
+
+    dateFilterType = DateFilterEnum
+
+    originalSelectedFilter: DateFilterEnum = this.selectedFilter
+    originalStartDate: string | null = this.startDate
+    originalEndDate: string | null = this.endDate
+
+    cancelOnExit = true
+
+    ngOnInit(): void {
+        const modalElement = this.dateFilterModal.nativeElement
+        modalElement.addEventListener('hidden.bs.modal', (event: Event) => {
+            if (event.target === this.dateFilterModal.nativeElement) {
+                if (this.cancelOnExit) {
+                    this.cancel()
+                }
+                this.cancelOnExit = true
+            }
+        })
+    }
 
     ngOnChanges(): void {
         this.originalSelectedFilter = this.selectedFilter
@@ -177,6 +196,7 @@ export class DateFilterComponent implements OnChanges {
     }
 
     clear() {
+        this.cancelOnExit = false
         this.selectedFilter = DateFilterEnum.ALL
         this.startDate = null
         this.endDate = null
@@ -188,6 +208,7 @@ export class DateFilterComponent implements OnChanges {
     }
 
     apply() {
+        this.cancelOnExit = false
         if (this.selectedFilter === DateFilterEnum.CUSTOM) {
             if (!this.startDate && !this.endDate) {
                 this.selectedFilter = DateFilterEnum.ALL
