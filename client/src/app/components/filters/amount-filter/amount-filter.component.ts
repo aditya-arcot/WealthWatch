@@ -101,6 +101,30 @@ export class AmountFilterComponent implements OnInit, OnChanges {
         return false
     }
 
+    minAmountValid(): boolean {
+        if (
+            this.selectedFilter !== AmountFilterEnum.ALL &&
+            this.selectedFilter !== AmountFilterEnum.LESS_THAN
+        ) {
+            return this.minAmount !== null
+        }
+        return true
+    }
+
+    maxAmountValid(): boolean {
+        if (this.selectedFilter === AmountFilterEnum.LESS_THAN) {
+            return this.maxAmount !== null
+        } else if (this.selectedFilter === AmountFilterEnum.BETWEEN) {
+            if (this.maxAmount === null) {
+                return false
+            }
+            if (this.minAmount !== null) {
+                return this.minAmount <= this.maxAmount
+            }
+        }
+        return true
+    }
+
     filterApplied(): boolean {
         return this.originalSelectedFilter !== AmountFilterEnum.ALL
     }

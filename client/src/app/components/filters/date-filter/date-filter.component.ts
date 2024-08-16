@@ -177,6 +177,18 @@ export class DateFilterComponent implements OnInit, OnChanges {
         this.endDate = formatDate(date, 'yyyy-MM-dd', 'en-US')
     }
 
+    handleStartDateChange() {
+        if (this.startDate === '') {
+            this.startDate = null
+        }
+    }
+
+    handleEndDateChange() {
+        if (this.endDate === '') {
+            this.endDate = null
+        }
+    }
+
     inputsChanged(): boolean {
         if (this.originalSelectedFilter !== this.selectedFilter) {
             return true
@@ -188,6 +200,25 @@ export class DateFilterComponent implements OnInit, OnChanges {
             )
         }
         return false
+    }
+
+    startDateValid(): boolean {
+        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+            return this.startDate !== null || this.endDate !== null
+        }
+        return true
+    }
+
+    endDateValid(): boolean {
+        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+            if (this.endDate === null) {
+                return this.startDate !== null
+            }
+            if (this.startDate !== null) {
+                return new Date(this.startDate) <= new Date(this.endDate)
+            }
+        }
+        return true
     }
 
     filterApplied(): boolean {
