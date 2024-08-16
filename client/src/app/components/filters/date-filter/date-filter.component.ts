@@ -11,6 +11,7 @@ import {
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { DateFilterEnum } from '../../../models/dateFilter'
+import { AlertService } from '../../../services/alert.service'
 
 @Component({
     selector: 'app-date-filter',
@@ -39,6 +40,8 @@ export class DateFilterComponent implements OnInit, OnChanges {
     originalEndDate: string | null = this.endDate
 
     cancelOnExit = true
+
+    constructor(private alertSvc: AlertService) {}
 
     ngOnInit(): void {
         const modalElement = this.dateFilterModal.nativeElement
@@ -244,6 +247,15 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 this.selectedFilter = DateFilterEnum.ALL
             }
         }
+
+        if (!this.startDateValid() || !this.endDateValid()) {
+            this.alertSvc.addErrorAlert('Invalid date range', [
+                'Update inputs and try again',
+            ])
+            this.cancel()
+            return
+        }
+
         this.filterInputsChanged.emit({
             selectedFilter: this.selectedFilter,
             startDate: this.startDate,
