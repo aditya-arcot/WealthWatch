@@ -23,7 +23,7 @@ export const corsMiddleware = cors({
 })
 
 export const createSessionMiddleware = () => {
-    if (!env['SESSION_SECRET']) {
+    if (env['SESSION_SECRET'] === undefined) {
         throw Error('missing session secret')
     }
     const postgresSession = pgSession(session)
@@ -45,7 +45,7 @@ export const createSessionMiddleware = () => {
 }
 
 export const createCsrfMiddleware = () => {
-    if (!env['CSRF_SECRET']) {
+    if (env['CSRF_SECRET'] === undefined) {
         throw Error('missing csrf secret')
     }
     const csrfSecret = env['CSRF_SECRET']

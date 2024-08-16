@@ -11,9 +11,11 @@ import {
     switchMap,
     throwError,
 } from 'rxjs'
-import { DateFilterComponent } from '../../components/date-filter/date-filter.component'
+import { AmountFilterComponent } from '../../components/filters/amount-filter/amount-filter.component'
+import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
+import { AmountFilterEnum } from '../../models/amountFilter'
 import { Category, CategoryEnum } from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
 import { Item } from '../../models/item'
@@ -34,6 +36,7 @@ import { TransactionService } from '../../services/transaction.service'
         LoadingSpinnerComponent,
         FormsModule,
         DateFilterComponent,
+        AmountFilterComponent,
     ],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
@@ -50,9 +53,9 @@ export class TransactionsComponent implements OnInit {
     pageSizeIndex = 0
     currentPage = 1
 
-    searchSubject = new Subject<string>()
-    previousSearchText = ''
+    searchSubject = new Subject<string | null>()
     searchText: string | null = null
+    previousSearchText: string | null = null
 
     dateFilterType = DateFilterEnum
     selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
@@ -60,6 +63,13 @@ export class TransactionsComponent implements OnInit {
     startDate: string | null = null
     previousEndDate: string | null = null
     endDate: string | null = null
+
+    amountFilterType = AmountFilterEnum
+    selectedAmountFilter: AmountFilterEnum = AmountFilterEnum.ALL
+    previousMinAmount: number | null = null
+    minAmount: number | null = null
+    previousMaxAmount: number | null = null
+    maxAmount: number | null = null
 
     totalCount = -1
     filteredCount: number | null = null
@@ -155,6 +165,8 @@ export class TransactionsComponent implements OnInit {
             searchQuery: this.searchText,
             startDate: this.startDate,
             endDate: this.endDate,
+            minAmount: this.minAmount,
+            maxAmount: this.maxAmount,
             limit,
             offset,
         }
@@ -179,6 +191,7 @@ export class TransactionsComponent implements OnInit {
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert('Failed to reload transactions')
+                    this.clearFilters()
                     this.loading = false
                     return throwError(() => err)
                 })
@@ -300,7 +313,7 @@ export class TransactionsComponent implements OnInit {
     }
 
     search(): void {
-        const modifiedSearchText = this.searchText?.trim().toLowerCase() ?? ''
+        const modifiedSearchText = this.searchText?.trim().toLowerCase() ?? null
         if (modifiedSearchText === this.previousSearchText) return
         this.previousSearchText = modifiedSearchText
 
@@ -310,20 +323,42 @@ export class TransactionsComponent implements OnInit {
     }
 
     applyDateFilter(
-        selected: DateFilterEnum,
-        startDate: string | null,
-        endDate: string | null
+        filter: DateFilterEnum,
+        start: string | null,
+        end: string | null
     ): void {
-        this.selectedDateFilter = selected
+        this.selectedDateFilter = filter
         let reload = false
-        if (startDate !== this.previousStartDate) {
-            this.previousStartDate = startDate
-            this.startDate = startDate
+        if (start !== this.previousStartDate) {
+            this.previousStartDate = start
+            this.startDate = start
             reload = true
         }
-        if (endDate !== this.previousEndDate) {
-            this.previousEndDate = endDate
-            this.endDate = endDate
+        if (end !== this.previousEndDate) {
+            this.previousEndDate = end
+            this.endDate = end
+            reload = true
+        }
+        if (reload) {
+            this.reloadTransactions()
+        }
+    }
+
+    applyAmountFilter(
+        filter: AmountFilterEnum,
+        min: number | null,
+        max: number | null
+    ): void {
+        this.selectedAmountFilter = filter
+        let reload = false
+        if (min !== this.previousMinAmount) {
+            this.previousMinAmount = min
+            this.minAmount = min
+            reload = true
+        }
+        if (max !== this.previousMaxAmount) {
+            this.previousMaxAmount = max
+            this.maxAmount = max
             reload = true
         }
         if (reload) {
@@ -337,19 +372,27 @@ export class TransactionsComponent implements OnInit {
 
     filterActive(): boolean {
         return (
-            !!this.searchText || this.selectedDateFilter !== DateFilterEnum.ALL
+            !!this.searchText ||
+            this.selectedDateFilter !== DateFilterEnum.ALL ||
+            this.selectedAmountFilter !== AmountFilterEnum.ALL
         )
     }
 
     clearFilters(): void {
+        this.previousSearchText = this.searchText
+        this.searchText = null
+
         this.selectedDateFilter = DateFilterEnum.ALL
         this.previousStartDate = this.startDate
         this.startDate = null
         this.previousEndDate = this.endDate
         this.endDate = null
 
-        this.previousSearchText = this.searchText ?? ''
-        this.searchText = ''
+        this.selectedAmountFilter = AmountFilterEnum.ALL
+        this.previousMinAmount = this.minAmount
+        this.minAmount = null
+        this.previousMaxAmount = this.maxAmount
+        this.maxAmount = null
 
         this.currentPage = 1
 
@@ -390,7 +433,7 @@ export class TransactionsComponent implements OnInit {
 
     getDisplayAmount(t: Transaction): string {
         const currency = t.unofficialCurrencyCode ?? t.isoCurrencyCode
-        if (!currency) return t.amount.toString()
+        if (currency === null) return t.amount.toString()
 
         if (!this.currencyFormatters[currency]) {
             this.currencyFormatters[currency] = new Intl.NumberFormat('en-US', {

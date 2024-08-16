@@ -26,7 +26,6 @@ import { UserService } from '../../services/user.service'
     standalone: true,
     imports: [LoadingSpinnerComponent, DatePipe],
     templateUrl: './accounts.component.html',
-    styleUrl: './accounts.component.css',
 })
 export class AccountsComponent implements OnInit {
     itemsWithAccounts: ItemWithAccounts[] = []
@@ -44,7 +43,7 @@ export class AccountsComponent implements OnInit {
 
     ngOnInit(): void {
         const institution = sessionStorage.getItem('deactivatedInstitution')
-        if (institution) {
+        if (institution !== null) {
             this.alertSvc.addSuccessAlert(`Deleted ${institution} data`)
             sessionStorage.removeItem('deactivatedInstitution')
         }

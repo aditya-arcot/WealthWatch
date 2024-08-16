@@ -1,13 +1,3 @@
-.top-left {
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.small-text {
-    font-size: 14px;
-}
-
 .center-div {
     position: absolute;
     left: 50%;

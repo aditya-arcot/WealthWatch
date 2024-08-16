@@ -3,7 +3,7 @@ import { env } from 'process'
 
 const level = env['LOG_LEVEL'] || 'info'
 const token = env['SERVER_LOGTAIL_TOKEN']
-if (!token) {
+if (token === undefined) {
     throw Error('missing logtail token')
 }
 export const logger = pino({

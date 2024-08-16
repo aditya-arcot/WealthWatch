@@ -5,7 +5,11 @@ import { queuePlaidApiRequestLog } from '../queues/logQueue.js'
 import { safeStringify } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 
-if (!env['PLAID_ENV'] || !env['PLAID_CLIENT_ID'] || !env['PLAID_SECRET']) {
+if (
+    env['PLAID_ENV'] === undefined ||
+    env['PLAID_CLIENT_ID'] === undefined ||
+    env['PLAID_SECRET'] === undefined
+) {
     throw Error('missing one or more plaid secrets')
 }
 const config = new Configuration({

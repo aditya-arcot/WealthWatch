@@ -17,7 +17,7 @@ export class TransactionService {
 
     getTransactions(req: TransactionsRequest) {
         let params = new HttpParams()
-        if (req.searchQuery) {
+        if (req.searchQuery !== null && req.searchQuery !== undefined) {
             params = params.set('searchQuery', req.searchQuery)
         }
         if (req.startDate) {
@@ -26,10 +26,16 @@ export class TransactionService {
         if (req.endDate) {
             params = params.set('endDate', req.endDate)
         }
-        if (req.limit) {
+        if (req.minAmount !== null && req.minAmount !== undefined) {
+            params = params.set('minAmount', req.minAmount)
+        }
+        if (req.maxAmount !== null && req.maxAmount !== undefined) {
+            params = params.set('maxAmount', req.maxAmount)
+        }
+        if (req.limit !== undefined) {
             params = params.set('limit', req.limit)
         }
-        if (req.offset) {
+        if (req.offset !== undefined) {
             params = params.set('offset', req.offset)
         }
         return this.http.get<TransactionsResponse>(this.baseUrl, { params })

@@ -28,7 +28,7 @@ export const plaidCreateLinkToken = async (
 
     let item: Item | undefined
     // link update mode
-    if (itemId) {
+    if (itemId !== undefined) {
         item = await fetchActiveItemById(itemId)
         if (!item) throw Error('item not found')
         accessToken = item.accessToken

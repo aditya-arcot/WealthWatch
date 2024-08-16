@@ -17,15 +17,31 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     logger.debug('getting transactions')
 
     const userId: number | undefined = req.session.user?.id
-    if (!userId) throw new HttpError('missing user id', 400)
+    if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const searchQuery = req.query['searchQuery'] as string | undefined
     const startDate = req.query['startDate'] as string | undefined
     const endDate = req.query['endDate'] as string | undefined
 
+    const minAmount = req.query['minAmount'] as string | undefined
+    let minAmountNum: number | undefined
+    if (minAmount !== undefined) {
+        minAmountNum = parseFloat(minAmount)
+        if (isNaN(minAmountNum)) throw new HttpError('invalid minAmount', 400)
+    }
+
+    const maxAmount = req.query['maxAmount'] as string | undefined
+    let maxAmountNum: number | undefined
+    if (maxAmount !== undefined) {
+        maxAmountNum = parseFloat(maxAmount)
+        if (isNaN(maxAmountNum)) throw new HttpError('invalid maxAmount', 400)
+        if (minAmountNum !== undefined && maxAmountNum < minAmountNum)
+            throw new HttpError('maxAmount must be greater than minAmount', 400)
+    }
+
     const limit = req.query['limit'] as string | undefined
     let limitNum: number | undefined
-    if (limit) {
+    if (limit !== undefined) {
         limitNum = parseInt(limit)
         if (isNaN(limitNum) || limitNum < 0)
             throw new HttpError('invalid limit', 400)
@@ -33,7 +49,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
 
     const offset = req.query['offset'] as string | undefined
     let offsetNum: number | undefined
-    if (offset) {
+    if (offset !== undefined) {
         offsetNum = parseInt(offset)
         if (isNaN(offsetNum) || offsetNum < 0)
             throw new HttpError('invalid offset', 400)
@@ -45,6 +61,8 @@ export const getUserTransactions = async (req: Request, res: Response) => {
             searchQuery,
             startDate,
             endDate,
+            minAmountNum,
+            maxAmountNum,
             limitNum,
             offsetNum
         )
@@ -63,7 +81,8 @@ export const updateTransactionCustomName = async (
     logger.debug('updating transaction custom name')
 
     const transactionId: string | undefined = req.params['transactionId']
-    if (!transactionId) throw new HttpError('missing transaction id', 400)
+    if (transactionId === undefined)
+        throw new HttpError('missing transaction id', 400)
 
     const name: string | null | undefined = req.body.name
     if (name === undefined) throw new HttpError('missing name', 400)
@@ -86,7 +105,8 @@ export const updateTransactionCustomCategoryId = async (
     logger.debug('updating transaction custom category id')
 
     const transactionId: string | undefined = req.params['transactionId']
-    if (!transactionId) throw new HttpError('missing transaction id', 400)
+    if (transactionId === undefined)
+        throw new HttpError('missing transaction id', 400)
 
     const categoryId: number | null | undefined = req.body.categoryId
     if (categoryId === undefined)
@@ -110,7 +130,7 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
     logger.debug('refreshing transactions')
 
     const userId: number | undefined = req.session.user?.id
-    if (!userId) throw new HttpError('missing user id', 400)
+    if (userId === undefined) throw new HttpError('missing user id', 400)
 
     try {
         const items = await fetchActiveItemsByUserId(userId)

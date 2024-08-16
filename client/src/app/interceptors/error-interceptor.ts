@@ -32,7 +32,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                     errorSubtext.push(error.message)
                 } else {
                     errorMessage = `Server HTTP Error (${error.status})`
-                    errorSubtext.push(error.message)
+                    errorSubtext.push(error.error)
                     if (error.status === 401) {
                         this.userSvc.clearCurrentUser()
                         this.router.navigateByUrl('/login')

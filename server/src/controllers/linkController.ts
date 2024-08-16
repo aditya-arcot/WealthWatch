@@ -19,7 +19,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
 
     const userId: number | undefined = req.session.user?.id
-    if (!userId) throw new HttpError('missing user id', 400)
+    if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const itemId: string | undefined = req.body.itemId
 
@@ -51,10 +51,15 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     const metadata: LinkSessionSuccessMetadata | undefined = req.body.metadata
     const institution = metadata?.institution
 
-    if (!userId) throw new HttpError('missing user id', 400)
-    if (!publicToken) throw new HttpError('missing public token', 400)
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+    if (publicToken === undefined)
+        throw new HttpError('missing public token', 400)
     if (!metadata) throw new HttpError('missing metadata', 400)
-    if (!institution || !institution.institution_id || !institution.name)
+    if (
+        !institution ||
+        institution.institution_id === undefined ||
+        institution.name === undefined
+    )
         throw new HttpError('missing institution info', 400)
 
     try {

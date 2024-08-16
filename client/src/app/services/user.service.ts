@@ -17,7 +17,7 @@ export class UserService {
 
     getStoredCurrentUser(): User | null {
         const userStr = sessionStorage.getItem('user')
-        if (!userStr) return null
+        if (userStr === null) return null
         return JSON.parse(userStr) as User
     }
 

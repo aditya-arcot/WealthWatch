@@ -1,0 +1,137 @@
+<div #dateFilterModal class="modal modal-sm fade" id="dateFilterModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-center p-2">
+                <h5 class="modal-title w-100">Filter by Date</h5>
+            </div>
+            <div class="modal-body p-3 py-2">
+                <div
+                    class="{{
+                        selectedFilter !== dateFilterType.CUSTOM ? 'pb-2' : ''
+                    }}"
+                >
+                    <label for="dateRange">
+                        <b>Date Range</b>
+                    </label>
+                    <select
+                        id="dateRange"
+                        class="form-select form-select-sm"
+                        [(ngModel)]="selectedFilter"
+                        (change)="handleFilterChange()"
+                    >
+                        <option value="{{ dateFilterType.ALL }}">
+                            All Dates
+                        </option>
+                        <option value="{{ dateFilterType.CURRENT_WEEK }}">
+                            This Week
+                        </option>
+                        <option value="{{ dateFilterType.CURRENT_MONTH }}">
+                            This Month
+                        </option>
+                        <option value="{{ dateFilterType.CURRENT_YEAR }}">
+                            This Year
+                        </option>
+                        <option value="{{ dateFilterType.PAST_WEEK }}">
+                            Past 7 Days
+                        </option>
+                        <option value="{{ dateFilterType.PAST_MONTH }}">
+                            Past 30 Days
+                        </option>
+                        <option value="{{ dateFilterType.LAST_WEEK }}">
+                            Last Week
+                        </option>
+                        <option value="{{ dateFilterType.LAST_MONTH }}">
+                            Last Month
+                        </option>
+                        <option value="{{ dateFilterType.LAST_YEAR }}">
+                            Last Year
+                        </option>
+                        <option value="{{ dateFilterType.CUSTOM }}">
+                            Custom
+                        </option>
+                    </select>
+                </div>
+
+                @if (selectedFilter === dateFilterType.CUSTOM) {
+                    <div class="mt-2">
+                        <label for="startDate">
+                            <b>Start Date</b>
+                        </label>
+                        <input
+                            id="startDate"
+                            type="date"
+                            class="form-control form-control-sm {{
+                                !startDateValid() ? 'invalid-input' : ''
+                            }}"
+                            [(ngModel)]="startDate"
+                            (change)="handleStartDateChange()"
+                        />
+                        @if (!startDateValid()) {
+                            <div class="feedback-text small-text">
+                                Start or end date required
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-2 pb-2">
+                        <label for="endDate">
+                            <b>End Date</b>
+                        </label>
+                        <input
+                            id="endDate"
+                            type="date"
+                            class="form-control form-control-sm {{
+                                !endDateValid() ? 'invalid-input' : ''
+                            }}"
+                            [(ngModel)]="endDate"
+                            (change)="handleEndDateChange()"
+                        />
+                        @if (!endDateValid()) {
+                            <div class="feedback-text small-text">
+                                @if (startDate === null) {
+                                    Start or end date required
+                                } @else {
+                                    End date cannot be before start date
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="modal-footer justify-content-center p-1">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    (click)="apply()"
+                    data-bs-dismiss="modal"
+                    [disabled]="
+                        !inputsChanged() || !startDateValid() || !endDateValid()
+                    "
+                >
+                    <i class="bi bi-check2"></i>
+                    Apply
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    (click)="clear()"
+                    data-bs-dismiss="modal"
+                    [disabled]="!filterApplied()"
+                >
+                    <i class="bi bi-trash"></i>
+                    Clear
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-warning"
+                    data-bs-dismiss="modal"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

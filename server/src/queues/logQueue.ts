@@ -16,7 +16,7 @@ enum LogJobType {
     PlaidApiRequestLog = 'PlaidApiRequest',
 }
 
-if (!env['NODE_ENV']) {
+if (env['NODE_ENV'] === undefined) {
     throw Error('missing node env')
 }
 const logQueueName = `log-${env['NODE_ENV']}`

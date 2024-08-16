@@ -6,7 +6,7 @@ import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
-if (!env['NODE_ENV']) {
+if (env['NODE_ENV'] === undefined) {
     throw Error('missing node env')
 }
 const webhookQueueName = `webhook-${env['NODE_ENV']}`
@@ -77,7 +77,7 @@ const processWebhook = async (webhook: Webhook) => {
     const webhookType: string | undefined = webhook.data.webhook_type
     const webhookCode: string | undefined = webhook.data.webhook_code
 
-    if (!webhookType || !webhookCode) {
+    if (webhookType === undefined || webhookCode === undefined) {
         throw Error('missing webhook type or code')
     }
 
@@ -86,7 +86,7 @@ const processWebhook = async (webhook: Webhook) => {
     switch (webhookTypeEnum) {
         case WebhookTypeEnum.Transactions: {
             const itemId: string | undefined = webhook.data.item_id
-            if (!itemId) throw Error('missing item id')
+            if (itemId === undefined) throw Error('missing item id')
             await plaidHandleTransactionsWebhook(webhookCode, itemId)
             break
         }

@@ -1,13 +1,17 @@
 import { formatDate } from '@angular/common'
 import {
     Component,
+    ElementRef,
     EventEmitter,
     Input,
     OnChanges,
+    OnInit,
     Output,
+    ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { DateFilterEnum } from '../../models/dateFilter'
+import { DateFilterEnum } from '../../../models/dateFilter'
+import { AlertService } from '../../../services/alert.service'
 
 @Component({
     selector: 'app-date-filter',
@@ -15,22 +19,41 @@ import { DateFilterEnum } from '../../models/dateFilter'
     imports: [FormsModule],
     templateUrl: './date-filter.component.html',
 })
-export class DateFilterComponent implements OnChanges {
-    dateFilterType = DateFilterEnum
+export class DateFilterComponent implements OnInit, OnChanges {
+    @ViewChild('dateFilterModal', { static: true }) dateFilterModal!: ElementRef
 
-    @Input() selectedFilter: DateFilterEnum = DateFilterEnum.ALL
-    @Input() startDate: string | null = null
-    @Input() endDate: string | null = null
-
-    private originalSelectedFilter: DateFilterEnum = this.selectedFilter
-    private originalStartDate: string | null = this.startDate
-    private originalEndDate: string | null = this.endDate
+    @Input({ required: true }) selectedFilter: DateFilterEnum =
+        DateFilterEnum.ALL
+    @Input({ required: true }) startDate: string | null = null
+    @Input({ required: true }) endDate: string | null = null
 
     @Output() filterInputsChanged = new EventEmitter<{
         selectedFilter: DateFilterEnum
         startDate: string | null
         endDate: string | null
     }>()
+
+    dateFilterType = DateFilterEnum
+
+    originalSelectedFilter: DateFilterEnum = this.selectedFilter
+    originalStartDate: string | null = this.startDate
+    originalEndDate: string | null = this.endDate
+
+    cancelOnExit = true
+
+    constructor(private alertSvc: AlertService) {}
+
+    ngOnInit(): void {
+        const modalElement = this.dateFilterModal.nativeElement
+        modalElement.addEventListener('hidden.bs.modal', (event: Event) => {
+            if (event.target === this.dateFilterModal.nativeElement) {
+                if (this.cancelOnExit) {
+                    this.cancel()
+                }
+                this.cancelOnExit = true
+            }
+        })
+    }
 
     ngOnChanges(): void {
         this.originalSelectedFilter = this.selectedFilter
@@ -157,26 +180,56 @@ export class DateFilterComponent implements OnChanges {
         this.endDate = formatDate(date, 'yyyy-MM-dd', 'en-US')
     }
 
+    handleStartDateChange() {
+        if (this.startDate === '') {
+            this.startDate = null
+        }
+    }
+
+    handleEndDateChange() {
+        if (this.endDate === '') {
+            this.endDate = null
+        }
+    }
+
     inputsChanged(): boolean {
         if (this.originalSelectedFilter !== this.selectedFilter) {
             return true
         }
         if (this.selectedFilter === DateFilterEnum.CUSTOM) {
-            if (
+            return (
                 this.originalStartDate !== this.startDate ||
                 this.originalEndDate !== this.endDate
-            ) {
-                return true
-            }
+            )
         }
         return false
     }
 
+    startDateValid(): boolean {
+        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+            return this.startDate !== null || this.endDate !== null
+        }
+        return true
+    }
+
+    endDateValid(): boolean {
+        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+            if (this.endDate === null) {
+                return this.startDate !== null
+            }
+            if (this.startDate !== null) {
+                return new Date(this.startDate) <= new Date(this.endDate)
+            }
+        }
+        return true
+    }
+
     filterApplied(): boolean {
-        return this.originalSelectedFilter !== this.dateFilterType.ALL
+        return this.originalSelectedFilter !== DateFilterEnum.ALL
     }
 
     clear() {
+        this.cancelOnExit = false
         this.selectedFilter = DateFilterEnum.ALL
         this.startDate = null
         this.endDate = null
@@ -188,11 +241,21 @@ export class DateFilterComponent implements OnChanges {
     }
 
     apply() {
+        this.cancelOnExit = false
         if (this.selectedFilter === DateFilterEnum.CUSTOM) {
             if (!this.startDate && !this.endDate) {
                 this.selectedFilter = DateFilterEnum.ALL
             }
         }
+
+        if (!this.startDateValid() || !this.endDateValid()) {
+            this.alertSvc.addErrorAlert('Invalid date range', [
+                'Update inputs and try again',
+            ])
+            this.cancel()
+            return
+        }
+
         this.filterInputsChanged.emit({
             selectedFilter: this.selectedFilter,
             startDate: this.startDate,
