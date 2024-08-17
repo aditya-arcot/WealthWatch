@@ -62,6 +62,13 @@ export class AccountsComponent implements OnInit {
                         return { ...item, accounts: [] }
                     })
                     return this.accountSvc.getAccounts()
+                }),
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert('Failed to load accounts', [
+                        err.message,
+                    ])
+                    this.loading = false
+                    return throwError(() => err)
                 })
             )
             .subscribe((accounts) => {
