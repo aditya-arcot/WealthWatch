@@ -39,6 +39,24 @@ export const getUserTransactions = async (req: Request, res: Response) => {
             throw new HttpError('maxAmount must be greater than minAmount', 400)
     }
 
+    const categoryId = req.query['categoryId'] as string | string[] | undefined
+    let categoryIdNums: number[] | undefined
+    if (categoryId !== undefined) {
+        if (typeof categoryId === 'string') {
+            const idNum = parseInt(categoryId)
+            if (isNaN(idNum) || idNum < 1)
+                throw new HttpError(`invalid categoryId - ${categoryId}`, 400)
+            categoryIdNums = [idNum]
+        } else {
+            categoryIdNums = categoryId.map((id) => {
+                const idNum = parseInt(id)
+                if (isNaN(idNum) || idNum < 1)
+                    throw new HttpError(`invalid categoryId - ${id}`, 400)
+                return idNum
+            })
+        }
+    }
+
     const limit = req.query['limit'] as string | undefined
     let limitNum: number | undefined
     if (limit !== undefined) {
@@ -63,6 +81,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
             endDate,
             minAmountNum,
             maxAmountNum,
+            categoryIdNums,
             limitNum,
             offsetNum
         )
