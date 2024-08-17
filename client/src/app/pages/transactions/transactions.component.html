@@ -308,7 +308,21 @@
                             </div>
                         </th>
                         <th scope="col" class="d-none d-sm-table-cell">
-                            Category
+                            <div class="d-flex justify-content-center">
+                                <span class="ps-1 me-1">Category</span>
+                                <button
+                                    class="btn btn-sm btn-dark p-0 ps-1 pe-1"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#categoryFilterModal"
+                                >
+                                    @if (selectedCategoryIds.size === 0) {
+                                        <i class="bi bi-funnel"></i>
+                                    } @else {
+                                        <i class="bi bi-funnel-fill"></i>
+                                    }
+                                </button>
+                            </div>
                         </th>
                         <th scope="col" class="d-none d-md-table-cell">
                             Account
@@ -428,5 +442,13 @@
             $event.minAmount,
             $event.maxAmount
         )
+    "
+/>
+
+<app-category-filter
+    [categories]="categories"
+    [originalSelectedCategoryIds]="selectedCategoryIds"
+    (selectedCategoriesChanged)="
+        applyCategoryFilter($event.selectedCategoryIds)
     "
 />

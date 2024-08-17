@@ -12,14 +12,18 @@ import {
     throwError,
 } from 'rxjs'
 import { AmountFilterComponent } from '../../components/filters/amount-filter/amount-filter.component'
+import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import { AmountFilterEnum } from '../../models/amountFilter'
-import { Category, CategoryEnum } from '../../models/category'
+import { Category, CategoryEnum, categoryIcons } from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
 import { Item } from '../../models/item'
-import { Transaction, TransactionsRequest } from '../../models/transaction'
+import {
+    Transaction,
+    TransactionsRequestParams,
+} from '../../models/transaction'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
@@ -37,6 +41,7 @@ import { TransactionService } from '../../services/transaction.service'
         FormsModule,
         DateFilterComponent,
         AmountFilterComponent,
+        CategoryFilterComponent,
     ],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
@@ -70,6 +75,8 @@ export class TransactionsComponent implements OnInit {
     minAmount: number | null = null
     previousMaxAmount: number | null = null
     maxAmount: number | null = null
+
+    selectedCategoryIds: Set<number> = new Set<number>()
 
     totalCount = -1
     filteredCount: number | null = null
@@ -161,12 +168,13 @@ export class TransactionsComponent implements OnInit {
     loadTransactions(): Observable<void> {
         const limit = this.pageSizes[this.pageSizeIndex]
         const offset = (this.currentPage - 1) * limit
-        const req: TransactionsRequest = {
+        const req: TransactionsRequestParams = {
             searchQuery: this.searchText,
             startDate: this.startDate,
             endDate: this.endDate,
             minAmount: this.minAmount,
             maxAmount: this.maxAmount,
+            categoryIds: this.selectedCategoryIds,
             limit,
             offset,
         }
@@ -366,6 +374,16 @@ export class TransactionsComponent implements OnInit {
         }
     }
 
+    applyCategoryFilter(ids: Set<number>): void {
+        if (
+            ids.size !== this.selectedCategoryIds.size ||
+            ![...ids].every((value) => this.selectedCategoryIds!.has(value))
+        ) {
+            this.selectedCategoryIds = new Set(ids)
+            this.reloadTransactions()
+        }
+    }
+
     resultsFiltered(): boolean {
         return this.filteredCount !== null
     }
@@ -374,7 +392,8 @@ export class TransactionsComponent implements OnInit {
         return (
             !!this.searchText ||
             this.selectedDateFilter !== DateFilterEnum.ALL ||
-            this.selectedAmountFilter !== AmountFilterEnum.ALL
+            this.selectedAmountFilter !== AmountFilterEnum.ALL ||
+            this.selectedCategoryIds.size !== 0
         )
     }
 
@@ -393,6 +412,8 @@ export class TransactionsComponent implements OnInit {
         this.minAmount = null
         this.previousMaxAmount = this.maxAmount
         this.maxAmount = null
+
+        this.selectedCategoryIds = new Set<number>()
 
         this.currentPage = 1
 
@@ -471,32 +492,7 @@ export class TransactionsComponent implements OnInit {
 
     getCategoryClasses(t: Transaction): string {
         const categoryId = this.getDisplayCategory(t) as CategoryEnum
-        return `bi ${this.icons[categoryId]}`
-    }
-
-    private icons: Record<CategoryEnum, string> = {
-        [CategoryEnum.Uncategorized]: 'bi-question-circle',
-        [CategoryEnum.Income]: 'bi-currency-dollar',
-        [CategoryEnum.Transfer]: 'bi-arrow-left-right',
-        [CategoryEnum.Deposit]: 'bi-bank',
-        [CategoryEnum.Investment]: 'bi-graph-up',
-        [CategoryEnum.Savings]: 'bi-piggy-bank',
-        [CategoryEnum.LoanPayment]: 'bi-wallet',
-        [CategoryEnum.CreditCardPayment]: 'bi-credit-card-2-front',
-        [CategoryEnum.Fees]: 'bi-file-earmark-text',
-        [CategoryEnum.Entertainment]: 'bi-controller',
-        [CategoryEnum.FoodAndDrink]: 'bi-cup-straw',
-        [CategoryEnum.Groceries]: 'bi-basket',
-        [CategoryEnum.Merchandise]: 'bi-bag',
-        [CategoryEnum.Medical]: 'bi-heart-pulse',
-        [CategoryEnum.PersonalCare]: 'bi-person',
-        [CategoryEnum.Services]: 'bi-tools',
-        [CategoryEnum.Government]: 'bi-building',
-        [CategoryEnum.Donations]: 'bi-heart',
-        [CategoryEnum.Taxes]: 'bi-percent',
-        [CategoryEnum.Transportation]: 'bi-car-front',
-        [CategoryEnum.Travel]: 'bi-airplane',
-        [CategoryEnum.Bills]: 'bi-receipt-cutoff',
+        return `bi ${categoryIcons[categoryId]}`
     }
 
     getDisplayAccount(t: Transaction): string {

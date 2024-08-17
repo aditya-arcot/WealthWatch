@@ -1,9 +1,10 @@
-export interface TransactionsRequest {
+export interface TransactionsRequestParams {
     searchQuery?: string | null
     startDate?: string | null
     endDate?: string | null
     minAmount?: number | null
     maxAmount?: number | null
+    categoryIds?: Set<number>
     limit?: number
     offset?: number
 }

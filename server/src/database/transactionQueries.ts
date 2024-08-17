@@ -72,6 +72,69 @@ export const insertTransactions = async (
     return rows.map(mapDbTransaction)
 }
 
+export const fetchActiveTransactionsByUserId = async (
+    userId: number,
+    searchQuery?: string,
+    startDate?: string,
+    endDate?: string,
+    minAmount?: number,
+    maxAmount?: number,
+    categoryIds?: number[],
+    limit?: number,
+    offset?: number
+): Promise<TransactionsResponse> => {
+    const totalCount = await fetchActiveTransactionsByUserIdCount(userId)
+
+    const {
+        filtered,
+        query: initialQuery,
+        values,
+        placeholder,
+    } = constructfetchActiveTransactionsByUserIdQuery(
+        userId,
+        searchQuery,
+        startDate,
+        endDate,
+        minAmount,
+        maxAmount,
+        categoryIds
+    )
+
+    let filteredCount: number | null = null
+    if (filtered) {
+        filteredCount = await fetchActiveTransactionsByUserIdFilteredCount(
+            initialQuery,
+            values
+        )
+    }
+
+    let query =
+        initialQuery +
+        `
+        ORDER BY t.date DESC, t.transaction_id
+    `
+    if (limit !== undefined) {
+        query += `
+            LIMIT $${placeholder}
+        `
+        values.push(limit)
+
+        if (offset !== undefined) {
+            query += `
+                OFFSET $${placeholder + 1}
+            `
+            values.push(offset)
+        }
+    }
+    const rows = (await runQuery<DbTransaction>(query, values)).rows
+
+    return {
+        totalCount,
+        filteredCount,
+        transactions: rows.map(mapDbTransaction),
+    }
+}
+
 const fetchActiveTransactionsByUserIdCount = async (
     userId: number
 ): Promise<number> => {
@@ -95,22 +158,19 @@ const fetchActiveTransactionsByUserIdCount = async (
     return isNaN(countNum) ? -1 : countNum
 }
 
-export const fetchActiveTransactionsByUserId = async (
+const constructfetchActiveTransactionsByUserIdQuery = (
     userId: number,
     searchQuery?: string,
     startDate?: string,
     endDate?: string,
     minAmount?: number,
     maxAmount?: number,
-    limit?: number,
-    offset?: number
-): Promise<TransactionsResponse> => {
-    const totalCount = await fetchActiveTransactionsByUserIdCount(userId)
-
+    categoryIds?: number[]
+) => {
     let placeholder = 1
     const values: unknown[] = []
 
-    let baseQuery = `
+    let query = `
         SELECT t.*
         FROM transactions t
         WHERE
@@ -130,7 +190,7 @@ export const fetchActiveTransactionsByUserId = async (
     let filtered = false
     if (searchQuery !== undefined) {
         filtered = true
-        baseQuery += `
+        query += `
             AND LOWER (
                 COALESCE (
                     t.custom_name,
@@ -145,7 +205,7 @@ export const fetchActiveTransactionsByUserId = async (
 
     if (startDate && endDate) {
         filtered = true
-        baseQuery += `
+        query += `
             AND t.date BETWEEN $${placeholder} AND $${placeholder + 1}
         `
         values.push(startDate)
@@ -153,14 +213,14 @@ export const fetchActiveTransactionsByUserId = async (
         placeholder += 2
     } else if (startDate) {
         filtered = true
-        baseQuery += `
+        query += `
             AND t.date >= $${placeholder}
         `
         values.push(startDate)
         placeholder++
     } else if (endDate) {
         filtered = true
-        baseQuery += `
+        query += `
             AND t.date <= $${placeholder}
         `
         values.push(endDate)
@@ -169,7 +229,7 @@ export const fetchActiveTransactionsByUserId = async (
 
     if (minAmount !== undefined && maxAmount !== undefined) {
         filtered = true
-        baseQuery += `
+        query += `
             AND t.amount BETWEEN $${placeholder} AND $${placeholder + 1}
         `
         values.push(minAmount)
@@ -177,61 +237,51 @@ export const fetchActiveTransactionsByUserId = async (
         placeholder += 2
     } else if (minAmount !== undefined) {
         filtered = true
-        baseQuery += `
+        query += `
             AND t.amount >= $${placeholder}
         `
         values.push(minAmount)
         placeholder++
     } else if (maxAmount !== undefined) {
         filtered = true
-        baseQuery += `
+        query += `
             AND t.amount <= $${placeholder}
         `
         values.push(maxAmount)
         placeholder++
     }
 
-    let filteredCount: number | null = null
-    if (filtered) {
-        const countQuery = `
-            SELECT COUNT(*)
-            FROM (${baseQuery}) AS t
+    if (categoryIds !== undefined && categoryIds.length > 0) {
+        filtered = true
+        const idsPlaceholder = categoryIds
+            .map((_, idx) => `$${idx + placeholder}`)
+            .join(', ')
+        query += `
+            AND COALESCE (
+                t.custom_category_id, 
+                t.category_id
+            ) IN (${idsPlaceholder})
         `
-        const countRows = (
-            await runQuery<{ count: string }>(countQuery, values)
-        ).rows
-        if (!countRows[0]) throw Error('failed to fetch count')
-        const countNum = parseInt(countRows[0].count)
-        filteredCount = isNaN(countNum) ? -1 : countNum
+        values.push(...categoryIds)
+        placeholder += categoryIds.length
     }
 
-    let mainQuery = baseQuery
-    mainQuery += `
-        ORDER BY t.date DESC, t.transaction_id
+    return { filtered, query, values, placeholder }
+}
+
+const fetchActiveTransactionsByUserIdFilteredCount = async (
+    query: string,
+    values: unknown[]
+) => {
+    const countQuery = `
+        SELECT COUNT(*)
+        FROM (${query}) AS t
     `
-
-    if (limit !== undefined) {
-        mainQuery += `
-            LIMIT $${placeholder}
-        `
-        values.push(limit)
-        placeholder++
-
-        if (offset !== undefined) {
-            mainQuery += `
-                OFFSET $${placeholder}
-            `
-            values.push(offset)
-            placeholder++
-        }
-    }
-
-    const rows = (await runQuery<DbTransaction>(mainQuery, values)).rows
-    return {
-        totalCount,
-        filteredCount,
-        transactions: rows.map(mapDbTransaction),
-    }
+    const countRows = (await runQuery<{ count: string }>(countQuery, values))
+        .rows
+    if (!countRows[0]) throw Error('failed to fetch count')
+    const count = parseInt(countRows[0].count)
+    return isNaN(count) ? -1 : count
 }
 
 export const updateTransactionCustomNameById = async (

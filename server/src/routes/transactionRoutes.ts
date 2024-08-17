@@ -42,13 +42,20 @@ const router = express.Router()
  *       - in: query
  *         name: minAmount
  *         schema:
- *           type: number
+ *           type: integer
  *         description: The minimum amount
  *       - in: query
  *         name: maxAmount
  *         schema:
- *           type: number
+ *           type: integer
  *         description: The maximum amount
+ *       - in: query
+ *         name: categoryId
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: integer
+ *         description: The category id(s)
  *       - in: query
  *         name: limit
  *         schema:
@@ -135,7 +142,7 @@ router
  *             type: object
  *             properties:
  *               categoryId:
- *                 type: number
+ *                 type: integer
  *     responses:
  *       204:
  *         description: Updated the transaction's custom category id

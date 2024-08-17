@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
 import {
     Transaction,
-    TransactionsRequest,
+    TransactionsRequestParams,
     TransactionsResponse,
 } from '../models/transaction'
 
@@ -15,7 +15,7 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
-    getTransactions(req: TransactionsRequest) {
+    getTransactions(req: TransactionsRequestParams) {
         let params = new HttpParams()
         if (req.searchQuery !== null && req.searchQuery !== undefined) {
             params = params.set('searchQuery', req.searchQuery)
@@ -31,6 +31,15 @@ export class TransactionService {
         }
         if (req.maxAmount !== null && req.maxAmount !== undefined) {
             params = params.set('maxAmount', req.maxAmount)
+        }
+        if (
+            req.categoryIds !== null &&
+            req.categoryIds !== undefined &&
+            req.categoryIds.size > 0
+        ) {
+            req.categoryIds.forEach(
+                (id) => (params = params.append('categoryId', id))
+            )
         }
         if (req.limit !== undefined) {
             params = params.set('limit', req.limit)
