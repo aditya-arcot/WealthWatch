@@ -25,15 +25,21 @@ jobs:
         runs-on: ${{ needs.setup.outputs.runner }}
         environment: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
         steps:
-            - name: set vars
+            - name: general vars
               run: |
                   VERSION=${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
-
                   echo "REPO=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
                   echo "IMAGE_TAG=$(date +%Y-%m-%d).$VERSION" >> $GITHUB_ENV
 
+            - name: docker container names
+              run: |
                   echo "SERVER_CONTAINER=$REPO-${{ github.ref_name }}-server" >> $GITHUB_ENV
+                  echo "CLIENT_CONTAINER=$REPO-${{ github.ref_name }}-client" >> $GITHUB_ENV
+
+            - name: docker image names
+              run: |
                   echo "SERVER_IMAGE=${{ secrets.DOCKER_REGISTRY }}/$SERVER_CONTAINER:$IMAGE_TAG" >> $GITHUB_ENV
+                  echo "CLIENT_IMAGE=${{ secrets.DOCKER_REGISTRY }}/$CLIENT_CONTAINER:$IMAGE_TAG" >> $GITHUB_ENV
 
             - name: test
               run: echo
