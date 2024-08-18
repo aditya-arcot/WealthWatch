@@ -41,6 +41,15 @@ export class TransactionService {
                 (id) => (params = params.append('categoryId', id))
             )
         }
+        if (
+            req.accountIds !== null &&
+            req.accountIds !== undefined &&
+            req.accountIds.size > 0
+        ) {
+            req.accountIds.forEach(
+                (id) => (params = params.append('accountId', id))
+            )
+        }
         if (req.limit !== undefined) {
             params = params.set('limit', req.limit)
         }

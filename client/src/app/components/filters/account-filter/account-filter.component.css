@@ -1,0 +1,8 @@
+.dropdown-menu {
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
+.dropdown-header {
+    color: black;
+}

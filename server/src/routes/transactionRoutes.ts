@@ -57,6 +57,13 @@ const router = express.Router()
  *             type: integer
  *         description: The category id(s)
  *       - in: query
+ *         name: accountId
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: integer
+ *         description: The account id(s)
+ *       - in: query
  *         name: limit
  *         schema:
  *           type: integer

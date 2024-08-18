@@ -5,6 +5,7 @@ export interface TransactionsRequestParams {
     minAmount?: number | null
     maxAmount?: number | null
     categoryIds?: Set<number>
+    accountIds?: Set<number>
     limit?: number
     offset?: number
 }
