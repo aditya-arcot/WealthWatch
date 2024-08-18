@@ -69,7 +69,6 @@ jobs:
                   echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
 
                   echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-                  echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> .env
 
                   echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
                   echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
@@ -100,7 +99,6 @@ jobs:
               run: |
                   cd client/src/environments/
                   sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT}}/g" \
-                      -e "s/{SERVER_HOST}/${{ secrets.SERVER_HOST}}/g" \
                       env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
