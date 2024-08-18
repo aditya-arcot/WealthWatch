@@ -149,6 +149,7 @@ jobs:
 
             - name: start docker
               run: |
+                  REPO=$REPO-${{ github.ref_name }}
                   SERVER_PORT=${{ vars.SERVER_PORT }} \
                   WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }} \
                   CLIENT_PORT=${{ vars.CLIENT_PORT }} \
