@@ -5,6 +5,7 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
+        "build:stage": "ng build --configuration stage",
         "build:test": "ng build --configuration test",
         "watch": "ng build --watch --configuration dev",
         "lint": "ng lint"

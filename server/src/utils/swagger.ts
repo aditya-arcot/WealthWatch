@@ -18,7 +18,7 @@ export const swaggerOptions: SwaggerUiOptions = {
 }
 
 export const createSwaggerSpec = () => {
-    if (production) throw Error('swagger being used in prod')
+    if (production) throw Error('swagger should not be used in prod')
     const options = {
         definition: {
             openapi: '3.1.0',

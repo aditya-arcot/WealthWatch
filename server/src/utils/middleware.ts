@@ -11,10 +11,14 @@ import { HttpError } from '../models/httpError.js'
 import { queueAppRequestLog } from '../queues/logQueue.js'
 import { logger } from './logger.js'
 
-export const production = env['NODE_ENV'] === 'prod'
+export const production =
+    env['NODE_ENV'] === 'prod' || env['NODE_ENV'] === 'stage'
+const stage = env['NODE_ENV'] === 'stage'
 
 const origins = [
-    'https://wealthwatch.aditya-arcot.com',
+    stage
+        ? 'https://wealthwatch-stage.aditya-arcot.com'
+        : 'https://wealthwatch.aditya-arcot.com',
     `http://localhost:${env['CLIENT_PORT']}`,
 ]
 export const corsMiddleware = cors({
