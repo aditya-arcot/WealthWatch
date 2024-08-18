@@ -1,0 +1,108 @@
+<div #accountFilterModal class="modal modal-sm fade" id="accountFilterModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-center p-2">
+                <h4 class="modal-title w-100">Filter by Account</h4>
+            </div>
+            <div class="modal-body p-3 py-2">
+                <div class="dropdown input-group input-group-sm">
+                    <button
+                        class="form-select form-select-sm"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside"
+                    >
+                        @if (selectedAccountIds.size === 0) {
+                            Select Accounts
+                        } @else {
+                            {{ selectedAccountIds.size }} Selected
+                        }
+                    </button>
+                    <ul class="dropdown-menu p-0">
+                        @for (i of items; track $index) {
+                            <li
+                                class="dropdown-header medium-text py-0 px-2 mt-1"
+                            >
+                                {{ i.institutionName }}
+                            </li>
+                            @for (a of getItemAccounts(i.id); track $index) {
+                                <li>
+                                    <div
+                                        class="dropdown-item form-check form-switch py-0 px-2 m-0"
+                                    >
+                                        <input
+                                            id="account-{{ a.id }}"
+                                            class="form-check-input ms-0"
+                                            type="checkbox"
+                                            [value]="a.id"
+                                            [checked]="inputChecked(a.id)"
+                                            (click)="
+                                                handleAccountSelect(
+                                                    $event,
+                                                    a.id
+                                                )
+                                            "
+                                            (keydown)="
+                                                handleAccountSelect(
+                                                    $event,
+                                                    a.id
+                                                )
+                                            "
+                                            tabindex="0"
+                                        />
+                                        <label
+                                            class="form-check-label small-text w-100 ms-2"
+                                            for="account-{{ a.id }}"
+                                        >
+                                            {{ a.name }}
+                                        </label>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-success"
+                        (click)="invert()"
+                    >
+                        <i class="bi bi-arrow-repeat"></i>
+                        Invert
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center p-1">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    (click)="apply()"
+                    data-bs-dismiss="modal"
+                    [disabled]="!accountIdsChanged()"
+                >
+                    <i class="bi bi-check2"></i>
+                    Apply
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    (click)="clear()"
+                    data-bs-dismiss="modal"
+                    [disabled]="!filterApplied()"
+                >
+                    <i class="bi bi-trash"></i>
+                    Clear
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-warning"
+                    data-bs-dismiss="modal"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

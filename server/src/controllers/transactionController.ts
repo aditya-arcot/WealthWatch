@@ -57,6 +57,24 @@ export const getUserTransactions = async (req: Request, res: Response) => {
         }
     }
 
+    const accountId = req.query['accountId'] as string | string[] | undefined
+    let accountIdNums: number[] | undefined
+    if (accountId !== undefined) {
+        if (typeof accountId === 'string') {
+            const idNum = parseInt(accountId)
+            if (isNaN(idNum) || idNum < 1)
+                throw new HttpError(`invalid accountId - ${accountId}`, 400)
+            accountIdNums = [idNum]
+        } else {
+            accountIdNums = accountId.map((id) => {
+                const idNum = parseInt(id)
+                if (isNaN(idNum) || idNum < 1)
+                    throw new HttpError(`invalid accountId - ${id}`, 400)
+                return idNum
+            })
+        }
+    }
+
     const limit = req.query['limit'] as string | undefined
     let limitNum: number | undefined
     if (limit !== undefined) {
@@ -82,6 +100,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
             minAmountNum,
             maxAmountNum,
             categoryIdNums,
+            accountIdNums,
             limitNum,
             offsetNum
         )

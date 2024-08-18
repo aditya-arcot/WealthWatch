@@ -11,6 +11,7 @@ import {
     switchMap,
     throwError,
 } from 'rxjs'
+import { AccountFilterComponent } from '../../components/filters/account-filter/account-filter.component'
 import { AmountFilterComponent } from '../../components/filters/amount-filter/amount-filter.component'
 import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
@@ -42,6 +43,7 @@ import { TransactionService } from '../../services/transaction.service'
         DateFilterComponent,
         AmountFilterComponent,
         CategoryFilterComponent,
+        AccountFilterComponent,
     ],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
@@ -77,6 +79,7 @@ export class TransactionsComponent implements OnInit {
     maxAmount: number | null = null
 
     selectedCategoryIds: Set<number> = new Set<number>()
+    selectedAccountIds: Set<number> = new Set<number>()
 
     totalCount = -1
     filteredCount: number | null = null
@@ -175,6 +178,7 @@ export class TransactionsComponent implements OnInit {
             minAmount: this.minAmount,
             maxAmount: this.maxAmount,
             categoryIds: this.selectedCategoryIds,
+            accountIds: this.selectedAccountIds,
             limit,
             offset,
         }
@@ -384,6 +388,16 @@ export class TransactionsComponent implements OnInit {
         }
     }
 
+    applyAccountFilter(ids: Set<number>): void {
+        if (
+            ids.size !== this.selectedAccountIds.size ||
+            ![...ids].every((value) => this.selectedAccountIds!.has(value))
+        ) {
+            this.selectedAccountIds = new Set(ids)
+            this.reloadTransactions()
+        }
+    }
+
     resultsFiltered(): boolean {
         return this.filteredCount !== null
     }
@@ -393,7 +407,8 @@ export class TransactionsComponent implements OnInit {
             !!this.searchText ||
             this.selectedDateFilter !== DateFilterEnum.ALL ||
             this.selectedAmountFilter !== AmountFilterEnum.ALL ||
-            this.selectedCategoryIds.size !== 0
+            this.selectedCategoryIds.size !== 0 ||
+            this.selectedAccountIds.size !== 0
         )
     }
 
@@ -414,6 +429,7 @@ export class TransactionsComponent implements OnInit {
         this.maxAmount = null
 
         this.selectedCategoryIds = new Set<number>()
+        this.selectedAccountIds = new Set<number>()
 
         this.currentPage = 1
 
@@ -514,7 +530,7 @@ export class TransactionsComponent implements OnInit {
         const item = this.items.find((i) => i.id === account.itemId)
         if (!item) {
             this.logger.error('unrecognized item id', account.itemId)
-            return account.name
+            return ''
         }
 
         return item.institutionName

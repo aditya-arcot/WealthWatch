@@ -80,6 +80,7 @@ export const fetchActiveTransactionsByUserId = async (
     minAmount?: number,
     maxAmount?: number,
     categoryIds?: number[],
+    accountIds?: number[],
     limit?: number,
     offset?: number
 ): Promise<TransactionsResponse> => {
@@ -97,7 +98,8 @@ export const fetchActiveTransactionsByUserId = async (
         endDate,
         minAmount,
         maxAmount,
-        categoryIds
+        categoryIds,
+        accountIds
     )
 
     let filteredCount: number | null = null
@@ -165,7 +167,8 @@ const constructfetchActiveTransactionsByUserIdQuery = (
     endDate?: string,
     minAmount?: number,
     maxAmount?: number,
-    categoryIds?: number[]
+    categoryIds?: number[],
+    accountIds?: number[]
 ) => {
     let placeholder = 1
     const values: unknown[] = []
@@ -264,6 +267,18 @@ const constructfetchActiveTransactionsByUserIdQuery = (
         `
         values.push(...categoryIds)
         placeholder += categoryIds.length
+    }
+
+    if (accountIds !== undefined && accountIds.length > 0) {
+        filtered = true
+        const idsPlaceholder = accountIds
+            .map((_, idx) => `$${idx + placeholder}`)
+            .join(', ')
+        query += `
+            AND t.account_id IN (${idsPlaceholder})
+        `
+        values.push(...accountIds)
+        placeholder += accountIds.length
     }
 
     return { filtered, query, values, placeholder }
