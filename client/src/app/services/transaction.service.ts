@@ -69,6 +69,11 @@ export class TransactionService {
         return this.http.patch(url, { categoryId: t.customCategoryId })
     }
 
+    updateTransactionNote(t: Transaction) {
+        const url = `${this.baseUrl}/${t.transactionId}/note`
+        return this.http.patch(url, { note: t.note })
+    }
+
     refreshTransactions() {
         return this.http.post(`${this.baseUrl}/refresh`, {})
     }

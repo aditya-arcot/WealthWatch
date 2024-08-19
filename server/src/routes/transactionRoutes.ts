@@ -4,6 +4,7 @@ import {
     refreshUserTransactions,
     updateTransactionCustomCategoryId,
     updateTransactionCustomName,
+    updateTransactionNote,
 } from '../controllers/transactionController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -159,6 +160,36 @@ router
 router
     .route('/:transactionId/category')
     .patch(catchAsync(updateTransactionCustomCategoryId))
+
+/**
+ * @swagger
+ * /transactions/{transactionId}/note:
+ *   patch:
+ *     summary: Update a transaction's note
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: transactionId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The transaction ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               note:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: Updated the transaction's note
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/:transactionId/note').patch(catchAsync(updateTransactionNote))
 
 /**
  * @swagger

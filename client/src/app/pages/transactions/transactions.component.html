@@ -1,4 +1,5 @@
 <app-loading-spinner [loading]="loading"></app-loading-spinner>
+<div #noteContainer></div>
 
 <div class="container-fluid position-relative mb-3">
     <h2 class="text-center mb-0">Transactions</h2>
@@ -323,6 +324,9 @@
                             </div>
                         </th>
                         <th scope="col" class="d-none d-md-table-cell">
+                            Actions
+                        </th>
+                        <th scope="col" class="d-none d-md-table-cell">
                             <div class="d-flex justify-content-center">
                                 <span class="ps-1 me-1">Account</span>
                                 <button
@@ -430,6 +434,20 @@
                                         ></i>
                                     </button>
                                 </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                <button
+                                    class="btn btn-sm p-0"
+                                    type="button"
+                                    title="Add note"
+                                    (click)="openNoteModal(t)"
+                                >
+                                    @if (t.note === null) {
+                                        <i class="bi bi-sticky"></i>
+                                    } @else {
+                                        <i class="bi bi-sticky-fill"></i>
+                                    }
+                                </button>
                             </td>
                             <td class="d-none d-md-table-cell">
                                 {{ getDisplayAccount(t) }}
