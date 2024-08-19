@@ -17,7 +17,7 @@ export class TransactionService {
 
     getTransactions(req: TransactionsRequestParams) {
         let params = new HttpParams()
-        if (req.searchQuery !== null && req.searchQuery !== undefined) {
+        if (req.searchQuery !== undefined && req.searchQuery !== '') {
             params = params.set('searchQuery', req.searchQuery)
         }
         if (req.startDate) {
