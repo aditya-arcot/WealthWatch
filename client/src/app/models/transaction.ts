@@ -1,5 +1,5 @@
 export interface TransactionsRequestParams {
-    searchQuery?: string | null
+    searchQuery?: string
     startDate?: string | null
     endDate?: string | null
     minAmount?: number | null
