@@ -191,7 +191,9 @@ const constructfetchActiveTransactionsByUserIdQuery = (
     placeholder++
 
     let filtered = false
-    if (searchQuery !== undefined) {
+
+    const modifiedSearchQuery = searchQuery?.trim().toLowerCase()
+    if (modifiedSearchQuery !== undefined && modifiedSearchQuery !== '') {
         filtered = true
         query += `
             AND LOWER (
@@ -202,7 +204,7 @@ const constructfetchActiveTransactionsByUserIdQuery = (
                 )
             ) LIKE $${placeholder}
         `
-        values.push(`%${searchQuery.toLowerCase()}%`)
+        values.push(`%${modifiedSearchQuery}%`)
         placeholder++
     }
 

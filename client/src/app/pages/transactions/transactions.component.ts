@@ -60,9 +60,9 @@ export class TransactionsComponent implements OnInit {
     pageSizeIndex = 0
     currentPage = 1
 
-    searchSubject = new Subject<string | null>()
-    searchText: string | null = null
-    previousSearchText: string | null = null
+    searchSubject = new Subject<string>()
+    searchText = ''
+    previousSearchText = ''
 
     dateFilterType = DateFilterEnum
     selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
@@ -325,12 +325,11 @@ export class TransactionsComponent implements OnInit {
     }
 
     search(): void {
-        const modifiedSearchText = this.searchText?.trim().toLowerCase() ?? null
+        const modifiedSearchText = this.searchText.trim().toLowerCase()
         if (modifiedSearchText === this.previousSearchText) return
         this.previousSearchText = modifiedSearchText
 
         this.currentPage = 1
-
         this.searchSubject.next(modifiedSearchText)
     }
 
@@ -352,6 +351,7 @@ export class TransactionsComponent implements OnInit {
             reload = true
         }
         if (reload) {
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -374,6 +374,7 @@ export class TransactionsComponent implements OnInit {
             reload = true
         }
         if (reload) {
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -384,6 +385,7 @@ export class TransactionsComponent implements OnInit {
             ![...ids].every((value) => this.selectedCategoryIds!.has(value))
         ) {
             this.selectedCategoryIds = new Set(ids)
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -394,6 +396,7 @@ export class TransactionsComponent implements OnInit {
             ![...ids].every((value) => this.selectedAccountIds!.has(value))
         ) {
             this.selectedAccountIds = new Set(ids)
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -404,7 +407,7 @@ export class TransactionsComponent implements OnInit {
 
     filterActive(): boolean {
         return (
-            !!this.searchText ||
+            this.searchText.length > 0 ||
             this.selectedDateFilter !== DateFilterEnum.ALL ||
             this.selectedAmountFilter !== AmountFilterEnum.ALL ||
             this.selectedCategoryIds.size !== 0 ||
@@ -414,7 +417,7 @@ export class TransactionsComponent implements OnInit {
 
     clearFilters(): void {
         this.previousSearchText = this.searchText
-        this.searchText = null
+        this.searchText = ''
 
         this.selectedDateFilter = DateFilterEnum.ALL
         this.previousStartDate = this.startDate
@@ -432,7 +435,6 @@ export class TransactionsComponent implements OnInit {
         this.selectedAccountIds = new Set<number>()
 
         this.currentPage = 1
-
         this.reloadTransactions()
     }
 
