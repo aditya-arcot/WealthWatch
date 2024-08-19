@@ -470,6 +470,12 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomName(t)
     }
 
+    resetName(t: Transaction): void {
+        if (t.customName === null) return
+        t.customName = null
+        this.updateCustomName(t)
+    }
+
     getDisplayAmount(t: Transaction): string {
         const currency = t.unofficialCurrencyCode ?? t.isoCurrencyCode
         if (currency === null) return t.amount.toString()
