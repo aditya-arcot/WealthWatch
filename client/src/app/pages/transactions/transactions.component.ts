@@ -330,7 +330,6 @@ export class TransactionsComponent implements OnInit {
         this.previousSearchText = modifiedSearchText
 
         this.currentPage = 1
-
         this.searchSubject.next(modifiedSearchText)
     }
 
@@ -352,6 +351,7 @@ export class TransactionsComponent implements OnInit {
             reload = true
         }
         if (reload) {
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -374,6 +374,7 @@ export class TransactionsComponent implements OnInit {
             reload = true
         }
         if (reload) {
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -384,6 +385,7 @@ export class TransactionsComponent implements OnInit {
             ![...ids].every((value) => this.selectedCategoryIds!.has(value))
         ) {
             this.selectedCategoryIds = new Set(ids)
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -394,6 +396,7 @@ export class TransactionsComponent implements OnInit {
             ![...ids].every((value) => this.selectedAccountIds!.has(value))
         ) {
             this.selectedAccountIds = new Set(ids)
+            this.currentPage = 1
             this.reloadTransactions()
         }
     }
@@ -432,7 +435,6 @@ export class TransactionsComponent implements OnInit {
         this.selectedAccountIds = new Set<number>()
 
         this.currentPage = 1
-
         this.reloadTransactions()
     }
 
