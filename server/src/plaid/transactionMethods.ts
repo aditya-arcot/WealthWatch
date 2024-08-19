@@ -67,6 +67,8 @@ export const mapPlaidTransaction = (
 ): Transaction => {
     let customName = null
     let customCategoryId = null
+    let note = null
+
     const primaryCategory = transaction.personal_finance_category?.primary
     const detailedCategory = transaction.personal_finance_category?.detailed
     const categoryId = mapPlaidCategory(primaryCategory, detailedCategory)
@@ -78,6 +80,7 @@ export const mapPlaidTransaction = (
     if (pendingTransaction) {
         customName = pendingTransaction.customName
         customCategoryId = pendingTransaction.customCategoryId
+        note = pendingTransaction.note
     }
 
     return {
@@ -98,6 +101,7 @@ export const mapPlaidTransaction = (
         unofficialCurrencyCode: transaction.unofficial_currency_code,
         date: new Date(transaction.authorized_date ?? transaction.date),
         pending: transaction.pending,
+        note,
     }
 }
 
