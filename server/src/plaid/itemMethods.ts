@@ -1,4 +1,5 @@
 import {
+    AccountsBalanceGetRequest,
     AccountsGetRequest,
     ItemRemoveRequest,
     ItemWebhookUpdateRequest,
@@ -11,6 +12,7 @@ import {
     insertTransactions,
     removeTransactionsByTransactionIds,
 } from '../database/transactionQueries.js'
+import { Account } from '../models/account.js'
 import { Item } from '../models/item.js'
 import { logger } from '../utils/logger.js'
 import { mapPlaidAccount } from './accountMethods.js'
@@ -19,6 +21,20 @@ import {
     mapPlaidTransaction,
     plaidRetrieveTransactionUpdates,
 } from './transactionMethods.js'
+
+export const plaidRefreshBalances = async (item: Item): Promise<Account[]> => {
+    logger.debug({ item }, 'getting item account balances')
+    const params: AccountsBalanceGetRequest = {
+        access_token: item.accessToken,
+    }
+    const resp = await executePlaidMethod(
+        plaidClient.accountsBalanceGet,
+        params,
+        item.userId,
+        item.id
+    )
+    return resp.data.accounts.map(mapPlaidAccount)
+}
 
 export const plaidSyncItemData = async (item: Item) => {
     logger.debug({ item }, 'syncing item data')

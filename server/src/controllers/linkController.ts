@@ -11,7 +11,7 @@ import {
     plaidCreateLinkToken,
     plaidExchangePublicToken,
 } from '../plaid/tokenMethods.js'
-import { queueItemSync } from '../queues/itemSyncQueue.js'
+import { queueItemSync } from '../queues/itemQueue.js'
 import { queuePlaidLinkEventLog } from '../queues/logQueue.js'
 import { logger } from '../utils/logger.js'
 

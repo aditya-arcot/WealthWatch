@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { insertAccounts } from '../database/accountQueries.js'
 import {
     fetchActiveItemById,
     fetchActiveItems,
@@ -7,12 +8,14 @@ import {
     modifyItemLastRefreshedByItemId,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
-import { refreshCooldown } from '../models/item.js'
+import { Item, refreshCooldown } from '../models/item.js'
 import {
+    plaidRefreshBalances,
     plaidUnlinkItem,
     plaidUpdateItemWebhook,
 } from '../plaid/itemMethods.js'
 import { plaidRefreshTransactions } from '../plaid/transactionMethods.js'
+import { queueItemBalancesRefresh } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserItems = async (req: Request, res: Response) => {
@@ -50,15 +53,19 @@ export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
     }
 }
 
-export const refreshItemTransactions = async (req: Request, res: Response) => {
+export const refreshItem = async (req: Request, res: Response) => {
     logger.debug('refreshing item transactions')
 
     const itemId: string | undefined = req.params['itemId']
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
+    const item = await fetchActiveItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
     try {
-        await refreshItemTransactionsMain(itemId)
-        return res.status(204).send()
+        await refreshItemTransactions(item)
+        await queueItemBalancesRefresh(item)
+        return res.status(202).send()
     } catch (error) {
         logger.error(error)
         if (error instanceof HttpError) throw error
@@ -66,21 +73,24 @@ export const refreshItemTransactions = async (req: Request, res: Response) => {
     }
 }
 
-export const refreshItemTransactionsMain = async (
-    itemId: string,
-    checkCooldown = true
-) => {
-    const item = await fetchActiveItemById(itemId)
-    if (!item) throw new HttpError('item not found', 404)
-
-    if (checkCooldown) {
-        const lastRefresh = item.lastRefreshed?.getTime() || 0
-        if (Date.now() - lastRefresh < refreshCooldown) {
+export const refreshItemTransactions = async (item: Item) => {
+    if (item.lastRefreshed) {
+        if (Date.now() - item.lastRefreshed.getTime() < refreshCooldown) {
             throw new HttpError('item refresh cooldown', 429)
         }
     }
-
     await plaidRefreshTransactions(item)
+    await modifyItemLastRefreshedByItemId(item.itemId, new Date())
+}
+
+export const refreshItemBalances = async (item: Item) => {
+    if (item.lastRefreshed) {
+        if (Date.now() - item.lastRefreshed.getTime() < refreshCooldown) {
+            throw new HttpError('item refresh cooldown', 429)
+        }
+    }
+    const accounts = await plaidRefreshBalances(item)
+    await insertAccounts(accounts)
     await modifyItemLastRefreshedByItemId(item.itemId, new Date())
 }
 

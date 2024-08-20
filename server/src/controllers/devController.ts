@@ -17,9 +17,9 @@ import {
     plaidExchangePublicToken,
 } from '../plaid/tokenMethods.js'
 import { plaidFireWebhook } from '../plaid/webhookMethods.js'
-import { queueItemSync } from '../queues/itemSyncQueue.js'
+import { queueItemBalancesRefresh, queueItemSync } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
-import { refreshItemTransactionsMain } from './itemController.js'
+import { refreshItemTransactions } from './itemController.js'
 
 export const deleteAllUsers = async (req: Request, res: Response) => {
     logger.debug('deleting all users')
@@ -119,8 +119,28 @@ export const forceRefreshItemTransactions = async (
     const itemId = req.query['itemId'] as string | undefined
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
-    await refreshItemTransactionsMain(itemId, false)
+    const item = await fetchActiveItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    item.lastRefreshed = null
+
+    await refreshItemTransactions(item)
     return res.status(204).send()
+}
+
+export const forceRefreshItemBalances = async (req: Request, res: Response) => {
+    logger.debug('force refreshing item balances')
+
+    const itemId = req.query['itemId'] as string | undefined
+    if (itemId === undefined) throw new HttpError('missing item id', 400)
+
+    const item = await fetchActiveItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    item.lastRefreshed = null
+
+    await queueItemBalancesRefresh(item)
+    return res.status(202).send()
 }
 
 export const resetSandboxItemLogin = async (req: Request, res: Response) => {

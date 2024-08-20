@@ -218,7 +218,7 @@ export class AccountsComponent implements OnInit {
         this.linkSvc.handleLinkEvent(event).subscribe()
     }
 
-    refreshItemTransactions(item: Item): void {
+    refreshItem(item: Item): void {
         const lastRefreshed = item.lastRefreshed
             ? new Date(item.lastRefreshed)
             : null
@@ -228,22 +228,22 @@ export class AccountsComponent implements OnInit {
                 lastRefreshTime + refreshCooldown
             ).toLocaleTimeString(undefined, { timeStyle: 'short' })
             this.alertSvc.addErrorAlert(
-                `${item.institutionName} data was recently synced`,
-                [`Please wait until ${nextRefresh} before syncing again`]
+                `${item.institutionName} data was recently refreshed`,
+                [`Please wait until ${nextRefresh} before refreshing again`]
             )
             return
         }
 
         this.loading = true
         this.itemSvc
-            .refreshItemTransactions(item.itemId)
+            .refreshItem(item.itemId)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (err.status === 429) {
                         item.lastRefreshed = new Date()
                     }
                     this.alertSvc.addErrorAlert(
-                        `Failed to sync ${item.institutionName} data`
+                        `Failed to refresh ${item.institutionName} data`
                     )
                     this.loading = false
                     return throwError(() => err)
@@ -252,7 +252,7 @@ export class AccountsComponent implements OnInit {
             .subscribe(() => {
                 item.lastRefreshed = new Date()
                 this.alertSvc.addSuccessAlert(
-                    `Syncing ${item.institutionName} data`,
+                    `Refreshing ${item.institutionName} data`,
                     ['Please check back later']
                 )
                 this.loading = false
