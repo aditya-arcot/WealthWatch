@@ -7,6 +7,7 @@ import {
     fetchActiveTransactionsByUserId,
     updateTransactionCustomCategoryIdById,
     updateTransactionCustomNameById,
+    updateTransactionNoteById,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { refreshCooldown } from '../models/item.js'
@@ -161,6 +162,27 @@ export const updateTransactionCustomCategoryId = async (
         logger.error(error)
         if (error instanceof HttpError) throw error
         throw Error('failed to update transaction custom category id')
+    }
+}
+
+export const updateTransactionNote = async (req: Request, res: Response) => {
+    logger.debug('updating transaction note')
+
+    const transactionId: string | undefined = req.params['transactionId']
+    if (transactionId === undefined)
+        throw new HttpError('missing transaction id', 400)
+
+    const note: string | null | undefined = req.body.note
+    if (note === undefined) throw new HttpError('missing note', 400)
+
+    try {
+        const t = await updateTransactionNoteById(transactionId, note)
+        if (!t) throw Error('transaction not updated')
+        return res.status(204).send()
+    } catch (error) {
+        logger.error(error)
+        if (error instanceof HttpError) throw error
+        throw Error('failed to update transaction note')
     }
 }
 

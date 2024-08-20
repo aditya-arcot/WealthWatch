@@ -164,6 +164,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     unofficial_currency_code TEXT,
     date DATE NOT NULL,
     pending BOOLEAN NOT NULL,
+    note TEXT,
     create_timestamp TIMESTAMPTZ DEFAULT NOW(),
     update_timestamp TIMESTAMPTZ DEFAULT NOW()
 );
