@@ -323,6 +323,9 @@
                             </div>
                         </th>
                         <th scope="col" class="d-none d-md-table-cell">
+                            Actions
+                        </th>
+                        <th scope="col" class="d-none d-md-table-cell">
                             <div class="d-flex justify-content-center">
                                 <span class="ps-1 me-1">Account</span>
                                 <button
@@ -432,6 +435,22 @@
                                 </div>
                             </td>
                             <td class="d-none d-md-table-cell">
+                                <button
+                                    class="btn btn-sm p-0"
+                                    type="button"
+                                    title="Add note"
+                                    (click)="openNoteModal(t)"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#noteModal"
+                                >
+                                    @if (t.note === null) {
+                                        <i class="bi bi-sticky"></i>
+                                    } @else {
+                                        <i class="bi bi-sticky-fill"></i>
+                                    }
+                                </button>
+                            </td>
+                            <td class="d-none d-md-table-cell">
                                 {{ getDisplayAccount(t) }}
                                 <span class="d-none d-lg-inline"
                                     >({{ getDisplayInstitution(t) }})</span
@@ -485,3 +504,5 @@
     [originalSelectedAccountIds]="selectedAccountIds"
     (selectedAccountsChanged)="applyAccountFilter($event.selectedAccountIds)"
 />
+
+<app-note />

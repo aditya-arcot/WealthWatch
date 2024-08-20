@@ -24,7 +24,8 @@ export const insertTransactions = async (
             transaction.isoCurrencyCode,
             transaction.unofficialCurrencyCode,
             transaction.date,
-            transaction.pending
+            transaction.pending,
+            transaction.note
         )
     })
 
@@ -48,7 +49,8 @@ export const insertTransactions = async (
             iso_currency_code,
             unofficial_currency_code,
             date,
-            pending
+            pending,
+            note
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         ON CONFLICT (transaction_id)
@@ -334,6 +336,22 @@ export const updateTransactionCustomCategoryIdById = async (
     return mapDbTransaction(rows[0])
 }
 
+export const updateTransactionNoteById = async (
+    transactionId: string,
+    note: string | null
+): Promise<Transaction | undefined> => {
+    const query = `
+        UPDATE transactions
+        SET note = $2
+        WHERE transaction_id = $1
+        RETURNING *
+    `
+    const rows = (await runQuery<DbTransaction>(query, [transactionId, note]))
+        .rows
+    if (!rows[0]) return
+    return mapDbTransaction(rows[0])
+}
+
 export const removeTransactionsByTransactionIds = async (
     transactionIds: string[]
 ): Promise<Transaction[] | undefined> => {
@@ -366,6 +384,7 @@ interface DbTransaction {
     unofficial_currency_code: string | null
     date: Date
     pending: boolean
+    note: string | null
 }
 
 const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
@@ -386,4 +405,5 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     unofficialCurrencyCode: dbTransaction.unofficial_currency_code,
     date: dbTransaction.date,
     pending: dbTransaction.pending,
+    note: dbTransaction.note,
 })

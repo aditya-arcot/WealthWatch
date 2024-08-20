@@ -16,6 +16,7 @@ export interface Transaction {
     unofficialCurrencyCode: string | null
     date: Date
     pending: boolean
+    note: string | null
 }
 
 export interface TransactionsResponse {

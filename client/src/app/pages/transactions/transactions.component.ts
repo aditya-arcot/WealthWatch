@@ -1,6 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import {
     catchError,
@@ -8,6 +8,7 @@ import {
     Observable,
     of,
     Subject,
+    Subscription,
     switchMap,
     throwError,
 } from 'rxjs'
@@ -16,6 +17,7 @@ import { AmountFilterComponent } from '../../components/filters/amount-filter/am
 import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { NoteComponent } from '../../components/note/note.component'
 import { Account } from '../../models/account'
 import { AmountFilterEnum } from '../../models/amountFilter'
 import { Category, CategoryEnum, categoryIcons } from '../../models/category'
@@ -44,11 +46,15 @@ import { TransactionService } from '../../services/transaction.service'
         AmountFilterComponent,
         CategoryFilterComponent,
         AccountFilterComponent,
+        NoteComponent,
     ],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent implements OnInit {
+    @ViewChild(NoteComponent) noteComponent!: NoteComponent
+    noteUpdateSubscription: Subscription | null = null
+
     loading = false
 
     transactions: Transaction[] = []
@@ -261,6 +267,22 @@ export class TransactionsComponent implements OnInit {
             )
             .subscribe(() => {
                 this.alertSvc.addSuccessAlert('Updated transaction category')
+            })
+    }
+
+    updateNote(t: Transaction): void {
+        this.transactionSvc
+            .updateTransactionNote(t)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert(
+                        'Failed to update transaction note'
+                    )
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert('Updated transaction note')
             })
     }
 
@@ -517,6 +539,26 @@ export class TransactionsComponent implements OnInit {
     getCategoryClasses(t: Transaction): string {
         const categoryId = this.getDisplayCategory(t) as CategoryEnum
         return `bi ${categoryIcons[categoryId]}`
+    }
+
+    openNoteModal(t: Transaction): void {
+        this.noteComponent.note = t.note
+        this.noteComponent.originalNote = t.note
+
+        if (this.noteUpdateSubscription)
+            this.noteUpdateSubscription.unsubscribe()
+        this.noteUpdateSubscription = this.noteComponent.noteUpdated.subscribe(
+            (newNote) => {
+                newNote = newNote?.trim() ?? null
+                if (!newNote?.length) newNote = null
+                if (newNote === t.note) return
+                t.note = newNote
+                this.updateNote(t)
+
+                this.noteComponent.note = null
+                this.noteComponent.originalNote = null
+            }
+        )
     }
 
     getDisplayAccount(t: Transaction): string {
