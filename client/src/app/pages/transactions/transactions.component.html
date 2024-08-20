@@ -1,5 +1,4 @@
 <app-loading-spinner [loading]="loading"></app-loading-spinner>
-<div #noteContainer></div>
 
 <div class="container-fluid position-relative mb-3">
     <h2 class="text-center mb-0">Transactions</h2>
@@ -441,6 +440,8 @@
                                     type="button"
                                     title="Add note"
                                     (click)="openNoteModal(t)"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#noteModal"
                                 >
                                     @if (t.note === null) {
                                         <i class="bi bi-sticky"></i>
@@ -503,3 +504,5 @@
     [originalSelectedAccountIds]="selectedAccountIds"
     (selectedAccountsChanged)="applyAccountFilter($event.selectedAccountIds)"
 />
+
+<app-note />

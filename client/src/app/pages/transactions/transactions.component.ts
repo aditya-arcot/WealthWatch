@@ -1,14 +1,14 @@
 import { DatePipe, DecimalPipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { Modal } from 'bootstrap'
 import {
     catchError,
     debounceTime,
     Observable,
     of,
     Subject,
+    Subscription,
     switchMap,
     throwError,
 } from 'rxjs'
@@ -52,8 +52,8 @@ import { TransactionService } from '../../services/transaction.service'
     styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent implements OnInit {
-    @ViewChild('noteContainer', { read: ViewContainerRef })
-    noteContainer!: ViewContainerRef
+    @ViewChild(NoteComponent) noteComponent!: NoteComponent
+    noteUpdateSubscription: Subscription | null = null
 
     loading = false
 
@@ -542,26 +542,22 @@ export class TransactionsComponent implements OnInit {
     }
 
     openNoteModal(t: Transaction): void {
-        const componentRef = this.noteContainer.createComponent(NoteComponent)
-        componentRef.instance.note = t.note
-        componentRef.instance.originalNote = t.note
-        componentRef.instance.noteUpdated.subscribe((newNote) => {
-            newNote = newNote?.trim() ?? null
-            if (!newNote?.length) newNote = null
-            if (newNote === t.note) return
-            t.note = newNote
-            this.updateNote(t)
-        })
+        this.noteComponent.note = t.note
+        this.noteComponent.originalNote = t.note
+        this.noteUpdateSubscription = this.noteComponent.noteUpdated.subscribe(
+            (newNote) => {
+                newNote = newNote?.trim() ?? null
+                if (!newNote?.length) newNote = null
+                if (newNote === t.note) return
+                t.note = newNote
+                this.updateNote(t)
 
-        const modalElement =
-            componentRef.location.nativeElement.querySelector('.modal')
-        const modal = new Modal(modalElement)
-        modal.show()
-
-        modalElement.addEventListener('hidden.bs.modal', () => {
-            componentRef.destroy()
-            this.noteContainer.clear()
-        })
+                // cleanup
+                this.noteComponent.note = null
+                this.noteComponent.originalNote = null
+                this.noteUpdateSubscription?.unsubscribe()
+            }
+        )
     }
 
     getDisplayAccount(t: Transaction): string {
