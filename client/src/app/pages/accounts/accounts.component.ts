@@ -12,10 +12,12 @@ import {
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { Account } from '../../models/account'
 import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
+import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
@@ -38,7 +40,8 @@ export class AccountsComponent implements OnInit {
         private plaidLinkSvc: NgxPlaidLinkService,
         private alertSvc: AlertService,
         private accountSvc: AccountService,
-        private itemSvc: ItemService
+        private itemSvc: ItemService,
+        private currencySvc: CurrencyService
     ) {}
 
     ngOnInit(): void {
@@ -284,5 +287,19 @@ export class AccountsComponent implements OnInit {
 
     convertDateToLocal(date: Date): string {
         return new Date(date).toLocaleString()
+    }
+
+    getDisplayCurrentBalance(acc: Account): string {
+        return this.currencySvc.formatAmount(
+            acc.currentBalance,
+            acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
+        )
+    }
+
+    getDisplayAvailableBalance(acc: Account): string {
+        return this.currencySvc.formatAmount(
+            acc.availableBalance,
+            acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
+        )
     }
 }

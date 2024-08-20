@@ -94,7 +94,13 @@
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Type</th>
-                            <th scope="col">Number</th>
+                            <th scope="col">Current Balance</th>
+                            <th scope="col" class="d-none d-md-table-cell">
+                                Available Balance
+                            </th>
+                            <th scope="col" class="d-none d-sm-table-cell">
+                                Number
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -104,7 +110,11 @@
                                 <td>
                                     {{ account.type }} ({{ account.subtype }})
                                 </td>
-                                <td>
+                                <td>{{ getDisplayCurrentBalance(account) }}</td>
+                                <td class="d-none d-md-table-cell">
+                                    {{ getDisplayAvailableBalance(account) }}
+                                </td>
+                                <td class="d-none d-sm-table-cell">
                                     &middot;&middot;&middot;&middot;
                                     {{ account.mask }}
                                 </td>
