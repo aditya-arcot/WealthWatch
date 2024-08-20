@@ -143,7 +143,7 @@ export const syncItemData = async (item: Item) => {
                 await fetchActiveTransactionsByUserId(item.userId)
             ).transactions
             const addTransactions = added.map((t) => {
-                const account = accounts.find(
+                const account = addedAccounts.find(
                     (a) => a.accountId === t.account_id
                 )
                 if (!account) throw Error('account not found')
