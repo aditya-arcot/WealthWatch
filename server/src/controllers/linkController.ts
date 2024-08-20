@@ -8,8 +8,8 @@ import { HttpError } from '../models/httpError.js'
 import { Item } from '../models/item.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 import {
-    plaidCreateLinkToken,
-    plaidExchangePublicToken,
+    plaidLinkTokenCreate,
+    plaidPublicTokenExchange,
 } from '../plaid/tokenMethods.js'
 import { queueItemSync } from '../queues/itemQueue.js'
 import { queuePlaidLinkEventLog } from '../queues/logQueue.js'
@@ -24,7 +24,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
     const itemId: string | undefined = req.body.itemId
 
     try {
-        const token = await plaidCreateLinkToken(userId, itemId)
+        const token = await plaidLinkTokenCreate(userId, itemId)
         return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)
@@ -69,7 +69,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         )
         if (existingItem) throw new HttpError('account already exists', 409)
 
-        const { accessToken, itemId } = await plaidExchangePublicToken(
+        const { accessToken, itemId } = await plaidPublicTokenExchange(
             publicToken,
             userId
         )

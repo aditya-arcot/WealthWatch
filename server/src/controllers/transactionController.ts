@@ -11,7 +11,7 @@ import {
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { refreshCooldown } from '../models/item.js'
-import { plaidRefreshTransactions } from '../plaid/transactionMethods.js'
+import { plaidTransactionsRefresh } from '../plaid/transactionMethods.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserTransactions = async (req: Request, res: Response) => {
@@ -198,7 +198,7 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
             items.map(async (item) => {
                 const lastRefresh = item.lastRefreshed?.getTime() || 0
                 if (Date.now() - lastRefresh >= refreshCooldown) {
-                    await plaidRefreshTransactions(item)
+                    await plaidTransactionsRefresh(item)
                     await modifyItemLastRefreshedByItemId(
                         item.itemId,
                         new Date()

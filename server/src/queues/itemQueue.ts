@@ -1,8 +1,10 @@
 import { Queue, Worker } from 'bullmq'
 import { env } from 'process'
-import { refreshItemBalances } from '../controllers/itemController.js'
+import {
+    refreshItemBalances,
+    syncItemData,
+} from '../controllers/itemController.js'
 import { Item } from '../models/item.js'
-import { plaidSyncItemData } from '../plaid/itemMethods.js'
 import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
@@ -57,7 +59,7 @@ export const initializeItemWorker = () => {
 
             switch (type) {
                 case ItemJobType.ItemSync: {
-                    await plaidSyncItemData(item)
+                    await syncItemData(item)
                     break
                 }
                 case ItemJobType.ItemBalancesRefresh: {

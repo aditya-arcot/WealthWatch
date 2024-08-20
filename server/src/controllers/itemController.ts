@@ -5,16 +5,26 @@ import {
     fetchActiveItems,
     fetchActiveItemsByUserId,
     modifyItemActiveById,
+    modifyItemDataByItemId,
     modifyItemLastRefreshedByItemId,
 } from '../database/itemQueries.js'
+import {
+    fetchActiveTransactionsByUserId,
+    insertTransactions,
+    removeTransactionsByTransactionIds,
+} from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { Item, refreshCooldown } from '../models/item.js'
 import {
-    plaidRefreshBalances,
-    plaidUnlinkItem,
-    plaidUpdateItemWebhook,
-} from '../plaid/itemMethods.js'
-import { plaidRefreshTransactions } from '../plaid/transactionMethods.js'
+    plaidAccountsBalanceGet,
+    plaidAccountsGet,
+} from '../plaid/accountMethods.js'
+import { plaidItemRemove, plaidWebhookUpdate } from '../plaid/itemMethods.js'
+import {
+    mapPlaidTransaction,
+    plaidTransactionsRefresh,
+    plaidTransactionsSync,
+} from '../plaid/transactionMethods.js'
 import { queueItemBalancesRefresh } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
 
@@ -43,7 +53,7 @@ export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
     try {
         const items = await fetchActiveItems()
         await Promise.all(
-            items.map(async (item) => await plaidUpdateItemWebhook(item, url))
+            items.map(async (item) => await plaidWebhookUpdate(item, url))
         )
         return res.status(204).send()
     } catch (error) {
@@ -79,7 +89,7 @@ export const refreshItemTransactions = async (item: Item) => {
             throw new HttpError('item refresh cooldown', 429)
         }
     }
-    await plaidRefreshTransactions(item)
+    await plaidTransactionsRefresh(item)
     await modifyItemLastRefreshedByItemId(item.itemId, new Date())
 }
 
@@ -89,7 +99,7 @@ export const refreshItemBalances = async (item: Item) => {
             throw new HttpError('item refresh cooldown', 429)
         }
     }
-    const accounts = await plaidRefreshBalances(item)
+    const accounts = await plaidAccountsBalanceGet(item)
     await insertAccounts(accounts)
     await modifyItemLastRefreshedByItemId(item.itemId, new Date())
 }
@@ -104,12 +114,56 @@ export const deactivateItem = async (req: Request, res: Response) => {
         const item = await fetchActiveItemById(itemId)
         if (!item) throw new HttpError('item not found', 404)
 
-        await plaidUnlinkItem(item)
+        await plaidItemRemove(item)
         await modifyItemActiveById(item.id, false)
         return res.status(204).send()
     } catch (error) {
         logger.error(error)
         if (error instanceof HttpError) throw error
         throw Error('failed to deactivate item')
+    }
+}
+
+export const syncItemData = async (item: Item) => {
+    logger.debug({ item }, 'syncing item data')
+
+    const accounts = await plaidAccountsGet(item)
+    if (accounts.length > 0) {
+        logger.debug('inserting accounts')
+        const addedAccounts = await insertAccounts(accounts)
+        if (!addedAccounts) throw Error('accounts not added')
+
+        const { added, modified, removed, cursor } =
+            await plaidTransactionsSync(item)
+
+        added.concat(modified)
+        if (added.length > 0) {
+            logger.debug('inserting transactions')
+            const existingTransactions = (
+                await fetchActiveTransactionsByUserId(item.userId)
+            ).transactions
+            const addTransactions = added.map((t) => {
+                const account = accounts.find(
+                    (a) => a.accountId === t.account_id
+                )
+                if (!account) throw Error('account not found')
+                return mapPlaidTransaction(t, account.id, existingTransactions)
+            })
+            const addedTransactions = await insertTransactions(addTransactions)
+            if (!addedTransactions) throw Error('transactions not added')
+        }
+
+        if (removed.length > 0) {
+            logger.debug('removing transactions')
+            const removeIds = removed.map((t) => t.transaction_id)
+            const removedTransactions =
+                await removeTransactionsByTransactionIds(removeIds)
+            if (!removedTransactions) throw Error('transactions not removed')
+        }
+
+        logger.debug('updating cursor')
+        await modifyItemDataByItemId(item.itemId, cursor, new Date())
+    } else {
+        logger.debug('no accounts. skipping transaction updates')
     }
 }
