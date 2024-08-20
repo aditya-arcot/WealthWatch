@@ -40,7 +40,6 @@
         "@angular-devkit/build-angular": "^18.0.4",
         "@angular/cli": "^18.0.4",
         "@angular/compiler-cli": "^18.0.0",
-        "@types/bootstrap": "^5.2.10",
         "@types/jasmine": "~5.1.0",
         "@types/node": "^20.14.8",
         "@types/uuid": "^10.0.0",
