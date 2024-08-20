@@ -12,7 +12,7 @@ import { User } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, plaidClient } from './index.js'
 
-export const plaidCreateLinkToken = async (
+export const plaidLinkTokenCreate = async (
     userId: number,
     itemId?: string
 ): Promise<string> => {
@@ -61,7 +61,7 @@ export const plaidCreateLinkToken = async (
     return resp.data.link_token
 }
 
-export const plaidExchangePublicToken = async (
+export const plaidPublicTokenExchange = async (
     publicToken: string,
     userId: number
 ) => {
@@ -73,14 +73,13 @@ export const plaidExchangePublicToken = async (
         params,
         userId
     )
-
     return {
         accessToken: resp.data.access_token,
         itemId: resp.data.item_id,
     }
 }
 
-export const plaidCreatePublicToken = async (
+export const plaidSandboxPublicTokenCreate = async (
     user: User,
     institutionId: string
 ) => {

@@ -9,7 +9,7 @@ import {
     removeUserById,
 } from '../database/userQueries.js'
 import { HttpError } from '../models/httpError.js'
-import { plaidUnlinkItem } from '../plaid/itemMethods.js'
+import { plaidItemRemove } from '../plaid/itemMethods.js'
 import { logger } from '../utils/logger.js'
 import { logout } from './authController.js'
 
@@ -30,7 +30,7 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
     try {
         await Promise.all(
             items.map(async (item) => {
-                await plaidUnlinkItem(item)
+                await plaidItemRemove(item)
                 await modifyItemActiveById(item.id, false)
             })
         )

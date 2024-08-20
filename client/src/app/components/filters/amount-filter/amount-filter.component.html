@@ -116,6 +116,7 @@
                     type="button"
                     class="btn btn-sm btn-primary"
                     (click)="apply()"
+                    title="Apply"
                     data-bs-dismiss="modal"
                     [disabled]="
                         !inputsChanged() ||
@@ -131,6 +132,7 @@
                     type="button"
                     class="btn btn-sm btn-danger"
                     (click)="clear()"
+                    title="Clear"
                     data-bs-dismiss="modal"
                     [disabled]="!filterApplied()"
                 >
@@ -141,6 +143,7 @@
                 <button
                     type="button"
                     class="btn btn-sm btn-warning"
+                    title="Cancel"
                     data-bs-dismiss="modal"
                 >
                     <i class="bi bi-arrow-left"></i>

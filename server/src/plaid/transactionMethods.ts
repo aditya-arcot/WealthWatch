@@ -10,7 +10,7 @@ import { Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, plaidClient } from './index.js'
 
-export const plaidRefreshTransactions = async (item: Item) => {
+export const plaidTransactionsRefresh = async (item: Item) => {
     logger.debug({ item }, 'refreshing item transactions')
     const params: TransactionsRefreshRequest = {
         access_token: item.accessToken,
@@ -23,8 +23,8 @@ export const plaidRefreshTransactions = async (item: Item) => {
     )
 }
 
-export const plaidRetrieveTransactionUpdates = async (item: Item) => {
-    logger.debug({ item }, 'retrieving transaction updates')
+export const plaidTransactionsSync = async (item: Item) => {
+    logger.debug({ item }, 'retrieving item transactions updates')
 
     let cursor = item.cursor
     let added: Array<PlaidTransaction> = []

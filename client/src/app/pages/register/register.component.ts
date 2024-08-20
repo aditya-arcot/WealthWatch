@@ -191,7 +191,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                 if (res) {
                     this.router.navigateByUrl('/home')
                     this.alertSvc.clearAlerts()
-                    this.alertSvc.addSuccessAlert('Success signing up')
+                    this.alertSvc.addSuccessAlert('Success registering')
                 }
             })
     }
