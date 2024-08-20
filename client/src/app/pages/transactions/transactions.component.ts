@@ -544,6 +544,9 @@ export class TransactionsComponent implements OnInit {
     openNoteModal(t: Transaction): void {
         this.noteComponent.note = t.note
         this.noteComponent.originalNote = t.note
+
+        if (this.noteUpdateSubscription)
+            this.noteUpdateSubscription.unsubscribe()
         this.noteUpdateSubscription = this.noteComponent.noteUpdated.subscribe(
             (newNote) => {
                 newNote = newNote?.trim() ?? null
@@ -552,10 +555,8 @@ export class TransactionsComponent implements OnInit {
                 t.note = newNote
                 this.updateNote(t)
 
-                // cleanup
                 this.noteComponent.note = null
                 this.noteComponent.originalNote = null
-                this.noteUpdateSubscription?.unsubscribe()
             }
         )
     }
