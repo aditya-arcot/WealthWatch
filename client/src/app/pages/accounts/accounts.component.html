@@ -6,6 +6,7 @@
         (click)="linkAccount()"
         class="btn btn-success d-none d-sm-block position-absolute top-left"
         type="button"
+        title="Link Account"
     >
         <i class="bi bi-plus"></i>
         Link an Account
@@ -14,6 +15,7 @@
         (click)="linkAccount()"
         class="btn btn-success d-block d-sm-none position-absolute top-left"
         type="button"
+        title="Link Account"
     >
         <i class="bi bi-plus"></i>
     </button>
@@ -54,6 +56,7 @@
                             (click)="refreshItemTransactions(item)"
                             class="btn btn-primary d-none d-sm-block"
                             type="button"
+                            title="Refresh Transactions"
                         >
                             <i class="bi bi-arrow-clockwise"></i>
                             Sync
@@ -62,6 +65,7 @@
                             (click)="refreshItemTransactions(item)"
                             class="btn btn-primary d-block d-sm-none"
                             type="button"
+                            title="Refresh Transactions"
                         >
                             <i class="bi bi-arrow-clockwise"></i>
                         </button>
@@ -69,6 +73,7 @@
                             (click)="deactivateItem(item)"
                             class="btn btn-danger d-none d-sm-block"
                             type="button"
+                            title="Deactivate"
                         >
                             <i class="bi bi-trash"></i>
                             Delete
@@ -77,6 +82,7 @@
                             (click)="deactivateItem(item)"
                             class="btn btn-danger d-block d-sm-none"
                             type="button"
+                            title="Deactivate"
                         >
                             <i class="bi bi-trash"></i>
                         </button>

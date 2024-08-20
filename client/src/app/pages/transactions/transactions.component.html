@@ -6,6 +6,7 @@
         (click)="refreshTransactions()"
         class="btn btn-primary d-none d-md-block position-absolute top-left"
         type="button"
+        title="Refresh Transactions"
     >
         <i class="bi bi-arrow-clockwise"></i>
         Refresh Transactions
@@ -14,6 +15,7 @@
         (click)="refreshTransactions()"
         class="btn btn-primary d-block d-md-none position-absolute top-left"
         type="button"
+        title="Refresh Transactions"
     >
         <i class="bi bi-arrow-clockwise"></i>
     </button>
@@ -63,8 +65,8 @@
                         <button
                             class="btn btn-sm btn-danger"
                             type="button"
-                            title="Clear filters"
                             (click)="clearFilters()"
+                            title="Clear Filters"
                         >
                             <i class="bi bi-trash"></i>
                             Clear Filters
@@ -114,8 +116,8 @@
                             <button
                                 class="btn btn-sm btn-danger"
                                 type="button"
-                                title="Clear filters"
                                 (click)="clearFilters()"
+                                title="Clear Filters"
                             >
                                 <i class="bi bi-x-circle"></i>
                                 Clear Filters
@@ -270,6 +272,7 @@
                                 <button
                                     class="btn btn-sm btn-dark p-0 ps-1 pe-1"
                                     type="button"
+                                    title="Filter by Date"
                                     data-bs-toggle="modal"
                                     data-bs-target="#dateFilterModal"
                                 >
@@ -291,6 +294,7 @@
                                 <button
                                     class="btn btn-sm btn-dark p-0 ps-1 pe-1"
                                     type="button"
+                                    title="Filter by Amount"
                                     data-bs-toggle="modal"
                                     data-bs-target="#amountFilterModal"
                                 >
@@ -311,6 +315,7 @@
                                 <button
                                     class="btn btn-sm btn-dark p-0 ps-1 pe-1"
                                     type="button"
+                                    title="Filter by Category"
                                     data-bs-toggle="modal"
                                     data-bs-target="#categoryFilterModal"
                                 >
@@ -331,6 +336,7 @@
                                 <button
                                     class="btn btn-sm btn-dark p-0 ps-1 pe-1"
                                     type="button"
+                                    title="Filter by Account"
                                     data-bs-toggle="modal"
                                     data-bs-target="#accountFilterModal"
                                 >
@@ -365,8 +371,8 @@
                                     <button
                                         class="btn btn-outline-dark"
                                         type="button"
-                                        title="Reset name"
                                         (click)="resetName(t)"
+                                        title="Reset Name"
                                     >
                                         <i
                                             class="bi bi-arrow-counterclockwise"
@@ -396,6 +402,7 @@
                                     <button
                                         class="btn btn-outline-primary icon-btn d-none d-md-inline"
                                         type="button"
+                                        title="Change Category"
                                     >
                                         <i
                                             [classList]="getCategoryClasses(t)"
@@ -425,8 +432,8 @@
                                     <button
                                         class="btn btn-outline-dark"
                                         type="button"
-                                        title="Reset category"
                                         (click)="resetCategory(t)"
+                                        title="Reset Category"
                                     >
                                         <i
                                             class="bi bi-arrow-counterclockwise"
@@ -438,7 +445,7 @@
                                 <button
                                     class="btn btn-sm p-0"
                                     type="button"
-                                    title="Add note"
+                                    title="Add Note"
                                     (click)="openNoteModal(t)"
                                     data-bs-toggle="modal"
                                     data-bs-target="#noteModal"
