@@ -4,6 +4,7 @@
         <button
             class="navbar-toggler"
             type="button"
+            title="Toggle Navbar"
             data-bs-toggle="collapse"
             data-bs-target="#navbarNav"
         >
@@ -60,7 +61,11 @@
                         Welcome, {{ userName }}
                     </span>
                 }
-                <button class="btn btn-danger" (click)="logout()">
+                <button
+                    class="btn btn-danger"
+                    (click)="logout()"
+                    title="Log Out"
+                >
                     <i class="bi bi-box-arrow-right"></i>
                     Log Out
                 </button>

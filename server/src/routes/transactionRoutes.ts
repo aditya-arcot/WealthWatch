@@ -109,7 +109,7 @@ router.route('/').get(authenticate, catchAsync(getUserTransactions))
  *         schema:
  *           type: string
  *         required: true
- *         description: The transaction ID
+ *         description: The transaction id
  *     requestBody:
  *       required: true
  *       content:
@@ -119,6 +119,7 @@ router.route('/').get(authenticate, catchAsync(getUserTransactions))
  *             properties:
  *               name:
  *                 type: string
+ *                 required: true
  *     responses:
  *       204:
  *         description: Updated the transaction's custom name
@@ -141,7 +142,7 @@ router
  *         schema:
  *           type: string
  *         required: true
- *         description: The transaction ID
+ *         description: The transaction id
  *     requestBody:
  *       required: true
  *       content:
@@ -151,6 +152,7 @@ router
  *             properties:
  *               categoryId:
  *                 type: integer
+ *                 required: true
  *     responses:
  *       204:
  *         description: Updated the transaction's custom category id
@@ -173,7 +175,7 @@ router
  *         schema:
  *           type: string
  *         required: true
- *         description: The transaction ID
+ *         description: The transaction id
  *     requestBody:
  *       required: true
  *       content:
@@ -183,6 +185,7 @@ router
  *             properties:
  *               note:
  *                 type: string
+ *                 required: true
  *     responses:
  *       204:
  *         description: Updated the transaction's note

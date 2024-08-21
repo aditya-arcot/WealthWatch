@@ -1,7 +1,7 @@
 import { Queue, Worker } from 'bullmq'
 import { env } from 'process'
-import { Webhook, WebhookTypeEnum } from '../models/webhook.js'
-import { plaidHandleTransactionsWebhook } from '../plaid/webhookMethods.js'
+import { processWebhook } from '../controllers/webhookController.js'
+import { Webhook } from '../models/webhook.js'
 import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
@@ -69,30 +69,4 @@ export const closeWebhookWorker = async () => {
     }
     await webhookWorker.close()
     logger.debug('closed webhook worker')
-}
-
-const processWebhook = async (webhook: Webhook) => {
-    logger.debug({ webhook }, 'processing webhook')
-
-    const webhookType: string | undefined = webhook.data.webhook_type
-    const webhookCode: string | undefined = webhook.data.webhook_code
-
-    if (webhookType === undefined || webhookCode === undefined) {
-        throw Error('missing webhook type or code')
-    }
-
-    const webhookTypeEnum = webhookType as WebhookTypeEnum
-
-    switch (webhookTypeEnum) {
-        case WebhookTypeEnum.Transactions: {
-            const itemId: string | undefined = webhook.data.item_id
-            if (itemId === undefined) throw Error('missing item id')
-            await plaidHandleTransactionsWebhook(webhookCode, itemId)
-            break
-        }
-        default:
-            throw Error(`unhandled webhook type: ${webhookType}`)
-    }
-
-    logger.debug('processed webhook')
 }

@@ -213,7 +213,7 @@ const constructfetchActiveTransactionsByUserIdQuery = (
     if (startDate && endDate) {
         filtered = true
         query += `
-            AND t.date BETWEEN $${placeholder} AND $${placeholder + 1}
+            AND t.date >= $${placeholder} AND t.date <= $${placeholder + 1}
         `
         values.push(startDate)
         values.push(endDate)
@@ -237,7 +237,7 @@ const constructfetchActiveTransactionsByUserIdQuery = (
     if (minAmount !== undefined && maxAmount !== undefined) {
         filtered = true
         query += `
-            AND t.amount BETWEEN $${placeholder} AND $${placeholder + 1}
+            AND t.amount >= $${placeholder} AND t.amount <= $${placeholder + 1}
         `
         values.push(minAmount)
         values.push(maxAmount)

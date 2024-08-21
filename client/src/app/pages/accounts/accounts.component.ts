@@ -12,10 +12,12 @@ import {
 } from 'ngx-plaid-link'
 import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { Account } from '../../models/account'
 import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
+import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
@@ -38,7 +40,8 @@ export class AccountsComponent implements OnInit {
         private plaidLinkSvc: NgxPlaidLinkService,
         private alertSvc: AlertService,
         private accountSvc: AccountService,
-        private itemSvc: ItemService
+        private itemSvc: ItemService,
+        private currencySvc: CurrencyService
     ) {}
 
     ngOnInit(): void {
@@ -218,7 +221,7 @@ export class AccountsComponent implements OnInit {
         this.linkSvc.handleLinkEvent(event).subscribe()
     }
 
-    refreshItemTransactions(item: Item): void {
+    refreshItem(item: Item): void {
         const lastRefreshed = item.lastRefreshed
             ? new Date(item.lastRefreshed)
             : null
@@ -228,22 +231,22 @@ export class AccountsComponent implements OnInit {
                 lastRefreshTime + refreshCooldown
             ).toLocaleTimeString(undefined, { timeStyle: 'short' })
             this.alertSvc.addErrorAlert(
-                `${item.institutionName} data was recently synced`,
-                [`Please wait until ${nextRefresh} before syncing again`]
+                `${item.institutionName} data was recently refreshed`,
+                [`Please wait until ${nextRefresh} before refreshing again`]
             )
             return
         }
 
         this.loading = true
         this.itemSvc
-            .refreshItemTransactions(item.itemId)
+            .refreshItem(item.itemId)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (err.status === 429) {
                         item.lastRefreshed = new Date()
                     }
                     this.alertSvc.addErrorAlert(
-                        `Failed to sync ${item.institutionName} data`
+                        `Failed to refresh ${item.institutionName} data`
                     )
                     this.loading = false
                     return throwError(() => err)
@@ -252,7 +255,7 @@ export class AccountsComponent implements OnInit {
             .subscribe(() => {
                 item.lastRefreshed = new Date()
                 this.alertSvc.addSuccessAlert(
-                    `Syncing ${item.institutionName} data`,
+                    `Refreshing ${item.institutionName} data`,
                     ['Please check back later']
                 )
                 this.loading = false
@@ -284,5 +287,19 @@ export class AccountsComponent implements OnInit {
 
     convertDateToLocal(date: Date): string {
         return new Date(date).toLocaleString()
+    }
+
+    getDisplayCurrentBalance(acc: Account): string {
+        return this.currencySvc.formatAmount(
+            acc.currentBalance,
+            acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
+        )
+    }
+
+    getDisplayAvailableBalance(acc: Account): string {
+        return this.currencySvc.formatAmount(
+            acc.availableBalance,
+            acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
+        )
     }
 }

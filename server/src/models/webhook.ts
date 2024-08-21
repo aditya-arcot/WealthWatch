@@ -1,13 +1,11 @@
 export interface Webhook {
     id: number
     timestamp: Date
-    data: WebhookData
-}
-
-interface WebhookData {
-    webhook_type: string
-    webhook_code: string
-    item_id?: string
+    data: {
+        webhook_type: string
+        webhook_code: string
+        item_id?: string
+    }
 }
 
 export enum WebhookTypeEnum {

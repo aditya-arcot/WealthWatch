@@ -19,7 +19,7 @@ const router = express.Router()
 /**
  * @swagger
  * /link/link-token:
- *   get:
+ *   post:
  *     summary: Create a link token
  *     tags: [Link]
  *     responses:
@@ -40,13 +40,16 @@ router.route('/link-token').post(authenticate, catchAsync(createLinkToken))
  *   post:
  *     summary: Handle a link event
  *     tags: [Link]
- *     parameters:
- *       - in: body
- *         name: event
- *         schema:
- *           type: object
- *         required: true
- *         description: The link event
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               event:
+ *                 type: object
+ *                 required: true
  *     responses:
  *       202:
  *         description: Handled the link event
@@ -61,19 +64,19 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
  *   post:
  *     summary: Exchange a public token
  *     tags: [Link]
- *     parameters:
- *       - in: body
- *         name: publicToken
- *         schema:
- *           type: string
- *         required: true
- *         description: The public token
- *       - in: body
- *         name: metadata
- *         schema:
- *           type: object
- *         required: true
- *         description: The metadata
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               publicToken:
+ *                 type: string
+ *                 required: true
+ *               metadata:
+ *                 type: object
+ *                 required: true
  *     responses:
  *       204:
  *         description: Exchanged the public token, queued the item for sync

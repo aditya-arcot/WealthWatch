@@ -30,6 +30,7 @@ import {
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
+import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
@@ -91,12 +92,6 @@ export class TransactionsComponent implements OnInit {
     filteredCount: number | null = null
 
     maxNameLength = 30
-    currencyFormatters: Record<string, Intl.NumberFormat> = {
-        USD: new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }),
-    }
 
     constructor(
         private transactionSvc: TransactionService,
@@ -104,7 +99,8 @@ export class TransactionsComponent implements OnInit {
         private accountSvc: AccountService,
         private itemSvc: ItemService,
         private logger: LoggerService,
-        private alertSvc: AlertService
+        private alertSvc: AlertService,
+        private currencySvc: CurrencyService
     ) {}
 
     ngOnInit(): void {
@@ -499,17 +495,10 @@ export class TransactionsComponent implements OnInit {
     }
 
     getDisplayAmount(t: Transaction): string {
-        const currency = t.unofficialCurrencyCode ?? t.isoCurrencyCode
-        if (currency === null) return t.amount.toString()
-
-        if (!this.currencyFormatters[currency]) {
-            this.currencyFormatters[currency] = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency,
-            })
-        }
-
-        return this.currencyFormatters[currency].format(t.amount)
+        return this.currencySvc.formatAmount(
+            t.amount,
+            t.unofficialCurrencyCode ?? t.isoCurrencyCode
+        )
     }
 
     getDisplayCategory(t: Transaction): number {

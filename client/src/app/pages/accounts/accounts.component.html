@@ -6,6 +6,7 @@
         (click)="linkAccount()"
         class="btn btn-success d-none d-sm-block position-absolute top-left"
         type="button"
+        title="Link Account"
     >
         <i class="bi bi-plus"></i>
         Link an Account
@@ -14,6 +15,7 @@
         (click)="linkAccount()"
         class="btn btn-success d-block d-sm-none position-absolute top-left"
         type="button"
+        title="Link Account"
     >
         <i class="bi bi-plus"></i>
     </button>
@@ -51,17 +53,19 @@
 
                     <div class="d-flex gap-2 position-absolute top-right">
                         <button
-                            (click)="refreshItemTransactions(item)"
+                            (click)="refreshItem(item)"
                             class="btn btn-primary d-none d-sm-block"
                             type="button"
+                            title="Refresh"
                         >
                             <i class="bi bi-arrow-clockwise"></i>
-                            Sync
+                            Refresh
                         </button>
                         <button
-                            (click)="refreshItemTransactions(item)"
+                            (click)="refreshItem(item)"
                             class="btn btn-primary d-block d-sm-none"
                             type="button"
+                            title="Refresh"
                         >
                             <i class="bi bi-arrow-clockwise"></i>
                         </button>
@@ -69,6 +73,7 @@
                             (click)="deactivateItem(item)"
                             class="btn btn-danger d-none d-sm-block"
                             type="button"
+                            title="Deactivate"
                         >
                             <i class="bi bi-trash"></i>
                             Delete
@@ -77,6 +82,7 @@
                             (click)="deactivateItem(item)"
                             class="btn btn-danger d-block d-sm-none"
                             type="button"
+                            title="Deactivate"
                         >
                             <i class="bi bi-trash"></i>
                         </button>
@@ -88,7 +94,13 @@
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Type</th>
-                            <th scope="col">Number</th>
+                            <th scope="col">Current Balance</th>
+                            <th scope="col" class="d-none d-md-table-cell">
+                                Available Balance
+                            </th>
+                            <th scope="col" class="d-none d-sm-table-cell">
+                                Number
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -98,7 +110,11 @@
                                 <td>
                                     {{ account.type }} ({{ account.subtype }})
                                 </td>
-                                <td>
+                                <td>{{ getDisplayCurrentBalance(account) }}</td>
+                                <td class="d-none d-md-table-cell">
+                                    {{ getDisplayAvailableBalance(account) }}
+                                </td>
+                                <td class="d-none d-sm-table-cell">
                                     &middot;&middot;&middot;&middot;
                                     {{ account.mask }}
                                 </td>

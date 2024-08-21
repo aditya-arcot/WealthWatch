@@ -4,6 +4,7 @@ import {
     deactivateAllItems,
     deleteAllUsers,
     fireSandboxWebhook,
+    forceRefreshItemBalances,
     forceRefreshItemTransactions,
     resetSandboxItemLogin,
     syncItem,
@@ -67,6 +68,7 @@ router.route('/item').post(catchAsync(createSandboxItem))
  *         schema:
  *           type: string
  *         required: true
+ *         description: The item id
  *     responses:
  *       202:
  *         description: Queued the item for sync
@@ -84,6 +86,8 @@ router.route('/item/sync').post(catchAsync(syncItem))
  *         name: itemId
  *         schema:
  *           type: string
+ *         required: true
+ *         description: The item id
  *     responses:
  *       204:
  *         description: Refreshed the item's transactions
@@ -91,6 +95,27 @@ router.route('/item/sync').post(catchAsync(syncItem))
 router
     .route('/item/refresh-transactions')
     .post(catchAsync(forceRefreshItemTransactions))
+
+/**
+ * @swagger
+ * /dev/item/refresh-balances:
+ *   post:
+ *     summary: Force refresh an item's balances (ignore cooldown)
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: itemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The item id
+ *     responses:
+ *       202:
+ *         description: Queued the item for balance refresh
+ */
+router
+    .route('/item/refresh-balances')
+    .post(catchAsync(forceRefreshItemBalances))
 
 /**
  * @swagger
@@ -104,6 +129,7 @@ router
  *         schema:
  *           type: string
  *         required: true
+ *         description: The item id
  *     responses:
  *       204:
  *         description: Reset the item login
