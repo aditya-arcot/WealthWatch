@@ -63,9 +63,10 @@
                             class="form-control form-control-sm {{
                                 !startDateValid() ? 'invalid-input' : ''
                             }}"
-                            [(ngModel)]="startDate"
-                            (change)="handleStartDateChange()"
+                            [(ngModel)]="selectorStartDate"
+                            (ngModelChange)="setSelectorStartDate($event)"
                         />
+
                         @if (!startDateValid()) {
                             <div class="feedback-text small-text">
                                 Start or end date required
@@ -83,8 +84,8 @@
                             class="form-control form-control-sm {{
                                 !endDateValid() ? 'invalid-input' : ''
                             }}"
-                            [(ngModel)]="endDate"
-                            (change)="handleEndDateChange()"
+                            [(ngModel)]="selectorEndDate"
+                            (ngModelChange)="setSelectorEndDate($event)"
                         />
                         @if (!endDateValid()) {
                             <div class="feedback-text small-text">

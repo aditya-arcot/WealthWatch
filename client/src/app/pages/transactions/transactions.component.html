@@ -354,7 +354,7 @@
                     @for (t of transactions; track $index) {
                         <tr>
                             <td>
-                                {{ t.date | date: 'shortDate' }}
+                                {{ getDisplayDate(t) }}
                             </td>
                             <td>
                                 <div class="input-group input-group-sm">

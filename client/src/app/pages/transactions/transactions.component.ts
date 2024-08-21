@@ -73,10 +73,10 @@ export class TransactionsComponent implements OnInit {
 
     dateFilterType = DateFilterEnum
     selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
-    previousStartDate: string | null = null
-    startDate: string | null = null
-    previousEndDate: string | null = null
-    endDate: string | null = null
+    previousStartDate: Date | null = null
+    startDate: Date | null = null
+    previousEndDate: Date | null = null
+    endDate: Date | null = null
 
     amountFilterType = AmountFilterEnum
     selectedAmountFilter: AmountFilterEnum = AmountFilterEnum.ALL
@@ -353,8 +353,8 @@ export class TransactionsComponent implements OnInit {
 
     applyDateFilter(
         filter: DateFilterEnum,
-        start: string | null,
-        end: string | null
+        start: Date | null,
+        end: Date | null
     ): void {
         this.selectedDateFilter = filter
         let reload = false
@@ -454,6 +454,14 @@ export class TransactionsComponent implements OnInit {
 
         this.currentPage = 1
         this.reloadTransactions()
+    }
+
+    getDisplayDate(t: Transaction): string {
+        return new Date(t.date).toLocaleDateString(undefined, {
+            month: 'numeric',
+            day: 'numeric',
+            year: '2-digit',
+        })
     }
 
     getDisplayName(t: Transaction): string {

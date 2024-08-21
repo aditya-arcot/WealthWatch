@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     payment_channel TEXT NOT NULL,
     iso_currency_code TEXT,
     unofficial_currency_code TEXT,
-    date DATE NOT NULL,
+    date TIMESTAMPTZ NOT NULL,
     pending BOOLEAN NOT NULL,
     note TEXT,
     create_timestamp TIMESTAMPTZ DEFAULT NOW(),
