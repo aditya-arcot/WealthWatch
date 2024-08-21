@@ -45,8 +45,7 @@
                         } @else {
                             Last synced:
                             {{
-                                convertDateToLocal(item.lastSynced)
-                                    | date: 'short'
+                                getDisplayDate(item.lastSynced) | date: 'short'
                             }}
                         }
                     </h6>

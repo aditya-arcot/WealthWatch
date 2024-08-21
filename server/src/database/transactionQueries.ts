@@ -213,7 +213,8 @@ const constructfetchActiveTransactionsByUserIdQuery = (
     if (startDate && endDate) {
         filtered = true
         query += `
-            AND t.date >= $${placeholder} AND t.date <= $${placeholder + 1}
+            AND t.date >= $${placeholder}
+            AND t.date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(startDate)
         values.push(endDate)
@@ -228,7 +229,7 @@ const constructfetchActiveTransactionsByUserIdQuery = (
     } else if (endDate) {
         filtered = true
         query += `
-            AND t.date <= $${placeholder}
+            AND t.date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(endDate)
         placeholder++

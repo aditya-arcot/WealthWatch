@@ -1,7 +1,7 @@
 export interface TransactionsRequestParams {
     searchQuery?: string
-    startDate?: string | null
-    endDate?: string | null
+    startDate?: Date | null
+    endDate?: Date | null
     minAmount?: number | null
     maxAmount?: number | null
     categoryIds?: Set<number>
