@@ -43,6 +43,16 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
  *   post:
  *     summary: Update webhook for active items
  *     tags: [Items]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               url:
+ *                 type: string
+ *                 required: true
  *     responses:
  *       204:
  *         description: Updated webhook for active items
@@ -65,7 +75,7 @@ router
  *         schema:
  *           type: string
  *         required: true
- *         description: The item ID
+ *         description: The item id
  *     responses:
  *       202:
  *         description: Refreshed the item's transactions and queued the balance refresh
@@ -86,7 +96,7 @@ router.route('/:itemId/refresh').post(authenticate, catchAsync(refreshItem))
  *         schema:
  *           type: string
  *         required: true
- *         description: The item ID
+ *         description: The item id
  *     responses:
  *       204:
  *         description: Deactivated the item
