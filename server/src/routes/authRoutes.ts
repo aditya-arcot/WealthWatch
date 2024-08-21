@@ -27,8 +27,10 @@ const router = express.Router()
  *             properties:
  *               username:
  *                 type: string
+ *                 required: true
  *               password:
  *                 type: string
+ *                 required: true
  *     responses:
  *       200:
  *         description: Logged in the user
@@ -68,14 +70,19 @@ router.route('/logout').post(authenticate, logout)
  *             properties:
  *               username:
  *                 type: string
+ *                 required: true
  *               email:
  *                 type: string
+ *                 required: true
  *               first_name:
  *                 type: string
+ *                 required: true
  *               last_name:
  *                 type: string
+ *                 required: true
  *               password:
  *                 type: string
+ *                 required: true
  *     responses:
  *       201:
  *         description: Registered the user

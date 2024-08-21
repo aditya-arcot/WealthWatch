@@ -37,7 +37,7 @@ export class LogoutComponent implements OnInit {
                     setTimeout(() => {
                         this.router.navigateByUrl('/login')
                         this.alertSvc.clearAlerts()
-                        this.alertSvc.addSuccessAlert('Success signing out')
+                        this.alertSvc.addSuccessAlert('Success logging out')
                     }, 3000)
                     return
                 }

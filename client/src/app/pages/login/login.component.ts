@@ -106,7 +106,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 this.userSvc.storeCurrentUser(user)
                 this.router.navigateByUrl('/home')
                 this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Success signing in')
+                this.alertSvc.addSuccessAlert('Success logging in')
             })
     }
 }

@@ -2,7 +2,7 @@ import express from 'express'
 import {
     deactivateItem,
     getUserItems,
-    refreshItemTransactions,
+    refreshItem,
     updateActiveItemsWebhook,
 } from '../controllers/itemController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -43,6 +43,16 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
  *   post:
  *     summary: Update webhook for active items
  *     tags: [Items]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               url:
+ *                 type: string
+ *                 required: true
  *     responses:
  *       204:
  *         description: Updated webhook for active items
@@ -55,9 +65,9 @@ router
 
 /**
  * @swagger
- * /items/{itemId}/refresh-transactions:
+ * /items/{itemId}/refresh:
  *   post:
- *     summary: Refresh an item's transactions
+ *     summary: Refresh an item's transactions and balances
  *     tags: [Items]
  *     parameters:
  *       - in: path
@@ -65,16 +75,14 @@ router
  *         schema:
  *           type: string
  *         required: true
- *         description: The item ID
+ *         description: The item id
  *     responses:
- *       204:
- *         description: Refreshed the item's transactions
+ *       202:
+ *         description: Refreshed the item's transactions and queued the balance refresh
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router
-    .route('/:itemId/refresh-transactions')
-    .post(authenticate, catchAsync(refreshItemTransactions))
+router.route('/:itemId/refresh').post(authenticate, catchAsync(refreshItem))
 
 /**
  * @swagger
@@ -88,7 +96,7 @@ router
  *         schema:
  *           type: string
  *         required: true
- *         description: The item ID
+ *         description: The item id
  *     responses:
  *       204:
  *         description: Deactivated the item

@@ -1,27 +1,66 @@
-import { AccountBase } from 'plaid'
+import {
+    AccountBase,
+    AccountsBalanceGetRequest,
+    AccountsGetRequest,
+} from 'plaid'
 import { Account } from '../models/account.js'
+import { Item } from '../models/item.js'
 import { toTitleCase } from '../utils/format.js'
+import { logger } from '../utils/logger.js'
+import { executePlaidMethod, plaidClient } from './index.js'
+
+export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
+    logger.debug({ item }, 'getting item accounts')
+    const params: AccountsGetRequest = {
+        access_token: item.accessToken,
+    }
+    const resp = await executePlaidMethod(
+        plaidClient.accountsGet,
+        params,
+        item.userId,
+        item.id
+    )
+    return resp.data.accounts.map((account) =>
+        mapPlaidAccount(account, item.id)
+    )
+}
+
+export const plaidAccountsBalanceGet = async (
+    item: Item
+): Promise<Account[]> => {
+    logger.debug({ item }, 'getting item account balances')
+    const params: AccountsBalanceGetRequest = {
+        access_token: item.accessToken,
+    }
+    const resp = await executePlaidMethod(
+        plaidClient.accountsBalanceGet,
+        params,
+        item.userId,
+        item.id
+    )
+    return resp.data.accounts.map((account) =>
+        mapPlaidAccount(account, item.id)
+    )
+}
 
 export const mapPlaidAccount = (
     account: AccountBase,
     itemId: number
-): Account => {
-    return {
-        id: 0,
-        itemId,
-        accountId: account.account_id,
-        name: account.name,
-        mask: account.mask,
-        officialName: account.official_name,
-        currentBalance: account.balances.current,
-        availableBalance: account.balances.available,
-        isoCurrencyCode: account.balances.iso_currency_code,
-        unofficialCurrencyCode: account.balances.unofficial_currency_code,
-        creditLimit: account.balances.limit,
-        type: toTitleCase(account.type),
-        subtype: mapAccountSubtype(account.subtype),
-    }
-}
+): Account => ({
+    id: 0,
+    itemId,
+    accountId: account.account_id,
+    name: account.name,
+    mask: account.mask,
+    officialName: account.official_name,
+    currentBalance: account.balances.current,
+    availableBalance: account.balances.available,
+    isoCurrencyCode: account.balances.iso_currency_code,
+    unofficialCurrencyCode: account.balances.unofficial_currency_code,
+    creditLimit: account.balances.limit,
+    type: toTitleCase(account.type),
+    subtype: mapAccountSubtype(account.subtype),
+})
 
 const mapAccountSubtype = (subtype: string | null): string | null => {
     if (subtype === null) return null

@@ -11,15 +11,18 @@ import { fetchUsers, removeUserById } from '../database/userQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { Item } from '../models/item.js'
 import { User } from '../models/user.js'
-import { plaidResetItemLogin, plaidUnlinkItem } from '../plaid/itemMethods.js'
 import {
-    plaidCreatePublicToken,
-    plaidExchangePublicToken,
+    plaidItemRemove,
+    plaidSandboxResetLogin,
+} from '../plaid/itemMethods.js'
+import {
+    plaidPublicTokenExchange,
+    plaidSandboxPublicTokenCreate,
 } from '../plaid/tokenMethods.js'
-import { plaidFireWebhook } from '../plaid/webhookMethods.js'
-import { queueItemSync } from '../queues/itemSyncQueue.js'
+import { plaidSandboxFireWebhook } from '../plaid/webhookMethods.js'
+import { queueItemBalancesRefresh, queueItemSync } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
-import { refreshItemTransactionsMain } from './itemController.js'
+import { refreshItemTransactions } from './itemController.js'
 
 export const deleteAllUsers = async (req: Request, res: Response) => {
     logger.debug('deleting all users')
@@ -43,7 +46,7 @@ const deactivateItems = async (deleteUsers: boolean) => {
             await Promise.all(
                 items.map(async (item) => {
                     logger.debug({ item }, 'unlinking & deactivating item')
-                    await plaidUnlinkItem(item)
+                    await plaidItemRemove(item)
                     await modifyItemActiveById(item.id, false)
                 })
             )
@@ -70,8 +73,8 @@ export const createSandboxItem = async (req: Request, res: Response) => {
     )
     if (existingItem) throw new HttpError('account already exists', 409)
 
-    const publicToken = await plaidCreatePublicToken(user, institutionId)
-    const { accessToken, itemId } = await plaidExchangePublicToken(
+    const publicToken = await plaidSandboxPublicTokenCreate(user, institutionId)
+    const { accessToken, itemId } = await plaidPublicTokenExchange(
         publicToken,
         user.id
     )
@@ -119,8 +122,28 @@ export const forceRefreshItemTransactions = async (
     const itemId = req.query['itemId'] as string | undefined
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
-    await refreshItemTransactionsMain(itemId, false)
+    const item = await fetchActiveItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    item.lastRefreshed = null
+
+    await refreshItemTransactions(item)
     return res.status(204).send()
+}
+
+export const forceRefreshItemBalances = async (req: Request, res: Response) => {
+    logger.debug('force refreshing item balances')
+
+    const itemId = req.query['itemId'] as string | undefined
+    if (itemId === undefined) throw new HttpError('missing item id', 400)
+
+    const item = await fetchActiveItemById(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    item.lastRefreshed = null
+
+    await queueItemBalancesRefresh(item)
+    return res.status(202).send()
 }
 
 export const resetSandboxItemLogin = async (req: Request, res: Response) => {
@@ -132,7 +155,7 @@ export const resetSandboxItemLogin = async (req: Request, res: Response) => {
     const item = await fetchActiveItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    const reset = await plaidResetItemLogin(item)
+    const reset = await plaidSandboxResetLogin(item)
     if (!reset) throw Error('failed to reset item login')
     return res.status(204).send()
 }
@@ -154,7 +177,7 @@ export const fireSandboxWebhook = async (req: Request, res: Response) => {
         throw new HttpError('invalid webhook code', 400)
     }
 
-    const fired = await plaidFireWebhook(item, codeEnum)
+    const fired = await plaidSandboxFireWebhook(item, codeEnum)
     if (!fired) throw new Error('failed to fire webhook')
     return res.status(204).send()
 }

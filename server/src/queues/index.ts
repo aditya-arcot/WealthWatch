@@ -1,10 +1,10 @@
 import { insertJob } from '../database/jobQueries.js'
 import { logger } from '../utils/logger.js'
 import {
-    closeItemSyncWorker,
-    initializeItemSyncQueue,
-    initializeItemSyncWorker,
-} from './itemSyncQueue.js'
+    closeItemWorker,
+    initializeItemQueue,
+    initializeItemWorker,
+} from './itemQueue.js'
 import {
     closeLogWorker,
     initializeLogQueue,
@@ -18,14 +18,14 @@ import {
 
 export const initializeQueues = () => {
     logger.debug('initializing queues')
-    initializeItemSyncQueue()
+    initializeItemQueue()
     initializeLogQueue()
     initializeWebhookQueue()
 }
 
 export const initializeWorkers = () => {
     logger.debug('initializing workers')
-    initializeItemSyncWorker()
+    initializeItemWorker()
     initializeLogWorker()
     initializeWebhookWorker()
 }
@@ -72,7 +72,7 @@ export const handleJobFailure = async (
 
 export const closeWorkers = async () => {
     logger.debug('closing workers')
-    await closeItemSyncWorker()
+    await closeItemWorker()
     await closeLogWorker()
     await closeWebhookWorker()
 }
