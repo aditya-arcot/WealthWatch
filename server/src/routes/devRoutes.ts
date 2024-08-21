@@ -68,6 +68,7 @@ router.route('/item').post(catchAsync(createSandboxItem))
  *         schema:
  *           type: string
  *         required: true
+ *         description: The item id
  *     responses:
  *       202:
  *         description: Queued the item for sync
@@ -85,6 +86,8 @@ router.route('/item/sync').post(catchAsync(syncItem))
  *         name: itemId
  *         schema:
  *           type: string
+ *         required: true
+ *         description: The item id
  *     responses:
  *       204:
  *         description: Refreshed the item's transactions
@@ -104,6 +107,8 @@ router
  *         name: itemId
  *         schema:
  *           type: string
+ *         required: true
+ *         description: The item id
  *     responses:
  *       202:
  *         description: Queued the item for balance refresh
@@ -124,6 +129,7 @@ router
  *         schema:
  *           type: string
  *         required: true
+ *         description: The item id
  *     responses:
  *       204:
  *         description: Reset the item login
