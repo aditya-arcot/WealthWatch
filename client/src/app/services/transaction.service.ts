@@ -21,10 +21,10 @@ export class TransactionService {
             params = params.set('searchQuery', req.searchQuery)
         }
         if (req.startDate) {
-            params = params.set('startDate', req.startDate)
+            params = params.set('startDate', req.startDate.toISOString())
         }
         if (req.endDate) {
-            params = params.set('endDate', req.endDate)
+            params = params.set('endDate', req.endDate.toISOString())
         }
         if (req.minAmount !== null && req.minAmount !== undefined) {
             params = params.set('minAmount', req.minAmount)

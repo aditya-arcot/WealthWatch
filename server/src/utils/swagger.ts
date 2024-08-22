@@ -32,16 +32,16 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'string',
-                                description: 'The account ID',
+                                type: 'number',
+                                description: 'The account id',
                             },
                             itemId: {
-                                type: 'string',
-                                description: 'The item ID',
+                                type: 'number',
+                                description: 'The item id',
                             },
                             accountId: {
                                 type: 'string',
-                                description: 'The Plaid account ID',
+                                description: 'The Plaid account id',
                             },
                             name: {
                                 type: 'string',
@@ -90,8 +90,8 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'string',
-                                description: 'The category ID',
+                                type: 'number',
+                                description: 'The category id',
                             },
                             name: {
                                 type: 'string',
@@ -103,16 +103,16 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'string',
-                                description: 'The item ID',
+                                type: 'number',
+                                description: 'The item id',
                             },
                             userId: {
-                                type: 'string',
-                                description: 'The user ID',
+                                type: 'number',
+                                description: 'The user id',
                             },
                             itemId: {
                                 type: 'string',
-                                description: 'The Plaid item ID',
+                                description: 'The Plaid item id',
                             },
                             active: {
                                 type: 'boolean',
@@ -124,11 +124,11 @@ export const createSwaggerSpec = () => {
                             },
                             institutionId: {
                                 type: 'string',
-                                description: 'The institution ID',
+                                description: 'The item institution id',
                             },
                             institutionName: {
                                 type: 'string',
-                                description: 'The institution name',
+                                description: 'The item institution name',
                             },
                             healthy: {
                                 type: 'boolean',
@@ -137,6 +137,43 @@ export const createSwaggerSpec = () => {
                             cursor: {
                                 type: 'string',
                                 description: 'The item cursor',
+                            },
+                            lastSynced: {
+                                type: 'date',
+                                description: 'The item last synced date',
+                            },
+                            lastRefreshed: {
+                                type: 'date',
+                                description: 'The item last refreshed date',
+                            },
+                        },
+                    },
+                    Notification: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                                description: 'The notification id',
+                            },
+                            userId: {
+                                type: 'number',
+                                description: 'The user id',
+                            },
+                            typeId: {
+                                type: 'number',
+                                description: 'The notification type id',
+                            },
+                            message: {
+                                type: 'string',
+                                description: 'The notification message',
+                            },
+                            read: {
+                                type: 'boolean',
+                                description: 'The notification read status',
+                            },
+                            active: {
+                                type: 'boolean',
+                                description: 'The notification active status',
                             },
                         },
                     },
@@ -153,41 +190,53 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'string',
-                                description: 'The transaction ID',
+                                type: 'number',
+                                description: 'The transaction id',
                             },
                             accountId: {
-                                type: 'string',
-                                description: 'The account ID',
+                                type: 'number',
+                                description: 'The account id',
                             },
                             transactionId: {
                                 type: 'string',
-                                description: 'The Plaid transaction ID',
+                                description: 'The Plaid transaction id',
                             },
-                            name: {
+                            merchantId: {
                                 type: 'string',
-                                description: 'The transaction name',
-                            },
-                            amount: {
-                                type: 'number',
-                                description: 'The transaction amount',
+                                description: 'The transaction merchant id',
                             },
                             merchant: {
                                 type: 'string',
                                 description: 'The transaction merchant',
                             },
-                            merchantId: {
+                            name: {
                                 type: 'string',
-                                description: 'The transaction merchant ID',
+                                description: 'The transaction name',
                             },
-                            category: {
+                            customName: {
                                 type: 'string',
-                                description: 'The transaction category',
+                                description: 'The transaction custom name',
+                            },
+                            amount: {
+                                type: 'number',
+                                description: 'The transaction amount',
+                            },
+                            primaryCategory: {
+                                type: 'string',
+                                description: 'The Plaid category',
                             },
                             detailedCategory: {
                                 type: 'string',
+                                description: 'The Plaid detailed category',
+                            },
+                            categoryId: {
+                                type: 'number',
+                                description: 'The transaction category id',
+                            },
+                            customCategoryId: {
+                                type: 'number',
                                 description:
-                                    'The transaction detailed category',
+                                    'The transaction custom category id',
                             },
                             paymentChannel: {
                                 type: 'string',
@@ -204,12 +253,16 @@ export const createSwaggerSpec = () => {
                                     'The transaction unofficial currency code',
                             },
                             date: {
-                                type: 'string',
+                                type: 'date',
                                 description: 'The transaction date',
                             },
                             pending: {
                                 type: 'boolean',
                                 description: 'The transaction pending status',
+                            },
+                            note: {
+                                type: 'string',
+                                description: 'The transaction note',
                             },
                         },
                     },
@@ -226,8 +279,8 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'string',
-                                description: 'The user ID',
+                                type: 'number',
+                                description: 'The user id',
                             },
                             username: {
                                 type: 'string',

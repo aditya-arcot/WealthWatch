@@ -1,4 +1,4 @@
-START TRANSACTION;
+BEGIN;
 
 -- UPDATE TIMESTAMP FUNCTION
 CREATE OR REPLACE FUNCTION set_update_timestamp()
@@ -11,14 +11,14 @@ $$ LANGUAGE plpgsql;
 
 
 -- AUDIT TABLE
-CREATE TABLE IF NOT EXISTS audit (
+CREATE TABLE audit (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     operation CHAR(1) NOT NULL CHECK (operation IN ('I', 'U', 'D')),
     table_name TEXT NOT NULL,
     row_id INTEGER NOT NULL,
     row_data JSON NOT NULL,
     user_id TEXT NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
@@ -45,23 +45,23 @@ $$ LANGUAGE plpgsql;
 
 
 -- CATEGORIES TABLE
-CREATE TABLE IF NOT EXISTS categories (
+CREATE TABLE categories (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name TEXT UNIQUE NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
 -- USERS TABLE, TRIGGERS
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_users_update_timestamp
@@ -75,8 +75,35 @@ FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
 
+-- NOTIFICATIONS TABLE
+CREATE TABLE notifications (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    message TEXT NOT NULL,
+    read BOOLEAN NOT NULL,
+    active BOOLEAN NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER trigger_notifications_update_timestamp
+BEFORE UPDATE ON notifications
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_notifications_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON notifications
+FOR EACH ROW
+EXECUTE FUNCTION insert_audit_record();
+
+CREATE VIEW active_notifications AS
+SELECT *
+FROM notifications
+WHERE active = TRUE;
+
+
 -- ITEMS TABLE, TRIGGERS, VIEW
-CREATE TABLE IF NOT EXISTS items (
+CREATE TABLE items (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     item_id TEXT UNIQUE NOT NULL,
@@ -88,8 +115,8 @@ CREATE TABLE IF NOT EXISTS items (
     cursor TEXT,
     last_synced TIMESTAMPTZ,
     last_refreshed TIMESTAMPTZ,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_items_update_timestamp
@@ -109,7 +136,7 @@ WHERE active = TRUE;
 
 
 -- ACCOUNTS TABLE, TRIGGERS, VIEW
-CREATE TABLE IF NOT EXISTS accounts (
+CREATE TABLE accounts (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
     account_id TEXT UNIQUE NOT NULL,
@@ -123,8 +150,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     credit_limit NUMERIC(28, 10),
     type TEXT NOT NULL,
     subtype TEXT NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_accounts_update_timestamp
@@ -146,7 +173,7 @@ WHERE i.active = TRUE;
 
 
 -- TRANSACTIONS TABLE, TRIGGERS, VIEW
-CREATE TABLE IF NOT EXISTS transactions (
+CREATE TABLE transactions (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     transaction_id TEXT UNIQUE NOT NULL,
@@ -162,11 +189,11 @@ CREATE TABLE IF NOT EXISTS transactions (
     payment_channel TEXT NOT NULL,
     iso_currency_code TEXT,
     unofficial_currency_code TEXT,
-    date DATE NOT NULL,
+    date TIMESTAMPTZ NOT NULL,
     pending BOOLEAN NOT NULL,
     note TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_transactions_update_timestamp
@@ -190,7 +217,7 @@ WHERE i.active = TRUE;
 
 
 -- APP REQUESTS TABLE
-CREATE TABLE IF NOT EXISTS app_requests (
+CREATE TABLE app_requests (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     request_id TEXT NOT NULL,
     user_id INTEGER,
@@ -208,12 +235,12 @@ CREATE TABLE IF NOT EXISTS app_requests (
     response_status INTEGER NOT NULL,
     response_headers JSON,
     response_body TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
 -- PLAID LINK EVENTS TABLE
-CREATE TABLE IF NOT EXISTS plaid_link_events (
+CREATE TABLE plaid_link_events (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER,
     timestamp TIMESTAMPTZ NOT NULL,
@@ -227,12 +254,12 @@ CREATE TABLE IF NOT EXISTS plaid_link_events (
     error_type TEXT,
     error_code TEXT,
     error_message TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
 -- PLAID API REQUESTS TABLE
-CREATE TABLE IF NOT EXISTS plaid_api_requests (
+CREATE TABLE plaid_api_requests (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER,
     item_id INTEGER,
@@ -244,12 +271,12 @@ CREATE TABLE IF NOT EXISTS plaid_api_requests (
     error_name TEXT,
     error_message TEXT,
     error_stack TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
 -- JOBS TABLE
-CREATE TABLE IF NOT EXISTS jobs (
+CREATE TABLE jobs (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     queue_name TEXT NOT NULL,
     job_id TEXT,
@@ -259,7 +286,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     error_name TEXT,
     error_message TEXT,
     error_stack TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 COMMIT;

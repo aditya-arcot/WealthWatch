@@ -285,7 +285,7 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    convertDateToLocal(date: Date): string {
+    getDisplayDate(date: Date): string {
         return new Date(date).toLocaleString()
     }
 

@@ -85,7 +85,10 @@ export const refreshItem = async (req: Request, res: Response) => {
 
 export const refreshItemTransactions = async (item: Item) => {
     if (item.lastRefreshed) {
-        if (Date.now() - item.lastRefreshed.getTime() < refreshCooldown) {
+        if (
+            Date.now() - new Date(item.lastRefreshed).getTime() <
+            refreshCooldown
+        ) {
             throw new HttpError('item refresh cooldown', 429)
         }
     }
@@ -95,7 +98,10 @@ export const refreshItemTransactions = async (item: Item) => {
 
 export const refreshItemBalances = async (item: Item) => {
     if (item.lastRefreshed) {
-        if (Date.now() - item.lastRefreshed.getTime() < refreshCooldown) {
+        if (
+            Date.now() - new Date(item.lastRefreshed).getTime() <
+            refreshCooldown
+        ) {
             throw new HttpError('item refresh cooldown', 429)
         }
     }

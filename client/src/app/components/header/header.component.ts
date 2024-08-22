@@ -1,30 +1,95 @@
-import { Component, OnInit } from '@angular/core'
+import { HttpErrorResponse } from '@angular/common/http'
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core'
 import { Router, RouterLink, RouterLinkActive } from '@angular/router'
-import { catchError, throwError } from 'rxjs'
+import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
+import { Notification } from '../../models/notification'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
+import { LoggerService } from '../../services/logger.service'
+import { NotificationService } from '../../services/notification.service'
 import { UserService } from '../../services/user.service'
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component'
+import { NotificationsComponent } from '../notifications/notifications.component'
 
 @Component({
     selector: 'app-header',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive],
+    imports: [
+        RouterLink,
+        RouterLinkActive,
+        NotificationsComponent,
+        LoadingSpinnerComponent,
+    ],
     templateUrl: './header.component.html',
     styleUrl: './header.component.css',
 })
-export class HeaderComponent implements OnInit {
-    public userName: string | undefined
+export class HeaderComponent implements OnInit, AfterViewInit {
+    @ViewChild(NotificationsComponent)
+    notificationsComponent!: NotificationsComponent
+    notifications: Notification[] = []
+    loading = false
 
     constructor(
         private userSvc: UserService,
         private alertSvc: AlertService,
         private authSvc: AuthService,
-        private router: Router
+        private router: Router,
+        private notificationSvc: NotificationService,
+        private logger: LoggerService
     ) {}
 
     ngOnInit(): void {
-        const user = this.userSvc.getStoredCurrentUser()
-        this.userName = user?.firstName
+        this.loadNotifications().subscribe()
+    }
+
+    ngAfterViewInit(): void {
+        const notificationsModal = document.getElementById('notificationsModal')
+        if (notificationsModal) {
+            notificationsModal.addEventListener('hidden.bs.modal', () => {
+                this.handleCloseNotificationsModal()
+            })
+        }
+    }
+
+    loadNotifications(): Observable<undefined> {
+        return this.notificationSvc.getNotifications().pipe(
+            switchMap((notifications) => {
+                this.logger.debug('loaded notifications', notifications)
+                this.notifications = notifications
+                return of(undefined)
+            }),
+            catchError((err: HttpErrorResponse) => {
+                this.logger.error('failed to load notifications', err)
+                return throwError(() => err)
+            })
+        )
+    }
+
+    updateNotificationsToRead(): Observable<undefined> {
+        return this.notificationSvc.updateNotificationsToRead().pipe(
+            switchMap(() => {
+                this.logger.debug('updated notifications to read')
+                return of(undefined)
+            }),
+            catchError(() => of(undefined))
+        )
+    }
+
+    openNotificationsModal(): void {
+        this.notificationsComponent.notifications = this.notifications
+    }
+
+    handleCloseNotificationsModal(): void {
+        this.updateNotificationsToRead()
+            .pipe(
+                switchMap(() => this.loadNotifications()),
+                catchError(() => of(undefined))
+            )
+            .subscribe()
+    }
+
+    unreadNotifications(): boolean {
+        return this.notifications.some((notification) => !notification.read)
     }
 
     logout(): void {
