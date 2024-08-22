@@ -1,15 +1,39 @@
+<app-loading-spinner [loading]="loading"></app-loading-spinner>
+
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" routerLink="/home">WealthWatch</a>
-        <button
-            class="navbar-toggler"
-            type="button"
-            title="Toggle Navbar"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex d-lg-none">
+            <button
+                class="navbar-toggler me-2"
+                type="button"
+                title="Toggle Navbar"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <button
+                class="btn btn-secondary position-relative me-2"
+                title="Notifications"
+                (click)="openNotificationsModal()"
+                data-bs-toggle="modal"
+                data-bs-target="#notificationsModal"
+            >
+                <i class="bi bi-bell"></i>
+                @if (unreadNotifications()) {
+                    <span
+                        class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
+                    >
+                        <span class="visually-hidden">New alerts</span>
+                    </span>
+                }
+            </button>
+            <button class="btn btn-danger" (click)="logout()" title="Log Out">
+                <i class="bi bi-box-arrow-right"></i>
+                Log Out
+            </button>
+        </div>
         <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav">
                 <a
@@ -55,21 +79,30 @@
                     Paychecks
                 </a>
             </div>
-            <div class="navbar-nav ms-auto">
-                @if (userName !== undefined) {
-                    <span class="navbar-text d-none d-lg-block p-2">
-                        Welcome, {{ userName }}
+        </div>
+        <div class="d-none d-lg-flex">
+            <button
+                class="btn btn-secondary position-relative me-2"
+                title="Notifications"
+                (click)="openNotificationsModal()"
+                data-bs-toggle="modal"
+                data-bs-target="#notificationsModal"
+            >
+                <i class="bi bi-bell"></i>
+                @if (unreadNotifications()) {
+                    <span
+                        class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
+                    >
+                        <span class="visually-hidden">New alerts</span>
                     </span>
                 }
-                <button
-                    class="btn btn-danger"
-                    (click)="logout()"
-                    title="Log Out"
-                >
-                    <i class="bi bi-box-arrow-right"></i>
-                    Log Out
-                </button>
-            </div>
+            </button>
+            <button class="btn btn-danger" (click)="logout()" title="Log Out">
+                <i class="bi bi-box-arrow-right"></i>
+                Log Out
+            </button>
         </div>
     </div>
 </nav>
+
+<app-notifications />

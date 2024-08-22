@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -e
+
+show_help() {
+    echo "Usage: run_migration_script [options]"
+    echo ""
+    echo "Options:"
+    echo "  --env file     Specify the environment file"
+    echo "  --script file   Specify the migration script"
+    echo "  -h, --help     Display this help message"
+}
+
+ENV_FILE="../.env.dev"
+
+while [[ "$1" != "" ]]; do
+    case $1 in
+        --env)
+            shift
+            ENV_FILE=$1
+            ;;
+        --script)
+            shift
+            MIGRATION_SCRIPT=$1
+            ;;
+        -h | --help)
+            show_help
+            exit
+            ;;
+        *)
+            echo "Invalid option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$MIGRATION_SCRIPT" ]; then
+    echo "MIGRATION_SCRIPT not set"
+    exit 1
+fi
+
+echo "Migration script: $MIGRATION_SCRIPT"
+echo "Environment file: $ENV_FILE"
+echo
+
+source ./load_env
+
+echo "running migration script..."
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f $MIGRATION_SCRIPT -v ON_ERROR_STOP=1
+echo
+
+echo "success running migration script"
