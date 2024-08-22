@@ -1,3 +1,9 @@
+/*
+    add notifications table, triggers, view
+*/
+
+BEGIN;
+
 -- NOTIFICATIONS TABLE
 CREATE TABLE notifications (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -23,3 +29,5 @@ CREATE VIEW active_notifications AS
 SELECT *
 FROM notifications
 WHERE active = TRUE;
+
+COMMIT;
