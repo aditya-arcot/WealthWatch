@@ -1,4 +1,4 @@
-START TRANSACTION;
+BEGIN;
 
 -- UPDATE TIMESTAMP FUNCTION
 CREATE OR REPLACE FUNCTION set_update_timestamp()
@@ -18,7 +18,7 @@ CREATE TABLE audit (
     row_id INTEGER NOT NULL,
     row_data JSON NOT NULL,
     user_id TEXT NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
@@ -48,7 +48,7 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE categories (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name TEXT UNIQUE NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
@@ -60,8 +60,8 @@ CREATE TABLE users (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_users_update_timestamp
@@ -82,8 +82,8 @@ CREATE TABLE notifications (
     message TEXT NOT NULL,
     read BOOLEAN NOT NULL,
     active BOOLEAN NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_notifications_update_timestamp
@@ -115,8 +115,8 @@ CREATE TABLE items (
     cursor TEXT,
     last_synced TIMESTAMPTZ,
     last_refreshed TIMESTAMPTZ,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_items_update_timestamp
@@ -150,8 +150,8 @@ CREATE TABLE accounts (
     credit_limit NUMERIC(28, 10),
     type TEXT NOT NULL,
     subtype TEXT NOT NULL,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_accounts_update_timestamp
@@ -192,8 +192,8 @@ CREATE TABLE transactions (
     date TIMESTAMPTZ NOT NULL,
     pending BOOLEAN NOT NULL,
     note TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trigger_transactions_update_timestamp
@@ -235,7 +235,7 @@ CREATE TABLE app_requests (
     response_status INTEGER NOT NULL,
     response_headers JSON,
     response_body TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
@@ -254,7 +254,7 @@ CREATE TABLE plaid_link_events (
     error_type TEXT,
     error_code TEXT,
     error_message TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
@@ -271,7 +271,7 @@ CREATE TABLE plaid_api_requests (
     error_name TEXT,
     error_message TEXT,
     error_stack TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
@@ -286,7 +286,7 @@ CREATE TABLE jobs (
     error_name TEXT,
     error_message TEXT,
     error_stack TEXT,
-    create_timestamp TIMESTAMPTZ DEFAULT NOW()
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 COMMIT;
