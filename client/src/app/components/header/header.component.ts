@@ -1,7 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core'
-import { Router, RouterLink, RouterLinkActive } from '@angular/router'
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
+import {
+    NavigationEnd,
+    Router,
+    RouterLink,
+    RouterLinkActive,
+} from '@angular/router'
+import { catchError, filter, Observable, of, switchMap, throwError } from 'rxjs'
 import { Notification } from '../../models/notification'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
@@ -40,6 +45,11 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.loadNotifications().subscribe()
+        this.router.events
+            .pipe(filter((event) => event instanceof NavigationEnd))
+            .forEach(() => {
+                this.loadNotifications().subscribe()
+            })
     }
 
     ngAfterViewInit(): void {
@@ -66,13 +76,15 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 
     updateNotificationsToRead(): Observable<undefined> {
-        return this.notificationSvc.updateNotificationsToRead().pipe(
-            switchMap(() => {
-                this.logger.debug('updated notifications to read')
-                return of(undefined)
-            }),
-            catchError(() => of(undefined))
-        )
+        return this.notificationSvc
+            .updateNotificationsToRead(this.notifications)
+            .pipe(
+                switchMap(() => {
+                    this.logger.debug('updated notifications to read')
+                    return of(undefined)
+                }),
+                catchError(() => of(undefined))
+            )
     }
 
     openNotificationsModal(): void {

@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
     fetchActiveItemByUserIdAndInstitutionId,
+    fetchActiveItems,
     insertItem,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
@@ -21,10 +22,26 @@ export const createLinkToken = async (req: Request, res: Response) => {
     const userId: number | undefined = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const itemId: string | undefined = req.body.itemId
+    const itemId: number | undefined = req.body.itemId
+    const updateAccounts: boolean | undefined = req.body.updateAccounts
+
+    if (updateAccounts === true && itemId === undefined) {
+        throw new HttpError('missing item id', 400)
+    }
+
+    const items = await fetchActiveItems()
+    const item = items.filter((i) => i.id === itemId)[0]
+    if (!item) throw new HttpError('invalid item', 400)
 
     try {
-        const token = await plaidLinkTokenCreate(userId, itemId)
+        let token = ''
+        if (updateAccounts === true) {
+            token = await plaidLinkTokenCreate(userId, item.itemId, true)
+        } else if (itemId !== undefined) {
+            token = await plaidLinkTokenCreate(userId, item.itemId)
+        } else {
+            token = await plaidLinkTokenCreate(userId)
+        }
         return res.send({ linkToken: token })
     } catch (error) {
         logger.error(error)

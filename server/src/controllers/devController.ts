@@ -172,8 +172,10 @@ export const fireSandboxWebhook = async (req: Request, res: Response) => {
     const item = await fetchActiveItemById(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
+    // login repaired missing from enum
+    const validCodes = [...Object.values(WebhookCodeEnum), 'LOGIN_REPAIRED']
     const codeEnum = code as WebhookCodeEnum
-    if (!codeEnum || !Object.values(WebhookCodeEnum).includes(codeEnum)) {
+    if (!codeEnum || !validCodes.includes(codeEnum)) {
         throw new HttpError('invalid webhook code', 400)
     }
 

@@ -52,6 +52,14 @@ CREATE TABLE categories (
 );
 
 
+-- NOTIFICATION TYPES TABLE
+CREATE TABLE notification_types (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name TEXT UNIQUE NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
 -- USERS TABLE, TRIGGERS
 CREATE TABLE users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -73,33 +81,6 @@ CREATE TRIGGER trigger_users_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON users
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
-
-
--- NOTIFICATIONS TABLE
-CREATE TABLE notifications (
-    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    message TEXT NOT NULL,
-    read BOOLEAN NOT NULL,
-    active BOOLEAN NOT NULL,
-    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TRIGGER trigger_notifications_update_timestamp
-BEFORE UPDATE ON notifications
-FOR EACH ROW
-EXECUTE PROCEDURE set_update_timestamp();
-
-CREATE TRIGGER trigger_notifications_insert_audit
-AFTER INSERT OR UPDATE OR DELETE ON notifications
-FOR EACH ROW
-EXECUTE FUNCTION insert_audit_record();
-
-CREATE VIEW active_notifications AS
-SELECT *
-FROM notifications
-WHERE active = TRUE;
 
 
 -- ITEMS TABLE, TRIGGERS, VIEW
@@ -132,6 +113,35 @@ EXECUTE FUNCTION insert_audit_record();
 CREATE VIEW active_items AS
 SELECT *
 FROM items
+WHERE active = TRUE;
+
+
+-- NOTIFICATIONS TABLE
+CREATE TABLE notifications (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    type_id INTEGER REFERENCES notification_types(id) NOT NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    read BOOLEAN NOT NULL,
+    active BOOLEAN NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER trigger_notifications_update_timestamp
+BEFORE UPDATE ON notifications
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_notifications_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON notifications
+FOR EACH ROW
+EXECUTE FUNCTION insert_audit_record();
+
+CREATE VIEW active_notifications AS
+SELECT *
+FROM notifications
 WHERE active = TRUE;
 
 

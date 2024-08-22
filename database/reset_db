@@ -87,8 +87,8 @@ echo "creating tables..."
 PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/create_tables.sql -v ON_ERROR_STOP=1
 echo
 
-echo "seeding categories..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_categories.sql -v ON_ERROR_STOP=1
+echo "seeding reference data..."
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_reference_data.sql -v ON_ERROR_STOP=1
 echo
 
 if [ "$USERS" = true ]; then

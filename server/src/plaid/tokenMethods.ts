@@ -14,9 +14,10 @@ import { executePlaidMethod, plaidClient } from './index.js'
 
 export const plaidLinkTokenCreate = async (
     userId: number,
-    itemId?: string
+    itemId?: string,
+    accountsUpdate: boolean = false
 ): Promise<string> => {
-    logger.debug({ itemId, userId }, 'creating link token')
+    logger.debug({ itemId, userId, accountsUpdate }, 'creating link token')
 
     let accessToken = null
     // balance product automatically included
@@ -50,6 +51,9 @@ export const plaidLinkTokenCreate = async (
         },
         access_token: accessToken,
         webhook: env['PLAID_WEBHOOK_URL'] ?? '',
+        update: {
+            account_selection_enabled: accountsUpdate,
+        },
     }
 
     const resp = await executePlaidMethod(

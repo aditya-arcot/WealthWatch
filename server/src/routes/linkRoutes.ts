@@ -22,6 +22,16 @@ const router = express.Router()
  *   post:
  *     summary: Create a link token
  *     tags: [Link]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               itemId:
+ *                 type: number
+ *               updateAccounts:
+ *                 type: boolean
  *     responses:
  *       200:
  *         description: Created a link token
