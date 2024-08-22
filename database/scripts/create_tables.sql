@@ -87,7 +87,7 @@ EXECUTE FUNCTION insert_audit_record();
 CREATE TABLE items (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    item_id TEXT UNIQUE NOT NULL,
+    plaid_id TEXT UNIQUE NOT NULL,
     active BOOLEAN NOT NULL,
     access_token TEXT NOT NULL,
     institution_id TEXT NOT NULL,
@@ -149,7 +149,7 @@ WHERE active = TRUE;
 CREATE TABLE accounts (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
-    account_id TEXT UNIQUE NOT NULL,
+    plaid_id TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     mask TEXT,
     official_name TEXT,
@@ -186,7 +186,7 @@ WHERE i.active = TRUE;
 CREATE TABLE transactions (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
-    transaction_id TEXT UNIQUE NOT NULL,
+    plaid_id TEXT UNIQUE NOT NULL,
     merchant_id TEXT,
     merchant TEXT,
     name TEXT NOT NULL,

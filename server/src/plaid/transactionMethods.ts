@@ -75,7 +75,7 @@ export const mapPlaidTransaction = (
 
     // link previous pending transaction
     const pendingTransaction = existingTransactions.find(
-        (t) => t.transactionId === transaction.pending_transaction_id
+        (t) => t.plaidId === transaction.pending_transaction_id
     )
     if (pendingTransaction) {
         customName = pendingTransaction.customName
@@ -86,7 +86,7 @@ export const mapPlaidTransaction = (
     return {
         id: 0,
         accountId,
-        transactionId: transaction.transaction_id,
+        plaidId: transaction.transaction_id,
         merchantId: transaction.merchant_entity_id ?? null,
         merchant: transaction.merchant_name ?? null,
         name: transaction.name,

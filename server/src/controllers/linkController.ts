@@ -36,9 +36,9 @@ export const createLinkToken = async (req: Request, res: Response) => {
     try {
         let token = ''
         if (updateAccounts === true) {
-            token = await plaidLinkTokenCreate(userId, item.itemId, true)
+            token = await plaidLinkTokenCreate(userId, item.plaidId, true)
         } else if (itemId !== undefined) {
-            token = await plaidLinkTokenCreate(userId, item.itemId)
+            token = await plaidLinkTokenCreate(userId, item.plaidId)
         } else {
             token = await plaidLinkTokenCreate(userId)
         }
@@ -86,7 +86,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         )
         if (existingItem) throw new HttpError('account already exists', 409)
 
-        const { accessToken, itemId } = await plaidPublicTokenExchange(
+        const { accessToken, plaidItemId } = await plaidPublicTokenExchange(
             publicToken,
             userId
         )
@@ -94,7 +94,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         const item: Item = {
             id: -1,
             userId,
-            itemId,
+            plaidId: plaidItemId,
             active: true,
             accessToken,
             institutionId: institution.institution_id,

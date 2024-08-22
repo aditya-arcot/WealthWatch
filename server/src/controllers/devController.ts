@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
 import {
-    fetchActiveItemById,
+    fetchActiveItemByPlaidId,
     fetchActiveItemByUserIdAndInstitutionId,
     fetchActiveItemsByUserId,
     insertItem,
@@ -74,7 +74,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
     if (existingItem) throw new HttpError('account already exists', 409)
 
     const publicToken = await plaidSandboxPublicTokenCreate(user, institutionId)
-    const { accessToken, itemId } = await plaidPublicTokenExchange(
+    const { accessToken, plaidItemId } = await plaidPublicTokenExchange(
         publicToken,
         user.id
     )
@@ -82,7 +82,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
     const item: Item = {
         id: -1,
         userId: user.id,
-        itemId,
+        plaidId: plaidItemId,
         active: true,
         accessToken,
         institutionId,
@@ -106,7 +106,7 @@ export const syncItem = async (req: Request, res: Response) => {
     const itemId = req.query['itemId'] as string | undefined
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
-    const item = await fetchActiveItemById(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     await queueItemSync(item)
@@ -122,7 +122,7 @@ export const forceRefreshItemTransactions = async (
     const itemId = req.query['itemId'] as string | undefined
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
-    const item = await fetchActiveItemById(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     item.lastRefreshed = null
@@ -137,7 +137,7 @@ export const forceRefreshItemBalances = async (req: Request, res: Response) => {
     const itemId = req.query['itemId'] as string | undefined
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
-    const item = await fetchActiveItemById(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     item.lastRefreshed = null
@@ -152,7 +152,7 @@ export const resetSandboxItemLogin = async (req: Request, res: Response) => {
     const itemId = req.query['itemId'] as string | undefined
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
-    const item = await fetchActiveItemById(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const reset = await plaidSandboxResetLogin(item)
@@ -169,7 +169,7 @@ export const fireSandboxWebhook = async (req: Request, res: Response) => {
     const code = req.query['code'] as string | undefined
     if (code === undefined) throw new HttpError('missing webhook code', 400)
 
-    const item = await fetchActiveItemById(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     // login repaired missing from enum

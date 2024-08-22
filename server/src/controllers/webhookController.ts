@@ -3,7 +3,7 @@ import { importJWK, JWK, jwtVerify } from 'jose'
 import { sha256 } from 'js-sha256'
 import { jwtDecode } from 'jwt-decode'
 import {
-    fetchActiveItemById,
+    fetchActiveItemByPlaidId,
     modifyItemActiveById,
 } from '../database/itemQueries.js'
 import {
@@ -137,7 +137,7 @@ const handleTransactionsWebhook = async (
     switch (webhookCodeEnum) {
         case TransactionsWebhookCodeEnum.SyncUpdatesAvailable: {
             logger.debug({ itemId }, 'handling transactions sync webhook')
-            const item = await fetchActiveItemById(itemId)
+            const item = await fetchActiveItemByPlaidId(itemId)
             if (!item) throw Error('item not found')
             await syncItemData(item)
             logger.debug({ itemId }, 'handled transactions sync webhook')
@@ -165,7 +165,7 @@ const handleItemWebhook = async (webhookCode: string, itemId: string) => {
     logger.debug({ webhookCode, itemId }, 'handling item webhook')
     const webhookCodeEnum = webhookCode as ItemWebhookCodeEnum
 
-    const item = await fetchActiveItemById(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw Error('item not found')
 
     switch (webhookCodeEnum) {

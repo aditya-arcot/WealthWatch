@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import {
     fetchActiveItemsByUserId,
-    modifyItemLastRefreshedByItemId,
+    modifyItemLastRefreshedByPlaidId,
 } from '../database/itemQueries.js'
 import {
     fetchActiveTransactionsByUserId,
-    updateTransactionCustomCategoryIdById,
-    updateTransactionCustomNameById,
-    updateTransactionNoteById,
+    updateTransactionCustomCategoryIdByPlaidId,
+    updateTransactionCustomNameByPlaidId,
+    updateTransactionNoteByPlaidId,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { refreshCooldown } from '../models/item.js'
@@ -127,7 +127,10 @@ export const updateTransactionCustomName = async (
     if (name === undefined) throw new HttpError('missing name', 400)
 
     try {
-        const t = await updateTransactionCustomNameById(transactionId, name)
+        const t = await updateTransactionCustomNameByPlaidId(
+            transactionId,
+            name
+        )
         if (!t) throw Error('transaction not updated')
         return res.status(204).send()
     } catch (error) {
@@ -152,7 +155,7 @@ export const updateTransactionCustomCategoryId = async (
         throw new HttpError('missing category id', 400)
 
     try {
-        const t = await updateTransactionCustomCategoryIdById(
+        const t = await updateTransactionCustomCategoryIdByPlaidId(
             transactionId,
             categoryId
         )
@@ -176,7 +179,7 @@ export const updateTransactionNote = async (req: Request, res: Response) => {
     if (note === undefined) throw new HttpError('missing note', 400)
 
     try {
-        const t = await updateTransactionNoteById(transactionId, note)
+        const t = await updateTransactionNoteByPlaidId(transactionId, note)
         if (!t) throw Error('transaction not updated')
         return res.status(204).send()
     } catch (error) {
@@ -199,13 +202,13 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
                 const lastRefresh = item.lastRefreshed?.getTime() || 0
                 if (Date.now() - lastRefresh >= refreshCooldown) {
                     await plaidTransactionsRefresh(item)
-                    await modifyItemLastRefreshedByItemId(
-                        item.itemId,
+                    await modifyItemLastRefreshedByPlaidId(
+                        item.plaidId,
                         new Date()
                     )
                 } else {
                     logger.debug(
-                        { itemId: item.itemId },
+                        { itemId: item.plaidId },
                         'skipping item refresh (cooldown)'
                     )
                 }

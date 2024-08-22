@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
 import { insertAccounts } from '../database/accountQueries.js'
 import {
-    fetchActiveItemById,
+    fetchActiveItemByPlaidId,
     fetchActiveItems,
     fetchActiveItemsByUserId,
     modifyItemActiveById,
-    modifyItemDataByItemId,
-    modifyItemLastRefreshedByItemId,
+    modifyItemDataByPlaidId,
+    modifyItemLastRefreshedByPlaidId,
 } from '../database/itemQueries.js'
 import {
     fetchActiveTransactionsByUserId,
     insertTransactions,
-    removeTransactionsByTransactionIds,
+    removeTransactionsByPlaidIds,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/httpError.js'
 import { Item, refreshCooldown } from '../models/item.js'
@@ -69,7 +69,7 @@ export const refreshItem = async (req: Request, res: Response) => {
     const itemId: string | undefined = req.params['itemId']
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
-    const item = await fetchActiveItemById(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     try {
@@ -93,7 +93,7 @@ export const refreshItemTransactions = async (item: Item) => {
         }
     }
     await plaidTransactionsRefresh(item)
-    await modifyItemLastRefreshedByItemId(item.itemId, new Date())
+    await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
 }
 
 export const refreshItemBalances = async (item: Item) => {
@@ -107,7 +107,7 @@ export const refreshItemBalances = async (item: Item) => {
     }
     const accounts = await plaidAccountsBalanceGet(item)
     await insertAccounts(accounts)
-    await modifyItemLastRefreshedByItemId(item.itemId, new Date())
+    await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
 }
 
 export const deactivateItem = async (req: Request, res: Response) => {
@@ -117,7 +117,7 @@ export const deactivateItem = async (req: Request, res: Response) => {
     if (itemId === undefined) throw new HttpError('missing item id', 400)
 
     try {
-        const item = await fetchActiveItemById(itemId)
+        const item = await fetchActiveItemByPlaidId(itemId)
         if (!item) throw new HttpError('item not found', 404)
 
         await plaidItemRemove(item)
@@ -150,7 +150,7 @@ export const syncItemData = async (item: Item) => {
             ).transactions
             const addTransactions = added.map((t) => {
                 const account = addedAccounts.find(
-                    (a) => a.accountId === t.account_id
+                    (a) => a.plaidId === t.account_id
                 )
                 if (!account) throw Error('account not found')
                 return mapPlaidTransaction(t, account.id, existingTransactions)
@@ -163,12 +163,12 @@ export const syncItemData = async (item: Item) => {
             logger.debug('removing transactions')
             const removeIds = removed.map((t) => t.transaction_id)
             const removedTransactions =
-                await removeTransactionsByTransactionIds(removeIds)
+                await removeTransactionsByPlaidIds(removeIds)
             if (!removedTransactions) throw Error('transactions not removed')
         }
 
         logger.debug('updating cursor')
-        await modifyItemDataByItemId(item.itemId, cursor, new Date())
+        await modifyItemDataByPlaidId(item.plaidId, cursor, new Date())
     } else {
         logger.debug('no accounts. skipping transaction updates')
     }

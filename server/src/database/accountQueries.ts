@@ -10,7 +10,7 @@ export const insertAccounts = async (
     accounts.forEach((account) => {
         values.push(
             account.itemId,
-            account.accountId,
+            account.plaidId,
             account.name,
             account.mask,
             account.officialName,
@@ -30,7 +30,7 @@ export const insertAccounts = async (
         INSERT INTO accounts
         (
             item_id,
-            account_id,
+            plaid_id,
             name,
             mask,
             official_name,
@@ -43,7 +43,7 @@ export const insertAccounts = async (
             subtype
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
-        ON CONFLICT (account_id)
+        ON CONFLICT (plaid_id)
         DO UPDATE SET
             name = EXCLUDED.name,
             mask = EXCLUDED.mask,
@@ -84,7 +84,7 @@ export const fetchActiveAccountsByUserId = async (
 interface DbAccount {
     id: number
     item_id: number
-    account_id: string
+    plaid_id: string
     name: string
     mask: string | null
     official_name: string | null
@@ -100,7 +100,7 @@ interface DbAccount {
 const mapDbAccount = (acc: DbAccount): Account => ({
     id: acc.id,
     itemId: acc.item_id,
-    accountId: acc.account_id,
+    plaidId: acc.plaid_id,
     name: acc.name,
     mask: acc.mask,
     officialName: acc.official_name,

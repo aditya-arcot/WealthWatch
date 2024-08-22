@@ -49,7 +49,7 @@ export const mapPlaidAccount = (
 ): Account => ({
     id: 0,
     itemId,
-    accountId: account.account_id,
+    plaidId: account.account_id,
     name: account.name,
     mask: account.mask,
     officialName: account.official_name,

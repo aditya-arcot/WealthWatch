@@ -10,7 +10,7 @@ export const insertTransactions = async (
     transactions.forEach((transaction) => {
         values.push(
             transaction.accountId,
-            transaction.transactionId,
+            transaction.plaidId,
             transaction.merchantId,
             transaction.merchant,
             transaction.name,
@@ -35,7 +35,7 @@ export const insertTransactions = async (
     const query = `
         INSERT INTO transactions (
             account_id,
-            transaction_id,
+            plaid_id,
             merchant_id,
             merchant,
             name,
@@ -53,7 +53,7 @@ export const insertTransactions = async (
             note
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
-        ON CONFLICT (transaction_id)
+        ON CONFLICT (plaid_id)
         DO UPDATE SET
             merchant_id = EXCLUDED.merchant_id,
             merchant = EXCLUDED.merchant,
@@ -115,7 +115,7 @@ export const fetchActiveTransactionsByUserId = async (
     let query =
         initialQuery +
         `
-        ORDER BY t.date DESC, t.transaction_id
+        ORDER BY t.date DESC, t.plaid_id
     `
     if (limit !== undefined) {
         query += `
@@ -304,73 +304,70 @@ const fetchActiveTransactionsByUserIdFilteredCount = async (
     return isNaN(count) ? -1 : count
 }
 
-export const updateTransactionCustomNameById = async (
-    transactionId: string,
+export const updateTransactionCustomNameByPlaidId = async (
+    plaidId: string,
     name: string | null
 ): Promise<Transaction | undefined> => {
     const query = `
         UPDATE transactions
         SET custom_name = $2
-        WHERE transaction_id = $1
+        WHERE plaid_id = $1
         RETURNING *
     `
-    const rows = (await runQuery<DbTransaction>(query, [transactionId, name]))
-        .rows
+    const rows = (await runQuery<DbTransaction>(query, [plaidId, name])).rows
     if (!rows[0]) return
     return mapDbTransaction(rows[0])
 }
 
-export const updateTransactionCustomCategoryIdById = async (
-    transactionId: string,
+export const updateTransactionCustomCategoryIdByPlaidId = async (
+    plaidId: string,
     categoryId: number | null
 ): Promise<Transaction | undefined> => {
     const query = `
         UPDATE transactions
         SET custom_category_id = $2
-        WHERE transaction_id = $1
+        WHERE plaid_id = $1
         RETURNING *
     `
-    const rows = (
-        await runQuery<DbTransaction>(query, [transactionId, categoryId])
-    ).rows
-    if (!rows[0]) return
-    return mapDbTransaction(rows[0])
-}
-
-export const updateTransactionNoteById = async (
-    transactionId: string,
-    note: string | null
-): Promise<Transaction | undefined> => {
-    const query = `
-        UPDATE transactions
-        SET note = $2
-        WHERE transaction_id = $1
-        RETURNING *
-    `
-    const rows = (await runQuery<DbTransaction>(query, [transactionId, note]))
+    const rows = (await runQuery<DbTransaction>(query, [plaidId, categoryId]))
         .rows
     if (!rows[0]) return
     return mapDbTransaction(rows[0])
 }
 
-export const removeTransactionsByTransactionIds = async (
-    transactionIds: string[]
-): Promise<Transaction[] | undefined> => {
-    if (!transactionIds.length) return
+export const updateTransactionNoteByPlaidId = async (
+    plaidId: string,
+    note: string | null
+): Promise<Transaction | undefined> => {
     const query = `
-        DELETE FROM transactions
-        WHERE transaction_id IN
-            (${transactionIds.map((_id, idx) => `$${idx + 1}`).join(', ')})
+        UPDATE transactions
+        SET note = $2
+        WHERE plaid_id = $1
         RETURNING *
     `
-    const rows = (await runQuery<DbTransaction>(query, transactionIds)).rows
+    const rows = (await runQuery<DbTransaction>(query, [plaidId, note])).rows
+    if (!rows[0]) return
+    return mapDbTransaction(rows[0])
+}
+
+export const removeTransactionsByPlaidIds = async (
+    plaidIds: string[]
+): Promise<Transaction[] | undefined> => {
+    if (!plaidIds.length) return
+    const query = `
+        DELETE FROM transactions
+        WHERE plaid_id IN
+            (${plaidIds.map((_id, idx) => `$${idx + 1}`).join(', ')})
+        RETURNING *
+    `
+    const rows = (await runQuery<DbTransaction>(query, plaidIds)).rows
     return rows.map(mapDbTransaction)
 }
 
 interface DbTransaction {
     id: number
     account_id: number
-    transaction_id: string
+    plaid_id: string
     merchant_id: string | null
     merchant: string | null
     name: string
@@ -391,7 +388,7 @@ interface DbTransaction {
 const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     id: dbTransaction.id,
     accountId: dbTransaction.account_id,
-    transactionId: dbTransaction.transaction_id,
+    plaidId: dbTransaction.plaid_id,
     merchantId: dbTransaction.merchant_id,
     merchant: dbTransaction.merchant,
     name: dbTransaction.name,

@@ -317,7 +317,7 @@ export class AccountsComponent implements OnInit {
 
         this.loading = true
         this.itemSvc
-            .refreshItem(item.itemId)
+            .refreshItem(item.plaidId)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (err.status === 429) {
@@ -343,7 +343,7 @@ export class AccountsComponent implements OnInit {
     deactivateItem(item: Item): void {
         this.loading = true
         this.itemSvc
-            .deactivateItem(item.itemId)
+            .deactivateItem(item.plaidId)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
