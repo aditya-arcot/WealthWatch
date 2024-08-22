@@ -1,0 +1,32 @@
+<div
+    class="modal fade {{ notifications.length === 0 ? 'modal-sm' : '' }}"
+    id="notificationsModal"
+    #notificationsModal
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center p-2">
+                <h4 class="modal-title w-100">Notifications</h4>
+            </div>
+            <div class="modal-body p-1">
+                @if (notifications.length === 0) {
+                    <h6 class="text-center mt-1">No notifications</h6>
+                } @else {
+                    <table class="table table-hover table-sm mb-0">
+                        <tbody>
+                            @for (n of notifications; track $index) {
+                                <tr>
+                                    <td
+                                        class="{{ n.read ? 'text-muted' : '' }}"
+                                    >
+                                        {{ n.message }}
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
