@@ -91,17 +91,23 @@ export const initializeLogWorker = () => {
         { connection: getRedis(), ...workerOptions }
     )
 
-    logWorker.on('completed', async (job) => {
+    logWorker.on('completed', (job) => {
         // logger.debug(`${logQueueName} queue - completed job (id ${job.id})`)
-        await handleJobSuccess(logQueueName, job.id, job.name, job.data)
+        handleJobSuccess(logQueueName, job.id, job.name, job.data).catch(
+            (err) => {
+                logger.error(err, `error handling job success`)
+            }
+        )
     })
 
-    logWorker.on('failed', async (job, err) => {
+    logWorker.on('failed', (job, err) => {
         logger.error(
             { err },
             `${logQueueName} queue - failed job (id ${job?.id})`
         )
-        await handleJobFailure(logQueueName, job?.id, job?.data, err)
+        handleJobFailure(logQueueName, job?.id, job?.data, err).catch((err) => {
+            logger.error(err, `error handling job failure`)
+        })
     })
 
     logger.debug('initialized log worker')

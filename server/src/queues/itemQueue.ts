@@ -71,17 +71,25 @@ export const initializeItemWorker = () => {
         { connection: getRedis(), ...workerOptions }
     )
 
-    itemWorker.on('completed', async (job) => {
+    itemWorker.on('completed', (job) => {
         logger.debug(`${itemQueueName} queue - completed job (id ${job.id})`)
-        await handleJobSuccess(itemQueueName, job.id, job.name, job.data)
+        handleJobSuccess(itemQueueName, job.id, job.name, job.data).catch(
+            (err) => {
+                logger.error(err, `error handling job success`)
+            }
+        )
     })
 
-    itemWorker.on('failed', async (job, err) => {
+    itemWorker.on('failed', (job, err) => {
         logger.error(
             { err },
             `${itemQueueName} queue - failed job (id ${job?.id})`
         )
-        await handleJobFailure(itemQueueName, job?.id, job?.data, err)
+        handleJobFailure(itemQueueName, job?.id, job?.data, err).catch(
+            (err) => {
+                logger.error(err, `error handling job failure`)
+            }
+        )
     })
 
     logger.debug('initialized item worker')

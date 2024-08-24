@@ -44,17 +44,25 @@ export const initializeWebhookWorker = () => {
         { connection: getRedis(), ...workerOptions }
     )
 
-    webhookWorker.on('completed', async (job) => {
+    webhookWorker.on('completed', (job) => {
         logger.debug(`${webhookQueueName} queue - completed job (id ${job.id})`)
-        await handleJobSuccess(webhookQueueName, job.id, job.name, job.data)
+        handleJobSuccess(webhookQueueName, job.id, job.name, job.data).catch(
+            (err) => {
+                logger.error(err, `error handling job success`)
+            }
+        )
     })
 
-    webhookWorker.on('failed', async (job, err) => {
+    webhookWorker.on('failed', (job, err) => {
         logger.error(
             { err },
             `${webhookQueueName} queue - failed job (id ${job?.id})`
         )
-        await handleJobFailure(webhookQueueName, job?.id, job?.data, err)
+        handleJobFailure(webhookQueueName, job?.id, job?.data, err).catch(
+            (err) => {
+                logger.error(err, `error handling job failure`)
+            }
+        )
     })
 
     logger.debug('initialized webhook worker')

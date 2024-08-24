@@ -13,8 +13,10 @@ export const configureCleanup = (): void => {
         'unhandledRejection',
     ]
     events.forEach((event) => {
-        process.on(event, async (err?: Error) => {
-            await runCleanupAndExit(event, err)
+        process.on(event, (err?: Error) => {
+            runCleanupAndExit(event, err).catch((err) => {
+                logger.fatal(err, 'error during cleanup')
+            })
         })
     })
     logger.debug('configured cleanup')

@@ -115,6 +115,6 @@ export const stopPool = async (): Promise<void> => {
         logger.warn('database pool not initialized')
         return
     }
-    clientPool.end()
+    await clientPool.end()
     logger.debug('stopped database pool')
 }

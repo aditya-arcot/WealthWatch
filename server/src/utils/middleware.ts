@@ -90,7 +90,7 @@ export const logRequestResponse = (
         return res.send(body)
     }
 
-    res.on('finish', async () => {
+    res.on('finish', () => {
         appReq.duration = Date.now() - appReq.timestamp.getTime()
         appReq.responseStatus = res.statusCode
         appReq.responseHeaders = res.getHeaders()
@@ -98,7 +98,9 @@ export const logRequestResponse = (
         appReq.responseBody = res._body
 
         logger.info(`sending response (id ${requestId})`)
-        await queueLogAppRequest(appReq)
+        queueLogAppRequest(appReq).catch((err) => {
+            logger.error(err, 'failed to queue log app request')
+        })
     })
     next()
 }
