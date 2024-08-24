@@ -4,14 +4,22 @@ import tseslint from 'typescript-eslint'
 
 export default [
     {
-        languageOptions: { globals: globals.node },
+        ignores: ['eslint.config.js', 'dist/**/*'],
+        languageOptions: {
+            globals: globals.node,
+            parserOptions: {
+                project: 'tsconfig.json',
+            },
+        },
         rules: {
             '@typescript-eslint/no-unused-vars': [
-                'warn',
+                'error',
                 {
                     argsIgnorePattern: '^_',
                 },
             ],
+            '@typescript-eslint/no-misused-promises': 'error',
+            '@typescript-eslint/no-floating-promises': 'error',
         },
     },
     pluginJs.configs.recommended,
