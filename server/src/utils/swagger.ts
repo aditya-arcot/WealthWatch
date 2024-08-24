@@ -1,8 +1,8 @@
 import { Request } from 'express'
-import { env } from 'process'
 import swaggerJSDoc from 'swagger-jsdoc'
 import { SwaggerUiOptions } from 'swagger-ui-express'
-import { production } from './middleware.js'
+import { HttpError } from '../models/httpError.js'
+import { production, vars } from './env.js'
 
 export const swaggerOptions: SwaggerUiOptions = {
     swaggerOptions: {
@@ -18,12 +18,12 @@ export const swaggerOptions: SwaggerUiOptions = {
 }
 
 export const createSwaggerSpec = () => {
-    if (production) throw Error('swagger should not be used in prod')
+    if (production) throw new HttpError('swagger should not be used in prod')
     const options = {
         definition: {
             openapi: '3.1.0',
             info: {
-                title: `WealthWatch API - ${env['NODE_ENV']}`,
+                title: `WealthWatch API - ${vars.nodeEnv}`,
                 version: '1.0.0',
             },
             components: {

@@ -5,11 +5,11 @@ import {
     fetchActiveItems,
     fetchActiveItemsByUserId,
     modifyItemActiveById,
-    modifyItemDataByPlaidId,
+    modifyItemCursorLastSyncedLastRefreshedByPlaidId,
     modifyItemLastRefreshedByPlaidId,
 } from '../database/itemQueries.js'
 import {
-    fetchActiveTransactionsByUserId,
+    fetchPaginatedActiveTransactionsByUserIdAndFilters,
     insertTransactions,
     removeTransactionsByPlaidIds,
 } from '../database/transactionQueries.js'
@@ -25,65 +25,53 @@ import {
     plaidTransactionsRefresh,
     plaidTransactionsSync,
 } from '../plaid/transactionMethods.js'
-import { queueItemBalancesRefresh } from '../queues/itemQueue.js'
+import { queueRefreshItemBalances } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserItems = async (req: Request, res: Response) => {
     logger.debug('getting items')
 
-    const userId: number | undefined = req.session.user?.id
+    const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    try {
-        const items = await fetchActiveItemsByUserId(userId)
-        return res.send(items)
-    } catch (error) {
-        logger.error(error)
-        if (error instanceof HttpError) throw error
-        throw Error('failed to get items')
-    }
+    const items = await fetchActiveItemsByUserId(userId)
+    return res.send(items)
 }
 
 export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
     logger.debug('updating webhook for active items')
 
-    const url: string | undefined = req.body.url
-    if (url === undefined) throw new HttpError('missing url', 400)
+    const url = req.body.url
+    if (typeof url !== 'string')
+        throw new HttpError('missing or invalid url', 400)
 
-    try {
-        const items = await fetchActiveItems()
-        await Promise.all(
-            items.map(async (item) => await plaidWebhookUpdate(item, url))
-        )
-        return res.status(204).send()
-    } catch (error) {
-        logger.error(error)
-        if (error instanceof HttpError) throw error
-        throw Error('failed to update webhook')
-    }
+    const items = await fetchActiveItems()
+    await Promise.all(
+        items.map(async (item) => await plaidWebhookUpdate(item, url))
+    )
+
+    return res.status(204).send()
 }
 
 export const refreshItem = async (req: Request, res: Response) => {
-    logger.debug('refreshing item transactions')
+    logger.debug('refreshing item')
 
-    const itemId: string | undefined = req.params['itemId']
-    if (itemId === undefined) throw new HttpError('missing item id', 400)
+    const plaidItemId = req.params['plaidItemId']
+    if (typeof plaidItemId !== 'string')
+        throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemByPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    try {
-        await refreshItemTransactions(item)
-        await queueItemBalancesRefresh(item)
-        return res.status(202).send()
-    } catch (error) {
-        logger.error(error)
-        if (error instanceof HttpError) throw error
-        throw Error('failed to refresh item transactions')
-    }
+    await refreshItemTransactions(item)
+    await queueRefreshItemBalances(item)
+
+    return res.status(202).send()
 }
 
 export const refreshItemTransactions = async (item: Item) => {
+    logger.debug('refreshing item transactions')
+
     if (item.lastRefreshed) {
         if (
             Date.now() - new Date(item.lastRefreshed).getTime() <
@@ -92,11 +80,14 @@ export const refreshItemTransactions = async (item: Item) => {
             throw new HttpError('item refresh cooldown', 429)
         }
     }
+
     await plaidTransactionsRefresh(item)
     await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
 }
 
 export const refreshItemBalances = async (item: Item) => {
+    logger.debug('refreshing item balances')
+
     if (item.lastRefreshed) {
         if (
             Date.now() - new Date(item.lastRefreshed).getTime() <
@@ -105,6 +96,7 @@ export const refreshItemBalances = async (item: Item) => {
             throw new HttpError('item refresh cooldown', 429)
         }
     }
+
     const accounts = await plaidAccountsBalanceGet(item)
     await insertAccounts(accounts)
     await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
@@ -113,31 +105,31 @@ export const refreshItemBalances = async (item: Item) => {
 export const deactivateItem = async (req: Request, res: Response) => {
     logger.debug('deactivating item')
 
-    const itemId: string | undefined = req.params['itemId']
-    if (itemId === undefined) throw new HttpError('missing item id', 400)
+    const plaidItemId = req.params['plaidItemId']
+    if (typeof plaidItemId !== 'string')
+        throw new HttpError('missing or invalid Plaid item id', 400)
 
-    try {
-        const item = await fetchActiveItemByPlaidId(itemId)
-        if (!item) throw new HttpError('item not found', 404)
+    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await deactivateItemMain(item)
 
-        await plaidItemRemove(item)
-        await modifyItemActiveById(item.id, false)
-        return res.status(204).send()
-    } catch (error) {
-        logger.error(error)
-        if (error instanceof HttpError) throw error
-        throw Error('failed to deactivate item')
-    }
+    return res.status(204).send()
+}
+
+export const deactivateItemMain = async (item: Item) => {
+    logger.debug({ id: item.id }, 'removing & deactivating item')
+    await plaidItemRemove(item)
+    await modifyItemActiveById(item.id, false)
 }
 
 export const syncItemData = async (item: Item) => {
-    logger.debug({ item }, 'syncing item data')
+    logger.debug({ id: item.id }, 'syncing item data')
 
     const accounts = await plaidAccountsGet(item)
     if (accounts.length > 0) {
         logger.debug('inserting accounts')
         const addedAccounts = await insertAccounts(accounts)
-        if (!addedAccounts) throw Error('accounts not added')
+        if (!addedAccounts) throw new HttpError('failed to insert accounts')
 
         const { added, modified, removed, cursor } =
             await plaidTransactionsSync(item)
@@ -146,17 +138,20 @@ export const syncItemData = async (item: Item) => {
         if (added.length > 0) {
             logger.debug('inserting transactions')
             const existingTransactions = (
-                await fetchActiveTransactionsByUserId(item.userId)
+                await fetchPaginatedActiveTransactionsByUserIdAndFilters(
+                    item.userId
+                )
             ).transactions
             const addTransactions = added.map((t) => {
                 const account = addedAccounts.find(
                     (a) => a.plaidId === t.account_id
                 )
-                if (!account) throw Error('account not found')
+                if (!account) throw new HttpError('account not found', 404)
                 return mapPlaidTransaction(t, account.id, existingTransactions)
             })
             const addedTransactions = await insertTransactions(addTransactions)
-            if (!addedTransactions) throw Error('transactions not added')
+            if (!addedTransactions)
+                throw new HttpError('failed to insert transactions')
         }
 
         if (removed.length > 0) {
@@ -164,11 +159,16 @@ export const syncItemData = async (item: Item) => {
             const removeIds = removed.map((t) => t.transaction_id)
             const removedTransactions =
                 await removeTransactionsByPlaidIds(removeIds)
-            if (!removedTransactions) throw Error('transactions not removed')
+            if (!removedTransactions)
+                throw new HttpError('failed to remove transactions')
         }
 
         logger.debug('updating cursor')
-        await modifyItemDataByPlaidId(item.plaidId, cursor, new Date())
+        await modifyItemCursorLastSyncedLastRefreshedByPlaidId(
+            item.plaidId,
+            cursor,
+            new Date()
+        )
     } else {
         logger.debug('no accounts. skipping transaction updates')
     }

@@ -61,12 +61,12 @@ export class TransactionService {
 
     updateTransactionCustomName(t: Transaction) {
         const url = `${this.baseUrl}/${t.plaidId}/name`
-        return this.http.patch(url, { name: t.customName })
+        return this.http.patch(url, { customName: t.customName })
     }
 
     updateTransactionCustomCategoryId(t: Transaction) {
         const url = `${this.baseUrl}/${t.plaidId}/category`
-        return this.http.patch(url, { categoryId: t.customCategoryId })
+        return this.http.patch(url, { customCategoryId: t.customCategoryId })
     }
 
     updateTransactionNote(t: Transaction) {

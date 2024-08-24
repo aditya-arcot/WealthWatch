@@ -1,15 +1,13 @@
 import { Queue, Worker } from 'bullmq'
-import { env } from 'process'
-import { processWebhook } from '../controllers/webhookController.js'
+import { handleWebhook } from '../controllers/webhookController.js'
+import { HttpError } from '../models/httpError.js'
 import { Webhook } from '../models/webhook.js'
+import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
-if (env['NODE_ENV'] === undefined) {
-    throw Error('missing node env')
-}
-const webhookQueueName = `webhook-${env['NODE_ENV']}`
+const webhookQueueName = `webhook-${vars.nodeEnv}`
 let webhookQueue: Queue | null = null
 let webhookWorker: Worker | null = null
 
@@ -20,7 +18,7 @@ export const initializeWebhookQueue = () => {
 
 const getWebhookQueue = () => {
     if (!webhookQueue) {
-        throw Error('webhook queue not initialized')
+        throw new HttpError('webhook queue not initialized')
     }
     return webhookQueue
 }
@@ -39,9 +37,9 @@ export const initializeWebhookWorker = () => {
             )
 
             const webhook: Webhook | undefined = job.data.webhook
-            if (!webhook) throw Error('missing webhook')
+            if (!webhook) throw new HttpError('missing webhook')
 
-            await processWebhook(webhook)
+            await handleWebhook(webhook)
         },
         { connection: getRedis(), ...workerOptions }
     )

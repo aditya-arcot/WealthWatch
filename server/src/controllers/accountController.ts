@@ -6,15 +6,9 @@ import { logger } from '../utils/logger.js'
 export const getUserAccounts = async (req: Request, res: Response) => {
     logger.debug('getting accounts')
 
-    const userId: number | undefined = req.session.user?.id
+    const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    try {
-        const accounts = await fetchActiveAccountsByUserId(userId)
-        return res.send(accounts)
-    } catch (error) {
-        logger.error(error)
-        if (error instanceof HttpError) throw error
-        throw Error('failed to get accounts')
-    }
+    const accounts = await fetchActiveAccountsByUserId(userId)
+    return res.send(accounts)
 }

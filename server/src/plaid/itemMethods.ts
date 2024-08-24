@@ -5,13 +5,13 @@ import {
 } from 'plaid'
 import { Item } from '../models/item.js'
 import { logger } from '../utils/logger.js'
-import { executePlaidMethod, plaidClient } from './index.js'
+import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidItemRemove = async (item: Item) => {
-    logger.debug({ item }, 'removing item')
+    logger.debug({ id: item.id }, 'removing item')
     const params: ItemRemoveRequest = { access_token: item.accessToken }
     await executePlaidMethod(
-        plaidClient.itemRemove,
+        getPlaidClient().itemRemove,
         params,
         item.userId,
         item.id
@@ -19,12 +19,12 @@ export const plaidItemRemove = async (item: Item) => {
 }
 
 export const plaidSandboxResetLogin = async (item: Item) => {
-    logger.debug({ item }, 'resetting item login')
+    logger.debug({ id: item.id }, 'resetting item login')
     const params: SandboxItemResetLoginRequest = {
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
-        plaidClient.sandboxItemResetLogin,
+        getPlaidClient().sandboxItemResetLogin,
         params,
         item.userId,
         item.id
@@ -33,13 +33,13 @@ export const plaidSandboxResetLogin = async (item: Item) => {
 }
 
 export const plaidWebhookUpdate = async (item: Item, webhook: string) => {
-    logger.debug({ item }, 'updating item webhook')
+    logger.debug({ id: item.id }, 'updating item webhook')
     const params: ItemWebhookUpdateRequest = {
         access_token: item.accessToken,
         webhook,
     }
     await executePlaidMethod(
-        plaidClient.itemWebhookUpdate,
+        getPlaidClient().itemWebhookUpdate,
         params,
         item.userId,
         item.id

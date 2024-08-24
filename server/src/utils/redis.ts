@@ -1,16 +1,14 @@
 import { Redis } from 'ioredis'
-import { env } from 'process'
+import { HttpError } from '../models/httpError.js'
+import { vars } from './env.js'
 import { logger } from './logger.js'
 
 let redis: Redis | null = null
 
 export const createRedis = (): void => {
     logger.debug('creating redis client')
-    if (env['REDIS_HOST'] === undefined) {
-        throw Error('missing redis host')
-    }
     redis = new Redis({
-        host: env['REDIS_HOST'],
+        host: vars.redisHost,
         maxRetriesPerRequest: null,
     })
     logger.debug('created redis client')
@@ -18,7 +16,7 @@ export const createRedis = (): void => {
 
 export const getRedis = (): Redis => {
     if (!redis) {
-        throw Error('redis not initialized')
+        throw new HttpError('redis client not initialized')
     }
     return redis
 }

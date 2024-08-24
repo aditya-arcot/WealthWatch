@@ -3,7 +3,6 @@ import {
     deactivateItem,
     getUserItems,
     refreshItem,
-    updateActiveItemsWebhook,
 } from '../controllers/itemController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -39,70 +38,46 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
 
 /**
  * @swagger
- * /items/update-webhook:
- *   post:
- *     summary: Update webhook for active items
- *     tags: [Items]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               url:
- *                 type: string
- *                 required: true
- *     responses:
- *       204:
- *         description: Updated webhook for active items
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router
-    .route('/update-webhook')
-    .post(authenticate, catchAsync(updateActiveItemsWebhook))
-
-/**
- * @swagger
- * /items/{itemId}/refresh:
+ * /items/{plaidItemId}/refresh:
  *   post:
  *     summary: Refresh an item's transactions and balances
  *     tags: [Items]
  *     parameters:
  *       - in: path
- *         name: itemId
+ *         name: plaidItemId
  *         schema:
  *           type: string
  *         required: true
- *         description: The item id
+ *         description: The Plaid item id
  *     responses:
  *       202:
  *         description: Refreshed the item's transactions and queued the balance refresh
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/:itemId/refresh').post(authenticate, catchAsync(refreshItem))
+router
+    .route('/:plaidItemId/refresh')
+    .post(authenticate, catchAsync(refreshItem))
 
 /**
  * @swagger
- * /items/{itemId}:
+ * /items/{plaidItemId}:
  *   delete:
  *     summary: Deactivate an item
  *     tags: [Items]
  *     parameters:
  *       - in: path
- *         name: itemId
+ *         name: plaidItemId
  *         schema:
  *           type: string
  *         required: true
- *         description: The item id
+ *         description: The Plaid item id
  *     responses:
  *       204:
  *         description: Deactivated the item
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/:itemId').delete(authenticate, catchAsync(deactivateItem))
+router.route('/:plaidItemId').delete(authenticate, catchAsync(deactivateItem))
 
 export default router

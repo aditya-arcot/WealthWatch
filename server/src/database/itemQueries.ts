@@ -112,7 +112,7 @@ export const modifyItemLastRefreshedByPlaidId = async (
     await runQuery(query, [lastRefreshed, plaidId])
 }
 
-export const modifyItemDataByPlaidId = async (
+export const modifyItemCursorLastSyncedLastRefreshedByPlaidId = async (
     plaidId: string,
     cursor: string | null,
     lastSynced: Date

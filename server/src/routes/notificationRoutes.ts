@@ -49,8 +49,9 @@ router.route('/').get(authenticate, catchAsync(getUserNotifications))
  *           schema:
  *             type: object
  *             properties:
- *               ids:
+ *               notificationIds:
  *                 type: array
+ *                 required: true
  *                 items:
  *                   type: integer
  *     responses:
@@ -76,8 +77,9 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               ids:
+ *               notificationIds:
  *                 type: array
+ *                 required: true
  *                 items:
  *                   type: integer
  *     responses:

@@ -15,11 +15,11 @@ export class ItemService {
         return this.http.get<Item[]>(this.baseUrl)
     }
 
-    refreshItem(itemId: string) {
-        return this.http.post(`${this.baseUrl}/${itemId}/refresh`, {})
+    refreshItem(plaidItemId: string) {
+        return this.http.post(`${this.baseUrl}/${plaidItemId}/refresh`, {})
     }
 
-    deactivateItem(itemId: string) {
-        return this.http.delete(`${this.baseUrl}/${itemId}`)
+    deactivateItem(plaidItemId: string) {
+        return this.http.delete(`${this.baseUrl}/${plaidItemId}`)
     }
 }

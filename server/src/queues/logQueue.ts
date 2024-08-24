@@ -1,25 +1,23 @@
 import { Queue, Worker } from 'bullmq'
-import { env } from 'process'
 import { insertAppRequest } from '../database/appRequestQueries.js'
 import { insertPlaidApiRequest } from '../database/plaidApiRequestQueries.js'
 import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
 import { AppRequest } from '../models/appRequest.js'
+import { HttpError } from '../models/httpError.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
+import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum LogJobType {
-    AppRequestLog = 'AppRequest',
-    PlaidLinkEventLog = 'PlaidLinkEvent',
-    PlaidApiRequestLog = 'PlaidApiRequest',
+    LogAppRequest = 'AppRequest',
+    LogPlaidLinkEvent = 'PlaidLinkEvent',
+    LogPlaidApiRequest = 'PlaidApiRequest',
 }
 
-if (env['NODE_ENV'] === undefined) {
-    throw Error('missing node env')
-}
-const logQueueName = `log-${env['NODE_ENV']}`
+const logQueueName = `log-${vars.nodeEnv}`
 let logQueue: Queue | null = null
 let logWorker: Worker | null = null
 
@@ -30,21 +28,21 @@ export const initializeLogQueue = () => {
 
 const getLogQueue = () => {
     if (!logQueue) {
-        throw Error('log queue not initialized')
+        throw new HttpError('log queue not initialized')
     }
     return logQueue
 }
 
-export const queueAppRequestLog = async (req: AppRequest) => {
-    await queueLog(LogJobType.AppRequestLog, req)
+export const queueLogAppRequest = async (req: AppRequest) => {
+    await queueLog(LogJobType.LogAppRequest, req)
 }
 
-export const queuePlaidLinkEventLog = async (event: PlaidLinkEvent) => {
-    await queueLog(LogJobType.PlaidLinkEventLog, event)
+export const queueLogPlaidLinkEvent = async (event: PlaidLinkEvent) => {
+    await queueLog(LogJobType.LogPlaidLinkEvent, event)
 }
 
-export const queuePlaidApiRequestLog = async (req: PlaidApiRequest) => {
-    await queueLog(LogJobType.PlaidApiRequestLog, req)
+export const queueLogPlaidApiRequest = async (req: PlaidApiRequest) => {
+    await queueLog(LogJobType.LogPlaidApiRequest, req)
 }
 
 const queueLog = async (type: LogJobType, log: object) => {
@@ -61,32 +59,33 @@ export const initializeLogWorker = () => {
             //     `${logQueueName} queue - starting job (id ${job.id}, ${type})`
             // )
             switch (type) {
-                case LogJobType.AppRequestLog: {
+                case LogJobType.LogAppRequest: {
                     const req: AppRequest | undefined = job.data.log
-                    if (!req) throw Error(`missing ${type}`)
+                    if (!req) throw new HttpError(`missing ${type}`)
 
                     const newReq = await insertAppRequest(req)
-                    if (!newReq) throw Error(`failed to insert ${type}`)
+                    if (!newReq) throw new HttpError(`failed to insert ${type}`)
                     break
                 }
-                case LogJobType.PlaidLinkEventLog: {
+                case LogJobType.LogPlaidLinkEvent: {
                     const event: PlaidLinkEvent | undefined = job.data.log
-                    if (!event) throw Error(`missing ${type}`)
+                    if (!event) throw new HttpError(`missing ${type}`)
 
                     const newEvent = await insertPlaidLinkEvent(event)
-                    if (!newEvent) throw Error(`failed to insert ${type}`)
+                    if (!newEvent)
+                        throw new HttpError(`failed to insert ${type}`)
                     break
                 }
-                case LogJobType.PlaidApiRequestLog: {
+                case LogJobType.LogPlaidApiRequest: {
                     const req: PlaidApiRequest | undefined = job.data.log
-                    if (!req) throw Error(`missing ${type}`)
+                    if (!req) throw new HttpError(`missing ${type}`)
 
                     const newReq = await insertPlaidApiRequest(req)
-                    if (!newReq) throw Error(`failed to insert ${type}`)
+                    if (!newReq) throw new HttpError(`failed to insert ${type}`)
                     break
                 }
                 default:
-                    throw Error(`unknown log job type: ${type}`)
+                    throw new HttpError(`unknown log job type: ${type}`)
             }
         },
         { connection: getRedis(), ...workerOptions }

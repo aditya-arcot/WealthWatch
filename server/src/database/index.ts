@@ -1,25 +1,17 @@
 import pg, { QueryResult, QueryResultRow } from 'pg'
-import { env } from 'process'
+import { HttpError } from '../models/httpError.js'
+import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 
-let clientPool: pg.Pool | null = null
+let clientPool: pg.Pool | undefined
 
 export const createPool = async (): Promise<void> => {
     logger.debug('creating database pool')
-    if (
-        env['DB_HOST'] === undefined ||
-        env['DB_NAME'] === undefined ||
-        env['DB_USER'] === undefined ||
-        env['DB_PASSWORD'] === undefined
-    ) {
-        throw Error('missing one or more database secrets')
-    }
-
     const config: pg.PoolConfig = {
-        host: env['DB_HOST'],
-        database: env['DB_NAME'],
-        user: env['DB_USER'],
-        password: env['DB_PASSWORD'],
+        host: vars.dbHost,
+        database: vars.dbName,
+        user: vars.dbUser,
+        password: vars.dbPassword,
         max: 20,
         allowExitOnIdle: true,
         idleTimeoutMillis: 30000,
@@ -32,15 +24,13 @@ export const createPool = async (): Promise<void> => {
         await runQuery('SELECT 1')
     } catch (e) {
         await clientPool.end()
-        throw Error('failed to create database pool')
+        throw new HttpError('failed to create database pool')
     }
     logger.debug('created database pool')
 }
 
 export const getPool = (): pg.Pool => {
-    if (!clientPool) {
-        throw Error('pool not initialized')
-    }
+    if (!clientPool) throw new HttpError('pool not initialized')
     return clientPool
 }
 
@@ -50,7 +40,7 @@ export const constructInsertQueryParamsPlaceholder = (
     counter: number = 1
 ): string => {
     if (rowCount < 1 || paramCount < 1)
-        throw Error('cannot construct parameters placeholder')
+        throw new HttpError('cannot construct parameters placeholder')
 
     const placeholders: string[] = []
     for (let i = 0; i < rowCount; i++) {
@@ -69,7 +59,7 @@ export const runQuery = async <T extends QueryResultRow>(
     skipSuccessLog: boolean = false
 ): Promise<QueryResult<T>> => {
     if (!clientPool) {
-        throw Error('pool not initialized')
+        throw new HttpError('pool not initialized')
     }
     const start = Date.now()
 

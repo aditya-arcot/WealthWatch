@@ -1,3 +1,4 @@
+import { HttpError } from '../models/httpError.js'
 import { Transaction, TransactionsResponse } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -74,7 +75,7 @@ export const insertTransactions = async (
     return rows.map(mapDbTransaction)
 }
 
-export const fetchActiveTransactionsByUserId = async (
+export const fetchPaginatedActiveTransactionsByUserIdAndFilters = async (
     userId: number,
     searchQuery?: string,
     startDate?: string,
@@ -93,7 +94,7 @@ export const fetchActiveTransactionsByUserId = async (
         query: initialQuery,
         values,
         placeholder,
-    } = constructfetchActiveTransactionsByUserIdQuery(
+    } = constructfetchActiveTransactionsByUserIdAndFiltersQuery(
         userId,
         searchQuery,
         startDate,
@@ -106,7 +107,7 @@ export const fetchActiveTransactionsByUserId = async (
 
     let filteredCount: number | null = null
     if (filtered) {
-        filteredCount = await fetchActiveTransactionsByUserIdFilteredCount(
+        filteredCount = await fetchActiveTransactionsByUserIdAndFiltersCount(
             initialQuery,
             values
         )
@@ -162,7 +163,7 @@ const fetchActiveTransactionsByUserIdCount = async (
     return isNaN(countNum) ? -1 : countNum
 }
 
-const constructfetchActiveTransactionsByUserIdQuery = (
+const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
     userId: number,
     searchQuery?: string,
     startDate?: string,
@@ -289,7 +290,7 @@ const constructfetchActiveTransactionsByUserIdQuery = (
     return { filtered, query, values, placeholder }
 }
 
-const fetchActiveTransactionsByUserIdFilteredCount = async (
+const fetchActiveTransactionsByUserIdAndFiltersCount = async (
     query: string,
     values: unknown[]
 ) => {
@@ -299,12 +300,12 @@ const fetchActiveTransactionsByUserIdFilteredCount = async (
     `
     const countRows = (await runQuery<{ count: string }>(countQuery, values))
         .rows
-    if (!countRows[0]) throw Error('failed to fetch count')
+    if (!countRows[0]) throw new HttpError('failed to fetch count')
     const count = parseInt(countRows[0].count)
     return isNaN(count) ? -1 : count
 }
 
-export const updateTransactionCustomNameByPlaidId = async (
+export const modifyTransactionCustomNameByPlaidId = async (
     plaidId: string,
     name: string | null
 ): Promise<Transaction | undefined> => {
@@ -319,7 +320,7 @@ export const updateTransactionCustomNameByPlaidId = async (
     return mapDbTransaction(rows[0])
 }
 
-export const updateTransactionCustomCategoryIdByPlaidId = async (
+export const modifyTransactionCustomCategoryIdByPlaidId = async (
     plaidId: string,
     categoryId: number | null
 ): Promise<Transaction | undefined> => {
@@ -335,7 +336,7 @@ export const updateTransactionCustomCategoryIdByPlaidId = async (
     return mapDbTransaction(rows[0])
 }
 
-export const updateTransactionNoteByPlaidId = async (
+export const modifyTransactionNoteByPlaidId = async (
     plaidId: string,
     note: string | null
 ): Promise<Transaction | undefined> => {

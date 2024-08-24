@@ -64,42 +64,44 @@ export const fetchActiveNotificationsByUserId = async (
     return rows.map(mapDbNotification)
 }
 
-export const updateNotificationsToReadByUserIdAndNotificationIds = async (
+export const modifyNotificationsReadByUserIdAndIds = async (
     userId: number,
-    notificationIds: number[]
+    ids: number[],
+    read: boolean
 ): Promise<Notification[]> => {
-    const placeholder = 2
-    const idsPlaceholder = notificationIds
+    const placeholder = 3
+    const idsPlaceholder = ids
         .map((_, idx) => `$${idx + placeholder}`)
         .join(', ')
     const query = `
         UPDATE notifications
-        SET read = true
-        WHERE user_id = $1
+        SET read = $1
+        WHERE user_id = $2
             AND id IN (${idsPlaceholder})
         RETURNING *
     `
-    const values = [userId, ...notificationIds]
+    const values = [read, userId, ...ids]
     const rows = (await runQuery<DbNotification>(query, values)).rows
     return rows.map(mapDbNotification)
 }
 
-export const updateNotificationsToInactiveByUserIdAndNotificationIds = async (
+export const modifyNotificationsActiveByUserIdAndIds = async (
     userId: number,
-    notificationIds: number[]
+    ids: number[],
+    active: boolean
 ): Promise<Notification[]> => {
-    const placeholder = 2
-    const idsPlaceholder = notificationIds
+    const placeholder = 3
+    const idsPlaceholder = ids
         .map((_, idx) => `$${idx + placeholder}`)
         .join(', ')
     const query = `
         UPDATE notifications
-        SET active = false
-        WHERE user_id = $1
+        SET active = $1
+        WHERE user_id = $2
             AND id IN (${idsPlaceholder})
         RETURNING *
     `
-    const values = [userId, ...notificationIds]
+    const values = [active, userId, ...ids]
     const rows = (await runQuery<DbNotification>(query, values)).rows
     return rows.map(mapDbNotification)
 }

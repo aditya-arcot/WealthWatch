@@ -29,7 +29,7 @@ const router = express.Router()
  *             type: object
  *             properties:
  *               itemId:
- *                 type: number
+ *                 type: integer
  *               updateAccounts:
  *                 type: boolean
  *     responses:

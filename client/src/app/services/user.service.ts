@@ -30,13 +30,11 @@ export class UserService {
         return this.http.get<User | undefined>(url)
     }
 
-    checkUsernameInUse(username: string) {
-        const url = `${this.baseUrl}/username-in-use/${username}`
-        return this.http.get<boolean>(url)
-    }
-
-    checkEmailInUse(email: string) {
-        const url = `${this.baseUrl}/email-in-use/${email}`
-        return this.http.get<boolean>(url)
+    checkUserExists(email: string, username: string) {
+        const url = `${this.baseUrl}/exists`
+        return this.http.post<{
+            emailExists: boolean
+            usernameExists: boolean
+        }>(url, { email, username })
     }
 }

@@ -68,16 +68,16 @@ router.route('/logout').post(authenticate, logout)
  *           schema:
  *             type: object
  *             properties:
+ *               firstName:
+ *                 type: string
+ *                 required: true
+ *               lastName:
+ *                 type: string
+ *                 required: true
  *               username:
  *                 type: string
  *                 required: true
  *               email:
- *                 type: string
- *                 required: true
- *               first_name:
- *                 type: string
- *                 required: true
- *               last_name:
  *                 type: string
  *                 required: true
  *               password:

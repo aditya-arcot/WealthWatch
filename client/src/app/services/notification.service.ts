@@ -17,18 +17,22 @@ export class NotificationService {
     }
 
     updateNotificationsToRead(notifications: Notification[]) {
-        const ids = notifications
+        const notificationIds = notifications
             .filter((notification) => !notification.read)
             .map((notification) => notification.id)
-        if (ids.length === 0) return of(undefined)
-        return this.http.patch<void>(`${this.baseUrl}/read`, { ids })
+        if (notificationIds.length === 0) return of(undefined)
+        return this.http.patch<void>(`${this.baseUrl}/read`, {
+            notificationIds,
+        })
     }
 
     updateNotificationsToInactive(notifications: Notification[]) {
-        const ids = notifications
+        const notificationIds = notifications
             .filter((notification) => notification.active)
             .map((notification) => notification.id)
-        if (ids.length === 0) return of(undefined)
-        return this.http.patch<void>(`${this.baseUrl}/inactive`, { ids })
+        if (notificationIds.length === 0) return of(undefined)
+        return this.http.patch<void>(`${this.baseUrl}/inactive`, {
+            notificationIds,
+        })
     }
 }

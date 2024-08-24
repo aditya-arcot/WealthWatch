@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
     fetchActiveItemByUserIdAndInstitutionId,
-    fetchActiveItems,
+    fetchActiveItemsByUserId,
     insertItem,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/httpError.js'
@@ -12,66 +12,67 @@ import {
     plaidLinkTokenCreate,
     plaidPublicTokenExchange,
 } from '../plaid/tokenMethods.js'
-import { queueItemSync } from '../queues/itemQueue.js'
-import { queuePlaidLinkEventLog } from '../queues/logQueue.js'
+import { queueSyncItem } from '../queues/itemQueue.js'
+import { queueLogPlaidLinkEvent } from '../queues/logQueue.js'
 import { logger } from '../utils/logger.js'
 
 export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
 
-    const userId: number | undefined = req.session.user?.id
+    const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const itemId: number | undefined = req.body.itemId
-    const updateAccounts: boolean | undefined = req.body.updateAccounts
+    const itemId = req.body.itemId
+    const updateAccounts = req.body.updateAccounts
 
-    if (updateAccounts === true && itemId === undefined) {
-        throw new HttpError('missing item id', 400)
+    if (itemId === undefined) {
+        const linkToken = await plaidLinkTokenCreate(userId)
+        return res.send({ linkToken })
     }
 
-    const items = await fetchActiveItems()
+    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
+    if (updateAccounts !== undefined && typeof updateAccounts !== 'boolean')
+        throw new HttpError('invalid update accounts flag', 400)
+
+    const items = await fetchActiveItemsByUserId(userId)
     const item = items.filter((i) => i.id === itemId)[0]
-    if (!item) throw new HttpError('invalid item', 400)
+    if (!item) throw new HttpError('item not found', 404)
 
-    try {
-        let token = ''
-        if (updateAccounts === true) {
-            token = await plaidLinkTokenCreate(userId, item.plaidId, true)
-        } else if (itemId !== undefined) {
-            token = await plaidLinkTokenCreate(userId, item.plaidId)
-        } else {
-            token = await plaidLinkTokenCreate(userId)
-        }
-        return res.send({ linkToken: token })
-    } catch (error) {
-        logger.error(error)
-        if (error instanceof HttpError) throw error
-        throw Error('failed to create link token')
-    }
+    const linkToken = await plaidLinkTokenCreate(
+        userId,
+        item.plaidId,
+        updateAccounts
+    )
+    return res.send({ linkToken })
 }
 
 export const handleLinkEvent = async (req: Request, res: Response) => {
     logger.debug('handling link event')
 
-    const event: PlaidLinkEvent | undefined = req.body.event
-    if (!event) throw new HttpError('missing event', 400)
+    const event = req.body.event as PlaidLinkEvent
+    if (typeof event !== 'object')
+        throw new HttpError('missing or invalid event', 400)
 
-    await queuePlaidLinkEventLog(event)
+    await queueLogPlaidLinkEvent(event)
+
     return res.status(202).send()
 }
 
 export const exchangePublicToken = async (req: Request, res: Response) => {
     logger.debug('exchanging public token')
 
-    const userId: number | undefined = req.session.user?.id
-    const publicToken: string | undefined = req.body.publicToken
-    const metadata: LinkSessionSuccessMetadata | undefined = req.body.metadata
-    const institution = metadata?.institution
-
+    const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
-    if (publicToken === undefined)
-        throw new HttpError('missing public token', 400)
-    if (!metadata) throw new HttpError('missing metadata', 400)
+
+    const publicToken = req.body.publicToken
+    if (typeof publicToken !== 'string')
+        throw new HttpError('missing or invalid public token', 400)
+
+    const metadata = req.body.metadata as LinkSessionSuccessMetadata
+    if (typeof metadata !== 'object')
+        throw new HttpError('missing or invalid metadata', 400)
+
+    const institution = metadata?.institution
     if (
         !institution ||
         institution.institution_id === undefined ||
@@ -79,40 +80,34 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     )
         throw new HttpError('missing institution info', 400)
 
-    try {
-        const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
-            userId,
-            institution.institution_id
-        )
-        if (existingItem) throw new HttpError('account already exists', 409)
+    const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
+        userId,
+        institution.institution_id
+    )
+    if (existingItem) throw new HttpError('item already linked', 409)
 
-        const { accessToken, plaidItemId } = await plaidPublicTokenExchange(
-            publicToken,
-            userId
-        )
+    const { accessToken, plaidItemId } = await plaidPublicTokenExchange(
+        publicToken,
+        userId
+    )
 
-        const item: Item = {
-            id: -1,
-            userId,
-            plaidId: plaidItemId,
-            active: true,
-            accessToken,
-            institutionId: institution.institution_id,
-            institutionName: institution.name,
-            healthy: true,
-            cursor: null,
-            lastSynced: null,
-            lastRefreshed: null,
-        }
-        const newItem = await insertItem(item)
-        if (!newItem) throw Error('item not created')
-
-        await queueItemSync(newItem)
-
-        return res.status(204).send()
-    } catch (error) {
-        logger.error(error)
-        if (error instanceof HttpError) throw error
-        throw Error('failed to exchange public token')
+    const item: Item = {
+        id: -1,
+        userId,
+        plaidId: plaidItemId,
+        active: true,
+        accessToken,
+        institutionId: institution.institution_id,
+        institutionName: institution.name,
+        healthy: true,
+        cursor: null,
+        lastSynced: null,
+        lastRefreshed: null,
     }
+    const newItem = await insertItem(item)
+    if (!newItem) throw new HttpError('failed to insert item')
+
+    await queueSyncItem(newItem)
+
+    return res.status(204).send()
 }
