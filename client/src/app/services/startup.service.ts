@@ -71,7 +71,6 @@ export class StartupService {
             catchError((err: HttpErrorResponse) => {
                 this.userSvc.clearCurrentUser()
                 this.router.navigateByUrl('/login')
-                this.logger.error('error while getting current user', err)
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addErrorAlert('Not logged in')
                 return throwError(() => err)
@@ -92,7 +91,6 @@ export class StartupService {
             }),
             catchError((err: HttpErrorResponse) => {
                 this.router.navigateByUrl('/startup-error')
-                this.logger.error('error while getting secrets', err)
                 this.alertSvc.addErrorAlert('Failed to get secrets')
                 return throwError(() => err)
             })
