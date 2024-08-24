@@ -48,7 +48,9 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this.router.events
             .pipe(filter((event) => event instanceof NavigationEnd))
             .forEach(() => {
-                this.loadNotifications().subscribe()
+                if (this.userSvc.getStoredCurrentUser()) {
+                    this.loadNotifications().subscribe()
+                }
             })
     }
 
