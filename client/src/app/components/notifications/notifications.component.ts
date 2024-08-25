@@ -5,6 +5,7 @@ import {
     Notification,
     NotificationTypeEnum,
 } from '../../models/notification'
+import { NotificationService } from '../../services/notification.service'
 
 @Component({
     selector: 'app-notifications',
@@ -12,9 +13,14 @@ import {
     templateUrl: './notifications.component.html',
 })
 export class NotificationsComponent {
-    notifications: Notification[] = []
+    constructor(
+        private router: Router,
+        private notificationSvc: NotificationService
+    ) {}
 
-    constructor(private router: Router) {}
+    get notifications(): Notification[] {
+        return this.notificationSvc.notifications
+    }
 
     linkUpdateNotification = (n: Notification): boolean => {
         return (

@@ -1,23 +1,37 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { of } from 'rxjs'
+import { catchError, of, tap, throwError } from 'rxjs'
 import { env } from '../../environments/env'
 import { Notification } from '../models/notification'
+import { LoggerService } from './logger.service'
 
 @Injectable({
     providedIn: 'root',
 })
 export class NotificationService {
+    notifications: Notification[] = []
     readonly baseUrl = `${env.apiUrl}/notifications`
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private logger: LoggerService
+    ) {}
 
-    getNotifications() {
-        return this.http.get<Notification[]>(this.baseUrl)
+    loadNotifications() {
+        this.logger.debug('loading notifications')
+        return this.http.get<Notification[]>(this.baseUrl).pipe(
+            tap((notifications) => {
+                this.notifications = notifications
+            }),
+            catchError((err: HttpErrorResponse) => {
+                this.logger.error('failed to load notifications', err)
+                return throwError(() => err)
+            })
+        )
     }
 
-    updateNotificationsToRead(notifications: Notification[]) {
-        const notificationIds = notifications
+    updateAllNotificationsToRead() {
+        const notificationIds = this.notifications
             .filter((notification) => !notification.read)
             .map((notification) => notification.id)
         if (notificationIds.length === 0) return of(undefined)

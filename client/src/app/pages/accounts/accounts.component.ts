@@ -11,7 +11,7 @@ import {
     PlaidLinkHandler,
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
-import { catchError, of, switchMap, throwError } from 'rxjs'
+import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
@@ -238,22 +238,13 @@ export class AccountsComponent implements OnInit {
 
     removeLinkNotifications(itemId: number, type: NotificationTypeEnum): void {
         this.logger.debug('removing notifications', itemId, type)
+        const notifications = this.notificationSvc.notifications
+            .filter((n) => n.itemId === itemId)
+            .filter((n) => n.typeId === type)
         this.notificationSvc
-            .getNotifications()
-            .pipe(
-                switchMap((notifications) => {
-                    return of(
-                        notifications
-                            .filter((n) => n.itemId === itemId)
-                            .filter((n) => n.typeId === type)
-                    )
-                })
-            )
-            .subscribe((notifications) => {
-                this.notificationSvc
-                    .updateNotificationsToInactive(notifications)
-                    .subscribe()
-            })
+            .updateNotificationsToInactive(notifications)
+            .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
+            .subscribe()
     }
 
     handleLinkExit(
