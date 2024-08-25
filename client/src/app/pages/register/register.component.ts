@@ -15,16 +15,7 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-import {
-    catchError,
-    finalize,
-    forkJoin,
-    map,
-    of,
-    switchMap,
-    tap,
-    throwError,
-} from 'rxjs'
+import { catchError, finalize, map, of, switchMap, tap, throwError } from 'rxjs'
 import { User } from '../../models/user'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
@@ -69,7 +60,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
             .getCurrentUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearCurrentUser()
+                    this.userSvc.clearStoredCurrentUser()
                     this.logger.error('error while getting current user')
                     return throwError(() => err)
                 })
@@ -139,14 +130,12 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         const username = this.registerFormGroup.value.username
         const password = this.registerFormGroup.value.password
 
-        forkJoin({
-            usernameInUse: this.userSvc.checkUsernameInUse(username),
-            emailInUse: this.userSvc.checkEmailInUse(email),
-        })
+        this.userSvc
+            .checkUserExists(email, username)
             .pipe(
                 switchMap((res) => {
-                    if (res.emailInUse || res.usernameInUse) {
-                        if (res.emailInUse) {
+                    if (res.emailExists || res.usernameExists) {
+                        if (res.emailExists) {
                             this.alertSvc.addErrorAlert(
                                 'Email is already in use'
                             )
@@ -155,7 +144,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                                 confirmPassword: '',
                             })
                         }
-                        if (res.usernameInUse) {
+                        if (res.usernameExists) {
                             this.alertSvc.addErrorAlert(
                                 'Username is already in use'
                             )

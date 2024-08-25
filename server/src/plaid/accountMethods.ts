@@ -7,15 +7,15 @@ import { Account } from '../models/account.js'
 import { Item } from '../models/item.js'
 import { toTitleCase } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
-import { executePlaidMethod, plaidClient } from './index.js'
+import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
-    logger.debug({ item }, 'getting item accounts')
+    logger.debug({ id: item.id }, 'getting item accounts')
     const params: AccountsGetRequest = {
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
-        plaidClient.accountsGet,
+        getPlaidClient().accountsGet,
         params,
         item.userId,
         item.id
@@ -28,12 +28,12 @@ export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
 export const plaidAccountsBalanceGet = async (
     item: Item
 ): Promise<Account[]> => {
-    logger.debug({ item }, 'getting item account balances')
+    logger.debug({ id: item.id }, 'getting item account balances')
     const params: AccountsBalanceGetRequest = {
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
-        plaidClient.accountsBalanceGet,
+        getPlaidClient().accountsBalanceGet,
         params,
         item.userId,
         item.id
@@ -49,7 +49,7 @@ export const mapPlaidAccount = (
 ): Account => ({
     id: 0,
     itemId,
-    accountId: account.account_id,
+    plaidId: account.account_id,
     name: account.name,
     mask: account.mask,
     officialName: account.official_name,

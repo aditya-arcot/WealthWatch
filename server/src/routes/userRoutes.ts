@@ -1,7 +1,6 @@
 import express from 'express'
 import {
-    checkEmailExists,
-    checkUsernameExists,
+    checkUserExists,
     deleteCurrentUser,
     getCurrentUser,
 } from '../controllers/userController.js'
@@ -46,52 +45,38 @@ router
 
 /**
  * @swagger
- * /users/username-in-use/{username}:
- *   get:
- *     summary: Check if a username is in use
+ * /users/exists:
+ *   post:
+ *     summary: Check if a email or username is in use
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: username
- *         schema:
- *           type: string
- *         required: true
- *         description: The username
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 required: true
+ *               username:
+ *                 type: string
+ *                 required: true
  *     responses:
  *       200:
- *         description: Checked if the username is in use
+ *         description: Checked if the email or username is in use
  *         content:
  *           application/json:
  *             schema:
- *               type: boolean
+ *               type: object
+ *               properties:
+ *                 emailExists:
+ *                   type: boolean
+ *                 usernameExists:
+ *                   type: boolean
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/username-in-use/:username').get(catchAsync(checkUsernameExists))
-
-/**
- * @swagger
- * /users/email-in-use/{email}:
- *   get:
- *     summary: Check if an email is in use
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: email
- *         schema:
- *           type: string
- *         required: true
- *         description: The email
- *     responses:
- *       200:
- *         description: Checked if the email is in use
- *         content:
- *           application/json:
- *             schema:
- *               type: boolean
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.route('/email-in-use/:email').get(catchAsync(checkEmailExists))
+router.route('/exists').post(catchAsync(checkUserExists))
 
 export default router

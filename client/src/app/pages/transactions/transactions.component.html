@@ -38,28 +38,30 @@
         <div class="card-body">
             <div class="mb-3 small-text">
                 <div
-                    class="d-none d-xl-inline center-div d-flex {{
-                        !filterActive() ? 'center-div-unfiltered' : ''
-                    }}"
+                    class="d-none d-xl-inline center-div d-flex"
+                    [class.center-div-unfiltered]="!filterActive()"
                 >
                     <span
-                        class="align-middle {{
-                            filterActive() ? 'pe-2' : 'pe-0'
-                        }}"
+                        class="align-middle"
+                        [ngClass]="filterActive() ? 'pe-2' : 'pe-0'"
                     >
                         @if (transactions.length) {
                             <b>{{ getStartTransactionNumber() }}</b> to
                             <b>{{ getEndTransactionNumber() }}</b> of
-                            <b>{{
-                                resultsFiltered() ? filteredCount : totalCount
-                            }}</b>
+                            <b>
+                                @if (resultsFiltered()) {
+                                    {{ filteredCount }}
+                                } @else {
+                                    {{ totalCount }}
+                                }
+                            </b>
+                            <!-- prettier-ignore -->
                             @if (resultsFiltered()) {
-                                (<b>{{ totalCount - filteredCount! }}</b>
-                                excluded)
-                            }
-                        } @else if (resultsFiltered()) {
-                            <b>{{ totalCount - filteredCount! }}</b> excluded
+                                (<b>{{ totalCount - filteredCount! }}</b> excluded)}
                         }
+                        <!-- prettier-ignore -->
+                        @else if (resultsFiltered()) {
+                            <b>{{ totalCount - filteredCount! }}</b> excluded}
                     </span>
                     @if (filterActive()) {
                         <button
@@ -86,31 +88,32 @@
                     </div>
 
                     <div
-                        class="d-inline d-xl-none text-center mb-lg-0 {{
-                            getTotalPages() ? 'col-lg-auto mb-2' : ''
-                        }}"
+                        class="d-inline d-xl-none text-center mb-lg-0"
+                        [ngClass]="
+                            getTotalPages() !== 0 ? 'col-lg-auto mb-2' : ''
+                        "
                     >
                         <span
-                            class="align-middle {{
-                                filterActive() ? 'pe-2' : 'pe-0'
-                            }}"
+                            class="align-middle"
+                            [ngClass]="filterActive() ? 'pe-2' : 'pe-0'"
                         >
                             @if (transactions.length) {
                                 <b>{{ getStartTransactionNumber() }}</b> to
                                 <b>{{ getEndTransactionNumber() }}</b> of
-                                <b>{{
-                                    resultsFiltered()
-                                        ? filteredCount
-                                        : totalCount
-                                }}</b>
+                                <b>
+                                    @if (resultsFiltered()) {
+                                        {{ filteredCount }}
+                                    } @else {
+                                        {{ totalCount }}
+                                    }
+                                </b>
+                                <!-- prettier-ignore -->
                                 @if (resultsFiltered()) {
-                                    (<b>{{ totalCount - filteredCount! }}</b>
-                                    excluded)
-                                }
-                            } @else if (resultsFiltered()) {
-                                <b>{{ totalCount - filteredCount! }}</b>
-                                excluded
+                                    (<b>{{ totalCount - filteredCount! }}</b> excluded)}
                             }
+                            <!-- prettier-ignore -->
+                            @else if (resultsFiltered()) {
+                                <b>{{ totalCount - filteredCount! }}</b> excluded}
                         </span>
                         @if (filterActive()) {
                             <button
@@ -160,11 +163,8 @@
                                 <div class="col-auto ps-0 ps-md-1">
                                     <ul class="pagination pagination-sm mb-0">
                                         <li
-                                            class="page-item {{
-                                                currentPage === 1
-                                                    ? 'disabled'
-                                                    : ''
-                                            }}"
+                                            class="page-item"
+                                            [class.disabled]="currentPage === 1"
                                             (click)="navigateToFirstPage()"
                                             (keydown.enter)="
                                                 navigateToFirstPage()
@@ -182,11 +182,8 @@
                                         </li>
 
                                         <li
-                                            class="page-item {{
-                                                currentPage === 1
-                                                    ? 'disabled'
-                                                    : ''
-                                            }}"
+                                            class="page-item"
+                                            [class.disabled]="currentPage === 1"
                                             (click)="navigateToPreviousPage()"
                                             (keydown.enter)="
                                                 navigateToPreviousPage()
@@ -211,11 +208,10 @@
                                         </li>
 
                                         <li
-                                            class="page-item {{
+                                            class="page-item"
+                                            [class.disabled]="
                                                 currentPage === getTotalPages()
-                                                    ? 'disabled'
-                                                    : ''
-                                            }}"
+                                            "
                                             (click)="navigateToNextPage()"
                                             (keydown.enter)="
                                                 navigateToNextPage()
@@ -233,11 +229,10 @@
                                         </li>
 
                                         <li
-                                            class="page-item {{
+                                            class="page-item"
+                                            [class.disabled]="
                                                 currentPage === getTotalPages()
-                                                    ? 'disabled'
-                                                    : ''
-                                            }}"
+                                            "
                                             (click)="navigateToLastPage()"
                                             (keydown.enter)="
                                                 navigateToLastPage()
@@ -276,14 +271,15 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#dateFilterModal"
                                 >
-                                    @if (
-                                        selectedDateFilter ===
-                                        dateFilterType.ALL
-                                    ) {
-                                        <i class="bi bi-funnel"></i>
-                                    } @else {
-                                        <i class="bi bi-funnel-fill"></i>
-                                    }
+                                    <i
+                                        class="bi"
+                                        [ngClass]="
+                                            selectedDateFilter ===
+                                            dateFilterType.ALL
+                                                ? 'bi-funnel'
+                                                : 'bi-funnel-fill'
+                                        "
+                                    ></i>
                                 </button>
                             </div>
                         </th>
@@ -298,14 +294,15 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#amountFilterModal"
                                 >
-                                    @if (
-                                        selectedAmountFilter ===
-                                        amountFilterType.ALL
-                                    ) {
-                                        <i class="bi bi-funnel"></i>
-                                    } @else {
-                                        <i class="bi bi-funnel-fill"></i>
-                                    }
+                                    <i
+                                        class="bi"
+                                        [ngClass]="
+                                            selectedAmountFilter ===
+                                            amountFilterType.ALL
+                                                ? 'bi-funnel'
+                                                : 'bi-funnel-fill'
+                                        "
+                                    ></i>
                                 </button>
                             </div>
                         </th>
@@ -319,11 +316,14 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#categoryFilterModal"
                                 >
-                                    @if (selectedCategoryIds.size === 0) {
-                                        <i class="bi bi-funnel"></i>
-                                    } @else {
-                                        <i class="bi bi-funnel-fill"></i>
-                                    }
+                                    <i
+                                        class="bi"
+                                        [ngClass]="
+                                            selectedCategoryIds.size === 0
+                                                ? 'bi-funnel'
+                                                : 'bi-funnel-fill'
+                                        "
+                                    ></i>
                                 </button>
                             </div>
                         </th>
@@ -340,11 +340,14 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#accountFilterModal"
                                 >
-                                    @if (selectedAccountIds.size === 0) {
-                                        <i class="bi bi-funnel"></i>
-                                    } @else {
-                                        <i class="bi bi-funnel-fill"></i>
-                                    }
+                                    <i
+                                        class="bi"
+                                        [ngClass]="
+                                            selectedAccountIds.size === 0
+                                                ? 'bi-funnel'
+                                                : 'bi-funnel-fill'
+                                        "
+                                    ></i>
                                 </button>
                             </div>
                         </th>
@@ -390,9 +393,8 @@
                                     }
                                 </div>
                                 <div
-                                    class="d-inline d-lg-none {{
-                                        t.pending ? 'pending-text' : ''
-                                    }}"
+                                    class="d-inline d-lg-none"
+                                    [class.pending-text]="t.pending"
                                 >
                                     {{ getDisplayAmount(t) }}
                                 </div>
@@ -405,7 +407,8 @@
                                         title="Change Category"
                                     >
                                         <i
-                                            [classList]="getCategoryClasses(t)"
+                                            class="bi"
+                                            [ngClass]="getCategoryClass(t)"
                                         ></i>
                                     </button>
                                     <select
@@ -422,7 +425,7 @@
                                                 [value]="category.id"
                                                 [selected]="
                                                     category.id ===
-                                                    getDisplayCategory(t)
+                                                    getDisplayCategoryId(t)
                                                 "
                                             >
                                                 {{ category.name }}
@@ -450,11 +453,14 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#noteModal"
                                 >
-                                    @if (t.note === null) {
-                                        <i class="bi bi-sticky"></i>
-                                    } @else {
-                                        <i class="bi bi-sticky-fill"></i>
-                                    }
+                                    <i
+                                        class="bi"
+                                        [ngClass]="
+                                            t.note === null
+                                                ? 'bi-sticky'
+                                                : 'bi-sticky-fill'
+                                        "
+                                    ></i>
                                 </button>
                             </td>
                             <td class="d-none d-md-table-cell">

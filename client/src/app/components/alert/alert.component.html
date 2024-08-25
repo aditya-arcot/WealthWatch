@@ -4,16 +4,14 @@
             <div class="row justify-content-center">
                 <div class="col-lg-6">
                     <div
-                        class="m-2 mb-0 p-3 alert alert-dismissible {{
-                            getAlertClass(alert.type)
-                        }}"
+                        class="m-2 mb-0 p-3 alert alert-dismissible"
+                        [ngClass]="getAlertClass(alert.type)"
                         role="alert"
                     >
                         <div class="d-flex align-items-center">
                             <i
-                                class="bi me-1 {{
-                                    getAlertIconClass(alert.type)
-                                }}"
+                                class="bi me-1"
+                                [ngClass]="getAlertIconClass(alert.type)"
                             ></i>
                             <strong>{{ alert.message }}</strong>
                             <button

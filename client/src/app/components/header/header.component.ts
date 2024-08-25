@@ -1,8 +1,11 @@
-import { HttpErrorResponse } from '@angular/common/http'
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core'
-import { Router, RouterLink, RouterLinkActive } from '@angular/router'
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
-import { Notification } from '../../models/notification'
+import {
+    NavigationEnd,
+    Router,
+    RouterLink,
+    RouterLinkActive,
+} from '@angular/router'
+import { catchError, filter, Observable, of, switchMap, throwError } from 'rxjs'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
@@ -26,7 +29,6 @@ import { NotificationsComponent } from '../notifications/notifications.component
 export class HeaderComponent implements OnInit, AfterViewInit {
     @ViewChild(NotificationsComponent)
     notificationsComponent!: NotificationsComponent
-    notifications: Notification[] = []
     loading = false
 
     constructor(
@@ -39,7 +41,13 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     ) {}
 
     ngOnInit(): void {
-        this.loadNotifications().subscribe()
+        this.router.events
+            .pipe(filter((event) => event instanceof NavigationEnd))
+            .forEach(() => {
+                if (this.userSvc.getStoredCurrentUser()) {
+                    this.notificationSvc.loadNotifications().subscribe()
+                }
+            })
     }
 
     ngAfterViewInit(): void {
@@ -51,22 +59,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         }
     }
 
-    loadNotifications(): Observable<undefined> {
-        return this.notificationSvc.getNotifications().pipe(
-            switchMap((notifications) => {
-                this.logger.debug('loaded notifications', notifications)
-                this.notifications = notifications
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load notifications', err)
-                return throwError(() => err)
-            })
-        )
-    }
-
     updateNotificationsToRead(): Observable<undefined> {
-        return this.notificationSvc.updateNotificationsToRead().pipe(
+        return this.notificationSvc.updateAllNotificationsToRead().pipe(
             switchMap(() => {
                 this.logger.debug('updated notifications to read')
                 return of(undefined)
@@ -75,21 +69,19 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         )
     }
 
-    openNotificationsModal(): void {
-        this.notificationsComponent.notifications = this.notifications
-    }
-
     handleCloseNotificationsModal(): void {
         this.updateNotificationsToRead()
             .pipe(
-                switchMap(() => this.loadNotifications()),
+                switchMap(() => this.notificationSvc.loadNotifications()),
                 catchError(() => of(undefined))
             )
             .subscribe()
     }
 
     unreadNotifications(): boolean {
-        return this.notifications.some((notification) => !notification.read)
+        return this.notificationSvc.notifications.some(
+            (notification) => !notification.read
+        )
     }
 
     logout(): void {
@@ -104,7 +96,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 })
             )
             .subscribe(() => {
-                this.userSvc.clearCurrentUser()
+                this.userSvc.clearStoredCurrentUser()
                 this.router.navigateByUrl('/logout')
             })
     }

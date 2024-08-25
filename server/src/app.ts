@@ -3,8 +3,11 @@ import express from 'express'
 import helmet from 'helmet'
 import methodOverride from 'method-override'
 import swaggerUi from 'swagger-ui-express'
-import router from '../routes/index.js'
-import { logger } from '../utils/logger.js'
+import { processWebhook } from './controllers/webhookController.js'
+import router from './routes/index.js'
+import { catchAsync } from './utils/catchAsync.js'
+import { production } from './utils/env.js'
+import { logger } from './utils/logger.js'
 import {
     corsMiddleware,
     createCsrfMiddleware,
@@ -12,11 +15,16 @@ import {
     handleError,
     handleUnmatchedRoute,
     logRequestResponse,
-    production,
-} from '../utils/middleware.js'
-import { createSwaggerSpec, swaggerOptions } from '../utils/swagger.js'
+} from './utils/middleware.js'
+import { createSwaggerSpec, swaggerOptions } from './utils/swagger.js'
 
-export const startMainApp = () => {
+export const startExpressApps = () => {
+    logger.debug('starting express apps')
+    startMainApp()
+    startWebhookApp()
+}
+
+const startMainApp = () => {
     logger.debug('configuring main app')
     const app = express()
     if (production) {
@@ -24,6 +32,7 @@ export const startMainApp = () => {
     }
 
     logger.debug('configuring middleware')
+    app.use(logRequestResponse)
     app.use(
         helmet({
             contentSecurityPolicy: {
@@ -37,7 +46,6 @@ export const startMainApp = () => {
     app.use(express.urlencoded({ extended: true }))
     app.use(createSessionMiddleware())
     app.use(cookieParser())
-    app.use(logRequestResponse) // keep before csrf
     app.use(createCsrfMiddleware())
 
     logger.debug('configuring routes')
@@ -61,5 +69,27 @@ export const startMainApp = () => {
     const port = 3000
     app.listen(port, () => {
         logger.info(`main app running on port ${port}`)
+    })
+}
+
+const startWebhookApp = () => {
+    logger.debug('configuring webhook app')
+    const webhookApp = express()
+
+    logger.debug('configuring middleware')
+    webhookApp.use(logRequestResponse)
+    webhookApp.use(express.json())
+    webhookApp.use(express.urlencoded({ extended: true }))
+
+    logger.debug('configuring routes')
+    webhookApp.use('/status', (_req, res) => res.send('ok'))
+    webhookApp.post('/webhooks', catchAsync(processWebhook))
+    webhookApp.use(handleUnmatchedRoute)
+    webhookApp.use(handleError)
+
+    logger.debug('starting webhook app')
+    const webhookPort = 3001
+    webhookApp.listen(webhookPort, () => {
+        logger.info(`webhook app running on port ${webhookPort}`)
     })
 }

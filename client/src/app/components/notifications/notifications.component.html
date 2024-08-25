@@ -1,25 +1,42 @@
 <div
-    class="modal fade {{ notifications.length === 0 ? 'modal-sm' : '' }}"
+    class="modal fade"
+    [class.modal-sm]="notifications.length === 0"
     id="notificationsModal"
-    #notificationsModal
 >
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header text-center p-2">
-                <h4 class="modal-title w-100">Notifications</h4>
+            <div
+                class="modal-header p-2 d-flex justify-content-center position-relative"
+            >
+                <h4 class="modal-title">Notifications</h4>
+                <button
+                    type="button"
+                    class="btn-close position-absolute end-0 me-2"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
             </div>
             <div class="modal-body p-1">
                 @if (notifications.length === 0) {
                     <h6 class="text-center mt-1">No notifications</h6>
                 } @else {
-                    <table class="table table-hover table-sm mb-0">
+                    <table class="table table-hover table-sm align-middle mb-0">
                         <tbody>
                             @for (n of notifications; track $index) {
                                 <tr>
-                                    <td
-                                        class="{{ n.read ? 'text-muted' : '' }}"
-                                    >
+                                    <td [class.text-muted]="n.read">
                                         {{ n.message }}
+                                    </td>
+                                    <td class="text-end">
+                                        @if (linkUpdateNotification(n)) {
+                                            <button
+                                                class="btn btn-sm btn-primary"
+                                                (click)="launchLinkUpdate(n)"
+                                                data-bs-dismiss="modal"
+                                            >
+                                                Launch Link
+                                            </button>
+                                        }
                                     </td>
                                 </tr>
                             }

@@ -4,19 +4,19 @@ import {
 } from 'plaid'
 import { Item } from '../models/item.js'
 import { logger } from '../utils/logger.js'
-import { executePlaidMethod, plaidClient } from './index.js'
+import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidSandboxFireWebhook = async (
     item: Item,
     code: WebhookCodeEnum
 ) => {
-    logger.debug({ item, code }, 'firing webhook')
+    logger.debug({ itemId: item.id, code }, 'firing webhook')
     const params: SandboxItemFireWebhookRequest = {
         access_token: item.accessToken,
         webhook_code: code,
     }
     const resp = await executePlaidMethod(
-        plaidClient.sandboxItemFireWebhook,
+        getPlaidClient().sandboxItemFireWebhook,
         params,
         item.userId,
         item.id
@@ -28,7 +28,7 @@ export const plaidWebhookVerificationKeyGet = async (kid: string) => {
     logger.debug({ kid }, 'getting webhook verification key')
     const params = { key_id: kid }
     const resp = await executePlaidMethod(
-        plaidClient.webhookVerificationKeyGet,
+        getPlaidClient().webhookVerificationKeyGet,
         params
     )
     return resp.data.key

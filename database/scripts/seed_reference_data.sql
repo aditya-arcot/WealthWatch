@@ -26,4 +26,12 @@ VALUES
     ('Travel'),
     ('Bills');
 
+INSERT INTO
+    notification_types (name)
+VALUES
+    ('Info'),
+    ('Link Update Required'),
+    ('Link Update Optional'),
+    ('Link Update Optional - New Accounts');
+
 COMMIT;

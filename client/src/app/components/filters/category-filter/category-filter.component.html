@@ -44,7 +44,8 @@
                                         for="category-{{ c.id }}"
                                     >
                                         <i
-                                            [classList]="getCategoryClasses(c)"
+                                            class="bi"
+                                            [ngClass]="getCategoryClass(c)"
                                         ></i>
                                         {{ c.name }}
                                     </label>

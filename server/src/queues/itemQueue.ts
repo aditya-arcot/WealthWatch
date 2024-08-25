@@ -1,23 +1,21 @@
 import { Queue, Worker } from 'bullmq'
-import { env } from 'process'
 import {
     refreshItemBalances,
     syncItemData,
 } from '../controllers/itemController.js'
+import { HttpError } from '../models/httpError.js'
 import { Item } from '../models/item.js'
+import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum ItemJobType {
-    ItemSync = 'ItemSync',
-    ItemBalancesRefresh = 'ItemBalancesRefresh',
+    SyncItem = 'Sync',
+    RefreshItemBalances = 'RefreshBalances',
 }
 
-if (env['NODE_ENV'] === undefined) {
-    throw Error('missing node env')
-}
-const itemQueueName = `item-${env['NODE_ENV']}`
+const itemQueueName = `item-${vars.nodeEnv}`
 let itemQueue: Queue | null = null
 let itemWorker: Worker | null = null
 
@@ -28,17 +26,17 @@ export const initializeItemQueue = () => {
 
 export const getItemQueue = () => {
     if (!itemQueue) {
-        throw Error('item queue not initialized')
+        throw new HttpError('item queue not initialized')
     }
     return itemQueue
 }
 
-export const queueItemSync = async (item: Item) => {
-    await queueItem(ItemJobType.ItemSync, item)
+export const queueSyncItem = async (item: Item) => {
+    await queueItem(ItemJobType.SyncItem, item)
 }
 
-export const queueItemBalancesRefresh = async (item: Item) => {
-    await queueItem(ItemJobType.ItemBalancesRefresh, item)
+export const queueRefreshItemBalances = async (item: Item) => {
+    await queueItem(ItemJobType.RefreshItemBalances, item)
 }
 
 const queueItem = async (type: ItemJobType, item: Item) => {
@@ -55,35 +53,43 @@ export const initializeItemWorker = () => {
                 `${itemQueueName} queue - starting job (id ${job.id}, ${type})`
             )
             const item: Item | undefined = job.data.item
-            if (!item) throw Error('missing item')
+            if (!item) throw new HttpError('missing item')
 
             switch (type) {
-                case ItemJobType.ItemSync: {
+                case ItemJobType.SyncItem: {
                     await syncItemData(item)
                     break
                 }
-                case ItemJobType.ItemBalancesRefresh: {
+                case ItemJobType.RefreshItemBalances: {
                     await refreshItemBalances(item)
                     break
                 }
                 default:
-                    throw Error(`unknown job type: ${type}`)
+                    throw new HttpError(`unknown job type: ${type}`)
             }
         },
         { connection: getRedis(), ...workerOptions }
     )
 
-    itemWorker.on('completed', async (job) => {
+    itemWorker.on('completed', (job) => {
         logger.debug(`${itemQueueName} queue - completed job (id ${job.id})`)
-        await handleJobSuccess(itemQueueName, job.id, job.name, job.data)
+        handleJobSuccess(itemQueueName, job.id, job.name, job.data).catch(
+            (err) => {
+                logger.error(err, `error handling job success`)
+            }
+        )
     })
 
-    itemWorker.on('failed', async (job, err) => {
+    itemWorker.on('failed', (job, err) => {
         logger.error(
             { err },
             `${itemQueueName} queue - failed job (id ${job?.id})`
         )
-        await handleJobFailure(itemQueueName, job?.id, job?.data, err)
+        handleJobFailure(itemQueueName, job?.id, job?.data, err).catch(
+            (err) => {
+                logger.error(err, `error handling job failure`)
+            }
+        )
     })
 
     logger.debug('initialized item worker')

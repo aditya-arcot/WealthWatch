@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common'
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -48,6 +48,7 @@ import { TransactionService } from '../../services/transaction.service'
         CategoryFilterComponent,
         AccountFilterComponent,
         NoteComponent,
+        CommonModule,
     ],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
@@ -509,7 +510,7 @@ export class TransactionsComponent implements OnInit {
         )
     }
 
-    getDisplayCategory(t: Transaction): number {
+    getDisplayCategoryId(t: Transaction): number {
         return t.customCategoryId ?? t.categoryId
     }
 
@@ -533,9 +534,9 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomCategoryId(t)
     }
 
-    getCategoryClasses(t: Transaction): string {
-        const categoryId = this.getDisplayCategory(t) as CategoryEnum
-        return `bi ${categoryIcons[categoryId]}`
+    getCategoryClass(t: Transaction): string {
+        const categoryId = this.getDisplayCategoryId(t) as CategoryEnum
+        return categoryIcons[categoryId]
     }
 
     openNoteModal(t: Transaction): void {
