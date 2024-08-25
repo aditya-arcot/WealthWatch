@@ -364,7 +364,13 @@ export class AccountsComponent implements OnInit {
     }
 
     getDisplayDate(date: Date): string {
-        return new Date(date).toLocaleString()
+        return new Date(date).toLocaleString(undefined, {
+            month: 'numeric',
+            day: 'numeric',
+            year: '2-digit',
+            hour: 'numeric',
+            minute: 'numeric',
+        })
     }
 
     getDisplayCurrentBalance(acc: Account): string {

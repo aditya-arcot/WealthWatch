@@ -21,7 +21,7 @@ export class UserService {
         return JSON.parse(userStr) as User
     }
 
-    clearCurrentUser(): void {
+    clearStoredCurrentUser(): void {
         sessionStorage.removeItem('user')
     }
 

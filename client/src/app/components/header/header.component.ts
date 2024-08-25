@@ -118,7 +118,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 })
             )
             .subscribe(() => {
-                this.userSvc.clearCurrentUser()
+                this.userSvc.clearStoredCurrentUser()
                 this.router.navigateByUrl('/logout')
             })
     }
