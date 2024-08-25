@@ -4,7 +4,7 @@ export const refreshCooldown = 1000 * 60 * 60 * 3
 export interface Item {
     id: number
     userId: number
-    itemId: string
+    plaidId: string
     active: boolean
     accessToken: string
     institutionId: string

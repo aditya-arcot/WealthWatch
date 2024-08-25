@@ -5,18 +5,20 @@ import {
     Products as PlaidProducts,
     SandboxPublicTokenCreateRequest,
 } from 'plaid'
-import { env } from 'process'
-import { fetchActiveItemById } from '../database/itemQueries.js'
+import { fetchActiveItemByPlaidId } from '../database/itemQueries.js'
+import { HttpError } from '../models/httpError.js'
 import { Item } from '../models/item.js'
 import { User } from '../models/user.js'
+import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
-import { executePlaidMethod, plaidClient } from './index.js'
+import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidLinkTokenCreate = async (
     userId: number,
-    itemId?: string
+    itemId?: string,
+    updateAccounts: boolean = false
 ): Promise<string> => {
-    logger.debug({ itemId, userId }, 'creating link token')
+    logger.debug({ itemId, userId, updateAccounts }, 'creating link token')
 
     let accessToken = null
     // balance product automatically included
@@ -29,8 +31,8 @@ export const plaidLinkTokenCreate = async (
     let item: Item | undefined
     // link update mode
     if (itemId !== undefined) {
-        item = await fetchActiveItemById(itemId)
-        if (!item) throw Error('item not found')
+        item = await fetchActiveItemByPlaidId(itemId)
+        if (!item) throw new HttpError('item not found')
         accessToken = item.accessToken
         products = []
         requiredIfSupportedProducts = []
@@ -49,11 +51,14 @@ export const plaidLinkTokenCreate = async (
             days_requested: 730, // max
         },
         access_token: accessToken,
-        webhook: env['PLAID_WEBHOOK_URL'] ?? '',
+        webhook: vars.plaidWebhookUrl,
+        update: {
+            account_selection_enabled: updateAccounts,
+        },
     }
 
     const resp = await executePlaidMethod(
-        plaidClient.linkTokenCreate,
+        getPlaidClient().linkTokenCreate,
         params,
         userId,
         item?.id
@@ -69,13 +74,13 @@ export const plaidPublicTokenExchange = async (
 
     const params: ItemPublicTokenExchangeRequest = { public_token: publicToken }
     const resp = await executePlaidMethod(
-        plaidClient.itemPublicTokenExchange,
+        getPlaidClient().itemPublicTokenExchange,
         params,
         userId
     )
     return {
         accessToken: resp.data.access_token,
-        itemId: resp.data.item_id,
+        plaidItemId: resp.data.item_id,
     }
 }
 
@@ -83,7 +88,7 @@ export const plaidSandboxPublicTokenCreate = async (
     user: User,
     institutionId: string
 ) => {
-    logger.debug({ user, institutionId }, 'creating public token')
+    logger.debug({ userId: user.id, institutionId }, 'creating public token')
 
     const lastYear = new Date()
     lastYear.setFullYear(lastYear.getFullYear() - 1)
@@ -97,14 +102,14 @@ export const plaidSandboxPublicTokenCreate = async (
         institution_id: institutionId,
         initial_products: [PlaidProducts.Transactions],
         options: {
-            webhook: env['PLAID_WEBHOOK_URL'] ?? '',
+            webhook: vars.plaidWebhookUrl,
             transactions: {
                 start_date: startDate,
             },
         },
     }
     const resp = await executePlaidMethod(
-        plaidClient.sandboxPublicTokenCreate,
+        getPlaidClient().sandboxPublicTokenCreate,
         params,
         user.id
     )

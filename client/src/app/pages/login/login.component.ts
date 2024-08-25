@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
             .getCurrentUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearCurrentUser()
+                    this.userSvc.clearStoredCurrentUser()
                     this.logger.error('error while getting current user')
                     return throwError(() => err)
                 })

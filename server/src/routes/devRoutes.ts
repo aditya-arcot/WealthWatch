@@ -64,11 +64,11 @@ router.route('/item').post(catchAsync(createSandboxItem))
  *     tags: [Dev]
  *     parameters:
  *       - in: query
- *         name: itemId
+ *         name: plaidItemId
  *         schema:
  *           type: string
  *         required: true
- *         description: The item id
+ *         description: The Plaid item id
  *     responses:
  *       202:
  *         description: Queued the item for sync
@@ -83,11 +83,11 @@ router.route('/item/sync').post(catchAsync(syncItem))
  *     tags: [Dev]
  *     parameters:
  *       - in: query
- *         name: itemId
+ *         name: plaidItemId
  *         schema:
  *           type: string
  *         required: true
- *         description: The item id
+ *         description: The Plaid item id
  *     responses:
  *       204:
  *         description: Refreshed the item's transactions
@@ -104,11 +104,11 @@ router
  *     tags: [Dev]
  *     parameters:
  *       - in: query
- *         name: itemId
+ *         name: plaidItemId
  *         schema:
  *           type: string
  *         required: true
- *         description: The item id
+ *         description: The Plaid item id
  *     responses:
  *       202:
  *         description: Queued the item for balance refresh
@@ -125,11 +125,11 @@ router
  *     tags: [Dev]
  *     parameters:
  *       - in: query
- *         name: itemId
+ *         name: plaidItemId
  *         schema:
  *           type: string
  *         required: true
- *         description: The item id
+ *         description: The Plaid item id
  *     responses:
  *       204:
  *         description: Reset the item login
@@ -143,11 +143,11 @@ router.route('/item/reset-login').post(catchAsync(resetSandboxItemLogin))
  *     tags: [Dev]
  *     parameters:
  *       - in: query
- *         name: itemId
+ *         name: plaidItemId
  *         schema:
  *           type: string
  *         required: true
- *         description: The item id
+ *         description: The Plaid item id
  *       - in: query
  *         name: code
  *         schema:

@@ -4,7 +4,7 @@ import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 export const insertItem = async (item: Item): Promise<Item | undefined> => {
     const values: unknown[] = [
         item.userId,
-        item.itemId,
+        item.plaidId,
         item.active,
         item.accessToken,
         item.institutionId,
@@ -20,7 +20,7 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
     const query = `
         INSERT INTO items (
             user_id,
-            item_id,
+            plaid_id,
             active,
             access_token,
             institution_id,
@@ -49,16 +49,16 @@ export const fetchActiveItems = async (): Promise<Item[]> => {
     return rows.map(mapDbItem)
 }
 
-export const fetchActiveItemById = async (
-    itemId: string
+export const fetchActiveItemByPlaidId = async (
+    plaidId: string
 ): Promise<Item | undefined> => {
     const query = `
         SELECT *
         FROM active_items
-        WHERE item_id = $1
+        WHERE plaid_id = $1
         ORDER BY id
     `
-    const rows = (await runQuery<DbItem>(query, [itemId])).rows
+    const rows = (await runQuery<DbItem>(query, [plaidId])).rows
     if (!rows[0]) return
     return mapDbItem(rows[0])
 }
@@ -100,20 +100,20 @@ export const modifyItemActiveById = async (id: number, active: boolean) => {
     await runQuery(query, [active, id])
 }
 
-export const modifyItemLastRefreshedByItemId = async (
-    itemId: string,
+export const modifyItemLastRefreshedByPlaidId = async (
+    plaidId: string,
     lastRefreshed: Date
 ) => {
     const query = `
         UPDATE items
         SET last_refreshed = $1
-        WHERE item_id = $2
+        WHERE plaid_id = $2
     `
-    await runQuery(query, [lastRefreshed, itemId])
+    await runQuery(query, [lastRefreshed, plaidId])
 }
 
-export const modifyItemDataByItemId = async (
-    itemId: string,
+export const modifyItemCursorLastSyncedLastRefreshedByPlaidId = async (
+    plaidId: string,
     cursor: string | null,
     lastSynced: Date
 ) => {
@@ -123,15 +123,15 @@ export const modifyItemDataByItemId = async (
             cursor = $1,
             last_synced = $2,
             last_refreshed = $2
-        WHERE item_id = $3
+        WHERE plaid_id = $3
     `
-    await runQuery(query, [cursor, lastSynced, itemId])
+    await runQuery(query, [cursor, lastSynced, plaidId])
 }
 
 interface DbItem {
     id: number
     user_id: number
-    item_id: string
+    plaid_id: string
     active: boolean
     access_token: string
     institution_id: string
@@ -145,7 +145,7 @@ interface DbItem {
 const mapDbItem = (dbItem: DbItem): Item => ({
     id: dbItem.id,
     userId: dbItem.user_id,
-    itemId: dbItem.item_id,
+    plaidId: dbItem.plaid_id,
     active: dbItem.active,
     accessToken: dbItem.access_token,
     institutionId: dbItem.institution_id,

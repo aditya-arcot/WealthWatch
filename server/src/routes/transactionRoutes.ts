@@ -99,17 +99,17 @@ router.route('/').get(authenticate, catchAsync(getUserTransactions))
 
 /**
  * @swagger
- * /transactions/{transactionId}/name:
+ * /transactions/{plaidTransactionId}/name:
  *   patch:
  *     summary: Update a transaction's custom name
  *     tags: [Transactions]
  *     parameters:
  *       - in: path
- *         name: transactionId
+ *         name: plaidTransactionId
  *         schema:
  *           type: string
  *         required: true
- *         description: The transaction id
+ *         description: The Plaid transaction id
  *     requestBody:
  *       required: true
  *       content:
@@ -117,7 +117,7 @@ router.route('/').get(authenticate, catchAsync(getUserTransactions))
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               customName:
  *                 type: string
  *                 required: true
  *     responses:
@@ -127,22 +127,22 @@ router.route('/').get(authenticate, catchAsync(getUserTransactions))
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/:transactionId/name')
+    .route('/:plaidTransactionId/name')
     .patch(authenticate, catchAsync(updateTransactionCustomName))
 
 /**
  * @swagger
- * /transactions/{transactionId}/category:
+ * /transactions/{plaidTransactionId}/category:
  *   patch:
  *     summary: Update a transaction's custom category id
  *     tags: [Transactions]
  *     parameters:
  *       - in: path
- *         name: transactionId
+ *         name: plaidTransactionId
  *         schema:
  *           type: string
  *         required: true
- *         description: The transaction id
+ *         description: The Plaid transaction id
  *     requestBody:
  *       required: true
  *       content:
@@ -150,7 +150,7 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               categoryId:
+ *               customCategoryId:
  *                 type: integer
  *                 required: true
  *     responses:
@@ -160,22 +160,22 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/:transactionId/category')
+    .route('/:plaidTransactionId/category')
     .patch(catchAsync(updateTransactionCustomCategoryId))
 
 /**
  * @swagger
- * /transactions/{transactionId}/note:
+ * /transactions/{plaidTransactionId}/note:
  *   patch:
  *     summary: Update a transaction's note
  *     tags: [Transactions]
  *     parameters:
  *       - in: path
- *         name: transactionId
+ *         name: plaidTransactionId
  *         schema:
  *           type: string
  *         required: true
- *         description: The transaction id
+ *         description: The Plaid transaction id
  *     requestBody:
  *       required: true
  *       content:
@@ -192,7 +192,9 @@ router
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/:transactionId/note').patch(catchAsync(updateTransactionNote))
+router
+    .route('/:plaidTransactionId/note')
+    .patch(catchAsync(updateTransactionNote))
 
 /**
  * @swagger

@@ -1,25 +1,20 @@
 import { pino } from 'pino'
-import { env } from 'process'
+import { vars } from './env.js'
 
-const level = env['LOG_LEVEL'] || 'info'
-const token = env['SERVER_LOGTAIL_TOKEN']
-if (token === undefined) {
-    throw Error('missing logtail token')
-}
 export const logger = pino({
-    level: level,
+    level: vars.logLevel,
     transport: {
         targets: [
             {
                 target: '@logtail/pino',
-                level: level,
+                level: vars.logLevel,
                 options: {
-                    sourceToken: token,
+                    sourceToken: vars.serverLogtailToken,
                 },
             },
             {
                 target: 'pino-pretty',
-                level: level,
+                level: vars.logLevel,
                 options: {
                     colorize: true,
                 },

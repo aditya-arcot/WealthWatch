@@ -8,15 +8,15 @@ import { CategoryEnum } from '../models/category.js'
 import { Item } from '../models/item.js'
 import { Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
-import { executePlaidMethod, plaidClient } from './index.js'
+import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidTransactionsRefresh = async (item: Item) => {
-    logger.debug({ item }, 'refreshing item transactions')
+    logger.debug({ id: item.id }, 'refreshing item transactions')
     const params: TransactionsRefreshRequest = {
         access_token: item.accessToken,
     }
     await executePlaidMethod(
-        plaidClient.transactionsRefresh,
+        getPlaidClient().transactionsRefresh,
         params,
         item.userId,
         item.id
@@ -24,7 +24,7 @@ export const plaidTransactionsRefresh = async (item: Item) => {
 }
 
 export const plaidTransactionsSync = async (item: Item) => {
-    logger.debug({ item }, 'retrieving item transactions updates')
+    logger.debug({ id: item.id }, 'retrieving item transactions updates')
 
     let cursor = item.cursor
     let added: Array<PlaidTransaction> = []
@@ -45,7 +45,7 @@ export const plaidTransactionsSync = async (item: Item) => {
             }
         }
         const resp = await executePlaidMethod(
-            plaidClient.transactionsSync,
+            getPlaidClient().transactionsSync,
             params,
             item.userId,
             item.id
@@ -75,7 +75,7 @@ export const mapPlaidTransaction = (
 
     // link previous pending transaction
     const pendingTransaction = existingTransactions.find(
-        (t) => t.transactionId === transaction.pending_transaction_id
+        (t) => t.plaidId === transaction.pending_transaction_id
     )
     if (pendingTransaction) {
         customName = pendingTransaction.customName
@@ -86,7 +86,7 @@ export const mapPlaidTransaction = (
     return {
         id: 0,
         accountId,
-        transactionId: transaction.transaction_id,
+        plaidId: transaction.transaction_id,
         merchantId: transaction.merchant_entity_id ?? null,
         merchant: transaction.merchant_name ?? null,
         name: transaction.name,

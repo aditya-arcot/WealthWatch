@@ -13,7 +13,7 @@ export interface TransactionsRequestParams {
 export interface Transaction {
     id: number
     accountId: number
-    transactionId: string
+    plaidId: string
     merchantId: string | null
     merchant: string | null
     name: string

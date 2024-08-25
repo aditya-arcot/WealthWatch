@@ -1,7 +1,7 @@
 export interface Account {
     id: number
     itemId: number
-    accountId: string
+    plaidId: string
     name: string
     mask: string | null
     officialName: string | null

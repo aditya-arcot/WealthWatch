@@ -5,11 +5,7 @@
                 <h4 class="modal-title w-100">Filter by Date</h4>
             </div>
             <div class="modal-body p-3 py-2">
-                <div
-                    class="{{
-                        selectedFilter !== dateFilterType.CUSTOM ? 'pb-2' : ''
-                    }}"
-                >
+                <div [class.pb-2]="selectedFilter !== dateFilterType.CUSTOM">
                     <label for="dateRange">
                         <b>Date Range</b>
                     </label>
@@ -19,36 +15,32 @@
                         [(ngModel)]="selectedFilter"
                         (change)="handleFilterChange()"
                     >
-                        <option value="{{ dateFilterType.ALL }}">
-                            All Dates
-                        </option>
-                        <option value="{{ dateFilterType.CURRENT_WEEK }}">
+                        <option [value]="dateFilterType.ALL">All Dates</option>
+                        <option [value]="dateFilterType.CURRENT_WEEK">
                             This Week
                         </option>
-                        <option value="{{ dateFilterType.CURRENT_MONTH }}">
+                        <option [value]="dateFilterType.CURRENT_MONTH">
                             This Month
                         </option>
-                        <option value="{{ dateFilterType.CURRENT_YEAR }}">
+                        <option [value]="dateFilterType.CURRENT_YEAR">
                             This Year
                         </option>
-                        <option value="{{ dateFilterType.PAST_WEEK }}">
+                        <option [value]="dateFilterType.PAST_WEEK">
                             Past 7 Days
                         </option>
-                        <option value="{{ dateFilterType.PAST_MONTH }}">
+                        <option [value]="dateFilterType.PAST_MONTH">
                             Past 30 Days
                         </option>
-                        <option value="{{ dateFilterType.LAST_WEEK }}">
+                        <option [value]="dateFilterType.LAST_WEEK">
                             Last Week
                         </option>
-                        <option value="{{ dateFilterType.LAST_MONTH }}">
+                        <option [value]="dateFilterType.LAST_MONTH">
                             Last Month
                         </option>
-                        <option value="{{ dateFilterType.LAST_YEAR }}">
+                        <option [value]="dateFilterType.LAST_YEAR">
                             Last Year
                         </option>
-                        <option value="{{ dateFilterType.CUSTOM }}">
-                            Custom
-                        </option>
+                        <option [value]="dateFilterType.CUSTOM">Custom</option>
                     </select>
                 </div>
 
@@ -60,9 +52,8 @@
                         <input
                             id="startDate"
                             type="date"
-                            class="form-control form-control-sm {{
-                                !startDateValid() ? 'invalid-input' : ''
-                            }}"
+                            class="form-control form-control-sm"
+                            [class.invalid-input]="!startDateValid()"
                             [(ngModel)]="selectorStartDate"
                             (ngModelChange)="setSelectorStartDate($event)"
                         />
@@ -81,9 +72,8 @@
                         <input
                             id="endDate"
                             type="date"
-                            class="form-control form-control-sm {{
-                                !endDateValid() ? 'invalid-input' : ''
-                            }}"
+                            class="form-control form-control-sm"
+                            [class.invalid-input]="!endDateValid()"
                             [(ngModel)]="selectorEndDate"
                             (ngModelChange)="setSelectorEndDate($event)"
                         />

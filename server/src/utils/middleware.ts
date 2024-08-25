@@ -4,22 +4,17 @@ import { randomInt } from 'crypto'
 import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
-import { env } from 'process'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
 import { HttpError } from '../models/httpError.js'
-import { queueAppRequestLog } from '../queues/logQueue.js'
+import { queueLogAppRequest } from '../queues/logQueue.js'
+import { production, stage, vars } from './env.js'
 import { logger } from './logger.js'
-
-export const production =
-    env['NODE_ENV'] === 'prod' || env['NODE_ENV'] === 'stage'
-const stage = env['NODE_ENV'] === 'stage'
 
 const origins = [
     stage
         ? 'https://wealthwatch-stage.aditya-arcot.com'
         : 'https://wealthwatch.aditya-arcot.com',
-    `http://localhost:${env['CLIENT_PORT']}`,
 ]
 export const corsMiddleware = cors({
     origin: production ? origins : true,
@@ -27,9 +22,6 @@ export const corsMiddleware = cors({
 })
 
 export const createSessionMiddleware = () => {
-    if (env['SESSION_SECRET'] === undefined) {
-        throw Error('missing session secret')
-    }
     const postgresSession = pgSession(session)
     const sessionStore = new postgresSession({
         pool: getPool(),
@@ -37,7 +29,7 @@ export const createSessionMiddleware = () => {
     })
     return session({
         store: sessionStore,
-        secret: env['SESSION_SECRET'],
+        secret: vars.sessionSecret,
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -49,19 +41,15 @@ export const createSessionMiddleware = () => {
 }
 
 export const createCsrfMiddleware = () => {
-    if (env['CSRF_SECRET'] === undefined) {
-        throw Error('missing csrf secret')
-    }
-    const csrfSecret = env['CSRF_SECRET']
     const cookieName = production
         ? '__Host-psifi.x-csrf-token'
-        : `x-csrf-token-${env['NODE_ENV']}`
+        : `x-csrf-token-${vars.nodeEnv}`
     const options = {
-        getSecret: () => csrfSecret,
+        getSecret: () => vars.sessionSecret,
         cookieName,
         cookieOptions: {
             secure: production,
-            sameSite: production ? ('strict' as const) : ('lax' as const),
+            sameSite: 'strict' as const,
         },
     }
     const { doubleCsrfProtection } = doubleCsrf(options)
@@ -102,7 +90,7 @@ export const logRequestResponse = (
         return res.send(body)
     }
 
-    res.on('finish', async () => {
+    res.on('finish', () => {
         appReq.duration = Date.now() - appReq.timestamp.getTime()
         appReq.responseStatus = res.statusCode
         appReq.responseHeaders = res.getHeaders()
@@ -110,7 +98,9 @@ export const logRequestResponse = (
         appReq.responseBody = res._body
 
         logger.info(`sending response (id ${requestId})`)
-        await queueAppRequestLog(appReq)
+        queueLogAppRequest(appReq).catch((err) => {
+            logger.error(err, 'failed to queue log app request')
+        })
     })
     next()
 }
@@ -123,7 +113,7 @@ export const authenticate = (
     if (req.session && req.session.user) {
         return next()
     }
-    throw new HttpError('unauthorized', 401)
+    throw new HttpError('Unauthorized', 401)
 }
 
 export const handleUnmatchedRoute = (
@@ -131,7 +121,7 @@ export const handleUnmatchedRoute = (
     _res: Response,
     _next: NextFunction
 ) => {
-    throw new HttpError(`endpoint not found - ${req.url}`, 404)
+    throw new HttpError(`Endpoint not found - ${req.url}`, 404)
 }
 
 export const handleError = (
@@ -142,8 +132,10 @@ export const handleError = (
 ): Response => {
     logger.error(err, err.message)
     if (err instanceof HttpError) {
-        return res.status(err.statusCode).send(err.message)
+        return res
+            .status(err.statusCode)
+            .send(err.message.charAt(0).toUpperCase() + err.message.slice(1))
     } else {
-        return res.status(500).send(err.message)
+        return res.status(500).send('Unexpected error')
     }
 }

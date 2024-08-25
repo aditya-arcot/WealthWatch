@@ -1,28 +1,33 @@
+import { AxiosError, isAxiosError } from 'axios'
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid'
-import { env } from 'process'
+import { HttpError } from '../models/httpError.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
-import { queuePlaidApiRequestLog } from '../queues/logQueue.js'
+import { queueLogPlaidApiRequest } from '../queues/logQueue.js'
+import { vars } from '../utils/env.js'
 import { safeStringify } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 
-if (
-    env['PLAID_ENV'] === undefined ||
-    env['PLAID_CLIENT_ID'] === undefined ||
-    env['PLAID_SECRET'] === undefined
-) {
-    throw Error('missing one or more plaid secrets')
-}
-const config = new Configuration({
-    basePath: PlaidEnvironments[env['PLAID_ENV']]!,
-    baseOptions: {
-        headers: {
-            'PLAID-CLIENT-ID': env['PLAID_CLIENT_ID'],
-            'PLAID-SECRET': env['PLAID_SECRET'],
+let plaidClient: PlaidApi | undefined
+
+export const createPlaidClient = () => {
+    logger.debug('configuring plaid client')
+    const config = new Configuration({
+        basePath: PlaidEnvironments[vars.plaidEnv]!,
+        baseOptions: {
+            headers: {
+                'PLAID-CLIENT-ID': vars.plaidClientId,
+                'PLAID-SECRET': vars.plaidSecret,
+            },
         },
-    },
-})
-export const plaidClient = new PlaidApi(config)
-logger.debug({ config }, 'configured plaid client')
+    })
+    plaidClient = new PlaidApi(config)
+    logger.debug('configured plaid client')
+}
+
+export const getPlaidClient = (): PlaidApi => {
+    if (!plaidClient) throw new HttpError('plaid client not initialized')
+    return plaidClient
+}
 
 export const executePlaidMethod = async <T extends object, P extends object>(
     method: (params: P) => Promise<T>,
@@ -50,21 +55,27 @@ export const executePlaidMethod = async <T extends object, P extends object>(
         delete sanitized['request']
         req.response = sanitized
 
-        await queuePlaidApiRequestLog(req)
+        await queueLogPlaidApiRequest(req)
         return resp
     } catch (error) {
-        req.duration = Date.now() - req.timestamp.getTime()
+        logger.error(`plaid client error - ${method.name}`)
 
-        logger.error({ error }, `plaid client error - ${method.name}`)
+        req.duration = Date.now() - req.timestamp.getTime()
         if (error instanceof Error) {
             req.errorName = error.name
             req.errorMessage = error.message
             req.errorStack = error.stack ?? null
+            if (isAxiosError(error)) {
+                const axiosError = error as AxiosError
+                req.errorCode =
+                    axiosError.response?.status ?? axiosError.status ?? null
+                req.errorResponse = axiosError.response?.data as object
+            }
         } else {
             req.errorName = 'unknown'
         }
 
-        await queuePlaidApiRequestLog(req)
+        await queueLogPlaidApiRequest(req)
         throw error
     }
 }

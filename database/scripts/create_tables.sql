@@ -52,6 +52,14 @@ CREATE TABLE categories (
 );
 
 
+-- NOTIFICATION TYPES TABLE
+CREATE TABLE notification_types (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name TEXT UNIQUE NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
 -- USERS TABLE, TRIGGERS
 CREATE TABLE users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -75,38 +83,11 @@ FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
 
--- NOTIFICATIONS TABLE
-CREATE TABLE notifications (
-    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    message TEXT NOT NULL,
-    read BOOLEAN NOT NULL,
-    active BOOLEAN NOT NULL,
-    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TRIGGER trigger_notifications_update_timestamp
-BEFORE UPDATE ON notifications
-FOR EACH ROW
-EXECUTE PROCEDURE set_update_timestamp();
-
-CREATE TRIGGER trigger_notifications_insert_audit
-AFTER INSERT OR UPDATE OR DELETE ON notifications
-FOR EACH ROW
-EXECUTE FUNCTION insert_audit_record();
-
-CREATE VIEW active_notifications AS
-SELECT *
-FROM notifications
-WHERE active = TRUE;
-
-
 -- ITEMS TABLE, TRIGGERS, VIEW
 CREATE TABLE items (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    item_id TEXT UNIQUE NOT NULL,
+    plaid_id TEXT UNIQUE NOT NULL,
     active BOOLEAN NOT NULL,
     access_token TEXT NOT NULL,
     institution_id TEXT NOT NULL,
@@ -135,11 +116,40 @@ FROM items
 WHERE active = TRUE;
 
 
+-- NOTIFICATIONS TABLE
+CREATE TABLE notifications (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    type_id INTEGER REFERENCES notification_types(id) NOT NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    read BOOLEAN NOT NULL,
+    active BOOLEAN NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER trigger_notifications_update_timestamp
+BEFORE UPDATE ON notifications
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
+CREATE TRIGGER trigger_notifications_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON notifications
+FOR EACH ROW
+EXECUTE FUNCTION insert_audit_record();
+
+CREATE VIEW active_notifications AS
+SELECT *
+FROM notifications
+WHERE active = TRUE;
+
+
 -- ACCOUNTS TABLE, TRIGGERS, VIEW
 CREATE TABLE accounts (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
-    account_id TEXT UNIQUE NOT NULL,
+    plaid_id TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     mask TEXT,
     official_name TEXT,
@@ -176,7 +186,7 @@ WHERE i.active = TRUE;
 CREATE TABLE transactions (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
-    transaction_id TEXT UNIQUE NOT NULL,
+    plaid_id TEXT UNIQUE NOT NULL,
     merchant_id TEXT,
     merchant TEXT,
     name TEXT NOT NULL,
@@ -268,8 +278,10 @@ CREATE TABLE plaid_api_requests (
     method TEXT NOT NULL,
     params JSON NOT NULL,
     response JSON,
+    error_code INTEGER,
     error_name TEXT,
     error_message TEXT,
+    error_response TEXT,
     error_stack TEXT,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

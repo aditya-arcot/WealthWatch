@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
     NgxPlaidLinkService,
     PlaidConfig,
@@ -14,6 +15,11 @@ import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
+import {
+    LinkUpdateTypeEnum,
+    mapLinkUpdateTypeToNotificationType,
+    NotificationTypeEnum,
+} from '../../models/notification'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
@@ -21,6 +27,7 @@ import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
+import { NotificationService } from '../../services/notification.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -41,7 +48,10 @@ export class AccountsComponent implements OnInit {
         private alertSvc: AlertService,
         private accountSvc: AccountService,
         private itemSvc: ItemService,
-        private currencySvc: CurrencyService
+        private currencySvc: CurrencyService,
+        private route: ActivatedRoute,
+        private notificationSvc: NotificationService,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
@@ -50,6 +60,27 @@ export class AccountsComponent implements OnInit {
             this.alertSvc.addSuccessAlert(`Deleted ${institution} data`)
             sessionStorage.removeItem('deactivatedInstitution')
         }
+
+        this.route.queryParams.subscribe((params) => {
+            const linkUpdateType = params['linkUpdateType'] as
+                | string
+                | undefined
+            if (linkUpdateType === undefined) return
+
+            const linkUpdateTypeEnum = linkUpdateType as LinkUpdateTypeEnum
+            if (
+                !linkUpdateTypeEnum ||
+                !Object.values(LinkUpdateTypeEnum).includes(linkUpdateTypeEnum)
+            )
+                throw Error('invalid notification type')
+
+            const itemId = params['itemId'] as string | undefined
+            if (itemId === undefined) throw Error('missing item id')
+            const itemIdNum = parseInt(itemId)
+            if (isNaN(itemIdNum)) throw Error('invalid item id')
+
+            this.linkAccount(linkUpdateTypeEnum, itemIdNum)
+        })
 
         this.loadAccounts()
     }
@@ -96,10 +127,10 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    linkAccount(): void {
+    linkAccount(linkUpdateType?: LinkUpdateTypeEnum, itemId?: number): void {
         this.loading = true
         this.linkSvc
-            .createLinkToken()
+            .createLinkToken(linkUpdateType, itemId)
             .pipe(
                 catchError((err) => {
                     this.logger.error('failed to create link token', err)
@@ -116,7 +147,13 @@ export class AccountsComponent implements OnInit {
                         onSuccess: (
                             token: string,
                             metadata: PlaidSuccessMetadata
-                        ) => this.handleLinkSuccess(token, metadata),
+                        ) =>
+                            this.handleLinkSuccess(
+                                token,
+                                metadata,
+                                linkUpdateType,
+                                itemId
+                            ),
                         onExit: (
                             error: PlaidErrorObject,
                             metadata: PlaidErrorMetadata
@@ -135,7 +172,12 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    handleLinkSuccess(token: string, metadata: PlaidSuccessMetadata): void {
+    handleLinkSuccess(
+        token: string,
+        metadata: PlaidSuccessMetadata,
+        linkUpdateType?: LinkUpdateTypeEnum,
+        itemId?: number
+    ): void {
         const type = 'success'
         this.logger.debug(type, token, metadata)
         const event: PlaidLinkEvent = {
@@ -151,31 +193,51 @@ export class AccountsComponent implements OnInit {
         }
         this.linkSvc.handleLinkEvent(event).subscribe()
 
-        this.loading = true
-        this.linkSvc.exchangePublicToken(token, metadata).subscribe({
-            next: () => {
-                this.logger.debug('exchanged public token')
-                this.alertSvc.addSuccessAlert('Success linking institution', [
-                    'Loading your accounts now',
-                ])
-                setTimeout(() => {
-                    this.loadAccounts()
-                }, 3000)
-            },
-            error: (err: HttpErrorResponse) => {
-                this.logger.error('failed to exchange public token', err)
-                if (err.status === 409) {
-                    this.alertSvc.addErrorAlert(
-                        'This institution has already been linked'
+        if (linkUpdateType === undefined) {
+            this.loading = true
+            this.linkSvc.exchangePublicToken(token, metadata).subscribe({
+                next: () => {
+                    this.logger.debug('exchanged public token')
+                    this.alertSvc.addSuccessAlert(
+                        'Success linking institution',
+                        ['Loading your accounts now']
                     )
-                } else {
-                    this.alertSvc.addErrorAlert(
-                        'Something went wrong. Please try again'
-                    )
-                }
-                this.loading = false
-            },
-        })
+                    setTimeout(() => {
+                        this.loadAccounts()
+                    }, 3000)
+                },
+                error: (err: HttpErrorResponse) => {
+                    this.logger.error('failed to exchange public token', err)
+                    if (err.status === 409) {
+                        this.alertSvc.addErrorAlert(
+                            'This institution has already been linked'
+                        )
+                    } else {
+                        this.alertSvc.addErrorAlert(
+                            'Something went wrong. Please try again'
+                        )
+                    }
+                    this.loading = false
+                },
+            })
+        } else {
+            this.removeLinkNotifications(
+                itemId!,
+                mapLinkUpdateTypeToNotificationType(linkUpdateType)
+            )
+            this.router.navigateByUrl('/accounts')
+        }
+    }
+
+    removeLinkNotifications(itemId: number, type: NotificationTypeEnum): void {
+        this.logger.debug('removing notifications', itemId, type)
+        const notifications = this.notificationSvc.notifications
+            .filter((n) => n.itemId === itemId)
+            .filter((n) => n.typeId === type)
+        this.notificationSvc
+            .updateNotificationsToInactive(notifications)
+            .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
+            .subscribe()
     }
 
     handleLinkExit(
@@ -239,7 +301,7 @@ export class AccountsComponent implements OnInit {
 
         this.loading = true
         this.itemSvc
-            .refreshItem(item.itemId)
+            .refreshItem(item.plaidId)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (err.status === 429) {
@@ -265,7 +327,7 @@ export class AccountsComponent implements OnInit {
     deactivateItem(item: Item): void {
         this.loading = true
         this.itemSvc
-            .deactivateItem(item.itemId)
+            .deactivateItem(item.plaidId)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
@@ -286,7 +348,13 @@ export class AccountsComponent implements OnInit {
     }
 
     getDisplayDate(date: Date): string {
-        return new Date(date).toLocaleString()
+        return new Date(date).toLocaleString(undefined, {
+            month: 'numeric',
+            day: 'numeric',
+            year: '2-digit',
+            hour: 'numeric',
+            minute: 'numeric',
+        })
     }
 
     getDisplayCurrentBalance(acc: Account): string {

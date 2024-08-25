@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common'
 import {
     Component,
     ElementRef,
@@ -14,7 +15,7 @@ import { Category, CategoryEnum, categoryIcons } from '../../../models/category'
 @Component({
     selector: 'app-category-filter',
     standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, CommonModule],
     templateUrl: './category-filter.component.html',
     styleUrl: './category-filter.component.css',
 })
@@ -75,9 +76,9 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
         }
     }
 
-    getCategoryClasses(c: Category): string {
+    getCategoryClass(c: Category): string {
         const categoryId = c.id as CategoryEnum
-        return `bi ${categoryIcons[categoryId]}`
+        return categoryIcons[categoryId]
     }
 
     categoryIdsChanged(): boolean {
