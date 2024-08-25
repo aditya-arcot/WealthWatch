@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
     NgxPlaidLinkService,
     PlaidConfig,
@@ -17,6 +17,7 @@ import { Account } from '../../models/account'
 import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
 import {
     LinkUpdateTypeEnum,
+    mapLinkUpdateTypeToNotificationType,
     NotificationTypeEnum,
 } from '../../models/notification'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
@@ -49,7 +50,8 @@ export class AccountsComponent implements OnInit {
         private itemSvc: ItemService,
         private currencySvc: CurrencyService,
         private route: ActivatedRoute,
-        private notificationSvc: NotificationService
+        private notificationSvc: NotificationService,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
@@ -218,21 +220,12 @@ export class AccountsComponent implements OnInit {
                     this.loading = false
                 },
             })
-        } else if (linkUpdateType === LinkUpdateTypeEnum.Required) {
-            this.removeLinkNotifications(
-                itemId!,
-                NotificationTypeEnum.LinkUpdateRequired
-            )
-        } else if (linkUpdateType === LinkUpdateTypeEnum.Optional) {
-            this.removeLinkNotifications(
-                itemId!,
-                NotificationTypeEnum.LinkUpdateOptional
-            )
         } else {
             this.removeLinkNotifications(
                 itemId!,
-                NotificationTypeEnum.LinkUpdateOptionalNewAccounts
+                mapLinkUpdateTypeToNotificationType(linkUpdateType)
             )
+            this.router.navigateByUrl('/accounts')
         }
     }
 

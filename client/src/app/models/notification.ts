@@ -20,3 +20,16 @@ export enum LinkUpdateTypeEnum {
     Optional = 'optional',
     Accounts = 'accounts',
 }
+
+export const mapLinkUpdateTypeToNotificationType = (
+    type: LinkUpdateTypeEnum
+): NotificationTypeEnum => {
+    switch (type) {
+        case LinkUpdateTypeEnum.Required:
+            return NotificationTypeEnum.LinkUpdateRequired
+        case LinkUpdateTypeEnum.Optional:
+            return NotificationTypeEnum.LinkUpdateOptional
+        case LinkUpdateTypeEnum.Accounts:
+            return NotificationTypeEnum.LinkUpdateOptionalNewAccounts
+    }
+}
