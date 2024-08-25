@@ -182,7 +182,7 @@ const handleItemWebhook = async (webhookCode: string, itemId: string) => {
             throw new HttpError('unknown webhook code', 400)
     }
 
-    logger.debug({ webhookCode, itemId }, 'handled transactions webhook')
+    logger.debug({ webhookCode, itemId }, 'handled item webhook')
 }
 
 const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
