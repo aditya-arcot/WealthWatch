@@ -278,8 +278,10 @@ CREATE TABLE plaid_api_requests (
     method TEXT NOT NULL,
     params JSON NOT NULL,
     response JSON,
+    error_code INTEGER,
     error_name TEXT,
     error_message TEXT,
+    error_response TEXT,
     error_stack TEXT,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

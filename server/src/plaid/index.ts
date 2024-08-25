@@ -1,3 +1,4 @@
+import { AxiosError, isAxiosError } from 'axios'
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid'
 import { HttpError } from '../models/httpError.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
@@ -57,13 +58,19 @@ export const executePlaidMethod = async <T extends object, P extends object>(
         await queueLogPlaidApiRequest(req)
         return resp
     } catch (error) {
-        req.duration = Date.now() - req.timestamp.getTime()
+        logger.error(`plaid client error - ${method.name}`)
 
-        logger.error({ error }, `plaid client error - ${method.name}`)
+        req.duration = Date.now() - req.timestamp.getTime()
         if (error instanceof Error) {
             req.errorName = error.name
             req.errorMessage = error.message
             req.errorStack = error.stack ?? null
+            if (isAxiosError(error)) {
+                const axiosError = error as AxiosError
+                req.errorCode =
+                    axiosError.response?.status ?? axiosError.status ?? null
+                req.errorResponse = axiosError.response?.data as object
+            }
         } else {
             req.errorName = 'unknown'
         }

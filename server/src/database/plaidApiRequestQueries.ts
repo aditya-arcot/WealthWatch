@@ -12,8 +12,10 @@ export const insertPlaidApiRequest = async (
         request.method,
         request.params,
         request.response,
+        request.errorCode,
         request.errorName,
         request.errorMessage,
+        request.errorResponse,
         request.errorStack,
     ]
 
@@ -28,8 +30,10 @@ export const insertPlaidApiRequest = async (
             method,
             params,
             response,
+            error_code,
             error_name,
             error_message,
+            error_response,
             error_stack
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
@@ -50,8 +54,10 @@ interface DbPlaidApiRequest {
     method: string
     params: object
     response: object | null
+    error_code: number | null
     error_name: string | null
     error_message: string | null
+    error_response: object | null
     error_stack: string | null
 }
 
@@ -66,7 +72,9 @@ const mapDbPlaidApiRequest = (
     method: dbPlaidApiRequest.method,
     params: dbPlaidApiRequest.params,
     response: dbPlaidApiRequest.response,
+    errorCode: dbPlaidApiRequest.error_code,
     errorName: dbPlaidApiRequest.error_name,
     errorMessage: dbPlaidApiRequest.error_message,
+    errorResponse: dbPlaidApiRequest.error_response,
     errorStack: dbPlaidApiRequest.error_stack,
 })
