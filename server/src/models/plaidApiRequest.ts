@@ -7,8 +7,8 @@ export interface PlaidApiRequest {
     method: string
     params: object
     response?: object | null
-    errorCode?: number | null
-    errorName?: string | null
+    errorCode?: string | null
+    errorType?: string | null
     errorMessage?: string | null
     errorResponse?: object | null
     errorStack?: string | null

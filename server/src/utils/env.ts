@@ -1,5 +1,5 @@
 import { env } from 'process'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 
 const getEnvVar = (key: string): string => {
     const val = env[key]

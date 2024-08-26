@@ -4,7 +4,7 @@ import {
     modifyNotificationsActiveByUserIdAndIds,
     modifyNotificationsReadByUserIdAndIds,
 } from '../database/notificationQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { parseNumberArrayFromBodyProp } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 

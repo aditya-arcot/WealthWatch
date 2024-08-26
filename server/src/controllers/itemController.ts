@@ -13,7 +13,7 @@ import {
     insertTransactions,
     removeTransactionsByPlaidIds,
 } from '../database/transactionQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { Item, refreshCooldown } from '../models/item.js'
 import {
     plaidAccountsBalanceGet,

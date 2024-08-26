@@ -1,6 +1,6 @@
 import { Queue, Worker } from 'bullmq'
 import { handleWebhook } from '../controllers/webhookController.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { Webhook } from '../models/webhook.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'

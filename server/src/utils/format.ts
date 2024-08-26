@@ -1,5 +1,5 @@
 import { ParsedQs } from 'qs'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 
 export const safeStringify = (obj: object) => {
     const seen = new WeakSet()
@@ -12,6 +12,10 @@ export const safeStringify = (obj: object) => {
         }
         return value
     })
+}
+
+export const capitalizeFirstLetter = (str: string): string => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 export const toTitleCase = (str: string): string =>

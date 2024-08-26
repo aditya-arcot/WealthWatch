@@ -8,7 +8,7 @@ import {
     insertItemNotification,
     modifyNotificationsActiveByUserIdAndIds,
 } from '../database/notificationQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { NotificationTypeEnum } from '../models/notification.js'
 import {
     ItemWebhookCodeEnum,

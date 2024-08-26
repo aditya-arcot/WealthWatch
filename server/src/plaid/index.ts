@@ -1,6 +1,6 @@
-import { AxiosError, isAxiosError } from 'axios'
-import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid'
-import { HttpError } from '../models/httpError.js'
+import { isAxiosError } from 'axios'
+import { Configuration, PlaidApi, PlaidEnvironments, PlaidError } from 'plaid'
+import { HttpError, PlaidApiError } from '../models/error.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { queueLogPlaidApiRequest } from '../queues/logQueue.js'
 import { vars } from '../utils/env.js'
@@ -58,21 +58,29 @@ export const executePlaidMethod = async <T extends object, P extends object>(
         await queueLogPlaidApiRequest(req)
         return resp
     } catch (error) {
-        logger.error(`plaid client error - ${method.name}`)
+        logger.error(`${method.name} error`)
 
         req.duration = Date.now() - req.timestamp.getTime()
         if (error instanceof Error) {
-            req.errorName = error.name
+            req.errorType = error.name
             req.errorMessage = error.message
             req.errorStack = error.stack ?? null
             if (isAxiosError(error)) {
-                const axiosError = error as AxiosError
-                req.errorCode =
-                    axiosError.response?.status ?? axiosError.status ?? null
-                req.errorResponse = axiosError.response?.data as object
+                // all errors should be Plaid errors
+                const plaidErr = error.response?.data as PlaidError
+                req.errorCode = plaidErr.error_code
+                req.errorType = plaidErr.error_type
+                req.errorMessage = plaidErr.error_message
+                req.errorResponse = plaidErr
+                await queueLogPlaidApiRequest(req)
+                throw new PlaidApiError(
+                    plaidErr.error_code,
+                    plaidErr.error_type,
+                    plaidErr.error_message
+                )
             }
         } else {
-            req.errorName = 'unknown'
+            req.errorType = 'non-error object'
         }
 
         await queueLogPlaidApiRequest(req)

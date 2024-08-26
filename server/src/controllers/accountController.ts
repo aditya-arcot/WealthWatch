@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { fetchActiveAccountsByUserId } from '../database/accountQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserAccounts = async (req: Request, res: Response) => {

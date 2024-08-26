@@ -7,7 +7,7 @@ import {
     insertItem,
 } from '../database/itemQueries.js'
 import { fetchUsers, removeUserById } from '../database/userQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { plaidSandboxResetLogin } from '../plaid/itemMethods.js'
 import {
