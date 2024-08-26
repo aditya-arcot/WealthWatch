@@ -60,14 +60,3 @@ export const parseNumberArrayOrUndefinedFromQueryParam = (
     }
     return nums
 }
-
-export const parseNumberArrayFromBodyProp = (prop: unknown): number[] => {
-    if (!Array.isArray(prop)) throw new HttpError('invalid array')
-    if (prop.length === 0) return []
-    return prop.map((num) => {
-        if (typeof num !== 'number' || isNaN(num)) {
-            throw new HttpError('invalid array')
-        }
-        return num
-    })
-}

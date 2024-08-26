@@ -80,7 +80,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     unreadNotifications(): boolean {
         return this.notificationSvc.notifications.some(
-            (notification) => !notification.read
+            (notification) => !notification.read || notification.persistent
         )
     }
 

@@ -1,16 +1,13 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import {
-    LinkUpdateTypeEnum,
-    Notification,
-    NotificationTypeEnum,
-} from '../../models/notification'
+import { Notification, NotificationTypeEnum } from '../../models/notification'
 import { NotificationService } from '../../services/notification.service'
 
 @Component({
     selector: 'app-notifications',
     standalone: true,
     templateUrl: './notifications.component.html',
+    styleUrl: './notifications.component.css',
 })
 export class NotificationsComponent {
     constructor(
@@ -24,25 +21,18 @@ export class NotificationsComponent {
 
     linkUpdateNotification = (n: Notification): boolean => {
         return (
-            n.typeId === NotificationTypeEnum.LinkUpdateRequired ||
-            n.typeId === NotificationTypeEnum.LinkUpdateOptional ||
-            n.typeId === NotificationTypeEnum.LinkUpdateOptionalNewAccounts
+            n.typeId === NotificationTypeEnum.LinkUpdate ||
+            n.typeId === NotificationTypeEnum.LinkUpdateWithAccounts
         )
     }
 
     launchLinkUpdate = (n: Notification): void => {
-        let linkUpdateType: LinkUpdateTypeEnum | undefined = undefined
-        if (n.typeId === NotificationTypeEnum.LinkUpdateRequired) {
-            linkUpdateType = LinkUpdateTypeEnum.Required
-        } else if (n.typeId === NotificationTypeEnum.LinkUpdateOptional) {
-            linkUpdateType = LinkUpdateTypeEnum.Optional
-        } else if (
-            n.typeId === NotificationTypeEnum.LinkUpdateOptionalNewAccounts
-        ) {
-            linkUpdateType = LinkUpdateTypeEnum.Accounts
-        }
         this.router.navigate(['/accounts'], {
-            queryParams: { linkUpdateType, itemId: n.itemId },
+            queryParams: {
+                itemId: n.itemId,
+                withAccounts:
+                    n.typeId === NotificationTypeEnum.LinkUpdateWithAccounts,
+            },
         })
     }
 }

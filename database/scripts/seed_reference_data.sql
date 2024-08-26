@@ -30,8 +30,7 @@ INSERT INTO
     notification_types (name)
 VALUES
     ('Info'),
-    ('Link Update Required'),
-    ('Link Update Optional'),
-    ('Link Update Optional - New Accounts');
+    ('Link Update'),
+    ('Link Update With Accounts');
 
 COMMIT;

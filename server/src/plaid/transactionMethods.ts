@@ -110,12 +110,12 @@ const mapPlaidCategory = (
     detailed: string | undefined
 ): number => {
     const detailedEnum = detailed as PlaidDetailedCategoryEnum
-    if (Object.values(PlaidDetailedCategoryEnum).indexOf(detailedEnum) >= 0) {
+    if (Object.values(PlaidDetailedCategoryEnum).includes(detailedEnum)) {
         return detailedCategoryMap[detailedEnum]
     }
 
     const primaryEnum = primary as PlaidPrimaryCategoryEnum
-    if (Object.values(PlaidPrimaryCategoryEnum).indexOf(primaryEnum) >= 0) {
+    if (Object.values(PlaidPrimaryCategoryEnum).includes(primaryEnum)) {
         return primaryCategoryMap[primaryEnum]
     }
 

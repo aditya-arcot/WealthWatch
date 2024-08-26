@@ -40,23 +40,11 @@ router.route('/').get(authenticate, catchAsync(getUserNotifications))
  * @swagger
  * /notifications/read:
  *   patch:
- *     summary: Update the logged in user's specified notifications to read
+ *     summary: Update the logged in user's notifications to read
  *     tags: [Notifications]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               notificationIds:
- *                 type: array
- *                 required: true
- *                 items:
- *                   type: integer
  *     responses:
  *       204:
- *         description: Updated the logged in user's specified notifications to read
+ *         description: Updated the logged in user's notifications to read
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -68,7 +56,7 @@ router
  * @swagger
  * /notifications/inactive:
  *   patch:
- *     summary: Update the logged in user's specified notifications to inactive
+ *     summary: Update the logged in user's notifications of the specified type to inactive
  *     tags: [Notifications]
  *     requestBody:
  *       required: true
@@ -77,14 +65,15 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               notificationIds:
- *                 type: array
+ *               itemId:
+ *                 type: number
  *                 required: true
- *                 items:
- *                   type: integer
+ *               notificationTypeId:
+ *                 type: number
+ *                 required: true
  *     responses:
  *       204:
- *         description: Updated the logged in user's specified notifications to inactive
+ *         description: Updated the logged in user's notifications of the specified type to inactive
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

@@ -1,11 +1,12 @@
 import { Request, Response } from 'express'
+import { fetchActiveItemsByUserId } from '../database/itemQueries.js'
 import {
     fetchActiveNotificationsByUserId,
-    modifyNotificationsActiveByUserIdAndIds,
-    modifyNotificationsReadByUserIdAndIds,
+    modifyNotificationsToInactiveByUserIdAndTypeId,
+    modifyNotificationsToReadByUserId,
 } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
-import { parseNumberArrayFromBodyProp } from '../utils/format.js'
+import { NotificationTypeEnum } from '../models/notification.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserNotifications = async (req: Request, res: Response) => {
@@ -27,16 +28,7 @@ export const updateUserNotificationsToRead = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const notificationIds = parseNumberArrayFromBodyProp(
-        req.body.notificationIds
-    )
-    if (notificationIds.length === 0) return res.status(204).send()
-
-    const notifications = await modifyNotificationsReadByUserIdAndIds(
-        userId,
-        notificationIds,
-        true
-    )
+    const notifications = await modifyNotificationsToReadByUserId(userId)
     if (!notifications) throw new HttpError('failed to modify notifications')
 
     return res.status(204).send()
@@ -51,15 +43,25 @@ export const updateUserNotificationsToInactive = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const notificationIds = parseNumberArrayFromBodyProp(
-        req.body.notificationIds
-    )
-    if (notificationIds.length === 0) return res.status(204).send()
+    const itemId = req.body.itemId
+    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
 
-    const notifications = await modifyNotificationsActiveByUserIdAndIds(
+    const items = await fetchActiveItemsByUserId(userId)
+    const item = items.filter((i) => i.id === itemId)[0]
+    if (!item) throw new HttpError('item not found', 404)
+
+    const notificationTypeId = req.body.notificationTypeId
+    if (typeof notificationTypeId !== 'number')
+        throw new HttpError('invalid notification type', 400)
+
+    const typeEnum = notificationTypeId as NotificationTypeEnum
+    if (!Object.values(NotificationTypeEnum).includes(typeEnum)) {
+        throw new HttpError('invalid notificationtype', 400)
+    }
+
+    const notifications = await modifyNotificationsToInactiveByUserIdAndTypeId(
         userId,
-        notificationIds,
-        false
+        notificationTypeId
     )
     if (!notifications) throw new HttpError('failed to modify notifications')
 

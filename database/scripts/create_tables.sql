@@ -123,6 +123,7 @@ CREATE TABLE notifications (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
+    persistent BOOLEAN NOT NULL,
     read BOOLEAN NOT NULL,
     active BOOLEAN NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
