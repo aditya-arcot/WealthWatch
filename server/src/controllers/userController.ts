@@ -5,7 +5,7 @@ import {
     fetchUserByUsername,
     removeUserById,
 } from '../database/userQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { logger } from '../utils/logger.js'
 import { logout } from './authController.js'
 import { deactivateItemMain } from './itemController.js'

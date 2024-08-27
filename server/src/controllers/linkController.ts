@@ -5,7 +5,7 @@ import {
     fetchActiveItemsByUserId,
     insertItem,
 } from '../database/itemQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 import {

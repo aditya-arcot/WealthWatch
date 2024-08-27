@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { vars } from './env.js'
 import { logger } from './logger.js'
 

@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { catchError, of, tap, throwError } from 'rxjs'
+import { catchError, tap, throwError } from 'rxjs'
 import { env } from '../../environments/env'
-import { Notification } from '../models/notification'
+import { Notification, NotificationTypeEnum } from '../models/notification'
 import { LoggerService } from './logger.service'
 
 @Injectable({
@@ -31,22 +31,19 @@ export class NotificationService {
     }
 
     updateAllNotificationsToRead() {
-        const notificationIds = this.notifications
-            .filter((notification) => !notification.read)
-            .map((notification) => notification.id)
-        if (notificationIds.length === 0) return of(undefined)
-        return this.http.patch<void>(`${this.baseUrl}/read`, {
-            notificationIds,
-        })
+        return this.http.patch<void>(`${this.baseUrl}/read`, {})
     }
 
-    updateNotificationsToInactive(notifications: Notification[]) {
-        const notificationIds = notifications
-            .filter((notification) => notification.active)
-            .map((notification) => notification.id)
-        if (notificationIds.length === 0) return of(undefined)
+    updateNotificationsToInactive(itemId: number, withAccounts?: boolean) {
+        if (withAccounts === undefined || withAccounts === false) {
+            return this.http.patch<void>(`${this.baseUrl}/inactive`, {
+                itemId,
+                notificationTypeId: NotificationTypeEnum.LinkUpdate,
+            })
+        }
         return this.http.patch<void>(`${this.baseUrl}/inactive`, {
-            notificationIds,
+            itemId,
+            notificationTypeId: NotificationTypeEnum.LinkUpdateWithAccounts,
         })
     }
 }

@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import swaggerJSDoc from 'swagger-jsdoc'
 import { SwaggerUiOptions } from 'swagger-ui-express'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { production, vars } from './env.js'
 
 export const swaggerOptions: SwaggerUiOptions = {

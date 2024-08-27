@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import { fetchUserByUsername, insertUser } from '../database/userQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { User } from '../models/user.js'
 import { logger } from '../utils/logger.js'
 

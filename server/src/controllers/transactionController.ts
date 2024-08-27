@@ -9,7 +9,7 @@ import {
     modifyTransactionCustomNameByPlaidId,
     modifyTransactionNoteByPlaidId,
 } from '../database/transactionQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { refreshCooldown } from '../models/item.js'
 import { plaidTransactionsRefresh } from '../plaid/transactionMethods.js'
 import {
