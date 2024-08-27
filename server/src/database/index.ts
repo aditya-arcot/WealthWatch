@@ -1,5 +1,5 @@
 import pg, { QueryResult, QueryResultRow } from 'pg'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 
@@ -22,7 +22,7 @@ export const createPool = async (): Promise<void> => {
 
     try {
         await runQuery('SELECT 1')
-    } catch (e) {
+    } catch (error) {
         await clientPool.end()
         throw new HttpError('failed to create database pool')
     }

@@ -6,7 +6,7 @@ import {
     SandboxPublicTokenCreateRequest,
 } from 'plaid'
 import { fetchActiveItemByPlaidId } from '../database/itemQueries.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { User } from '../models/user.js'
 import { vars } from '../utils/env.js'

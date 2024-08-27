@@ -15,11 +15,6 @@ import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
-import {
-    LinkUpdateTypeEnum,
-    mapLinkUpdateTypeToNotificationType,
-    NotificationTypeEnum,
-} from '../../models/notification'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
@@ -62,24 +57,15 @@ export class AccountsComponent implements OnInit {
         }
 
         this.route.queryParams.subscribe((params) => {
-            const linkUpdateType = params['linkUpdateType'] as
-                | string
-                | undefined
-            if (linkUpdateType === undefined) return
-
-            const linkUpdateTypeEnum = linkUpdateType as LinkUpdateTypeEnum
-            if (
-                !linkUpdateTypeEnum ||
-                !Object.values(LinkUpdateTypeEnum).includes(linkUpdateTypeEnum)
-            )
-                throw Error('invalid notification type')
-
-            const itemId = params['itemId'] as string | undefined
-            if (itemId === undefined) throw Error('missing item id')
+            const itemId: string | undefined = params['itemId']
+            if (itemId === undefined) return
             const itemIdNum = parseInt(itemId)
             if (isNaN(itemIdNum)) throw Error('invalid item id')
 
-            this.linkAccount(linkUpdateTypeEnum, itemIdNum)
+            const withAccounts: string | undefined = params['withAccounts']
+            if (withAccounts === undefined) throw Error('missing with accounts')
+
+            this.linkAccount(itemIdNum, withAccounts === 'true')
         })
 
         this.loadAccounts()
@@ -127,10 +113,10 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    linkAccount(linkUpdateType?: LinkUpdateTypeEnum, itemId?: number): void {
+    linkAccount(itemId?: number, withAccounts?: boolean): void {
         this.loading = true
         this.linkSvc
-            .createLinkToken(linkUpdateType, itemId)
+            .createLinkToken(itemId, withAccounts)
             .pipe(
                 catchError((err) => {
                     this.logger.error('failed to create link token', err)
@@ -151,8 +137,8 @@ export class AccountsComponent implements OnInit {
                             this.handleLinkSuccess(
                                 token,
                                 metadata,
-                                linkUpdateType,
-                                itemId
+                                itemId,
+                                withAccounts
                             ),
                         onExit: (
                             error: PlaidErrorObject,
@@ -175,8 +161,8 @@ export class AccountsComponent implements OnInit {
     handleLinkSuccess(
         token: string,
         metadata: PlaidSuccessMetadata,
-        linkUpdateType?: LinkUpdateTypeEnum,
-        itemId?: number
+        itemId?: number,
+        withAccounts?: boolean
     ): void {
         const type = 'success'
         this.logger.debug(type, token, metadata)
@@ -193,14 +179,14 @@ export class AccountsComponent implements OnInit {
         }
         this.linkSvc.handleLinkEvent(event).subscribe()
 
-        if (linkUpdateType === undefined) {
+        if (itemId === undefined) {
             this.loading = true
             this.linkSvc.exchangePublicToken(token, metadata).subscribe({
                 next: () => {
                     this.logger.debug('exchanged public token')
                     this.alertSvc.addSuccessAlert(
                         'Success linking institution',
-                        ['Loading your accounts now']
+                        ['Loading your accounts']
                     )
                     setTimeout(() => {
                         this.loadAccounts()
@@ -221,23 +207,13 @@ export class AccountsComponent implements OnInit {
                 },
             })
         } else {
-            this.removeLinkNotifications(
-                itemId!,
-                mapLinkUpdateTypeToNotificationType(linkUpdateType)
-            )
+            this.logger.debug('removing notifications', itemId, withAccounts)
+            this.notificationSvc
+                .updateNotificationsToInactive(itemId, withAccounts)
+                .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
+                .subscribe()
             this.router.navigateByUrl('/accounts')
         }
-    }
-
-    removeLinkNotifications(itemId: number, type: NotificationTypeEnum): void {
-        this.logger.debug('removing notifications', itemId, type)
-        const notifications = this.notificationSvc.notifications
-            .filter((n) => n.itemId === itemId)
-            .filter((n) => n.typeId === type)
-        this.notificationSvc
-            .updateNotificationsToInactive(notifications)
-            .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
-            .subscribe()
     }
 
     handleLinkExit(

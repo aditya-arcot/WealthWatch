@@ -35,8 +35,8 @@ const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
         await closeWorkers()
         closeRedis()
         await stopPool()
-    } catch (e) {
-        logger.fatal(e, 'error during cleanup')
+    } catch (error) {
+        logger.fatal(error, 'error during cleanup')
     } finally {
         logger.info(`exiting - pid ${pid}`)
         exit(1)

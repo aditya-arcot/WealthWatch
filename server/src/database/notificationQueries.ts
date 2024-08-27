@@ -5,7 +5,8 @@ import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 export const insertItemNotification = async (
     type: NotificationTypeEnum,
     item: Item,
-    message: string
+    message: string,
+    persistent: boolean = false
 ) => {
     const notification: Notification = {
         id: -1,
@@ -13,10 +14,11 @@ export const insertItemNotification = async (
         userId: item.userId,
         itemId: item.id,
         message,
+        persistent,
         read: false,
         active: true,
     }
-    await insertNotification(notification)
+    return await insertNotification(notification)
 }
 
 export const insertNotification = async (
@@ -27,6 +29,7 @@ export const insertNotification = async (
         n.typeId,
         n.itemId,
         n.message,
+        n.persistent,
         n.read,
         n.active,
     ]
@@ -39,6 +42,7 @@ export const insertNotification = async (
             type_id,
             item_id,
             message,
+            persistent,
             read,
             active
         )
@@ -64,44 +68,32 @@ export const fetchActiveNotificationsByUserId = async (
     return rows.map(mapDbNotification)
 }
 
-export const modifyNotificationsReadByUserIdAndIds = async (
-    userId: number,
-    ids: number[],
-    read: boolean
+export const modifyNotificationsToReadByUserId = async (
+    userId: number
 ): Promise<Notification[]> => {
-    const placeholder = 3
-    const idsPlaceholder = ids
-        .map((_, idx) => `$${idx + placeholder}`)
-        .join(', ')
     const query = `
         UPDATE notifications
-        SET read = $1
-        WHERE user_id = $2
-            AND id IN (${idsPlaceholder})
+        SET read = true
+        WHERE user_id = $1
         RETURNING *
     `
-    const values = [read, userId, ...ids]
+    const values = [userId]
     const rows = (await runQuery<DbNotification>(query, values)).rows
     return rows.map(mapDbNotification)
 }
 
-export const modifyNotificationsActiveByUserIdAndIds = async (
+export const modifyNotificationsToInactiveByUserIdAndTypeId = async (
     userId: number,
-    ids: number[],
-    active: boolean
+    typeId: number
 ): Promise<Notification[]> => {
-    const placeholder = 3
-    const idsPlaceholder = ids
-        .map((_, idx) => `$${idx + placeholder}`)
-        .join(', ')
     const query = `
         UPDATE notifications
-        SET active = $1
-        WHERE user_id = $2
-            AND id IN (${idsPlaceholder})
+        SET active = false
+        WHERE user_id = $1
+            AND type_id = $2
         RETURNING *
     `
-    const values = [active, userId, ...ids]
+    const values = [userId, typeId]
     const rows = (await runQuery<DbNotification>(query, values)).rows
     return rows.map(mapDbNotification)
 }
@@ -112,6 +104,7 @@ interface DbNotification {
     type_id: number
     item_id: number | null
     message: string
+    persistent: boolean
     read: boolean
     active: boolean
 }
@@ -122,6 +115,7 @@ const mapDbNotification = (n: DbNotification): Notification => ({
     typeId: n.type_id,
     itemId: n.item_id,
     message: n.message,
+    persistent: n.persistent,
     read: n.read,
     active: n.active,
 })

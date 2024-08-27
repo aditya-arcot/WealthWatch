@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
-import { LinkUpdateTypeEnum } from '../models/notification'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent'
 
 @Injectable({
@@ -12,11 +11,11 @@ export class LinkService {
 
     constructor(private http: HttpClient) {}
 
-    createLinkToken(linkUpdateType?: LinkUpdateTypeEnum, itemId?: number) {
+    createLinkToken(itemId?: number, withAccounts?: boolean) {
         const url = `${this.baseUrl}/link-token`
         return this.http.post<{ linkToken: string }>(url, {
             itemId,
-            updateAccounts: linkUpdateType === LinkUpdateTypeEnum.Accounts,
+            updateAccounts: withAccounts,
         })
     }
 

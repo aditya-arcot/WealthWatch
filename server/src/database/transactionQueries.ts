@@ -1,4 +1,4 @@
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { Transaction, TransactionsResponse } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 

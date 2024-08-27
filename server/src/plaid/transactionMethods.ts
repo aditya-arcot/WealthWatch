@@ -5,7 +5,12 @@ import {
     TransactionsSyncRequest,
 } from 'plaid'
 import { CategoryEnum } from '../models/category.js'
+import { PlaidApiError } from '../models/error.js'
 import { Item } from '../models/item.js'
+import {
+    PlaidTransactionErrorCodeEnum,
+    PlaidTransactionsSyncResponse,
+} from '../models/plaidApiRequest.js'
 import { Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
@@ -23,7 +28,10 @@ export const plaidTransactionsRefresh = async (item: Item) => {
     )
 }
 
-export const plaidTransactionsSync = async (item: Item) => {
+export const plaidTransactionsSync = async (
+    item: Item,
+    retry = true
+): Promise<PlaidTransactionsSyncResponse> => {
     logger.debug({ id: item.id }, 'retrieving item transactions updates')
 
     let cursor = item.cursor
@@ -32,32 +40,55 @@ export const plaidTransactionsSync = async (item: Item) => {
     let removed: Array<PlaidRemovedTransaction> = []
     let hasMore = true
 
-    while (hasMore) {
-        let params: TransactionsSyncRequest
-        if (cursor !== null) {
-            params = {
-                access_token: item.accessToken,
-                cursor,
+    try {
+        while (hasMore) {
+            let params: TransactionsSyncRequest
+            if (cursor !== null) {
+                params = {
+                    access_token: item.accessToken,
+                    cursor,
+                }
+            } else {
+                params = {
+                    access_token: item.accessToken,
+                }
             }
-        } else {
-            params = {
-                access_token: item.accessToken,
-            }
-        }
-        const resp = await executePlaidMethod(
-            getPlaidClient().transactionsSync,
-            params,
-            item.userId,
-            item.id
-        )
+            const resp = await executePlaidMethod(
+                getPlaidClient().transactionsSync,
+                params,
+                item.userId,
+                item.id
+            )
 
-        added = added.concat(resp.data.added)
-        modified = modified.concat(resp.data.modified)
-        removed = removed.concat(resp.data.removed)
-        hasMore = resp.data.has_more
-        cursor = resp.data.next_cursor
+            added = added.concat(resp.data.added)
+            modified = modified.concat(resp.data.modified)
+            removed = removed.concat(resp.data.removed)
+            hasMore = resp.data.has_more
+            cursor = resp.data.next_cursor
+        }
+        return { added, modified, removed, cursor }
+    } catch (error) {
+        if (!(error instanceof PlaidApiError)) {
+            throw error
+        }
+        if (
+            error.code !==
+            PlaidTransactionErrorCodeEnum.TransactionsSyncMutationDuringPagination
+        ) {
+            throw error
+        }
+        if (!retry) {
+            logger.error('already retried transactions sync')
+            throw error
+        }
+
+        logger.debug(
+            { id: item.id },
+            'retrying transactions sync after 5 seconds'
+        )
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+        return await plaidTransactionsSync(item, false)
     }
-    return { added, modified, removed, cursor }
 }
 
 export const mapPlaidTransaction = (
@@ -110,12 +141,12 @@ const mapPlaidCategory = (
     detailed: string | undefined
 ): number => {
     const detailedEnum = detailed as PlaidDetailedCategoryEnum
-    if (Object.values(PlaidDetailedCategoryEnum).indexOf(detailedEnum) >= 0) {
+    if (Object.values(PlaidDetailedCategoryEnum).includes(detailedEnum)) {
         return detailedCategoryMap[detailedEnum]
     }
 
     const primaryEnum = primary as PlaidPrimaryCategoryEnum
-    if (Object.values(PlaidPrimaryCategoryEnum).indexOf(primaryEnum) >= 0) {
+    if (Object.values(PlaidPrimaryCategoryEnum).includes(primaryEnum)) {
         return primaryCategoryMap[primaryEnum]
     }
 

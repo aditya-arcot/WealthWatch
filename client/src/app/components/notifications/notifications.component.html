@@ -24,7 +24,11 @@
                         <tbody>
                             @for (n of notifications; track $index) {
                                 <tr>
-                                    <td [class.text-muted]="n.read">
+                                    <td
+                                        [class.text-muted]="
+                                            n.read && !n.persistent
+                                        "
+                                    >
                                         {{ n.message }}
                                     </td>
                                     <td class="text-end">

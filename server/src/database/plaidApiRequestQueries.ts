@@ -13,7 +13,7 @@ export const insertPlaidApiRequest = async (
         request.params,
         request.response,
         request.errorCode,
-        request.errorName,
+        request.errorType,
         request.errorMessage,
         request.errorResponse,
         request.errorStack,
@@ -31,7 +31,7 @@ export const insertPlaidApiRequest = async (
             params,
             response,
             error_code,
-            error_name,
+            error_type,
             error_message,
             error_response,
             error_stack
@@ -54,8 +54,8 @@ interface DbPlaidApiRequest {
     method: string
     params: object
     response: object | null
-    error_code: number | null
-    error_name: string | null
+    error_code: string | null
+    error_type: string | null
     error_message: string | null
     error_response: object | null
     error_stack: string | null
@@ -73,7 +73,7 @@ const mapDbPlaidApiRequest = (
     params: dbPlaidApiRequest.params,
     response: dbPlaidApiRequest.response,
     errorCode: dbPlaidApiRequest.error_code,
-    errorName: dbPlaidApiRequest.error_name,
+    errorType: dbPlaidApiRequest.error_type,
     errorMessage: dbPlaidApiRequest.error_message,
     errorResponse: dbPlaidApiRequest.error_response,
     errorStack: dbPlaidApiRequest.error_stack,

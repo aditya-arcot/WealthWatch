@@ -3,7 +3,7 @@ import {
     refreshItemBalances,
     syncItemData,
 } from '../controllers/itemController.js'
-import { HttpError } from '../models/httpError.js'
+import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
