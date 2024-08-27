@@ -1,3 +1,8 @@
+import {
+    RemovedTransaction as PlaidRemovedTransaction,
+    Transaction as PlaidTransaction,
+} from 'plaid'
+
 export interface PlaidApiRequest {
     id: number
     userId?: number | null
@@ -12,6 +17,13 @@ export interface PlaidApiRequest {
     errorMessage?: string | null
     errorResponse?: object | null
     errorStack?: string | null
+}
+
+export interface PlaidTransactionsSyncResponse {
+    added: PlaidTransaction[]
+    modified: PlaidTransaction[]
+    removed: PlaidRemovedTransaction[]
+    cursor: string | null
 }
 
 // most common error codes for products in use
@@ -30,4 +42,8 @@ export enum PlaidGeneralErrorCodeEnum {
     AdditionalConsentRequired = 'ADDITIONAL_CONSENT_REQUIRED',
     InstitutionNotResponding = 'INSTITUTION_NOT_RESPONDING',
     InstitutionDown = 'INSTITUTION_DOWN',
+}
+
+export enum PlaidTransactionErrorCodeEnum {
+    TransactionsSyncMutationDuringPagination = 'TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION',
 }
