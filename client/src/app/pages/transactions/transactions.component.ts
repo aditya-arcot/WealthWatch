@@ -501,10 +501,13 @@ export class TransactionsComponent implements OnInit {
     }
 
     getDisplayAmount(t: Transaction): string {
-        return this.currencySvc.formatAmount(
-            t.amount,
+        const negative = t.amount < 0
+        const formatted = this.currencySvc.formatAmount(
+            Math.abs(t.amount),
             t.unofficialCurrencyCode ?? t.isoCurrencyCode
         )
+        if (negative) return `+${formatted}`
+        return formatted
     }
 
     getDisplayCategoryId(t: Transaction): number {

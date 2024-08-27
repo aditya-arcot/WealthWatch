@@ -385,7 +385,9 @@
                             </td>
                             <td>
                                 <div class="d-none d-lg-inline">
-                                    {{ getDisplayAmount(t) }}
+                                    <span [class.text-success]="t.amount < 0"
+                                        >{{ getDisplayAmount(t) }}
+                                    </span>
                                     @if (t.pending) {
                                         <span class="pending-text"
                                             >(Pending)</span
@@ -395,6 +397,9 @@
                                 <div
                                     class="d-inline d-lg-none"
                                     [class.pending-text]="t.pending"
+                                    [class.text-success]="
+                                        t.amount < 0 && !t.pending
+                                    "
                                 >
                                     {{ getDisplayAmount(t) }}
                                 </div>
@@ -465,7 +470,7 @@
                             </td>
                             <td class="d-none d-md-table-cell">
                                 {{ getDisplayAccount(t) }}
-                                <span class="d-none d-lg-inline"
+                                <span class="d-none d-xl-inline"
                                     >({{ getDisplayInstitution(t) }})</span
                                 >
                             </td>
