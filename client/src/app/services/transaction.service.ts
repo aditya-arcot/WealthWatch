@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
 import {
     Transaction,
-    TransactionsRequestParams,
+    TransactionsRequest,
     TransactionsResponse,
 } from '../models/transaction'
 
@@ -15,7 +15,7 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
-    getTransactions(req: TransactionsRequestParams) {
+    getTransactions(req: TransactionsRequest) {
         let params = new HttpParams()
         if (req.searchQuery !== undefined && req.searchQuery !== '') {
             params = params.set('searchQuery', req.searchQuery)

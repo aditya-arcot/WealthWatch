@@ -23,10 +23,7 @@ import { AmountFilterEnum } from '../../models/amountFilter'
 import { Category, CategoryEnum, categoryIcons } from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
 import { Item } from '../../models/item'
-import {
-    Transaction,
-    TransactionsRequestParams,
-} from '../../models/transaction'
+import { Transaction, TransactionsRequest } from '../../models/transaction'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
@@ -174,7 +171,7 @@ export class TransactionsComponent implements OnInit {
     loadTransactions(): Observable<void> {
         const limit = this.pageSizes[this.pageSizeIndex]
         const offset = (this.currentPage - 1) * limit
-        const req: TransactionsRequestParams = {
+        const req: TransactionsRequest = {
             searchQuery: this.searchText,
             startDate: this.startDate,
             endDate: this.endDate,

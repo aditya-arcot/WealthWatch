@@ -1,4 +1,4 @@
-export interface TransactionsRequestParams {
+export interface TransactionsRequest {
     searchQuery?: string
     startDate?: Date | null
     endDate?: Date | null
