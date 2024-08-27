@@ -18,7 +18,7 @@ export const insertItemNotification = async (
         read: false,
         active: true,
     }
-    await insertNotification(notification)
+    return await insertNotification(notification)
 }
 
 export const insertNotification = async (
