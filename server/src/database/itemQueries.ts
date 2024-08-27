@@ -100,6 +100,15 @@ export const modifyItemActiveById = async (id: number, active: boolean) => {
     await runQuery(query, [active, id])
 }
 
+export const modifyItemHealthyById = async (id: number, healthy: boolean) => {
+    const query = `
+        UPDATE items
+        SET healthy = $1
+        WHERE id = $2
+    `
+    await runQuery(query, [healthy, id])
+}
+
 export const modifyItemLastRefreshedByPlaidId = async (
     plaidId: string,
     lastRefreshed: Date

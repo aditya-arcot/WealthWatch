@@ -39,6 +39,17 @@
             <div class="card-body">
                 <div class="container-fluid position-relative mb-2 p-0">
                     <h5 class="card-title mb-1">{{ item.institutionName }}</h5>
+                    <h6
+                        class="card-subtitle mb-1"
+                        [class.text-success]="item.healthy"
+                        [class.text-danger]="!item.healthy"
+                    >
+                        @if (item.healthy) {
+                            Healthy
+                        } @else {
+                            Unhealthy
+                        }
+                    </h6>
                     <h6 class="card-subtitle text-muted">
                         @if (!item.lastSynced) {
                             Never synced

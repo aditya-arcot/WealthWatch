@@ -21,7 +21,7 @@ export const insertItemNotification = async (
     return await insertNotification(notification)
 }
 
-export const insertNotification = async (
+const insertNotification = async (
     n: Notification
 ): Promise<Notification | undefined> => {
     const values: unknown[] = [

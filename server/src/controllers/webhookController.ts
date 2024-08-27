@@ -2,7 +2,10 @@ import { Request, Response } from 'express'
 import { importJWK, JWK, jwtVerify } from 'jose'
 import { sha256 } from 'js-sha256'
 import { jwtDecode } from 'jwt-decode'
-import { fetchActiveItemByPlaidId } from '../database/itemQueries.js'
+import {
+    fetchActiveItemByPlaidId,
+    modifyItemHealthyById,
+} from '../database/itemQueries.js'
 import {
     insertItemNotification,
     modifyNotificationsToInactiveByUserIdAndTypeId,
@@ -199,6 +202,9 @@ const handleItemErrorWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+
+    await modifyItemHealthyById(item.id, false)
+
     if (
         !(await insertItemNotification(
             NotificationTypeEnum.LinkUpdate,
@@ -217,6 +223,8 @@ const handleItemLoginRepairedWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+
+    await modifyItemHealthyById(item.id, true)
 
     await modifyNotificationsToInactiveByUserIdAndTypeId(
         item.userId,
@@ -274,14 +282,19 @@ const handleUserPermissionRevokedWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+
+    await modifyItemHealthyById(item.id, false)
+
     if (
         !(await insertItemNotification(
-            NotificationTypeEnum.LinkUpdate,
+            NotificationTypeEnum.Info,
             item,
             `${item.institutionName} permission revoked`
         ))
     )
         throw new HttpError('failed to insert item notification')
+
+    await deactivateItemMain(item)
 
     logger.debug({ itemId }, 'handled user permission revoked webhook')
 }
@@ -291,15 +304,18 @@ const handleItemUserAccountRevokedWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+
+    await modifyItemHealthyById(item.id, false)
+
     if (
         !(await insertItemNotification(
-            NotificationTypeEnum.Info,
+            NotificationTypeEnum.LinkUpdate,
             item,
-            `${item.institutionName} user account revoked`
+            `${item.institutionName} user account revoked`,
+            true
         ))
     )
         throw new HttpError('failed to insert item notification')
-    await deactivateItemMain(item)
 
     logger.debug({ itemId }, 'handled user account revoked webhook')
 }

@@ -1,6 +1,9 @@
 import { AxiosError, isAxiosError } from 'axios'
 import { Configuration, PlaidApi, PlaidEnvironments, PlaidError } from 'plaid'
-import { fetchActiveItemsByUserId } from '../database/itemQueries.js'
+import {
+    fetchActiveItemsByUserId,
+    modifyItemHealthyById,
+} from '../database/itemQueries.js'
 import {
     fetchActiveNotificationsByUserId,
     insertItemNotification,
@@ -197,15 +200,15 @@ const insertPersistentLinkUpdateNotification = async (
 
     if (notifications.length !== 0) {
         logger.debug('persistent link update notification already exists')
-    }
-
-    if (notifications.length === 0) {
+    } else {
         const message = `${item.institutionName} connection error`
         if (!(await insertItemNotification(type, item, message, true))) {
             logger.error('failed to insert persistent link update notification')
             return
         }
     }
+
+    await modifyItemHealthyById(itemId, false)
 }
 
 const insertInstitutionIssuesNotification = async (
@@ -233,5 +236,7 @@ const insertInstitutionIssuesNotification = async (
         ) {
             logger.error('failed to insert institution issues notification')
         }
+
+        await modifyItemHealthyById(itemId, false)
     }
 }
