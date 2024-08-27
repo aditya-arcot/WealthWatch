@@ -63,7 +63,11 @@
                                 </div>
                                 @if (!minAmountValid()) {
                                     <div class="feedback-text small-text">
-                                        Enter a value
+                                        @if (minAmount === null) {
+                                            Enter a value
+                                        } @else {
+                                            Value cannot be less than 0
+                                        }
                                     </div>
                                 }
                             </div>
@@ -102,6 +106,8 @@
                                     <div class="feedback-text small-text">
                                         @if (maxAmount === null) {
                                             Enter a value
+                                        } @else if (maxAmount < 0) {
+                                            Value cannot be less than 0
                                         } @else {
                                             Value cannot be less than
                                             {{ minAmount }}

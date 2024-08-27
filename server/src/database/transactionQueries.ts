@@ -239,7 +239,7 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
     if (minAmount !== undefined && maxAmount !== undefined) {
         filtered = true
         query += `
-            AND t.amount >= $${placeholder} AND t.amount <= $${placeholder + 1}
+            AND ABS(t.amount) >= $${placeholder} AND ABS(t.amount) <= $${placeholder + 1}
         `
         values.push(minAmount)
         values.push(maxAmount)
@@ -247,14 +247,14 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
     } else if (minAmount !== undefined) {
         filtered = true
         query += `
-            AND t.amount >= $${placeholder}
+            AND ABS(t.amount) >= $${placeholder}
         `
         values.push(minAmount)
         placeholder++
     } else if (maxAmount !== undefined) {
         filtered = true
         query += `
-            AND t.amount <= $${placeholder}
+            AND ABS(t.amount) <= $${placeholder}
         `
         values.push(maxAmount)
         placeholder++

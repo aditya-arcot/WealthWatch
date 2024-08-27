@@ -37,11 +37,20 @@ export const getUserTransactions = async (req: Request, res: Response) => {
         throw new HttpError('invalid end date', 400)
 
     const minAmount = parseNumberOrUndefinedFromQueryParam(
-        req.query['minAmount']
+        req.query['minAmount'],
+        true
     )
     const maxAmount = parseNumberOrUndefinedFromQueryParam(
-        req.query['maxAmount']
+        req.query['maxAmount'],
+        true
     )
+    if (
+        minAmount !== undefined &&
+        maxAmount !== undefined &&
+        minAmount > maxAmount
+    ) {
+        throw new HttpError('invalid amount range', 400)
+    }
     const categoryId = parseNumberArrayOrUndefinedFromQueryParam(
         req.query['categoryId']
     )
