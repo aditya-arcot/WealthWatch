@@ -323,7 +323,7 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    getDisplayDate(date: Date): string {
+    getFormattedDate(date: Date): string {
         return new Date(date).toLocaleString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -333,14 +333,14 @@ export class AccountsComponent implements OnInit {
         })
     }
 
-    getDisplayCurrentBalance(acc: Account): string {
+    getFormattedCurrentBalance(acc: Account): string {
         return this.currencySvc.formatAmount(
             acc.currentBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
         )
     }
 
-    getDisplayAvailableBalance(acc: Account): string {
+    getFormattedAvailableBalance(acc: Account): string {
         return this.currencySvc.formatAmount(
             acc.availableBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode

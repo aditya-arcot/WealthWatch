@@ -357,17 +357,17 @@
                     @for (t of transactions; track $index) {
                         <tr>
                             <td>
-                                {{ getDisplayDate(t) }}
+                                {{ getFormattedDate(t) }}
                             </td>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input
                                         class="form-control"
                                         type="text"
-                                        [value]="getDisplayName(t)"
+                                        [value]="getShortenedName(t)"
                                         (focus)="showFullName($event.target, t)"
                                         (blur)="
-                                            showDisplayName($event.target, t)
+                                            showShortenedName($event.target, t)
                                         "
                                         (change)="updateName($event.target, t)"
                                     />
@@ -386,7 +386,7 @@
                             <td>
                                 <div class="d-none d-lg-inline">
                                     <span [class.text-success]="t.amount < 0"
-                                        >{{ getDisplayAmount(t) }}
+                                        >{{ getFormattedAmount(t) }}
                                     </span>
                                     @if (t.pending) {
                                         <span class="pending-text"
@@ -401,7 +401,7 @@
                                         t.amount < 0 && !t.pending
                                     "
                                 >
-                                    {{ getDisplayAmount(t) }}
+                                    {{ getFormattedAmount(t) }}
                                 </div>
                             </td>
                             <td class="d-none d-sm-table-cell">
@@ -430,7 +430,7 @@
                                                 [value]="category.id"
                                                 [selected]="
                                                     category.id ===
-                                                    getDisplayCategoryId(t)
+                                                    getCategoryId(t)
                                                 "
                                             >
                                                 {{ category.name }}
@@ -469,9 +469,9 @@
                                 </button>
                             </td>
                             <td class="d-none d-md-table-cell">
-                                {{ getDisplayAccount(t) }}
+                                {{ getAccountName(t) }}
                                 <span class="d-none d-xl-inline"
-                                    >({{ getDisplayInstitution(t) }})</span
+                                    >({{ getInstitutionName(t) }})</span
                                 >
                             </td>
                         </tr>

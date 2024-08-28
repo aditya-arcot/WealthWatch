@@ -55,7 +55,7 @@
                             Never synced
                         } @else {
                             Last synced:
-                            {{ getDisplayDate(item.lastSynced) }}
+                            {{ getFormattedDate(item.lastSynced) }}
                         }
                     </h6>
 
@@ -120,9 +120,11 @@
                                 <td>
                                     {{ account.type }} ({{ account.subtype }})
                                 </td>
-                                <td>{{ getDisplayCurrentBalance(account) }}</td>
+                                <td>
+                                    {{ getFormattedCurrentBalance(account) }}
+                                </td>
                                 <td class="d-none d-md-table-cell">
-                                    {{ getDisplayAvailableBalance(account) }}
+                                    {{ getFormattedAvailableBalance(account) }}
                                 </td>
                                 <td class="d-none d-sm-table-cell">
                                     &middot;&middot;&middot;&middot;

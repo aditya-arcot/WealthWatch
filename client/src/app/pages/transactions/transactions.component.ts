@@ -454,7 +454,7 @@ export class TransactionsComponent implements OnInit {
         this.reloadTransactions()
     }
 
-    getDisplayDate(t: Transaction): string {
+    getFormattedDate(t: Transaction): string {
         return new Date(t.date).toLocaleDateString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -462,7 +462,7 @@ export class TransactionsComponent implements OnInit {
         })
     }
 
-    getDisplayName(t: Transaction): string {
+    getShortenedName(t: Transaction): string {
         let name = t.customName ?? t.merchant ?? t.name
         if (name.length > this.maxNameLength)
             name = name.substring(0, this.maxNameLength) + '...'
@@ -475,10 +475,10 @@ export class TransactionsComponent implements OnInit {
         element.value = (t.customName ?? t.merchant ?? t.name).trim()
     }
 
-    showDisplayName(target: EventTarget | null, t: Transaction): void {
+    showShortenedName(target: EventTarget | null, t: Transaction): void {
         if (!target) return
         const element = target as HTMLInputElement
-        element.value = this.getDisplayName(t)
+        element.value = this.getShortenedName(t)
     }
 
     updateName(target: EventTarget | null, t: Transaction): void {
@@ -500,7 +500,7 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomName(t)
     }
 
-    getDisplayAmount(t: Transaction): string {
+    getFormattedAmount(t: Transaction): string {
         const negative = t.amount < 0
         const formatted = this.currencySvc.formatAmount(
             Math.abs(t.amount),
@@ -510,7 +510,7 @@ export class TransactionsComponent implements OnInit {
         return formatted
     }
 
-    getDisplayCategoryId(t: Transaction): number {
+    getCategoryId(t: Transaction): number {
         return t.customCategoryId ?? t.categoryId
     }
 
@@ -535,7 +535,7 @@ export class TransactionsComponent implements OnInit {
     }
 
     getCategoryClass(t: Transaction): string {
-        const categoryId = this.getDisplayCategoryId(t) as CategoryEnum
+        const categoryId = this.getCategoryId(t) as CategoryEnum
         return categoryIcons[categoryId]
     }
 
@@ -559,7 +559,7 @@ export class TransactionsComponent implements OnInit {
         )
     }
 
-    getDisplayAccount(t: Transaction): string {
+    getAccountName(t: Transaction): string {
         const account = this.accounts.find((a) => a.id === t.accountId)
         if (!account) {
             this.logger.error('unrecognized account id', t.accountId)
@@ -568,7 +568,7 @@ export class TransactionsComponent implements OnInit {
         return account.name
     }
 
-    getDisplayInstitution(t: Transaction): string {
+    getInstitutionName(t: Transaction): string {
         const account = this.accounts.find((a) => a.id === t.accountId)
         if (!account) {
             this.logger.error('unrecognized account id', t.accountId)
