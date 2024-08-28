@@ -32,7 +32,6 @@ const startMainApp = () => {
     }
 
     logger.debug('configuring middleware')
-    app.use(logRequestResponse)
     app.use(
         helmet({
             contentSecurityPolicy: {
@@ -41,10 +40,11 @@ const startMainApp = () => {
         })
     )
     app.use(corsMiddleware)
-    app.use(methodOverride('_method'))
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
     app.use(createSessionMiddleware())
+    app.use(logRequestResponse)
+    app.use(methodOverride('_method'))
     app.use(cookieParser())
     app.use(createCsrfMiddleware())
 
@@ -77,9 +77,9 @@ const startWebhookApp = () => {
     const webhookApp = express()
 
     logger.debug('configuring middleware')
-    webhookApp.use(logRequestResponse)
     webhookApp.use(express.json())
     webhookApp.use(express.urlencoded({ extended: true }))
+    webhookApp.use(logRequestResponse)
 
     logger.debug('configuring routes')
     webhookApp.use('/status', (_req, res) => res.send('ok'))
