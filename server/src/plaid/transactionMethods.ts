@@ -159,6 +159,7 @@ enum PlaidDetailedCategoryEnum {
     TransferInSavings = 'TRANSFER_IN_SAVINGS',
     TransferOutInvestment = 'TRANSFER_OUT_INVESTMENT_AND_RETIREMENT_FUNDS',
     TransferOutSavings = 'TRANSFER_OUT_SAVINGS',
+    TransferOutWithdrawal = 'TRANSFER_OUT_WITHDRAWAL',
     LoanPaymentsCreditCard = 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT',
     FoodAndDrinkGroceries = 'FOOD_AND_DRINK_GROCERIES',
     GovernmentAndNonProfitDonation = 'GOVERNMENT_AND_NON_PROFIT_DONATIONS',
@@ -168,11 +169,13 @@ enum PlaidDetailedCategoryEnum {
 const detailedCategoryMap: {
     [key in PlaidDetailedCategoryEnum]: CategoryEnum
 } = {
-    [PlaidDetailedCategoryEnum.TransferInDeposit]: CategoryEnum.Deposit,
+    [PlaidDetailedCategoryEnum.TransferInDeposit]: CategoryEnum.CashAndChecks,
     [PlaidDetailedCategoryEnum.TransferInInvestment]: CategoryEnum.Investment,
     [PlaidDetailedCategoryEnum.TransferInSavings]: CategoryEnum.Savings,
     [PlaidDetailedCategoryEnum.TransferOutInvestment]: CategoryEnum.Investment,
     [PlaidDetailedCategoryEnum.TransferOutSavings]: CategoryEnum.Savings,
+    [PlaidDetailedCategoryEnum.TransferOutWithdrawal]:
+        CategoryEnum.CashAndChecks,
     [PlaidDetailedCategoryEnum.LoanPaymentsCreditCard]:
         CategoryEnum.CreditCardPayment,
     [PlaidDetailedCategoryEnum.FoodAndDrinkGroceries]: CategoryEnum.Groceries,
@@ -198,7 +201,6 @@ enum PlaidPrimaryCategoryEnum {
     Transportation = 'TRANSPORTATION',
     Travel = 'TRAVEL',
     RentAndUtilities = 'RENT_AND_UTILITIES',
-    Other = 'OTHER',
 }
 
 const primaryCategoryMap: {
@@ -220,5 +222,4 @@ const primaryCategoryMap: {
     [PlaidPrimaryCategoryEnum.Transportation]: CategoryEnum.Transportation,
     [PlaidPrimaryCategoryEnum.Travel]: CategoryEnum.Travel,
     [PlaidPrimaryCategoryEnum.RentAndUtilities]: CategoryEnum.Bills,
-    [PlaidPrimaryCategoryEnum.Other]: CategoryEnum.Uncategorized,
 }
