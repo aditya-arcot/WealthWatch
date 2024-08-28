@@ -211,7 +211,7 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
         placeholder++
     }
 
-    if (startDate && endDate) {
+    if (startDate !== undefined && endDate !== undefined) {
         filtered = true
         query += `
             AND t.date >= $${placeholder}
@@ -220,17 +220,17 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
         values.push(startDate)
         values.push(endDate)
         placeholder += 2
-    } else if (startDate) {
+    } else if (startDate !== undefined) {
         filtered = true
         query += `
             AND t.date >= $${placeholder}
         `
         values.push(startDate)
         placeholder++
-    } else if (endDate) {
+    } else if (endDate !== undefined) {
         filtered = true
         query += `
-            AND t.date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
+            AND t.date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(endDate)
         placeholder++
