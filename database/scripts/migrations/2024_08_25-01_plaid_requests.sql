@@ -1,5 +1,5 @@
 /*
-add error code, error response columns to plaid api requests table
+    add error code, error response columns to plaid api requests table
 */
 
 BEGIN;
