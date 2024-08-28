@@ -57,7 +57,6 @@
                             [(ngModel)]="selectorStartDate"
                             (ngModelChange)="setSelectorStartDate($event)"
                         />
-
                         @if (!startDateValid()) {
                             <div class="feedback-text small-text">
                                 Start or end date required

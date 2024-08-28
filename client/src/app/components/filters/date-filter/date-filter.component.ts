@@ -65,13 +65,19 @@ export class DateFilterComponent implements OnInit, OnChanges {
         this.originalEndDate = this.endDate
     }
 
-    setSelectorStartDate(value: string | null) {
-        if (value === null) return
+    setSelectorStartDate(value: string) {
+        if (value === '') {
+            this.startDate = null
+            return
+        }
         this.startDate = new Date(value + 'T00:00:00')
     }
 
-    setSelectorEndDate(value: string | null) {
-        if (value === null) return
+    setSelectorEndDate(value: string) {
+        if (value === '') {
+            this.endDate = null
+            return
+        }
         this.endDate = new Date(value + 'T00:00:00')
     }
 
