@@ -112,6 +112,7 @@ const handlePlaidError = async (
     req.errorType = plaidErr.error_type
     req.errorMessage = plaidErr.error_message
     req.errorResponse = plaidErr
+    req.errorStack = error.stack ?? null
 
     const errorCodeEnum =
         plaidErr.error_code.toUpperCase() as PlaidGeneralErrorCodeEnum
