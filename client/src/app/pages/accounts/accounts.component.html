@@ -40,7 +40,7 @@
                 <div class="container-fluid position-relative mb-2 p-0">
                     <h5 class="card-title mb-1">{{ item.institutionName }}</h5>
                     <h6
-                        class="card-subtitle mb-1"
+                        class="card-subtitle mb-1 small-text"
                         [class.text-success]="item.healthy"
                         [class.text-danger]="!item.healthy"
                     >
@@ -50,7 +50,7 @@
                             Unhealthy
                         }
                     </h6>
-                    <h6 class="card-subtitle text-muted">
+                    <h6 class="card-subtitle text-muted small-text">
                         @if (!item.lastSynced) {
                             Never synced
                         } @else {
@@ -113,7 +113,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="table-group-divider">
+                    <tbody class="table-group-divider small-text">
                         @for (account of item.accounts; track $index) {
                             <tr>
                                 <td>{{ account.name }}</td>
