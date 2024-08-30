@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms'
 import { DateFilterEnum } from '../../../models/dateFilter'
 import { AlertService } from '../../../services/alert.service'
+import { checkDatesEqual } from '../../../utilities/date.utility'
 
 // all dates are in client timezone
 
@@ -62,7 +63,9 @@ export class DateFilterComponent implements OnInit, OnChanges {
     ngOnChanges(): void {
         this.originalSelectedFilter = this.selectedFilter
         this.originalStartDate = this.startDate
-        this.originalEndDate = this.endDate
+            ? new Date(this.startDate)
+            : null
+        this.originalEndDate = this.endDate ? new Date(this.endDate) : null
     }
 
     setSelectorStartDate(value: string) {
@@ -98,7 +101,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 const day = start.getDay() || 7
                 if (day !== 1) start.setHours(-24 * (day - 1))
 
-                this.startDate = start
+                this.startDate = start ? new Date(start) : null
                 this.endDate = null
                 break
             }
@@ -108,7 +111,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 start.setHours(0, 0, 0, 0)
                 start.setDate(1)
 
-                this.startDate = start
+                this.startDate = start ? new Date(start) : null
                 this.endDate = null
                 break
             }
@@ -119,7 +122,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 start.setMonth(0)
                 start.setDate(1)
 
-                this.startDate = start
+                this.startDate = start ? new Date(start) : null
                 this.endDate = null
                 break
             }
@@ -129,7 +132,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 start.setHours(0, 0, 0, 0)
                 start.setHours(-24 * 6)
 
-                this.startDate = start
+                this.startDate = start ? new Date(start) : null
                 this.endDate = null
                 break
             }
@@ -139,7 +142,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 start.setHours(0, 0, 0, 0)
                 start.setHours(-24 * 29)
 
-                this.startDate = start
+                this.startDate = start ? new Date(start) : null
                 this.endDate = null
                 break
             }
@@ -153,8 +156,8 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 const start = new Date(end.getTime())
                 start.setHours(-24 * 6)
 
-                this.startDate = start
-                this.endDate = end
+                this.startDate = start ? new Date(start) : null
+                this.endDate = end ? new Date(end) : null
                 break
             }
 
@@ -167,8 +170,8 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 const start = new Date(end.getTime())
                 start.setDate(1)
 
-                this.startDate = start
-                this.endDate = end
+                this.startDate = start ? new Date(start) : null
+                this.endDate = end ? new Date(end) : null
                 break
             }
 
@@ -183,8 +186,8 @@ export class DateFilterComponent implements OnInit, OnChanges {
                 start.setMonth(0)
                 start.setDate(1)
 
-                this.startDate = start
-                this.endDate = end
+                this.startDate = start ? new Date(start) : null
+                this.endDate = end ? new Date(end) : null
                 break
             }
 
@@ -204,8 +207,8 @@ export class DateFilterComponent implements OnInit, OnChanges {
         }
         if (this.selectedFilter === DateFilterEnum.CUSTOM) {
             return (
-                this.originalStartDate !== this.startDate ||
-                this.originalEndDate !== this.endDate
+                !checkDatesEqual(this.originalStartDate, this.startDate) ||
+                !checkDatesEqual(this.originalEndDate, this.endDate)
             )
         }
         return false
@@ -213,17 +216,17 @@ export class DateFilterComponent implements OnInit, OnChanges {
 
     startDateValid(): boolean {
         if (this.selectedFilter === DateFilterEnum.CUSTOM) {
-            return this.startDate !== null || this.endDate !== null
+            return !!this.startDate || !!this.endDate
         }
         return true
     }
 
     endDateValid(): boolean {
         if (this.selectedFilter === DateFilterEnum.CUSTOM) {
-            if (this.endDate === null) {
-                return this.startDate !== null
+            if (!this.endDate) {
+                return !!this.startDate
             }
-            if (this.startDate !== null) {
+            if (this.startDate) {
                 return this.startDate <= this.endDate
             }
         }
@@ -272,6 +275,10 @@ export class DateFilterComponent implements OnInit, OnChanges {
     cancel() {
         this.selectedFilter = this.originalSelectedFilter
         this.startDate = this.originalStartDate
+            ? new Date(this.originalStartDate)
+            : null
         this.endDate = this.originalEndDate
+            ? new Date(this.originalEndDate)
+            : null
     }
 }

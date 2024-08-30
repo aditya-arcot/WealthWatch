@@ -78,7 +78,7 @@
                         />
                         @if (!endDateValid()) {
                             <div class="feedback-text small-text">
-                                @if (startDate === null) {
+                                @if (!startDate) {
                                     Start or end date required
                                 } @else {
                                     End date cannot be before start date

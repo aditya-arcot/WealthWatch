@@ -357,13 +357,13 @@ export class TransactionsComponent implements OnInit {
         this.selectedDateFilter = filter
         let reload = false
         if (start !== this.previousStartDate) {
-            this.previousStartDate = start
-            this.startDate = start
+            this.previousStartDate = start ? new Date(start) : null
+            this.startDate = start ? new Date(start) : null
             reload = true
         }
         if (end !== this.previousEndDate) {
-            this.previousEndDate = end
-            this.endDate = end
+            this.previousEndDate = end ? new Date(end) : null
+            this.endDate = end ? new Date(end) : null
             reload = true
         }
         if (reload) {
@@ -437,8 +437,10 @@ export class TransactionsComponent implements OnInit {
 
         this.selectedDateFilter = DateFilterEnum.ALL
         this.previousStartDate = this.startDate
+            ? new Date(this.startDate)
+            : null
         this.startDate = null
-        this.previousEndDate = this.endDate
+        this.previousEndDate = this.endDate ? new Date(this.endDate) : null
         this.endDate = null
 
         this.selectedAmountFilter = AmountFilterEnum.ALL
