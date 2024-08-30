@@ -4,20 +4,12 @@
     <h2 class="text-center mb-0">Transactions</h2>
     <button
         (click)="refreshTransactions()"
-        class="btn btn-primary d-none d-md-block position-absolute top-left"
+        class="btn btn-primary position-absolute top-left"
         type="button"
         title="Refresh Transactions"
     >
         <i class="bi bi-arrow-clockwise"></i>
-        Refresh Transactions
-    </button>
-    <button
-        (click)="refreshTransactions()"
-        class="btn btn-primary d-block d-md-none position-absolute top-left"
-        type="button"
-        title="Refresh Transactions"
-    >
-        <i class="bi bi-arrow-clockwise"></i>
+        <span class="ms-1 d-none d-md-inline">Refresh Transactions</span>
     </button>
 </div>
 
@@ -409,7 +401,7 @@
                                     <button
                                         class="btn btn-outline-primary icon-btn d-none d-md-inline"
                                         type="button"
-                                        title="Change Category"
+                                        title="Current Category"
                                     >
                                         <i
                                             class="bi"

@@ -4,20 +4,12 @@
     <h2 class="text-center mb-0">Accounts</h2>
     <button
         (click)="linkAccount()"
-        class="btn btn-success d-none d-sm-block position-absolute top-left"
+        class="btn btn-success position-absolute top-left"
         type="button"
         title="Link Account"
     >
         <i class="bi bi-plus"></i>
-        Link an Account
-    </button>
-    <button
-        (click)="linkAccount()"
-        class="btn btn-success d-block d-sm-none position-absolute top-left"
-        type="button"
-        title="Link Account"
-    >
-        <i class="bi bi-plus"></i>
+        <span class="ms-1 d-none d-sm-inline">Link an Account</span>
     </button>
 </div>
 
@@ -62,37 +54,21 @@
                     <div class="d-flex gap-2 position-absolute top-right">
                         <button
                             (click)="refreshItem(item)"
-                            class="btn btn-primary d-none d-sm-block"
+                            class="btn btn-primary"
                             type="button"
                             title="Refresh"
                         >
                             <i class="bi bi-arrow-clockwise"></i>
-                            Refresh
-                        </button>
-                        <button
-                            (click)="refreshItem(item)"
-                            class="btn btn-primary d-block d-sm-none"
-                            type="button"
-                            title="Refresh"
-                        >
-                            <i class="bi bi-arrow-clockwise"></i>
+                            <span class="ms-1 d-none d-sm-inline">Refresh</span>
                         </button>
                         <button
                             (click)="deactivateItem(item)"
-                            class="btn btn-danger d-none d-sm-block"
+                            class="btn btn-danger"
                             type="button"
                             title="Deactivate"
                         >
                             <i class="bi bi-trash"></i>
-                            Delete
-                        </button>
-                        <button
-                            (click)="deactivateItem(item)"
-                            class="btn btn-danger d-block d-sm-none"
-                            type="button"
-                            title="Deactivate"
-                        >
-                            <i class="bi bi-trash"></i>
+                            <span class="ms-1 d-none d-sm-inline">Delete</span>
                         </button>
                     </div>
                 </div>
