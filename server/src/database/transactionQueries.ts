@@ -1,5 +1,5 @@
 import { HttpError } from '../models/error.js'
-import { Transaction, TransactionsResponse } from '../models/transaction.js'
+import { Transaction, TransactionsWithCounts } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
@@ -86,7 +86,7 @@ export const fetchPaginatedActiveTransactionsByUserIdAndFilters = async (
     accountIds?: number[],
     limit?: number,
     offset?: number
-): Promise<TransactionsResponse> => {
+): Promise<TransactionsWithCounts> => {
     const totalCount = await fetchActiveTransactionsByUserIdCount(userId)
 
     const {
@@ -94,7 +94,7 @@ export const fetchPaginatedActiveTransactionsByUserIdAndFilters = async (
         query: initialQuery,
         values,
         placeholder,
-    } = constructfetchActiveTransactionsByUserIdAndFiltersQuery(
+    } = constructFetchActiveTransactionsByUserIdAndFiltersQuery(
         userId,
         searchQuery,
         startDate,
@@ -134,9 +134,9 @@ export const fetchPaginatedActiveTransactionsByUserIdAndFilters = async (
     const rows = (await runQuery<DbTransaction>(query, values)).rows
 
     return {
-        totalCount,
-        filteredCount,
         transactions: rows.map(mapDbTransaction),
+        filteredCount,
+        totalCount,
     }
 }
 
@@ -163,7 +163,7 @@ const fetchActiveTransactionsByUserIdCount = async (
     return isNaN(countNum) ? -1 : countNum
 }
 
-const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
+const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     userId: number,
     searchQuery?: string,
     startDate?: string,

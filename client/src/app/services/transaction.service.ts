@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
 import {
     Transaction,
-    TransactionsRequest,
-    TransactionsResponse,
+    TransactionsRequestParams,
+    TransactionsWithCounts,
 } from '../models/transaction'
 
 @Injectable({
@@ -15,7 +15,7 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
-    getTransactions(req: TransactionsRequest) {
+    getTransactions(req: TransactionsRequestParams) {
         let params = new HttpParams()
         if (req.searchQuery !== undefined && req.searchQuery !== '') {
             params = params.set('searchQuery', req.searchQuery)
@@ -56,7 +56,7 @@ export class TransactionService {
         if (req.offset !== undefined) {
             params = params.set('offset', req.offset)
         }
-        return this.http.get<TransactionsResponse>(this.baseUrl, { params })
+        return this.http.get<TransactionsWithCounts>(this.baseUrl, { params })
     }
 
     updateTransactionCustomName(t: Transaction) {

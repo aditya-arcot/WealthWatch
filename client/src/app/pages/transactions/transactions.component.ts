@@ -23,7 +23,10 @@ import { AmountFilterEnum } from '../../models/amountFilter'
 import { Category, CategoryEnum, categoryIcons } from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
 import { Item } from '../../models/item'
-import { Transaction, TransactionsRequest } from '../../models/transaction'
+import {
+    Transaction,
+    TransactionsRequestParams,
+} from '../../models/transaction'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
@@ -31,6 +34,7 @@ import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
+import { checkDatesEqual } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-transactions',
@@ -171,7 +175,7 @@ export class TransactionsComponent implements OnInit {
     loadTransactions(): Observable<void> {
         const limit = this.pageSizes[this.pageSizeIndex]
         const offset = (this.currentPage - 1) * limit
-        const req: TransactionsRequest = {
+        const req: TransactionsRequestParams = {
             searchQuery: this.searchText,
             startDate: this.startDate,
             endDate: this.endDate,
@@ -185,9 +189,9 @@ export class TransactionsComponent implements OnInit {
         return this.transactionSvc.getTransactions(req).pipe(
             switchMap((t) => {
                 this.logger.debug('loaded transactions', t)
-                this.totalCount = t.totalCount
-                this.filteredCount = t.filteredCount
                 this.transactions = t.transactions
+                this.filteredCount = t.filteredCount
+                this.totalCount = t.totalCount
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -356,12 +360,12 @@ export class TransactionsComponent implements OnInit {
     ): void {
         this.selectedDateFilter = filter
         let reload = false
-        if (start !== this.previousStartDate) {
+        if (!checkDatesEqual(start, this.previousStartDate)) {
             this.previousStartDate = start ? new Date(start) : null
             this.startDate = start ? new Date(start) : null
             reload = true
         }
-        if (end !== this.previousEndDate) {
+        if (!checkDatesEqual(end, this.previousEndDate)) {
             this.previousEndDate = end ? new Date(end) : null
             this.endDate = end ? new Date(end) : null
             reload = true
