@@ -55,7 +55,7 @@ const insertNotification = async (
     return mapDbNotification(rows[0])
 }
 
-export const fetchActiveNotificationsByUserId = async (
+export const fetchActiveNotificationsWithUserId = async (
     userId: number
 ): Promise<Notification[]> => {
     const query = `
@@ -68,7 +68,7 @@ export const fetchActiveNotificationsByUserId = async (
     return rows.map(mapDbNotification)
 }
 
-export const modifyNotificationsToReadByUserId = async (
+export const modifyNotificationsToReadWithUserId = async (
     userId: number
 ): Promise<Notification[]> => {
     const query = `
@@ -82,7 +82,7 @@ export const modifyNotificationsToReadByUserId = async (
     return rows.map(mapDbNotification)
 }
 
-export const modifyNotificationsToInactiveByUserIdAndTypeId = async (
+export const modifyNotificationsToInactiveWithUserIdAndTypeId = async (
     userId: number,
     typeId: number
 ): Promise<Notification[]> => {

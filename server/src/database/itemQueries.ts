@@ -49,7 +49,7 @@ export const fetchActiveItems = async (): Promise<Item[]> => {
     return rows.map(mapDbItem)
 }
 
-export const fetchActiveItemByPlaidId = async (
+export const fetchActiveItemWithPlaidId = async (
     plaidId: string
 ): Promise<Item | undefined> => {
     const query = `
@@ -63,7 +63,7 @@ export const fetchActiveItemByPlaidId = async (
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItemsByUserId = async (
+export const fetchActiveItemsWithUserId = async (
     userId: number
 ): Promise<Item[]> => {
     const query = `
@@ -76,7 +76,7 @@ export const fetchActiveItemsByUserId = async (
     return rows.map(mapDbItem)
 }
 
-export const fetchActiveItemByUserIdAndInstitutionId = async (
+export const fetchActiveItemWithUserIdAndInstitutionId = async (
     userId: number,
     institutionId: string
 ): Promise<Item | undefined> => {
@@ -91,7 +91,7 @@ export const fetchActiveItemByUserIdAndInstitutionId = async (
     return mapDbItem(rows[0])
 }
 
-export const modifyItemActiveById = async (id: number, active: boolean) => {
+export const modifyItemActiveWithId = async (id: number, active: boolean) => {
     const query = `
         UPDATE items
         SET active = $1
@@ -100,7 +100,7 @@ export const modifyItemActiveById = async (id: number, active: boolean) => {
     await runQuery(query, [active, id])
 }
 
-export const modifyItemHealthyById = async (id: number, healthy: boolean) => {
+export const modifyItemHealthyWithId = async (id: number, healthy: boolean) => {
     const query = `
         UPDATE items
         SET healthy = $1
@@ -109,7 +109,7 @@ export const modifyItemHealthyById = async (id: number, healthy: boolean) => {
     await runQuery(query, [healthy, id])
 }
 
-export const modifyItemLastRefreshedByPlaidId = async (
+export const modifyItemLastRefreshedWithPlaidId = async (
     plaidId: string,
     lastRefreshed: Date
 ) => {
@@ -121,7 +121,7 @@ export const modifyItemLastRefreshedByPlaidId = async (
     await runQuery(query, [lastRefreshed, plaidId])
 }
 
-export const modifyItemCursorLastSyncedLastRefreshedByPlaidId = async (
+export const modifyItemCursorLastSyncedLastRefreshedWithPlaidId = async (
     plaidId: string,
     cursor: string | null,
     lastSynced: Date

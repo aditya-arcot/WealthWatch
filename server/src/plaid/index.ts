@@ -1,11 +1,11 @@
 import { AxiosError, isAxiosError } from 'axios'
 import { Configuration, PlaidApi, PlaidEnvironments, PlaidError } from 'plaid'
 import {
-    fetchActiveItemsByUserId,
-    modifyItemHealthyById,
+    fetchActiveItemsWithUserId,
+    modifyItemHealthyWithId,
 } from '../database/itemQueries.js'
 import {
-    fetchActiveNotificationsByUserId,
+    fetchActiveNotificationsWithUserId,
     insertItemNotification,
 } from '../database/notificationQueries.js'
 import { HttpError, PlaidApiError } from '../models/error.js'
@@ -188,10 +188,10 @@ const insertPersistentLinkUpdateNotification = async (
     )
 
     const notifications = (
-        await fetchActiveNotificationsByUserId(userId)
+        await fetchActiveNotificationsWithUserId(userId)
     ).filter((n) => n.typeId === type && n.itemId === itemId && n.persistent)
 
-    const item = (await fetchActiveItemsByUserId(userId)).find(
+    const item = (await fetchActiveItemsWithUserId(userId)).find(
         (i) => i.id === itemId
     )
     if (!item) {
@@ -209,7 +209,7 @@ const insertPersistentLinkUpdateNotification = async (
         }
     }
 
-    await modifyItemHealthyById(itemId, false)
+    await modifyItemHealthyWithId(itemId, false)
 }
 
 const insertInstitutionIssuesNotification = async (
@@ -221,7 +221,7 @@ const insertInstitutionIssuesNotification = async (
         'inserting institution issues notification'
     )
 
-    const item = (await fetchActiveItemsByUserId(userId)).find(
+    const item = (await fetchActiveItemsWithUserId(userId)).find(
         (i) => i.id === itemId
     )
     if (!item) {
@@ -238,6 +238,6 @@ const insertInstitutionIssuesNotification = async (
             logger.error('failed to insert institution issues notification')
         }
 
-        await modifyItemHealthyById(itemId, false)
+        await modifyItemHealthyWithId(itemId, false)
     }
 }

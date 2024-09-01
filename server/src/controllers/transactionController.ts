@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import {
-    fetchActiveItemsByUserId,
-    modifyItemLastRefreshedByPlaidId,
+    fetchActiveItemsWithUserId,
+    modifyItemLastRefreshedWithPlaidId,
 } from '../database/itemQueries.js'
 import {
-    fetchPaginatedActiveTransactionsByUserIdAndFilters,
-    modifyTransactionCustomCategoryIdByPlaidId,
-    modifyTransactionCustomNameByPlaidId,
-    modifyTransactionNoteByPlaidId,
+    fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters,
+    modifyTransactionCustomCategoryIdWithPlaidId,
+    modifyTransactionCustomNameWithPlaidId,
+    modifyTransactionNoteWithPlaidId,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
 import { refreshCooldown } from '../models/item.js'
@@ -64,7 +64,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     )
 
     const transactions =
-        await fetchPaginatedActiveTransactionsByUserIdAndFilters(
+        await fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters(
             userId,
             searchQuery,
             startDate,
@@ -93,7 +93,7 @@ export const updateTransactionCustomName = async (
     if (customName !== null && typeof customName !== 'string')
         throw new HttpError('missing or invalid name', 400)
 
-    const transaction = await modifyTransactionCustomNameByPlaidId(
+    const transaction = await modifyTransactionCustomNameWithPlaidId(
         plaidTransactionId,
         customName
     )
@@ -116,7 +116,7 @@ export const updateTransactionCustomCategoryId = async (
     if (customCategoryId !== null && typeof customCategoryId !== 'number')
         throw new HttpError('missing or invalid category id', 400)
 
-    const transaction = await modifyTransactionCustomCategoryIdByPlaidId(
+    const transaction = await modifyTransactionCustomCategoryIdWithPlaidId(
         plaidTransactionId,
         customCategoryId
     )
@@ -136,7 +136,7 @@ export const updateTransactionNote = async (req: Request, res: Response) => {
     if (note !== null && typeof note !== 'string')
         throw new HttpError('missing or invalid note', 400)
 
-    const transaction = await modifyTransactionNoteByPlaidId(
+    const transaction = await modifyTransactionNoteWithPlaidId(
         plaidTransactionId,
         note
     )
@@ -151,13 +151,16 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const items = await fetchActiveItemsByUserId(userId)
+    const items = await fetchActiveItemsWithUserId(userId)
     await Promise.all(
         items.map(async (item) => {
             const lastRefresh = item.lastRefreshed?.getTime() || 0
             if (Date.now() - lastRefresh >= refreshCooldown) {
                 await plaidTransactionsRefresh(item)
-                await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
+                await modifyItemLastRefreshedWithPlaidId(
+                    item.plaidId,
+                    new Date()
+                )
             } else {
                 logger.debug(
                     { id: item.id, lastRefresh },

@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
-import { fetchActiveItemsByUserId } from '../database/itemQueries.js'
+import { fetchActiveItemsWithUserId } from '../database/itemQueries.js'
 import {
-    fetchUserByEmail,
-    fetchUserByUsername,
-    removeUserById,
+    fetchUserWithEmail,
+    removeUserWithId,
 } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
 import { logger } from '../utils/logger.js'
@@ -21,7 +20,7 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
     const user = req.session.user
     if (!user) throw new HttpError('missing user', 400)
 
-    const items = await fetchActiveItemsByUserId(user.id)
+    const items = await fetchActiveItemsWithUserId(user.id)
     await Promise.all(
         items.map(async (item) => {
             await deactivateItemMain(item)
@@ -29,7 +28,7 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
     )
 
     logger.debug('deleting user')
-    await removeUserById(user.id)
+    await removeUserWithId(user.id)
     return logout(req, res)
 }
 
@@ -44,7 +43,7 @@ export const checkUserExists = async (req: Request, res: Response) => {
     if (typeof username !== 'string')
         throw new HttpError('missing or invalid username', 400)
 
-    const emailExists = !!(await fetchUserByEmail(email))
-    const usernameExists = !!(await fetchUserByUsername(username))
+    const emailExists = !!(await fetchUserWithEmail(email))
+    const usernameExists = !!(await fetchUserWithEmail(username))
     return res.send({ emailExists, usernameExists })
 }

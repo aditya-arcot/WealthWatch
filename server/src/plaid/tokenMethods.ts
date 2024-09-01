@@ -5,8 +5,6 @@ import {
     Products as PlaidProducts,
     SandboxPublicTokenCreateRequest,
 } from 'plaid'
-import { fetchActiveItemByPlaidId } from '../database/itemQueries.js'
-import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { User } from '../models/user.js'
 import { vars } from '../utils/env.js'
@@ -15,10 +13,13 @@ import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidLinkTokenCreate = async (
     userId: number,
-    itemId?: string,
+    item?: Item,
     updateAccounts: boolean = false
 ): Promise<string> => {
-    logger.debug({ itemId, userId, updateAccounts }, 'creating link token')
+    logger.debug(
+        { itemId: item?.id, userId, updateAccounts },
+        'creating link token'
+    )
 
     let accessToken = null
     // balance product automatically included
@@ -28,11 +29,8 @@ export const plaidLinkTokenCreate = async (
         PlaidProducts.Liabilities,
     ]
 
-    let item: Item | undefined
     // link update mode
-    if (itemId !== undefined) {
-        item = await fetchActiveItemByPlaidId(itemId)
-        if (!item) throw new HttpError('item not found')
+    if (item !== undefined) {
         accessToken = item.accessToken
         products = []
         requiredIfSupportedProducts = []

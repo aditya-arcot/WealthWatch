@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
 import { insertAccounts } from '../database/accountQueries.js'
 import {
-    fetchActiveItemByPlaidId,
     fetchActiveItems,
-    fetchActiveItemsByUserId,
-    modifyItemActiveById,
-    modifyItemCursorLastSyncedLastRefreshedByPlaidId,
-    modifyItemLastRefreshedByPlaidId,
+    fetchActiveItemsWithUserId,
+    fetchActiveItemWithPlaidId,
+    modifyItemActiveWithId,
+    modifyItemCursorLastSyncedLastRefreshedWithPlaidId,
+    modifyItemLastRefreshedWithPlaidId,
 } from '../database/itemQueries.js'
 import {
-    fetchPaginatedActiveTransactionsByUserIdAndFilters,
+    fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters,
     insertTransactions,
-    removeTransactionsByPlaidIds,
+    removeTransactionsWithPlaidIds,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
 import { Item, refreshCooldown } from '../models/item.js'
@@ -34,7 +34,7 @@ export const getUserItems = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const items = await fetchActiveItemsByUserId(userId)
+    const items = await fetchActiveItemsWithUserId(userId)
     return res.send(items)
 }
 
@@ -60,7 +60,7 @@ export const refreshItem = async (req: Request, res: Response) => {
     if (typeof plaidItemId !== 'string')
         throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
     await refreshItemTransactions(item)
@@ -82,7 +82,7 @@ export const refreshItemTransactions = async (item: Item) => {
     }
 
     await plaidTransactionsRefresh(item)
-    await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
+    await modifyItemLastRefreshedWithPlaidId(item.plaidId, new Date())
 }
 
 export const refreshItemBalances = async (item: Item) => {
@@ -99,7 +99,7 @@ export const refreshItemBalances = async (item: Item) => {
 
     const accounts = await plaidAccountsBalanceGet(item)
     await insertAccounts(accounts)
-    await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
+    await modifyItemLastRefreshedWithPlaidId(item.plaidId, new Date())
 }
 
 export const deactivateItem = async (req: Request, res: Response) => {
@@ -109,7 +109,7 @@ export const deactivateItem = async (req: Request, res: Response) => {
     if (typeof plaidItemId !== 'string')
         throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await deactivateItemMain(item)
 
@@ -119,7 +119,7 @@ export const deactivateItem = async (req: Request, res: Response) => {
 export const deactivateItemMain = async (item: Item) => {
     logger.debug({ id: item.id }, 'removing & deactivating item')
     await plaidItemRemove(item)
-    await modifyItemActiveById(item.id, false)
+    await modifyItemActiveWithId(item.id, false)
 }
 
 export const syncItemData = async (item: Item) => {
@@ -138,7 +138,7 @@ export const syncItemData = async (item: Item) => {
         if (added.length > 0) {
             logger.debug('inserting transactions')
             const existingTransactions = (
-                await fetchPaginatedActiveTransactionsByUserIdAndFilters(
+                await fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters(
                     item.userId
                 )
             ).transactions
@@ -158,13 +158,13 @@ export const syncItemData = async (item: Item) => {
             logger.debug('removing transactions')
             const removeIds = removed.map((t) => t.transaction_id)
             const removedTransactions =
-                await removeTransactionsByPlaidIds(removeIds)
+                await removeTransactionsWithPlaidIds(removeIds)
             if (!removedTransactions)
                 throw new HttpError('failed to remove transactions')
         }
 
         logger.debug('updating cursor')
-        await modifyItemCursorLastSyncedLastRefreshedByPlaidId(
+        await modifyItemCursorLastSyncedLastRefreshedWithPlaidId(
             item.plaidId,
             cursor,
             new Date()
