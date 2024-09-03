@@ -305,6 +305,78 @@ const fetchActiveTransactionsCountWithUserIdAndFilters = async (
     return isNaN(count) ? -1 : count
 }
 
+export const fetchActiveTransactionsDailyDateRangeWithUserIdAndDates = async (
+    userId: number,
+    startDate?: string,
+    endDate?: string
+): Promise<Date[]> => {
+    const values: unknown[] = []
+
+    let query = `
+        WITH user_transactions AS (
+            SELECT
+                COALESCE (
+                    custom_category_id,
+                    category_id
+                ) AS category_id,
+                date,
+                amount
+            FROM transactions
+            WHERE account_id IN (
+                SELECT id
+                FROM accounts
+                WHERE item_id IN (
+                    SELECT id
+                    FROM active_items
+                    WHERE user_id = $1
+                )
+            )
+        ),
+        date_series AS (
+            SELECT GENERATE_SERIES (
+    `
+    values.push(userId)
+
+    if (startDate === undefined && endDate === undefined) {
+        query += `
+                (SELECT MIN (date) FROM user_transactions),
+                (SELECT MAX (date) FROM user_transactions),
+        `
+    } else if (startDate === undefined) {
+        query += `
+                DATE_TRUNC ('day', (SELECT MIN (date) FROM user_transactions))
+                    - INTERVAL '1 day'
+                    + ($2::TIMESTAMPTZ - DATE_TRUNC ('day', $2::TIMESTAMPTZ)),
+                $2::TIMESTAMPTZ,
+        `
+        values.push(endDate)
+    } else if (endDate === undefined) {
+        query += `
+                $2::TIMESTAMPTZ,
+                NOW (),
+        `
+        values.push(startDate)
+    } else {
+        query += `
+                $2::TIMESTAMPTZ,
+                $3::TIMESTAMPTZ,
+        `
+        values.push(startDate)
+        values.push(endDate)
+    }
+
+    query += `
+                INTERVAL '1 day'
+            ) AS date
+        )
+        SELECT date
+        FROM date_series
+        ORDER BY date
+    `
+    const rows = (await runQuery<{ date: Date }>(query, values)).rows
+    return rows.map((row) => row.date)
+}
+
 export const modifyTransactionCustomNameWithPlaidId = async (
     plaidId: string,
     name: string | null

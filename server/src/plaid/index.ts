@@ -104,7 +104,6 @@ const handlePlaidError = async (
     userId?: number,
     itemId?: number
 ) => {
-    // all errors should be Axios/Plaid errors
     const plaidErr = error.response?.data as PlaidError
     logger.error(`${methodName} error - ${plaidErr.error_code}`)
 

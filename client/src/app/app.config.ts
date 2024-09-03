@@ -11,6 +11,7 @@ import {
 } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { provideRouter } from '@angular/router'
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
 import { env } from '../environments/env'
 import { routes } from './app.routes'
@@ -55,5 +56,6 @@ export const appConfig: ApplicationConfig = {
             multi: true,
         },
         Title,
+        provideCharts(withDefaultRegisterables()),
     ],
 }

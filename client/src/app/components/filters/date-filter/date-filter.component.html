@@ -15,32 +15,11 @@
                         [(ngModel)]="selectedFilter"
                         (change)="handleFilterChange()"
                     >
-                        <option [value]="dateFilterType.ALL">All Dates</option>
-                        <option [value]="dateFilterType.CURRENT_WEEK">
-                            This Week
-                        </option>
-                        <option [value]="dateFilterType.CURRENT_MONTH">
-                            This Month
-                        </option>
-                        <option [value]="dateFilterType.CURRENT_YEAR">
-                            This Year
-                        </option>
-                        <option [value]="dateFilterType.PAST_WEEK">
-                            Past 7 Days
-                        </option>
-                        <option [value]="dateFilterType.PAST_MONTH">
-                            Past 30 Days
-                        </option>
-                        <option [value]="dateFilterType.LAST_WEEK">
-                            Last Week
-                        </option>
-                        <option [value]="dateFilterType.LAST_MONTH">
-                            Last Month
-                        </option>
-                        <option [value]="dateFilterType.LAST_YEAR">
-                            Last Year
-                        </option>
-                        <option [value]="dateFilterType.CUSTOM">Custom</option>
+                        @for (key of dateFilterKeys; track $index) {
+                            <option [value]="dateFilterType[key]">
+                                {{ dateFilterType[key] }}
+                            </option>
+                        }
                     </select>
                 </div>
 
@@ -103,17 +82,30 @@
                     Apply
                 </button>
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-danger"
-                    (click)="clear()"
-                    title="Clear"
-                    data-bs-dismiss="modal"
-                    [disabled]="!filterApplied()"
-                >
-                    <i class="bi bi-trash"></i>
-                    Clear
-                </button>
+                @if (showReset) {
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        (click)="reset()"
+                        title="Reset"
+                        data-bs-dismiss="modal"
+                    >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Reset
+                    </button>
+                } @else {
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        (click)="clear()"
+                        title="Clear"
+                        data-bs-dismiss="modal"
+                        [disabled]="!filterApplied()"
+                    >
+                        <i class="bi bi-trash"></i>
+                        Clear
+                    </button>
+                }
 
                 <button
                     type="button"

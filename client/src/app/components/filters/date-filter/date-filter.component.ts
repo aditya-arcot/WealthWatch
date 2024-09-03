@@ -28,14 +28,19 @@ export class DateFilterComponent implements OnInit, OnChanges {
         DateFilterEnum.ALL
     @Input({ required: true }) startDate: Date | null = null
     @Input({ required: true }) endDate: Date | null = null
+    @Input({ required: false }) showReset? = false
 
     @Output() filterInputsChanged = new EventEmitter<{
         selectedFilter: DateFilterEnum
         startDate: Date | null
         endDate: Date | null
     }>()
+    @Output() resetRange = new EventEmitter<void>()
 
     dateFilterType = DateFilterEnum
+    dateFilterKeys = Object.keys(
+        DateFilterEnum
+    ) as (keyof typeof DateFilterEnum)[]
 
     selectorStartDate: string | null = null
     selectorEndDate: string | null = null
@@ -280,5 +285,9 @@ export class DateFilterComponent implements OnInit, OnChanges {
         this.endDate = this.originalEndDate
             ? new Date(this.originalEndDate)
             : null
+    }
+
+    reset() {
+        this.resetRange.emit()
     }
 }

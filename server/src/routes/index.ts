@@ -8,6 +8,7 @@ import itemRouter from './itemRoutes.js'
 import linkRouter from './linkRoutes.js'
 import notificationRouter from './notificationRoutes.js'
 import secretsRouter from './secretsRoutes.js'
+import spendingRouter from './spendingRoutes.js'
 import transactionRouter from './transactionRoutes.js'
 import userRouter from './userRoutes.js'
 
@@ -22,6 +23,7 @@ router.use('/items', itemRouter)
 router.use('/link', linkRouter)
 router.use('/notifications', notificationRouter)
 router.use('/secrets', secretsRouter)
+router.use('/spending', spendingRouter)
 router.use('/transactions', transactionRouter)
 router.use('/users', userRouter)
 
