@@ -47,6 +47,7 @@ export class SpendingComponent implements OnInit {
     dates: Date[] = []
     totalByCategoryAndDate: CategoryTotalByDate[] = []
 
+    spendingTotal = -1
     spendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
     nonSpendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
 
@@ -219,6 +220,7 @@ export class SpendingComponent implements OnInit {
     }
 
     processData(): void {
+        this.spendingTotal = 0
         this.spendingCategoriesTotalAndCount = []
         this.nonSpendingCategoriesTotalAndCount = []
 
@@ -233,6 +235,7 @@ export class SpendingComponent implements OnInit {
             if (!category) return
 
             if (category.groupId === CategoryGroupEnum.Spending) {
+                this.spendingTotal += t.total
                 this.spendingCategoriesTotalAndCount.push(t)
 
                 if (t.total > 0) {
@@ -329,5 +332,9 @@ export class SpendingComponent implements OnInit {
         const formatted = this.currencySvc.formatAmount(Math.abs(total), 'USD')
         if (negative) return `+${formatted}`
         return formatted
+    }
+
+    getFormattedTotalPercent(total: number): string {
+        return `${((total / this.spendingTotal) * 100).toFixed(1)}%`
     }
 }

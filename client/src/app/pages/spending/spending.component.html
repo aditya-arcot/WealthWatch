@@ -15,7 +15,7 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-4 col-xxl-3">
+    <div class="col-lg-4">
         <div class="row">
             <div class="px-2 col-md-6 col-lg-12 pe-md-1">
                 <div class="card mb-2">
@@ -35,8 +35,9 @@
                                 <thead class="table-dark">
                                     <tr class="text-center">
                                         <th scope="col">Category</th>
-                                        <th scope="col">Transactions</th>
+                                        <th scope="col">Count</th>
                                         <th scope="col">Total</th>
+                                        <th scope="col">Percent</th>
                                     </tr>
                                 </thead>
                                 <tbody class="small-text">
@@ -62,6 +63,13 @@
                                                 "
                                             >
                                                 {{ getFormattedTotal(c.total) }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{
+                                                    getFormattedTotalPercent(
+                                                        c.total
+                                                    )
+                                                }}
                                             </td>
                                         </tr>
                                     }
@@ -89,7 +97,7 @@
                                 <thead class="table-dark">
                                     <tr class="text-center">
                                         <th scope="col">Category</th>
-                                        <th scope="col">Transactions</th>
+                                        <th scope="col">Count</th>
                                         <th scope="col">Total</th>
                                     </tr>
                                 </thead>
@@ -128,7 +136,7 @@
         </div>
     </div>
 
-    <div class="col-lg-8 col-xxl-9">
+    <div class="col-lg-8">
         <div class="row">
             <div class="px-2 ps-lg-1 pe-lg-2 col-xxl-8 pe-xxl-1">
                 <div class="card mb-2">
