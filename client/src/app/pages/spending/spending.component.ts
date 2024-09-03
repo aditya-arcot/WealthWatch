@@ -84,6 +84,7 @@ export class SpendingComponent implements OnInit {
         },
         plugins: {
             tooltip: {
+                position: 'center',
                 callbacks: {
                     title: (tooltipItems) => {
                         const date = tooltipItems[0].label

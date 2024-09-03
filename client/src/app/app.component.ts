@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { Router, RouterOutlet } from '@angular/router'
+import { Tooltip } from 'chart.js'
 import { env } from '../environments/env'
 import { AlertComponent } from './components/alert/alert.component'
 import { HeaderComponent } from './components/header/header.component'
+import { CustomBarElement } from './models/chart.js'
 import { AuthService } from './services/auth.service'
 
 @Component({
@@ -30,6 +32,21 @@ export class AppComponent implements OnInit {
     ngOnInit(): void {
         if (env.name !== 'prod') {
             this.titleSvc.setTitle(`WealthWatch (${env.name})`)
+        }
+
+        // vertically-centered tooltip for stacked bar graph
+        Tooltip.positioners.center = (items) => {
+            if (items.length) {
+                const element = items[0].element as CustomBarElement
+                if (isNaN(element.height)) return false
+                const x = element.x
+                const y =
+                    element.base < element.y
+                        ? element.y - element.height / 2
+                        : element.y + element.height / 2
+                return { x, y }
+            }
+            return false
         }
     }
 
