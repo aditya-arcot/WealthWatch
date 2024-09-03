@@ -1,4 +1,3 @@
-import { HttpError } from '../models/error.js'
 import { Transaction, TransactionsWithCounts } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -146,7 +145,7 @@ const fetchActiveTransactionsCountWithUserId = async (
     userId: number
 ): Promise<number> => {
     const query = `
-        SELECT COUNT(*)
+        SELECT COUNT(*)::INT
         FROM transactions t
         WHERE
             t.account_id IN (
@@ -159,10 +158,10 @@ const fetchActiveTransactionsCountWithUserId = async (
                 )
             )
     `
-    const rows = (await runQuery<{ count: string }>(query, [userId])).rows
+    const rows = (await runQuery<{ count: number }>(query, [userId])).rows
     if (!rows[0]) return -1
-    const countNum = parseInt(rows[0].count)
-    return isNaN(countNum) ? -1 : countNum
+    const count = rows[0].count
+    return isNaN(count) ? -1 : count
 }
 
 const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
@@ -293,17 +292,16 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
 }
 
 const fetchActiveTransactionsCountWithUserIdAndFilters = async (
-    query: string,
+    mainQuery: string,
     values: unknown[]
 ) => {
-    const countQuery = `
-        SELECT COUNT(*)
-        FROM (${query}) AS t
+    const query = `
+        SELECT COUNT(*)::INT
+        FROM (${mainQuery}) AS t
     `
-    const countRows = (await runQuery<{ count: string }>(countQuery, values))
-        .rows
-    if (!countRows[0]) throw new HttpError('failed to fetch count')
-    const count = parseInt(countRows[0].count)
+    const rows = (await runQuery<{ count: number }>(query, values)).rows
+    if (!rows[0]) return -1
+    const count = rows[0].count
     return isNaN(count) ? -1 : count
 }
 
