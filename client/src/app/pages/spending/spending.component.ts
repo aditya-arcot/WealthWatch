@@ -128,6 +128,8 @@ export class SpendingComponent implements OnInit {
     pieChartLabels: string[] = []
     pieChartDataset: number[] = []
     pieChartOptions: ChartOptions<'pie'> = {
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             tooltip: {
                 callbacks: {

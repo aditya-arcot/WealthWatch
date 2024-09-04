@@ -411,6 +411,7 @@
                         } @else {
                             <div>
                                 <canvas
+                                    class="bar-graph"
                                     baseChart
                                     type="bar"
                                     [datasets]="barGraphDatasets"
@@ -436,14 +437,15 @@
                             <div class="text-center">No data</div>
                         } @else {
                             <div class="d-flex justify-content-center">
-                                <canvas
-                                    class="pie-chart"
-                                    baseChart
-                                    type="pie"
-                                    [datasets]="[{ data: pieChartDataset }]"
-                                    [labels]="pieChartLabels"
-                                    [options]="pieChartOptions"
-                                ></canvas>
+                                <div class="pie-chart-div">
+                                    <canvas
+                                        baseChart
+                                        type="pie"
+                                        [datasets]="[{ data: pieChartDataset }]"
+                                        [labels]="pieChartLabels"
+                                        [options]="pieChartOptions"
+                                    ></canvas>
+                                </div>
                             </div>
                         }
                     </div>
