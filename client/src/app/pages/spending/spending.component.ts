@@ -146,6 +146,12 @@ export class SpendingComponent implements OnInit {
             },
             autocolors: {
                 mode: 'data',
+                customize: (context) => {
+                    return {
+                        background: context.colors.background,
+                        border: 'white',
+                    }
+                },
             },
         },
     }
