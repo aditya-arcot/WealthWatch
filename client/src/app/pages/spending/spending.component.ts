@@ -259,7 +259,11 @@ export class SpendingComponent implements OnInit {
                     this.pieChartDataset.push(t.total)
                 }
             } else {
-                this.nonSpendingCategoriesTotalAndCount.push(t)
+                if (category.id === CategoryEnum.Bills) {
+                    this.nonSpendingCategoriesTotalAndCount.unshift(t)
+                } else {
+                    this.nonSpendingCategoriesTotalAndCount.push(t)
+                }
             }
         })
 
