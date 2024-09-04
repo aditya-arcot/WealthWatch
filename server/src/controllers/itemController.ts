@@ -98,7 +98,7 @@ export const refreshItemBalances = async (item: Item) => {
     }
 
     const accounts = await plaidAccountsBalanceGet(item)
-    await insertAccounts(accounts)
+    await insertAccounts(accounts, true)
     await modifyItemLastRefreshedWithPlaidId(item.plaidId, new Date())
 }
 
