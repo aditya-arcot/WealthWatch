@@ -117,7 +117,7 @@ export const handleWebhook = async (webhook: Webhook) => {
             throw new HttpError(`unhandled webhook type: ${webhookType}`, 400)
     }
 
-    logger.debug({ timestamp: webhook.timestamp }, 'handled webhook')
+    logger.debug({ webhookTimestamp: webhook.timestamp }, 'handled webhook')
 }
 
 const handleTransactionsWebhook = async (
