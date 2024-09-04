@@ -140,6 +140,9 @@ export class SpendingComponent implements OnInit {
                     usePointStyle: true,
                 },
             },
+            autocolors: {
+                mode: 'data',
+            },
         },
     }
 
