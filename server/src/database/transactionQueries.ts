@@ -268,7 +268,7 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
             .join(', ')
         query += `
             AND COALESCE (
-                t.custom_category_id, 
+                t.custom_category_id,
                 t.category_id
             ) IN (${idsPlaceholder})
         `

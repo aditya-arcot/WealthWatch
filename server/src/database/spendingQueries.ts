@@ -13,7 +13,7 @@ export const fetchTotalAndCountByCategoryWithUserIdAndDateRange = async (
     const values: unknown[] = []
 
     let query = `
-        WITH category_amounts AS (
+        WITH category_id_amount_date AS (
             SELECT
                 COALESCE (
                     custom_category_id,
@@ -59,14 +59,21 @@ export const fetchTotalAndCountByCategoryWithUserIdAndDateRange = async (
     }
 
     query += `
+        ),
+        category_id_total_count AS (
+            SELECT
+                category_id,
+                SUM (amount) AS total,
+                COUNT (*) AS count
+            FROM category_id_amount_date
+            GROUP BY category_id
         )
         SELECT
-            ca.category_id,
-            SUM (ca.amount) AS total,
-            COUNT (*) AS count
-        FROM category_amounts ca
-        GROUP BY ca.category_id
-        ORDER BY ca.category_id
+            citc.*
+        FROM category_id_total_count citc
+        JOIN categories c
+            ON c.id = citc.category_id
+        ORDER BY c.group_id, c.id
     `
     const rows = (await runQuery<DbCategoryTotalAndCount>(query, values)).rows
     return rows.map(mapDbCategoryTotalAndCount)
@@ -162,12 +169,12 @@ export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
     query += `
             )
         ),
-        daily_totals AS (
+        category_id_date_total AS (
             SELECT
                 fc.category_id,
                 ds.date,
                 SUM (
-                    CASE 
+                    CASE
                         WHEN fc.category_id = ut.category_id
                         THEN ut.amount
                         ELSE 0
@@ -181,13 +188,20 @@ export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
                 AND ut.date < (ds.date + INTERVAL '1 day')
             GROUP BY fc.category_id, ds.date
             ORDER BY ds.date
+        ),
+        category_id_total_by_date AS (
+            SELECT
+                category_id,
+                ARRAY_AGG (total) AS total_by_date
+            FROM category_id_date_total
+            GROUP BY category_id
         )
         SELECT
-            category_id,
-            ARRAY_AGG (total) AS total_by_date
-        FROM daily_totals
-        GROUP BY category_id
-        ORDER BY category_id
+            citbd.*
+        FROM category_id_total_by_date citbd
+        JOIN categories c
+            ON c.id = citbd.category_id
+        ORDER BY c.group_id, c.id
     `
     const rows = (await runQuery<DbCategoryTotalByDate>(query, values)).rows
     return rows.map(mapDbCategoryTotalByDate)
