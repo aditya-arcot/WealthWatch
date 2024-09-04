@@ -54,7 +54,14 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         const notificationsModal = document.getElementById('notificationsModal')
         if (notificationsModal) {
             notificationsModal.addEventListener('hidden.bs.modal', () => {
-                this.handleCloseNotificationsModal()
+                this.updateNotificationsToRead()
+                    .pipe(
+                        switchMap(() =>
+                            this.notificationSvc.loadNotifications()
+                        ),
+                        catchError(() => of(undefined))
+                    )
+                    .subscribe()
             })
         }
     }
@@ -67,15 +74,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             }),
             catchError(() => of(undefined))
         )
-    }
-
-    handleCloseNotificationsModal(): void {
-        this.updateNotificationsToRead()
-            .pipe(
-                switchMap(() => this.notificationSvc.loadNotifications()),
-                catchError(() => of(undefined))
-            )
-            .subscribe()
     }
 
     unreadNotifications(): boolean {

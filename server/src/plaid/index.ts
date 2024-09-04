@@ -1,8 +1,11 @@
 import { AxiosError, isAxiosError } from 'axios'
 import { Configuration, PlaidApi, PlaidEnvironments, PlaidError } from 'plaid'
-import { fetchActiveItemsByUserId } from '../database/itemQueries.js'
 import {
-    fetchActiveNotificationsByUserId,
+    fetchActiveItemsWithUserId,
+    modifyItemHealthyWithId,
+} from '../database/itemQueries.js'
+import {
+    fetchActiveNotificationsWithUserId,
     insertItemNotification,
 } from '../database/notificationQueries.js'
 import { HttpError, PlaidApiError } from '../models/error.js'
@@ -101,7 +104,6 @@ const handlePlaidError = async (
     userId?: number,
     itemId?: number
 ) => {
-    // all errors should be Axios/Plaid errors
     const plaidErr = error.response?.data as PlaidError
     logger.error(`${methodName} error - ${plaidErr.error_code}`)
 
@@ -109,6 +111,7 @@ const handlePlaidError = async (
     req.errorType = plaidErr.error_type
     req.errorMessage = plaidErr.error_message
     req.errorResponse = plaidErr
+    req.errorStack = error.stack ?? null
 
     const errorCodeEnum =
         plaidErr.error_code.toUpperCase() as PlaidGeneralErrorCodeEnum
@@ -184,10 +187,10 @@ const insertPersistentLinkUpdateNotification = async (
     )
 
     const notifications = (
-        await fetchActiveNotificationsByUserId(userId)
+        await fetchActiveNotificationsWithUserId(userId)
     ).filter((n) => n.typeId === type && n.itemId === itemId && n.persistent)
 
-    const item = (await fetchActiveItemsByUserId(userId)).find(
+    const item = (await fetchActiveItemsWithUserId(userId)).find(
         (i) => i.id === itemId
     )
     if (!item) {
@@ -197,15 +200,15 @@ const insertPersistentLinkUpdateNotification = async (
 
     if (notifications.length !== 0) {
         logger.debug('persistent link update notification already exists')
-    }
-
-    if (notifications.length === 0) {
+    } else {
         const message = `${item.institutionName} connection error`
         if (!(await insertItemNotification(type, item, message, true))) {
             logger.error('failed to insert persistent link update notification')
             return
         }
     }
+
+    await modifyItemHealthyWithId(itemId, false)
 }
 
 const insertInstitutionIssuesNotification = async (
@@ -217,7 +220,7 @@ const insertInstitutionIssuesNotification = async (
         'inserting institution issues notification'
     )
 
-    const item = (await fetchActiveItemsByUserId(userId)).find(
+    const item = (await fetchActiveItemsWithUserId(userId)).find(
         (i) => i.id === itemId
     )
     if (!item) {
@@ -233,5 +236,7 @@ const insertInstitutionIssuesNotification = async (
         ) {
             logger.error('failed to insert institution issues notification')
         }
+
+        await modifyItemHealthyWithId(itemId, false)
     }
 }

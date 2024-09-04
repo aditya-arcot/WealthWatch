@@ -1,13 +1,219 @@
-<h2 class="text-center mb-3">Spending</h2>
+<app-loading-spinner [loading]="loading"></app-loading-spinner>
 
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-10 col-sm-8 col-md-6 col-xl-4">
-            <div class="card mb-2">
-                <div class="card-body">
-                    <h4 class="text-center mb-0">Under Construction</h4>
+<div class="container-fluid position-relative mb-3">
+    <h2 class="text-center mb-0">Spending</h2>
+    <button
+        class="btn btn-primary position-absolute top-left"
+        type="button"
+        title="Filter by Date"
+        data-bs-toggle="modal"
+        data-bs-target="#dateFilterModal"
+    >
+        <i class="bi bi-funnel"></i>
+        <span class="ms-1 d-none d-md-inline">Filter by Date</span>
+    </button>
+    <div class="card position-absolute top-right">
+        <div class="card-body px-2 py-1">
+            <div class="form-check form-switch mb-0">
+                <input
+                    id="includeBills"
+                    class="form-check-input"
+                    type="checkbox"
+                    tabindex="0"
+                    [(checked)]="includeBills"
+                    (click)="toggleIncludeBills()"
+                />
+                <label class="form-check-label" for="includeBills">
+                    Include Bills
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-4">
+        <div class="row">
+            <div class="px-2 col-md-6 pe-md-1 col-xl-12 pe-xl-1">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-1">
+                            Spending Categories
+                        </h5>
+                        <h6 class="text-center card-subtitle text-muted mb-1">
+                            {{ getFormattedSelectedDateRange() }}
+                        </h6>
+                        @if (spendingCategoriesTotalAndCount.length === 0) {
+                            <div class="text-center">No data</div>
+                        } @else {
+                            <table
+                                class="table table-striped table-hover table-sm table-bordered align-middle mb-0"
+                            >
+                                <thead class="table-dark">
+                                    <tr class="text-center">
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Count</th>
+                                        <th scope="col">Total</th>
+                                        <th scope="col">Percent</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small-text">
+                                    @for (
+                                        c of spendingCategoriesTotalAndCount;
+                                        track $index
+                                    ) {
+                                        <tr>
+                                            <td>
+                                                {{
+                                                    getCategoryName(
+                                                        c.categoryId
+                                                    )
+                                                }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ c.count }}
+                                            </td>
+                                            <td
+                                                class="text-center"
+                                                [class.text-success]="
+                                                    c.total < 0
+                                                "
+                                            >
+                                                {{ getFormattedTotal(c.total) }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{
+                                                    getFormattedTotalPercent(
+                                                        c.total
+                                                    )
+                                                }}
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 col-md-6 ps-md-1 col-xl-12 ps-xl-2 pe-xl-1">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-1">
+                            Non-Spending Categories
+                        </h5>
+                        <h6 class="text-center card-subtitle text-muted mb-1">
+                            {{ getFormattedSelectedDateRange() }}
+                        </h6>
+                        @if (nonSpendingCategoriesTotalAndCount.length === 0) {
+                            <div class="text-center">No data</div>
+                        } @else {
+                            <table
+                                class="table table-striped table-hover table-sm table-bordered align-middle mb-0"
+                            >
+                                <thead class="table-dark">
+                                    <tr class="text-center">
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Count</th>
+                                        <th scope="col">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small-text">
+                                    @for (
+                                        c of nonSpendingCategoriesTotalAndCount;
+                                        track $index
+                                    ) {
+                                        <tr>
+                                            <td>
+                                                {{
+                                                    getCategoryName(
+                                                        c.categoryId
+                                                    )
+                                                }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ c.count }}
+                                            </td>
+                                            <td
+                                                class="text-center"
+                                                [class.text-success]="
+                                                    c.total < 0
+                                                "
+                                            >
+                                                {{ getFormattedTotal(c.total) }}
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8">
+        <div class="row">
+            <div class="px-2 col-md-8 pe-md-1 ps-xl-1">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-1">
+                            Daily Spending by Category
+                        </h5>
+                        <h6 class="text-center card-subtitle text-muted mb-1">
+                            {{ getFormattedSelectedDateRange() }}
+                        </h6>
+                        <div>
+                            <canvas
+                                baseChart
+                                type="bar"
+                                [datasets]="barGraphDatasets"
+                                [labels]="barGraphLabels"
+                                [options]="barGraphOptions"
+                            ></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-2 col-md-4 ps-md-1">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-1">
+                            Spending By Category
+                        </h5>
+                        <h6 class="text-center card-subtitle text-muted mb-1">
+                            {{ getFormattedSelectedDateRange() }}
+                        </h6>
+                        @if (spendingCategoriesTotalAndCount.length === 0) {
+                            <div class="text-center">No data</div>
+                        } @else {
+                            <div class="d-flex justify-content-center">
+                                <canvas
+                                    class="pie-chart"
+                                    baseChart
+                                    type="pie"
+                                    [datasets]="[{ data: pieChartDataset }]"
+                                    [labels]="pieChartLabels"
+                                    [options]="pieChartOptions"
+                                ></canvas>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<app-date-filter
+    [selectedFilter]="selectedDateFilter"
+    [startDate]="startDate"
+    [endDate]="endDate"
+    [showReset]="true"
+    (filterInputsChanged)="
+        applyDateFilter($event.selectedFilter, $event.startDate, $event.endDate)
+    "
+    (resetRange)="resetDateFilter()"
+/>

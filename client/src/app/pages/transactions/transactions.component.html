@@ -4,20 +4,12 @@
     <h2 class="text-center mb-0">Transactions</h2>
     <button
         (click)="refreshTransactions()"
-        class="btn btn-primary d-none d-md-block position-absolute top-left"
+        class="btn btn-primary position-absolute top-left"
         type="button"
         title="Refresh Transactions"
     >
         <i class="bi bi-arrow-clockwise"></i>
-        Refresh Transactions
-    </button>
-    <button
-        (click)="refreshTransactions()"
-        class="btn btn-primary d-block d-md-none position-absolute top-left"
-        type="button"
-        title="Refresh Transactions"
-    >
-        <i class="bi bi-arrow-clockwise"></i>
+        <span class="ms-1 d-none d-md-inline">Refresh Transactions</span>
     </button>
 </div>
 
@@ -353,21 +345,21 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="table-group-divider">
+                <tbody class="small-text">
                     @for (t of transactions; track $index) {
                         <tr>
                             <td>
-                                {{ getDisplayDate(t) }}
+                                {{ getFormattedDate(t) }}
                             </td>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input
                                         class="form-control"
                                         type="text"
-                                        [value]="getDisplayName(t)"
+                                        [value]="getShortenedName(t)"
                                         (focus)="showFullName($event.target, t)"
                                         (blur)="
-                                            showDisplayName($event.target, t)
+                                            showShortenedName($event.target, t)
                                         "
                                         (change)="updateName($event.target, t)"
                                     />
@@ -385,7 +377,9 @@
                             </td>
                             <td>
                                 <div class="d-none d-lg-inline">
-                                    {{ getDisplayAmount(t) }}
+                                    <span [class.text-success]="t.amount < 0"
+                                        >{{ getFormattedAmount(t) }}
+                                    </span>
                                     @if (t.pending) {
                                         <span class="pending-text"
                                             >(Pending)</span
@@ -395,8 +389,11 @@
                                 <div
                                     class="d-inline d-lg-none"
                                     [class.pending-text]="t.pending"
+                                    [class.text-success]="
+                                        t.amount < 0 && !t.pending
+                                    "
                                 >
-                                    {{ getDisplayAmount(t) }}
+                                    {{ getFormattedAmount(t) }}
                                 </div>
                             </td>
                             <td class="d-none d-sm-table-cell">
@@ -404,7 +401,7 @@
                                     <button
                                         class="btn btn-outline-primary icon-btn d-none d-md-inline"
                                         type="button"
-                                        title="Change Category"
+                                        title="Current Category"
                                     >
                                         <i
                                             class="bi"
@@ -425,7 +422,7 @@
                                                 [value]="category.id"
                                                 [selected]="
                                                     category.id ===
-                                                    getDisplayCategoryId(t)
+                                                    getCategoryId(t)
                                                 "
                                             >
                                                 {{ category.name }}
@@ -464,9 +461,9 @@
                                 </button>
                             </td>
                             <td class="d-none d-md-table-cell">
-                                {{ getDisplayAccount(t) }}
-                                <span class="d-none d-lg-inline"
-                                    >({{ getDisplayInstitution(t) }})</span
+                                {{ getAccountName(t) }}
+                                <span class="d-none d-xl-inline"
+                                    >({{ getInstitutionName(t) }})</span
                                 >
                             </td>
                         </tr>

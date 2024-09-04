@@ -4,7 +4,7 @@ import { env } from '../../environments/env'
 import {
     Transaction,
     TransactionsRequestParams,
-    TransactionsResponse,
+    TransactionsWithCounts,
 } from '../models/transaction'
 
 @Injectable({
@@ -56,7 +56,7 @@ export class TransactionService {
         if (req.offset !== undefined) {
             params = params.set('offset', req.offset)
         }
-        return this.http.get<TransactionsResponse>(this.baseUrl, { params })
+        return this.http.get<TransactionsWithCounts>(this.baseUrl, { params })
     }
 
     updateTransactionCustomName(t: Transaction) {

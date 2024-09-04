@@ -1,5 +1,4 @@
-import { HttpError } from '../models/error.js'
-import { Transaction, TransactionsResponse } from '../models/transaction.js'
+import { Transaction, TransactionsWithCounts } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
@@ -75,76 +74,78 @@ export const insertTransactions = async (
     return rows.map(mapDbTransaction)
 }
 
-export const fetchPaginatedActiveTransactionsByUserIdAndFilters = async (
-    userId: number,
-    searchQuery?: string,
-    startDate?: string,
-    endDate?: string,
-    minAmount?: number,
-    maxAmount?: number,
-    categoryIds?: number[],
-    accountIds?: number[],
-    limit?: number,
-    offset?: number
-): Promise<TransactionsResponse> => {
-    const totalCount = await fetchActiveTransactionsByUserIdCount(userId)
+export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
+    async (
+        userId: number,
+        searchQuery?: string,
+        startDate?: string,
+        endDate?: string,
+        minAmount?: number,
+        maxAmount?: number,
+        categoryIds?: number[],
+        accountIds?: number[],
+        limit?: number,
+        offset?: number
+    ): Promise<TransactionsWithCounts> => {
+        const totalCount = await fetchActiveTransactionsCountWithUserId(userId)
 
-    const {
-        filtered,
-        query: initialQuery,
-        values,
-        placeholder,
-    } = constructfetchActiveTransactionsByUserIdAndFiltersQuery(
-        userId,
-        searchQuery,
-        startDate,
-        endDate,
-        minAmount,
-        maxAmount,
-        categoryIds,
-        accountIds
-    )
-
-    let filteredCount: number | null = null
-    if (filtered) {
-        filteredCount = await fetchActiveTransactionsByUserIdAndFiltersCount(
-            initialQuery,
-            values
+        const {
+            filtered,
+            query: initialQuery,
+            values,
+            placeholder,
+        } = constructFetchActiveTransactionsWithUserIdAndFiltersQuery(
+            userId,
+            searchQuery,
+            startDate,
+            endDate,
+            minAmount,
+            maxAmount,
+            categoryIds,
+            accountIds
         )
-    }
 
-    let query =
-        initialQuery +
-        `
+        let filteredCount: number | null = null
+        if (filtered) {
+            filteredCount =
+                await fetchActiveTransactionsCountWithUserIdAndFilters(
+                    initialQuery,
+                    values
+                )
+        }
+
+        let query =
+            initialQuery +
+            `
         ORDER BY t.date DESC, t.plaid_id
     `
-    if (limit !== undefined) {
-        query += `
+        if (limit !== undefined) {
+            query += `
             LIMIT $${placeholder}
         `
-        values.push(limit)
+            values.push(limit)
 
-        if (offset !== undefined) {
-            query += `
+            if (offset !== undefined) {
+                query += `
                 OFFSET $${placeholder + 1}
             `
-            values.push(offset)
+                values.push(offset)
+            }
+        }
+        const rows = (await runQuery<DbTransaction>(query, values)).rows
+
+        return {
+            transactions: rows.map(mapDbTransaction),
+            filteredCount,
+            totalCount,
         }
     }
-    const rows = (await runQuery<DbTransaction>(query, values)).rows
 
-    return {
-        totalCount,
-        filteredCount,
-        transactions: rows.map(mapDbTransaction),
-    }
-}
-
-const fetchActiveTransactionsByUserIdCount = async (
+const fetchActiveTransactionsCountWithUserId = async (
     userId: number
 ): Promise<number> => {
     const query = `
-        SELECT COUNT(*)
+        SELECT COUNT(*)::INT
         FROM transactions t
         WHERE
             t.account_id IN (
@@ -157,13 +158,13 @@ const fetchActiveTransactionsByUserIdCount = async (
                 )
             )
     `
-    const rows = (await runQuery<{ count: string }>(query, [userId])).rows
+    const rows = (await runQuery<{ count: number }>(query, [userId])).rows
     if (!rows[0]) return -1
-    const countNum = parseInt(rows[0].count)
-    return isNaN(countNum) ? -1 : countNum
+    const count = rows[0].count
+    return isNaN(count) ? -1 : count
 }
 
-const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
+const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
     userId: number,
     searchQuery?: string,
     startDate?: string,
@@ -211,7 +212,7 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
         placeholder++
     }
 
-    if (startDate && endDate) {
+    if (startDate !== undefined && endDate !== undefined) {
         filtered = true
         query += `
             AND t.date >= $${placeholder}
@@ -220,17 +221,17 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
         values.push(startDate)
         values.push(endDate)
         placeholder += 2
-    } else if (startDate) {
+    } else if (startDate !== undefined) {
         filtered = true
         query += `
             AND t.date >= $${placeholder}
         `
         values.push(startDate)
         placeholder++
-    } else if (endDate) {
+    } else if (endDate !== undefined) {
         filtered = true
         query += `
-            AND t.date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
+            AND t.date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(endDate)
         placeholder++
@@ -239,7 +240,7 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
     if (minAmount !== undefined && maxAmount !== undefined) {
         filtered = true
         query += `
-            AND t.amount >= $${placeholder} AND t.amount <= $${placeholder + 1}
+            AND ABS(t.amount) >= $${placeholder} AND ABS(t.amount) <= $${placeholder + 1}
         `
         values.push(minAmount)
         values.push(maxAmount)
@@ -247,14 +248,14 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
     } else if (minAmount !== undefined) {
         filtered = true
         query += `
-            AND t.amount >= $${placeholder}
+            AND ABS(t.amount) >= $${placeholder}
         `
         values.push(minAmount)
         placeholder++
     } else if (maxAmount !== undefined) {
         filtered = true
         query += `
-            AND t.amount <= $${placeholder}
+            AND ABS(t.amount) <= $${placeholder}
         `
         values.push(maxAmount)
         placeholder++
@@ -267,7 +268,7 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
             .join(', ')
         query += `
             AND COALESCE (
-                t.custom_category_id, 
+                t.custom_category_id,
                 t.category_id
             ) IN (${idsPlaceholder})
         `
@@ -290,22 +291,93 @@ const constructfetchActiveTransactionsByUserIdAndFiltersQuery = (
     return { filtered, query, values, placeholder }
 }
 
-const fetchActiveTransactionsByUserIdAndFiltersCount = async (
-    query: string,
+const fetchActiveTransactionsCountWithUserIdAndFilters = async (
+    mainQuery: string,
     values: unknown[]
 ) => {
-    const countQuery = `
-        SELECT COUNT(*)
-        FROM (${query}) AS t
+    const query = `
+        SELECT COUNT(*)::INT
+        FROM (${mainQuery}) AS t
     `
-    const countRows = (await runQuery<{ count: string }>(countQuery, values))
-        .rows
-    if (!countRows[0]) throw new HttpError('failed to fetch count')
-    const count = parseInt(countRows[0].count)
+    const rows = (await runQuery<{ count: number }>(query, values)).rows
+    if (!rows[0]) return -1
+    const count = rows[0].count
     return isNaN(count) ? -1 : count
 }
 
-export const modifyTransactionCustomNameByPlaidId = async (
+export const fetchActiveTransactionsDailyDateRangeWithUserIdAndDates = async (
+    userId: number,
+    startDate?: string,
+    endDate?: string
+): Promise<Date[]> => {
+    const values: unknown[] = []
+
+    let query = `
+        WITH user_transactions AS (
+            SELECT
+                COALESCE (
+                    custom_category_id,
+                    category_id
+                ) AS category_id,
+                date,
+                amount
+            FROM transactions
+            WHERE account_id IN (
+                SELECT id
+                FROM accounts
+                WHERE item_id IN (
+                    SELECT id
+                    FROM active_items
+                    WHERE user_id = $1
+                )
+            )
+        ),
+        date_series AS (
+            SELECT GENERATE_SERIES (
+    `
+    values.push(userId)
+
+    if (startDate === undefined && endDate === undefined) {
+        query += `
+                (SELECT MIN (date) FROM user_transactions),
+                (SELECT MAX (date) FROM user_transactions),
+        `
+    } else if (startDate === undefined) {
+        query += `
+                DATE_TRUNC ('day', (SELECT MIN (date) FROM user_transactions))
+                    - INTERVAL '1 day'
+                    + ($2::TIMESTAMPTZ - DATE_TRUNC ('day', $2::TIMESTAMPTZ)),
+                $2::TIMESTAMPTZ,
+        `
+        values.push(endDate)
+    } else if (endDate === undefined) {
+        query += `
+                $2::TIMESTAMPTZ,
+                NOW (),
+        `
+        values.push(startDate)
+    } else {
+        query += `
+                $2::TIMESTAMPTZ,
+                $3::TIMESTAMPTZ,
+        `
+        values.push(startDate)
+        values.push(endDate)
+    }
+
+    query += `
+                INTERVAL '1 day'
+            ) AS date
+        )
+        SELECT date
+        FROM date_series
+        ORDER BY date
+    `
+    const rows = (await runQuery<{ date: Date }>(query, values)).rows
+    return rows.map((row) => row.date)
+}
+
+export const modifyTransactionCustomNameWithPlaidId = async (
     plaidId: string,
     name: string | null
 ): Promise<Transaction | undefined> => {
@@ -320,7 +392,7 @@ export const modifyTransactionCustomNameByPlaidId = async (
     return mapDbTransaction(rows[0])
 }
 
-export const modifyTransactionCustomCategoryIdByPlaidId = async (
+export const modifyTransactionCustomCategoryIdWithPlaidId = async (
     plaidId: string,
     categoryId: number | null
 ): Promise<Transaction | undefined> => {
@@ -336,7 +408,7 @@ export const modifyTransactionCustomCategoryIdByPlaidId = async (
     return mapDbTransaction(rows[0])
 }
 
-export const modifyTransactionNoteByPlaidId = async (
+export const modifyTransactionNoteWithPlaidId = async (
     plaidId: string,
     note: string | null
 ): Promise<Transaction | undefined> => {
@@ -351,7 +423,7 @@ export const modifyTransactionNoteByPlaidId = async (
     return mapDbTransaction(rows[0])
 }
 
-export const removeTransactionsByPlaidIds = async (
+export const removeTransactionsWithPlaidIds = async (
     plaidIds: string[]
 ): Promise<Transaction[] | undefined> => {
     if (!plaidIds.length) return

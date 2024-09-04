@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
-    fetchActiveItemByUserIdAndInstitutionId,
-    fetchActiveItemsByUserId,
+    fetchActiveItemsWithUserId,
+    fetchActiveItemWithUserIdAndInstitutionId,
     insertItem,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/error.js'
@@ -34,15 +34,11 @@ export const createLinkToken = async (req: Request, res: Response) => {
     if (updateAccounts !== undefined && typeof updateAccounts !== 'boolean')
         throw new HttpError('invalid update accounts flag', 400)
 
-    const items = await fetchActiveItemsByUserId(userId)
+    const items = await fetchActiveItemsWithUserId(userId)
     const item = items.filter((i) => i.id === itemId)[0]
     if (!item) throw new HttpError('item not found', 404)
 
-    const linkToken = await plaidLinkTokenCreate(
-        userId,
-        item.plaidId,
-        updateAccounts
-    )
+    const linkToken = await plaidLinkTokenCreate(userId, item, updateAccounts)
     return res.send({ linkToken })
 }
 
@@ -80,7 +76,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     )
         throw new HttpError('missing institution info', 400)
 
-    const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
+    const existingItem = await fetchActiveItemWithUserIdAndInstitutionId(
         userId,
         institution.institution_id
     )

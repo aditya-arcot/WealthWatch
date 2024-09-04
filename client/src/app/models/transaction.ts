@@ -1,15 +1,3 @@
-export interface TransactionsRequestParams {
-    searchQuery?: string
-    startDate?: Date | null
-    endDate?: Date | null
-    minAmount?: number | null
-    maxAmount?: number | null
-    categoryIds?: Set<number>
-    accountIds?: Set<number>
-    limit?: number
-    offset?: number
-}
-
 export interface Transaction {
     id: number
     accountId: number
@@ -31,8 +19,20 @@ export interface Transaction {
     note: string | null
 }
 
-export interface TransactionsResponse {
-    totalCount: number
-    filteredCount: number | null
+export interface TransactionsRequestParams {
+    searchQuery?: string
+    startDate?: Date | null
+    endDate?: Date | null
+    minAmount?: number | null
+    maxAmount?: number | null
+    categoryIds?: Set<number>
+    accountIds?: Set<number>
+    limit?: number
+    offset?: number
+}
+
+export interface TransactionsWithCounts {
     transactions: Transaction[]
+    filteredCount: number | null
+    totalCount: number
 }

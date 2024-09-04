@@ -109,7 +109,7 @@ export class AmountFilterComponent implements OnInit, OnChanges {
             this.selectedFilter !== AmountFilterEnum.ALL &&
             this.selectedFilter !== AmountFilterEnum.LESS_THAN
         ) {
-            return this.minAmount !== null
+            return this.minAmount !== null && this.minAmount >= 0
         }
         return true
     }
@@ -122,7 +122,7 @@ export class AmountFilterComponent implements OnInit, OnChanges {
                 return false
             }
             if (this.minAmount !== null) {
-                return this.minAmount <= this.maxAmount
+                return this.minAmount <= this.maxAmount && this.maxAmount >= 0
             }
         }
         return true

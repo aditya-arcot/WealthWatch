@@ -20,10 +20,6 @@
     cursor: pointer;
 }
 
-td {
-    font-size: 14px;
-}
-
 .pending-text {
     color: grey;
 }

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
-import { fetchUserByUsername, insertUser } from '../database/userQueries.js'
+import { fetchUserWithUsername, insertUser } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
 import { User } from '../models/user.js'
 import { logger } from '../utils/logger.js'
@@ -16,7 +16,7 @@ export const login = async (req: Request, res: Response) => {
     if (typeof password !== 'string')
         throw new HttpError('missing or invalid password', 400)
 
-    const user = await fetchUserByUsername(username)
+    const user = await fetchUserWithUsername(username)
     if (!user) {
         throw new HttpError('invalid username', 404)
     }

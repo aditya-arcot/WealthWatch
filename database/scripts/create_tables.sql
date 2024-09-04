@@ -44,10 +44,19 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+-- CATEGORY GROUPS TABLE
+CREATE TABLE category_groups (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name TEXT UNIQUE NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
 -- CATEGORIES TABLE
 CREATE TABLE categories (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name TEXT UNIQUE NOT NULL,
+    group_id INTEGER REFERENCES category_groups(id) NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -154,11 +163,11 @@ CREATE TABLE accounts (
     name TEXT NOT NULL,
     mask TEXT,
     official_name TEXT,
-    current_balance NUMERIC(28, 10),
-    available_balance NUMERIC(28, 10),
+    current_balance DOUBLE,
+    available_balance DOUBLE,
     iso_currency_code TEXT,
     unofficial_currency_code TEXT,
-    credit_limit NUMERIC(28, 10),
+    credit_limit DOUBLE,
     type TEXT NOT NULL,
     subtype TEXT NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -192,7 +201,7 @@ CREATE TABLE transactions (
     merchant TEXT,
     name TEXT NOT NULL,
     custom_name TEXT,
-    amount NUMERIC(28, 10) NOT NULL,
+    amount DOUBLE NOT NULL,
     primary_category TEXT,
     detailed_category TEXT,
     category_id INTEGER REFERENCES categories(id) NOT NULL,

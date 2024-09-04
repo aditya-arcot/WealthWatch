@@ -34,6 +34,7 @@ import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
+import { checkDatesEqual } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-transactions',
@@ -188,9 +189,9 @@ export class TransactionsComponent implements OnInit {
         return this.transactionSvc.getTransactions(req).pipe(
             switchMap((t) => {
                 this.logger.debug('loaded transactions', t)
-                this.totalCount = t.totalCount
-                this.filteredCount = t.filteredCount
                 this.transactions = t.transactions
+                this.filteredCount = t.filteredCount
+                this.totalCount = t.totalCount
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -359,14 +360,14 @@ export class TransactionsComponent implements OnInit {
     ): void {
         this.selectedDateFilter = filter
         let reload = false
-        if (start !== this.previousStartDate) {
-            this.previousStartDate = start
-            this.startDate = start
+        if (!checkDatesEqual(start, this.previousStartDate)) {
+            this.previousStartDate = start ? new Date(start) : null
+            this.startDate = start ? new Date(start) : null
             reload = true
         }
-        if (end !== this.previousEndDate) {
-            this.previousEndDate = end
-            this.endDate = end
+        if (!checkDatesEqual(end, this.previousEndDate)) {
+            this.previousEndDate = end ? new Date(end) : null
+            this.endDate = end ? new Date(end) : null
             reload = true
         }
         if (reload) {
@@ -440,8 +441,10 @@ export class TransactionsComponent implements OnInit {
 
         this.selectedDateFilter = DateFilterEnum.ALL
         this.previousStartDate = this.startDate
+            ? new Date(this.startDate)
+            : null
         this.startDate = null
-        this.previousEndDate = this.endDate
+        this.previousEndDate = this.endDate ? new Date(this.endDate) : null
         this.endDate = null
 
         this.selectedAmountFilter = AmountFilterEnum.ALL
@@ -457,7 +460,7 @@ export class TransactionsComponent implements OnInit {
         this.reloadTransactions()
     }
 
-    getDisplayDate(t: Transaction): string {
+    getFormattedDate(t: Transaction): string {
         return new Date(t.date).toLocaleDateString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -465,7 +468,7 @@ export class TransactionsComponent implements OnInit {
         })
     }
 
-    getDisplayName(t: Transaction): string {
+    getShortenedName(t: Transaction): string {
         let name = t.customName ?? t.merchant ?? t.name
         if (name.length > this.maxNameLength)
             name = name.substring(0, this.maxNameLength) + '...'
@@ -478,10 +481,10 @@ export class TransactionsComponent implements OnInit {
         element.value = (t.customName ?? t.merchant ?? t.name).trim()
     }
 
-    showDisplayName(target: EventTarget | null, t: Transaction): void {
+    showShortenedName(target: EventTarget | null, t: Transaction): void {
         if (!target) return
         const element = target as HTMLInputElement
-        element.value = this.getDisplayName(t)
+        element.value = this.getShortenedName(t)
     }
 
     updateName(target: EventTarget | null, t: Transaction): void {
@@ -503,14 +506,17 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomName(t)
     }
 
-    getDisplayAmount(t: Transaction): string {
-        return this.currencySvc.formatAmount(
-            t.amount,
+    getFormattedAmount(t: Transaction): string {
+        const negative = t.amount < 0
+        const formatted = this.currencySvc.formatAmount(
+            Math.abs(t.amount),
             t.unofficialCurrencyCode ?? t.isoCurrencyCode
         )
+        if (negative) return `+${formatted}`
+        return formatted
     }
 
-    getDisplayCategoryId(t: Transaction): number {
+    getCategoryId(t: Transaction): number {
         return t.customCategoryId ?? t.categoryId
     }
 
@@ -535,7 +541,7 @@ export class TransactionsComponent implements OnInit {
     }
 
     getCategoryClass(t: Transaction): string {
-        const categoryId = this.getDisplayCategoryId(t) as CategoryEnum
+        const categoryId = this.getCategoryId(t) as CategoryEnum
         return categoryIcons[categoryId]
     }
 
@@ -559,7 +565,7 @@ export class TransactionsComponent implements OnInit {
         )
     }
 
-    getDisplayAccount(t: Transaction): string {
+    getAccountName(t: Transaction): string {
         const account = this.accounts.find((a) => a.id === t.accountId)
         if (!account) {
             this.logger.error('unrecognized account id', t.accountId)
@@ -568,7 +574,7 @@ export class TransactionsComponent implements OnInit {
         return account.name
     }
 
-    getDisplayInstitution(t: Transaction): string {
+    getInstitutionName(t: Transaction): string {
         const account = this.accounts.find((a) => a.id === t.accountId)
         if (!account) {
             this.logger.error('unrecognized account id', t.accountId)

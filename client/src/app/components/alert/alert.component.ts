@@ -25,7 +25,7 @@ export class AlertComponent implements OnDestroy {
         this.subscription.unsubscribe()
     }
 
-    onClose(id: string): void {
+    removeAlert(id: string): void {
         this.alertSvc.removeAlert(id)
     }
 
