@@ -20,11 +20,12 @@
                     class="form-check-input"
                     type="checkbox"
                     tabindex="0"
-                    [(checked)]="includeBills"
+                    [checked]="includeBills"
                     (click)="toggleIncludeBills()"
                 />
                 <label class="form-check-label" for="includeBills">
                     Include Bills
+                    <span class="d-none d-md-inline">in Spending</span>
                 </label>
             </div>
         </div>
@@ -41,7 +42,7 @@
                             Spending Categories
                         </h5>
                         <h6 class="text-center card-subtitle text-muted mb-1">
-                            {{ getFormattedSelectedDateRange() }}
+                            {{ getSelectedDateRangeString() }}
                         </h6>
                         @if (spendingCategoriesTotalAndCount.length === 0) {
                             <div class="text-center">No data</div>
@@ -54,7 +55,7 @@
                                         <th scope="col">Category</th>
                                         <th scope="col">Count</th>
                                         <th scope="col">Total</th>
-                                        <th scope="col">Percent</th>
+                                        <th scope="col">% Spending</th>
                                     </tr>
                                 </thead>
                                 <tbody class="small-text">
@@ -79,12 +80,39 @@
                                                     c.total < 0
                                                 "
                                             >
-                                                {{ getFormattedTotal(c.total) }}
+                                                {{ getAmountString(c.total) }}
                                             </td>
                                             <td class="text-center">
                                                 {{
-                                                    getFormattedTotalPercent(
+                                                    getPercentSpendingString(
                                                         c.total
+                                                    )
+                                                }}
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (
+                                        includeBills && billsTotal !== undefined
+                                    ) {
+                                        <tr>
+                                            <td>Bills</td>
+                                            <td class="text-center">
+                                                {{ billsCount }}
+                                            </td>
+                                            <td
+                                                class="text-center"
+                                                [class.text-success]="
+                                                    billsTotal < 0
+                                                "
+                                            >
+                                                {{
+                                                    getAmountString(billsTotal)
+                                                }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{
+                                                    getPercentSpendingString(
+                                                        billsTotal
                                                     )
                                                 }}
                                             </td>
@@ -96,14 +124,89 @@
                     </div>
                 </div>
             </div>
-            <div class="px-2 col-md-6 ps-md-1 col-xl-12 ps-xl-2 pe-xl-1">
+            <div class="px-2 col-md-6 ps-md-1 col-xl-12 pe-xl-1">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-1">
+                            Income and Spending
+                        </h5>
+                        <h6 class="text-center card-subtitle text-muted mb-1">
+                            {{ getSelectedDateRangeString() }}
+                        </h6>
+                        <table
+                            class="table table-striped table-hover table-sm table-bordered align-middle mb-0"
+                        >
+                            <thead class="table-dark">
+                                <tr class="text-center">
+                                    <th scope="col">Group</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">% Income</th>
+                                </tr>
+                            </thead>
+                            <tbody class="small-text">
+                                <tr>
+                                    <td>Income</td>
+                                    <td class="text-center">
+                                        {{ getIncomeTotalString() }}
+                                    </td>
+                                    <td class="text-center">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Non-Bill Spending</td>
+                                    <td class="text-center">
+                                        {{ getSpendingTotalString() }}
+                                    </td>
+                                    <td class="text-center">
+                                        {{
+                                            getPercentIncomeString(
+                                                spendingTotal
+                                            )
+                                        }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Bills</td>
+                                    <td class="text-center">
+                                        {{ getBillsTotalString() }}
+                                    </td>
+                                    <td class="text-center">
+                                        {{ getPercentIncomeString(billsTotal) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Remaining</td>
+                                    <td
+                                        class="text-center"
+                                        [class.text-success]="
+                                            getRemainingAmount() > 0
+                                        "
+                                        [class.text-danger]="
+                                            getRemainingAmount() < 0
+                                        "
+                                    >
+                                        {{ getRemainingAmountString() }}
+                                    </td>
+                                    <td class="text-center">
+                                        {{
+                                            getPercentIncomeString(
+                                                getRemainingAmount()
+                                            )
+                                        }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="px-2 col-md-6 pe-md-1 col-xl-12">
                 <div class="card mb-2">
                     <div class="card-body">
                         <h5 class="card-title text-center mb-1">
                             Non-Spending Categories
                         </h5>
                         <h6 class="text-center card-subtitle text-muted mb-1">
-                            {{ getFormattedSelectedDateRange() }}
+                            {{ getSelectedDateRangeString() }}
                         </h6>
                         @if (nonSpendingCategoriesTotalAndCount.length === 0) {
                             <div class="text-center">No data</div>
@@ -119,6 +222,27 @@
                                     </tr>
                                 </thead>
                                 <tbody class="small-text">
+                                    @if (
+                                        !includeBills &&
+                                        billsTotal !== undefined
+                                    ) {
+                                        <tr>
+                                            <td>Bills</td>
+                                            <td class="text-center">
+                                                {{ billsCount }}
+                                            </td>
+                                            <td
+                                                class="text-center"
+                                                [class.text-success]="
+                                                    billsTotal < 0
+                                                "
+                                            >
+                                                {{
+                                                    getAmountString(billsTotal)
+                                                }}
+                                            </td>
+                                        </tr>
+                                    }
                                     @for (
                                         c of nonSpendingCategoriesTotalAndCount;
                                         track $index
@@ -140,7 +264,7 @@
                                                     c.total < 0
                                                 "
                                             >
-                                                {{ getFormattedTotal(c.total) }}
+                                                {{ getAmountString(c.total) }}
                                             </td>
                                         </tr>
                                     }
@@ -162,7 +286,7 @@
                             Daily Spending by Category
                         </h5>
                         <h6 class="text-center card-subtitle text-muted mb-1">
-                            {{ getFormattedSelectedDateRange() }}
+                            {{ getSelectedDateRangeString() }}
                         </h6>
                         <div>
                             <canvas
@@ -184,7 +308,7 @@
                             Spending By Category
                         </h5>
                         <h6 class="text-center card-subtitle text-muted mb-1">
-                            {{ getFormattedSelectedDateRange() }}
+                            {{ getSelectedDateRangeString() }}
                         </h6>
                         @if (spendingCategoriesTotalAndCount.length === 0) {
                             <div class="text-center">No data</div>

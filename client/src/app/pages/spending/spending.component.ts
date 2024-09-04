@@ -54,7 +54,11 @@ export class SpendingComponent implements OnInit {
     totalByCategoryAndDate: CategoryTotalByDate[] = []
 
     includeBills = true
-    spendingTotal = -1
+    incomeTotal: number | undefined = undefined
+    incomeCount: number | undefined = undefined
+    billsTotal: number | undefined = undefined
+    billsCount: number | undefined = undefined
+    spendingTotal = 0
     spendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
     nonSpendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
 
@@ -236,6 +240,10 @@ export class SpendingComponent implements OnInit {
     }
 
     processData(): void {
+        this.incomeTotal = undefined
+        this.incomeCount = undefined
+        this.billsTotal = undefined
+        this.billsCount = undefined
         this.spendingTotal = 0
         this.spendingCategoriesTotalAndCount = []
         this.nonSpendingCategoriesTotalAndCount = []
@@ -250,10 +258,21 @@ export class SpendingComponent implements OnInit {
             const category = this.categories.find((c) => c.id === t.categoryId)
             if (!category) return
 
-            if (
-                category.groupId === CategoryGroupEnum.Spending &&
-                (category.id !== CategoryEnum.Bills || this.includeBills)
-            ) {
+            if (category.id === CategoryEnum.Income) {
+                this.incomeTotal = t.total
+                this.incomeCount = t.count
+                return
+            } else if (category.id === CategoryEnum.Bills) {
+                this.billsTotal = t.total
+                this.billsCount = t.count
+                if (t.total > 0) {
+                    this.pieChartLabels.push(category.name)
+                    this.pieChartDataset.push(t.total)
+                }
+                return
+            }
+
+            if (category.groupId === CategoryGroupEnum.Spending) {
                 this.spendingTotal += t.total
                 this.spendingCategoriesTotalAndCount.push(t)
 
@@ -262,15 +281,11 @@ export class SpendingComponent implements OnInit {
                     this.pieChartDataset.push(t.total)
                 }
             } else {
-                if (category.id === CategoryEnum.Bills) {
-                    this.nonSpendingCategoriesTotalAndCount.unshift(t)
-                } else {
-                    this.nonSpendingCategoriesTotalAndCount.push(t)
-                }
+                this.nonSpendingCategoriesTotalAndCount.push(t)
             }
         })
 
-        this.barGraphLabels = this.dates.map((d) => this.getFormattedDate(d))
+        this.barGraphLabels = this.dates.map((d) => this.getDateString(d))
 
         this.totalByCategoryAndDate.forEach((t) => {
             const category = this.categories.find((c) => c.id === t.categoryId)
@@ -292,21 +307,8 @@ export class SpendingComponent implements OnInit {
         const billsCategory = this.categories.find(
             (c) => c.id === CategoryEnum.Bills
         )
-
-        if (this.includeBills) {
-            const billsIdx = this.spendingCategoriesTotalAndCount.findIndex(
-                (t) => t.categoryId === CategoryEnum.Bills
-            )
-            if (billsIdx !== -1) {
-                const bills = this.spendingCategoriesTotalAndCount.splice(
-                    billsIdx,
-                    1
-                )[0]
-                this.nonSpendingCategoriesTotalAndCount.unshift(bills)
-                this.spendingTotal -= bills.total
-            }
-
-            if (billsCategory) {
+        if (billsCategory) {
+            if (this.includeBills) {
                 const billsLabelIdx = this.pieChartLabels.findIndex(
                     (l) => l === billsCategory.name
                 )
@@ -321,21 +323,7 @@ export class SpendingComponent implements OnInit {
                 if (billsDatasetIdx !== -1) {
                     this.barGraphDatasets.splice(billsDatasetIdx, 1)
                 }
-            }
-        } else {
-            const billsIdx = this.nonSpendingCategoriesTotalAndCount.findIndex(
-                (t) => t.categoryId === CategoryEnum.Bills
-            )
-            if (billsIdx !== -1) {
-                const bills = this.nonSpendingCategoriesTotalAndCount.splice(
-                    billsIdx,
-                    1
-                )[0]
-                this.spendingCategoriesTotalAndCount.push(bills)
-                this.spendingTotal += bills.total
-            }
-
-            if (billsCategory) {
+            } else {
                 const billsTotal = this.totalAndCountByCategory.find(
                     (t) => t.categoryId === CategoryEnum.Bills
                 )?.total
@@ -355,9 +343,8 @@ export class SpendingComponent implements OnInit {
                 }
             }
         }
-
-        this.updateCharts()
         this.includeBills = !this.includeBills
+        this.updateCharts()
         this.loading = false
     }
 
@@ -410,20 +397,20 @@ export class SpendingComponent implements OnInit {
         return category?.name ?? 'Unknown'
     }
 
-    getFormattedSelectedDateRange(): string {
+    getSelectedDateRangeString(): string {
         if (this.selectedDateFilter !== DateFilterEnum.CUSTOM) {
             return this.selectedDateFilter
         }
         if (!this.startDate) {
-            return `On or Before ${this.getFormattedDate(this.endDate!)}`
+            return `On or Before ${this.getDateString(this.endDate!)}`
         }
         if (!this.endDate) {
-            return `On or After ${this.getFormattedDate(this.startDate!)}`
+            return `On or After ${this.getDateString(this.startDate!)}`
         }
-        return `${this.getFormattedDate(this.startDate)} - ${this.getFormattedDate(this.endDate)}`
+        return `${this.getDateString(this.startDate)} - ${this.getDateString(this.endDate)}`
     }
 
-    getFormattedDate(date: Date): string {
+    getDateString(date: Date): string {
         return new Date(date).toLocaleDateString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -431,14 +418,52 @@ export class SpendingComponent implements OnInit {
         })
     }
 
-    getFormattedTotal(total: number): string {
+    getIncomeTotalString(): string | undefined {
+        return this.getAmountString(this.incomeTotal ?? 0)
+    }
+
+    getBillsTotalString(): string | undefined {
+        return this.getAmountString(this.billsTotal ?? 0)
+    }
+
+    getSpendingTotalString(): string {
+        return this.getAmountString(this.spendingTotal)
+    }
+
+    getAmountString(total: number): string {
         const negative = total < 0
         const formatted = this.currencySvc.formatAmount(Math.abs(total), 'USD')
         if (negative) return `+${formatted}`
         return formatted
     }
 
-    getFormattedTotalPercent(total: number): string {
-        return `${((total / this.spendingTotal) * 100).toFixed(1)}%`
+    getRemainingAmountString(): string {
+        return this.currencySvc.formatAmount(
+            Math.abs(this.getRemainingAmount()),
+            'USD'
+        )
+    }
+    getRemainingAmount(): number {
+        return (
+            -1 *
+            ((this.incomeTotal ?? 0) +
+                (this.spendingTotal + (this.billsTotal ?? 0)))
+        )
+    }
+
+    getPercentSpendingString(amount: number): string {
+        const spendingBillsTotal =
+            this.spendingTotal +
+            (this.includeBills && this.billsTotal ? this.billsTotal : 0)
+        return this.getPercentString(amount / spendingBillsTotal)
+    }
+
+    getPercentIncomeString(amount: number | undefined): string {
+        if (this.incomeTotal === undefined || this.incomeTotal === 0) return '-'
+        return this.getPercentString((amount ?? 0) / (-1 * this.incomeTotal))
+    }
+
+    getPercentString(decimal: number): string {
+        return `${(decimal * 100).toFixed(1)}%`
     }
 }
