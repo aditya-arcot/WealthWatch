@@ -56,6 +56,8 @@ export class AppComponent implements OnInit {
         Chart.defaults.font.family = `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`
         Chart.defaults.color = 'black'
         Chart.defaults.font.size = 10
+
+        Chart.defaults.devicePixelRatio = 3
     }
 
     noHeaderPath(path: string) {
