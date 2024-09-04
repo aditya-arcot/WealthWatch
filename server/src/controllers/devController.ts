@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
 import {
-    fetchActiveItemByPlaidId,
-    fetchActiveItemByUserIdAndInstitutionId,
-    fetchActiveItemsByUserId,
+    fetchActiveItemWithPlaidId,
+    fetchActiveItemWithUserIdAndInstitutionId,
+    fetchActiveItemsWithUserId,
     insertItem,
 } from '../database/itemQueries.js'
-import { fetchUsers, removeUserById } from '../database/userQueries.js'
+import { fetchUsers, removeUserWithId } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { plaidSandboxResetLogin } from '../plaid/itemMethods.js'
@@ -40,7 +40,7 @@ const deactivateItems = async (deleteUsers = false) => {
         users.map(async (user) => {
             logger.debug({ id: user.id }, 'deactivating user items')
 
-            const items = await fetchActiveItemsByUserId(user.id)
+            const items = await fetchActiveItemsWithUserId(user.id)
             await Promise.all(
                 items.map(async (item) => {
                     await deactivateItemMain(item)
@@ -49,7 +49,7 @@ const deactivateItems = async (deleteUsers = false) => {
 
             if (deleteUsers) {
                 logger.debug({ id: user.id }, 'deleting user')
-                await removeUserById(user.id)
+                await removeUserWithId(user.id)
             }
         })
     )
@@ -63,7 +63,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
 
     const institutionId = 'ins_56'
     const institutionName = 'Chase'
-    const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
+    const existingItem = await fetchActiveItemWithUserIdAndInstitutionId(
         user.id,
         institutionId
     )
@@ -102,7 +102,7 @@ export const syncItem = async (req: Request, res: Response) => {
     if (typeof plaidItemId !== 'string')
         throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItem(item)
 
@@ -119,7 +119,7 @@ export const forceRefreshItemTransactions = async (
     if (typeof plaidItemId !== 'string')
         throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     item.lastRefreshed = null
     await refreshItemTransactions(item)
@@ -134,7 +134,7 @@ export const forceRefreshItemBalances = async (req: Request, res: Response) => {
     if (typeof plaidItemId !== 'string')
         throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     item.lastRefreshed = null
     await queueRefreshItemBalances(item)
@@ -149,7 +149,7 @@ export const resetSandboxItemLogin = async (req: Request, res: Response) => {
     if (typeof plaidItemId !== 'string')
         throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const reset = await plaidSandboxResetLogin(item)
@@ -169,7 +169,7 @@ export const fireSandboxWebhook = async (req: Request, res: Response) => {
     if (typeof code !== 'string')
         throw new HttpError('missing or invalid webhook code', 400)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
     // login repaired missing from enum

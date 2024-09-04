@@ -19,8 +19,8 @@ export interface Transaction {
     note: string | null
 }
 
-export interface TransactionsResponse {
-    totalCount: number
-    filteredCount: number | null
+export interface TransactionsWithCounts {
     transactions: Transaction[]
+    filteredCount: number | null
+    totalCount: number
 }

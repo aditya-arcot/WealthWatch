@@ -1,13 +1,14 @@
 export interface Category {
     id: number
     name: string
+    groupId: number
 }
 
 export enum CategoryEnum {
     Uncategorized = 1,
     Income,
     Transfer,
-    Deposit,
+    CashAndChecks,
     Investment,
     Savings,
     LoanPayment,
@@ -28,11 +29,17 @@ export enum CategoryEnum {
     Bills,
 }
 
+export enum CategoryGroupEnum {
+    Earning = 1,
+    Spending,
+    Ignored,
+}
+
 export const categoryIcons: Record<CategoryEnum, string> = {
     [CategoryEnum.Uncategorized]: 'bi-question-circle',
     [CategoryEnum.Income]: 'bi-currency-dollar',
     [CategoryEnum.Transfer]: 'bi-arrow-left-right',
-    [CategoryEnum.Deposit]: 'bi-bank',
+    [CategoryEnum.CashAndChecks]: 'bi-bank',
     [CategoryEnum.Investment]: 'bi-graph-up',
     [CategoryEnum.Savings]: 'bi-piggy-bank',
     [CategoryEnum.LoanPayment]: 'bi-wallet',

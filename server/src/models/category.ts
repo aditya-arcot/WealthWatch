@@ -1,13 +1,14 @@
 export interface Category {
     id: number
     name: string
+    groupId: number
 }
 
 export enum CategoryEnum {
     Uncategorized = 1,
     Income,
     Transfer,
-    Deposit,
+    CashAndChecks,
     Investment,
     Savings,
     LoanPayment,
@@ -26,4 +27,10 @@ export enum CategoryEnum {
     Transportation,
     Travel,
     Bills,
+}
+
+export enum CategoryGroupEnum {
+    Earning = 1,
+    Spending,
+    Ignored,
 }

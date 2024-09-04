@@ -99,6 +99,37 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    CategoryTotalAndCount: {
+                        type: 'object',
+                        properties: {
+                            categoryId: {
+                                type: 'number',
+                                description: 'The category id',
+                            },
+                            total: {
+                                type: 'number',
+                                description: 'The category transaction total',
+                            },
+                            count: {
+                                type: 'number',
+                                description: 'The category transaction count',
+                            },
+                        },
+                    },
+                    CategoryTotalByDate: {
+                        type: 'object',
+                        properties: {
+                            categoryId: {
+                                type: 'number',
+                                description: 'The category id',
+                            },
+                            totalByDate: {
+                                type: 'array',
+                                description:
+                                    'The category transaction total by date',
+                            },
+                        },
+                    },
                     Item: {
                         type: 'object',
                         properties: {
