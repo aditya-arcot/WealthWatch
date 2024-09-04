@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { Router, RouterOutlet } from '@angular/router'
-import { Tooltip } from 'chart.js'
+import { Chart, Tooltip } from 'chart.js'
 import { env } from '../environments/env'
 import { AlertComponent } from './components/alert/alert.component'
 import { HeaderComponent } from './components/header/header.component'
@@ -48,6 +48,11 @@ export class AppComponent implements OnInit {
             }
             return false
         }
+
+        // bootstrap 5 font family
+        Chart.defaults.font.family = `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`
+        Chart.defaults.color = 'black'
+        Chart.defaults.font.size = 10
     }
 
     noHeaderPath(path: string) {

@@ -1,13 +1,17 @@
 import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { Category, CategoryGroupEnum } from '../../models/category'
+import {
+    Category,
+    CategoryEnum,
+    CategoryGroupEnum,
+} from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
 import {
     CategoryTotalAndCount,
@@ -34,6 +38,8 @@ import { checkDatesEqual } from '../../utilities/date.utility'
     styleUrl: './spending.component.css',
 })
 export class SpendingComponent implements OnInit {
+    @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
+
     loading = false
 
     selectedDateFilter: DateFilterEnum = DateFilterEnum.CURRENT_MONTH
@@ -47,6 +53,7 @@ export class SpendingComponent implements OnInit {
     dates: Date[] = []
     totalByCategoryAndDate: CategoryTotalByDate[] = []
 
+    includeBills = true
     spendingTotal = -1
     spendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
     nonSpendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
@@ -63,6 +70,9 @@ export class SpendingComponent implements OnInit {
                 title: {
                     display: true,
                     text: 'Date',
+                    font: {
+                        size: 12,
+                    },
                 },
             },
             y: {
@@ -70,6 +80,9 @@ export class SpendingComponent implements OnInit {
                 title: {
                     display: true,
                     text: 'Amount',
+                    font: {
+                        size: 12,
+                    },
                 },
                 beginAtZero: true,
                 ticks: {
@@ -234,7 +247,10 @@ export class SpendingComponent implements OnInit {
             const category = this.categories.find((c) => c.id === t.categoryId)
             if (!category) return
 
-            if (category.groupId === CategoryGroupEnum.Spending) {
+            if (
+                category.groupId === CategoryGroupEnum.Spending &&
+                (category.id !== CategoryEnum.Bills || this.includeBills)
+            ) {
                 this.spendingTotal += t.total
                 this.spendingCategoriesTotalAndCount.push(t)
 
@@ -253,12 +269,93 @@ export class SpendingComponent implements OnInit {
             const category = this.categories.find((c) => c.id === t.categoryId)
             if (!category) return
             if (category.groupId !== CategoryGroupEnum.Spending) return
+            if (category.id === CategoryEnum.Bills && !this.includeBills) return
 
             this.barGraphDatasets.push({
                 label: category.name,
                 data: t.totalByDate,
             })
         })
+
+        this.updateCharts()
+    }
+
+    toggleIncludeBills(): void {
+        this.loading = true
+        const billsCategory = this.categories.find(
+            (c) => c.id === CategoryEnum.Bills
+        )
+
+        if (this.includeBills) {
+            const billsIdx = this.spendingCategoriesTotalAndCount.findIndex(
+                (t) => t.categoryId === CategoryEnum.Bills
+            )
+            if (billsIdx !== -1) {
+                const bills = this.spendingCategoriesTotalAndCount.splice(
+                    billsIdx,
+                    1
+                )[0]
+                this.nonSpendingCategoriesTotalAndCount.unshift(bills)
+                this.spendingTotal -= bills.total
+            }
+
+            if (billsCategory) {
+                const billsLabelIdx = this.pieChartLabels.findIndex(
+                    (l) => l === billsCategory.name
+                )
+                if (billsLabelIdx !== -1) {
+                    this.pieChartLabels.splice(billsLabelIdx, 1)
+                    this.pieChartDataset.splice(billsLabelIdx, 1)
+                }
+
+                const billsDatasetIdx = this.barGraphDatasets.findIndex(
+                    (d) => d.label === billsCategory.name
+                )
+                if (billsDatasetIdx !== -1) {
+                    this.barGraphDatasets.splice(billsDatasetIdx, 1)
+                }
+            }
+        } else {
+            const billsIdx = this.nonSpendingCategoriesTotalAndCount.findIndex(
+                (t) => t.categoryId === CategoryEnum.Bills
+            )
+            if (billsIdx !== -1) {
+                const bills = this.nonSpendingCategoriesTotalAndCount.splice(
+                    billsIdx,
+                    1
+                )[0]
+                this.spendingCategoriesTotalAndCount.push(bills)
+                this.spendingTotal += bills.total
+            }
+
+            if (billsCategory) {
+                const billsTotal = this.totalAndCountByCategory.find(
+                    (t) => t.categoryId === CategoryEnum.Bills
+                )?.total
+                if (billsTotal !== undefined && billsTotal > 0) {
+                    this.pieChartLabels.push(billsCategory.name)
+                    this.pieChartDataset.push(billsTotal)
+                }
+
+                const billsTotalByDate = this.totalByCategoryAndDate.find(
+                    (t) => t.categoryId === CategoryEnum.Bills
+                )?.totalByDate
+                if (billsTotalByDate) {
+                    this.barGraphDatasets.push({
+                        label: billsCategory.name,
+                        data: billsTotalByDate,
+                    })
+                }
+            }
+        }
+
+        this.updateCharts()
+        this.includeBills = !this.includeBills
+        this.loading = false
+    }
+
+    updateCharts(): void {
+        this.charts.forEach((chart) => chart.chart?.update())
     }
 
     applyDateFilter(

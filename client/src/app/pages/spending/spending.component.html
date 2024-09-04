@@ -12,6 +12,19 @@
         <i class="bi bi-funnel"></i>
         <span class="ms-1 d-none d-md-inline">Filter by Date</span>
     </button>
+    <div class="form-check form-switch position-absolute top-right me-2">
+        <input
+            id="includeBills"
+            class="form-check-input"
+            type="checkbox"
+            tabindex="0"
+            [(checked)]="includeBills"
+            (click)="toggleIncludeBills()"
+        />
+        <label class="form-check-label" for="includeBills">
+            Include Bills
+        </label>
+    </div>
 </div>
 
 <div class="row">
