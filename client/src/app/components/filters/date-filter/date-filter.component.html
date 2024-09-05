@@ -77,7 +77,7 @@
                     type="button"
                     class="btn btn-sm btn-primary"
                     (click)="apply()"
-                    title="Apply"
+                    title="Apply Filter"
                     data-bs-dismiss="modal"
                     [disabled]="
                         !inputsChanged() || !startDateValid() || !endDateValid()
@@ -92,7 +92,7 @@
                         type="button"
                         class="btn btn-sm btn-danger"
                         (click)="reset()"
-                        title="Reset"
+                        title="Reset Filter"
                         data-bs-dismiss="modal"
                     >
                         <i class="bi bi-arrow-counterclockwise"></i>
@@ -103,7 +103,7 @@
                         type="button"
                         class="btn btn-sm btn-danger"
                         (click)="clear()"
-                        title="Clear"
+                        title="Clear Filter"
                         data-bs-dismiss="modal"
                         [disabled]="!filterApplied()"
                     >

@@ -14,7 +14,7 @@
                     <button
                         class="form-select form-select-sm"
                         type="button"
-                        title="Select"
+                        title="Select Accounts"
                         data-bs-toggle="dropdown"
                         data-bs-auto-close="outside"
                     >
@@ -83,7 +83,7 @@
                     type="button"
                     class="btn btn-sm btn-primary"
                     (click)="apply()"
-                    title="Apply"
+                    title="Apply Filter"
                     data-bs-dismiss="modal"
                     [disabled]="!accountIdsChanged()"
                 >
@@ -95,7 +95,7 @@
                     type="button"
                     class="btn btn-sm btn-danger"
                     (click)="clear()"
-                    title="Clear"
+                    title="Clear Filter"
                     data-bs-dismiss="modal"
                     [disabled]="!filterApplied()"
                 >
