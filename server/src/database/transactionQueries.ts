@@ -71,6 +71,7 @@ export const insertTransactions = async (
     `
 
     const rows = (await runQuery<DbTransaction>(query, values)).rows
+    if (!rows.length) return
     return rows.map(mapDbTransaction)
 }
 
