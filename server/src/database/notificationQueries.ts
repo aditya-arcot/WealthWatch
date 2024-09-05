@@ -82,6 +82,23 @@ export const modifyNotificationsToReadWithUserId = async (
     return rows.map(mapDbNotification)
 }
 
+export const modifyNotificationToInactiveWithUserIdAndId = async (
+    userId: number,
+    id: number
+): Promise<Notification | undefined> => {
+    const query = `
+        UPDATE notifications
+        SET active = false
+        WHERE user_id = $1
+            AND id = $2
+        RETURNING *
+    `
+    const values = [userId, id]
+    const rows = (await runQuery<DbNotification>(query, values)).rows
+    if (!rows[0]) return
+    return mapDbNotification(rows[0])
+}
+
 export const modifyNotificationsToInactiveWithUserIdAndTypeId = async (
     userId: number,
     typeId: number

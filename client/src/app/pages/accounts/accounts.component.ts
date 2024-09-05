@@ -209,7 +209,7 @@ export class AccountsComponent implements OnInit {
         } else {
             this.logger.debug('removing notifications', itemId, withAccounts)
             this.notificationSvc
-                .updateNotificationsToInactive(itemId, withAccounts)
+                .updateNotificationsOfTypeToInactive(itemId, withAccounts)
                 .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
                 .subscribe()
             this.router.navigateByUrl('/accounts')
