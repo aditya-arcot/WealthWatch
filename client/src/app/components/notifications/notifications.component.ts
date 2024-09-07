@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
+import { switchMap } from 'rxjs'
 import { Notification, NotificationTypeEnum } from '../../models/notification'
 import { NotificationService } from '../../services/notification.service'
 
@@ -34,5 +35,12 @@ export class NotificationsComponent {
                     n.typeId === NotificationTypeEnum.LinkUpdateWithAccounts,
             },
         })
+    }
+
+    removeNotification = (n: Notification): void => {
+        this.notificationSvc
+            .updateNotificationToInactive(n.id)
+            .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
+            .subscribe()
     }
 }

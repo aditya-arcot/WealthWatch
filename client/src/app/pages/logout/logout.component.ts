@@ -10,7 +10,6 @@ import { UserService } from '../../services/user.service'
 @Component({
     selector: 'app-logout',
     standalone: true,
-    imports: [],
     templateUrl: './logout.component.html',
 })
 export class LogoutComponent implements OnInit {

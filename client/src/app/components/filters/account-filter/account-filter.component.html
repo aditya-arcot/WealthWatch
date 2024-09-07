@@ -1,4 +1,9 @@
-<div #accountFilterModal class="modal modal-sm fade" id="accountFilterModal">
+<div
+    #accountFilterModal
+    class="modal modal-sm fade"
+    id="accountFilterModal"
+    tabindex="-1"
+>
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-center p-2">
@@ -9,7 +14,7 @@
                     <button
                         class="form-select form-select-sm"
                         type="button"
-                        title="Select"
+                        title="Select Accounts"
                         data-bs-toggle="dropdown"
                         data-bs-auto-close="outside"
                     >
@@ -78,7 +83,7 @@
                     type="button"
                     class="btn btn-sm btn-primary"
                     (click)="apply()"
-                    title="Apply"
+                    title="Apply Filter"
                     data-bs-dismiss="modal"
                     [disabled]="!accountIdsChanged()"
                 >
@@ -90,7 +95,7 @@
                     type="button"
                     class="btn btn-sm btn-danger"
                     (click)="clear()"
-                    title="Clear"
+                    title="Clear Filter"
                     data-bs-dismiss="modal"
                     [disabled]="!filterApplied()"
                 >

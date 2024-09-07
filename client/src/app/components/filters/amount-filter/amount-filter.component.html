@@ -1,4 +1,9 @@
-<div #amountFilterModal class="modal modal-sm fade" id="amountFilterModal">
+<div
+    #amountFilterModal
+    class="modal modal-sm fade"
+    id="amountFilterModal"
+    tabindex="-1"
+>
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-center p-2">
@@ -124,7 +129,7 @@
                     type="button"
                     class="btn btn-sm btn-primary"
                     (click)="apply()"
-                    title="Apply"
+                    title="Apply Filter"
                     data-bs-dismiss="modal"
                     [disabled]="
                         !inputsChanged() ||
@@ -140,7 +145,7 @@
                     type="button"
                     class="btn btn-sm btn-danger"
                     (click)="clear()"
-                    title="Clear"
+                    title="Clear Filter"
                     data-bs-dismiss="modal"
                     [disabled]="!filterApplied()"
                 >

@@ -31,7 +31,8 @@ VALUES
     ('Taxes', 2),
     ('Transportation', 2),
     ('Travel', 2),
-    ('Bills', 2);
+    ('Bills', 2),
+    ('Ignored', 3);
 
 INSERT INTO
     notification_types (name)
