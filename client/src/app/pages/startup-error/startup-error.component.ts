@@ -5,7 +5,6 @@ import { StartupService } from '../../services/startup.service'
 @Component({
     selector: 'app-startup-error',
     standalone: true,
-    imports: [],
     templateUrl: './startup-error.component.html',
 })
 export class StartupErrorComponent implements OnInit {

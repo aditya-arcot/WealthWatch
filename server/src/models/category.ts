@@ -27,6 +27,7 @@ export enum CategoryEnum {
     Transportation,
     Travel,
     Bills,
+    Ignored,
 }
 
 export enum CategoryGroupEnum {

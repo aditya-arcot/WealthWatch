@@ -115,7 +115,7 @@ export const mapPlaidTransaction = (
     }
 
     return {
-        id: 0,
+        id: -1,
         accountId,
         plaidId: transaction.transaction_id,
         merchantId: transaction.merchant_entity_id ?? null,

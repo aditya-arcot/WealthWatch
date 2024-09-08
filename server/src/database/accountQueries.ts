@@ -2,7 +2,8 @@ import { Account } from '../models/account.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
-    accounts: Account[]
+    accounts: Account[],
+    updateBalances = false
 ): Promise<Account[] | undefined> => {
     if (!accounts.length) return
 
@@ -26,7 +27,7 @@ export const insertAccounts = async (
 
     const rowCount = accounts.length
     const paramCount = Math.floor(values.length / rowCount)
-    const query = `
+    let query = `
         INSERT INTO accounts
         (
             item_id,
@@ -48,8 +49,14 @@ export const insertAccounts = async (
             name = EXCLUDED.name,
             mask = EXCLUDED.mask,
             official_name = EXCLUDED.official_name,
+        `
+    if (updateBalances) {
+        query += `
             current_balance = EXCLUDED.current_balance,
             available_balance = EXCLUDED.available_balance,
+        `
+    }
+    query += `
             iso_currency_code = EXCLUDED.iso_currency_code,
             unofficial_currency_code = EXCLUDED.unofficial_currency_code,
             credit_limit = EXCLUDED.credit_limit,

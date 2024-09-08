@@ -27,6 +27,7 @@ export enum CategoryEnum {
     Transportation,
     Travel,
     Bills,
+    Ignored,
 }
 
 export enum CategoryGroupEnum {
@@ -58,4 +59,5 @@ export const categoryIcons: Record<CategoryEnum, string> = {
     [CategoryEnum.Transportation]: 'bi-car-front',
     [CategoryEnum.Travel]: 'bi-airplane',
     [CategoryEnum.Bills]: 'bi-receipt-cutoff',
+    [CategoryEnum.Ignored]: 'bi-ban',
 }

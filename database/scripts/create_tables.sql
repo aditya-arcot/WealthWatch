@@ -16,6 +16,7 @@ CREATE TABLE audit (
     operation CHAR(1) NOT NULL CHECK (operation IN ('I', 'U', 'D')),
     table_name TEXT NOT NULL,
     row_id INTEGER NOT NULL,
+    old_row_data JSON,
     row_data JSON NOT NULL,
     user_id TEXT NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -31,8 +32,10 @@ BEGIN
         VALUES ('I', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user);
         RETURN NEW;
     ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO audit (operation, table_name, row_id, row_data, user_id)
-        VALUES ('U', TG_TABLE_NAME, NEW.id, row_to_json(NEW), current_user);
+        IF (jsonb_strip_nulls(row_to_json(OLD)::jsonb) - 'update_timestamp') IS DISTINCT FROM (jsonb_strip_nulls(row_to_json(NEW)::jsonb) - 'update_timestamp') THEN
+            INSERT INTO audit (operation, table_name, row_id, old_row_data, row_data, user_id)
+            VALUES ('U', TG_TABLE_NAME, NEW.id, row_to_json(OLD), row_to_json(NEW), current_user);
+        END IF;
         RETURN NEW;
     ELSIF (TG_OP = 'DELETE') THEN
         INSERT INTO audit (operation, table_name, row_id, row_data, user_id)
@@ -163,11 +166,11 @@ CREATE TABLE accounts (
     name TEXT NOT NULL,
     mask TEXT,
     official_name TEXT,
-    current_balance DOUBLE,
-    available_balance DOUBLE,
+    current_balance DOUBLE PRECISION,
+    available_balance DOUBLE PRECISION,
     iso_currency_code TEXT,
     unofficial_currency_code TEXT,
-    credit_limit DOUBLE,
+    credit_limit DOUBLE PRECISION,
     type TEXT NOT NULL,
     subtype TEXT NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -201,7 +204,7 @@ CREATE TABLE transactions (
     merchant TEXT,
     name TEXT NOT NULL,
     custom_name TEXT,
-    amount DOUBLE NOT NULL,
+    amount DOUBLE PRECISION NOT NULL,
     primary_category TEXT,
     detailed_category TEXT,
     category_id INTEGER REFERENCES categories(id) NOT NULL,

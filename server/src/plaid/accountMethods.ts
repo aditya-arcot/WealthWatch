@@ -47,7 +47,7 @@ export const mapPlaidAccount = (
     account: AccountBase,
     itemId: number
 ): Account => ({
-    id: 0,
+    id: -1,
     itemId,
     plaidId: account.account_id,
     name: account.name,
