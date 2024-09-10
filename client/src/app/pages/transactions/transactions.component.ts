@@ -508,7 +508,7 @@ export class TransactionsComponent implements OnInit {
 
     getFormattedAmount(t: Transaction): string {
         const negative = t.amount < 0
-        const formatted = this.currencySvc.formatAmount(
+        const formatted = this.currencySvc.format(
             Math.abs(t.amount),
             t.unofficialCurrencyCode ?? t.isoCurrencyCode
         )

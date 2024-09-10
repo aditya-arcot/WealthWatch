@@ -92,10 +92,10 @@ export class SpendingComponent implements OnInit {
                 ticks: {
                     callback: (value) => {
                         if (typeof value === 'number') {
-                            return this.currencySvc.formatAmount(value, 'USD')
+                            return this.currencySvc.format(value, 'USD')
                         }
                         const parsed = parseFloat(value)
-                        return this.currencySvc.formatAmount(parsed, 'USD')
+                        return this.currencySvc.format(parsed, 'USD')
                     },
                 },
             },
@@ -111,7 +111,7 @@ export class SpendingComponent implements OnInit {
                     },
                     label: (tooltipItem) => {
                         const val = tooltipItem.parsed.y
-                        return ' ' + this.currencySvc.formatAmount(val, 'USD')
+                        return ' ' + this.currencySvc.format(val, 'USD')
                     },
                 },
             },
@@ -135,7 +135,7 @@ export class SpendingComponent implements OnInit {
                 callbacks: {
                     label: (tooltipItem) => {
                         const val = tooltipItem.parsed
-                        return ' ' + this.currencySvc.formatAmount(val, 'USD')
+                        return ' ' + this.currencySvc.format(val, 'USD')
                     },
                 },
             },
@@ -440,13 +440,13 @@ export class SpendingComponent implements OnInit {
 
     getAmountString(total: number): string {
         const negative = total < 0
-        const formatted = this.currencySvc.formatAmount(Math.abs(total), 'USD')
+        const formatted = this.currencySvc.format(Math.abs(total), 'USD')
         if (negative) return `+${formatted}`
         return formatted
     }
 
     getRemainingAmountString(): string {
-        return this.currencySvc.formatAmount(
+        return this.currencySvc.format(
             Math.abs(this.getRemainingAmount()),
             'USD'
         )

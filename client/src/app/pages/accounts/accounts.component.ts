@@ -334,14 +334,14 @@ export class AccountsComponent implements OnInit {
     }
 
     getFormattedCurrentBalance(acc: Account): string {
-        return this.currencySvc.formatAmount(
+        return this.currencySvc.format(
             acc.currentBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
         )
     }
 
     getFormattedAvailableBalance(acc: Account): string {
-        return this.currencySvc.formatAmount(
+        return this.currencySvc.format(
             acc.availableBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
         )
