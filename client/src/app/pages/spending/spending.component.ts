@@ -21,6 +21,7 @@ import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
 import { LoggerService } from '../../services/logger.service'
+import { PercentService } from '../../services/percent.service'
 import { SpendingService } from '../../services/spending.service'
 import { checkDatesEqual } from '../../utilities/date.utility'
 
@@ -163,7 +164,8 @@ export class SpendingComponent implements OnInit {
         private categorySvc: CategoryService,
         private currencySvc: CurrencyService,
         private alertSvc: AlertService,
-        private spendingSvc: SpendingService
+        private spendingSvc: SpendingService,
+        private percentSvc: PercentService
     ) {}
 
     ngOnInit(): void {
@@ -463,15 +465,11 @@ export class SpendingComponent implements OnInit {
         const spendingBillsTotal =
             this.spendingTotal +
             (this.includeBills && this.billsTotal ? this.billsTotal : 0)
-        return this.getPercentString(amount / spendingBillsTotal)
+        return this.percentSvc.format(amount / spendingBillsTotal)
     }
 
     getPercentIncomeString(amount: number | undefined): string {
         if (this.incomeTotal === undefined || this.incomeTotal === 0) return '-'
-        return this.getPercentString((amount ?? 0) / (-1 * this.incomeTotal))
-    }
-
-    getPercentString(decimal: number): string {
-        return `${(decimal * 100).toFixed(1)}%`
+        return this.percentSvc.format((amount ?? 0) / (-1 * this.incomeTotal))
     }
 }
