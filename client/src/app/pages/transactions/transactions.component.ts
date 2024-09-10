@@ -460,7 +460,7 @@ export class TransactionsComponent implements OnInit {
         this.reloadTransactions()
     }
 
-    getFormattedDate(t: Transaction): string {
+    getDateString(t: Transaction): string {
         return new Date(t.date).toLocaleDateString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -506,7 +506,7 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomName(t)
     }
 
-    getFormattedAmount(t: Transaction): string {
+    getAmountString(t: Transaction): string {
         const negative = t.amount < 0
         const formatted = this.currencySvc.format(
             Math.abs(t.amount),

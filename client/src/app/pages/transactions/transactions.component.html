@@ -347,7 +347,7 @@
                     @for (t of transactions; track $index) {
                         <tr>
                             <td>
-                                {{ getFormattedDate(t) }}
+                                {{ getDateString(t) }}
                             </td>
                             <td>
                                 <div class="input-group input-group-sm">
@@ -376,7 +376,7 @@
                             <td>
                                 <div class="d-none d-lg-inline">
                                     <span [class.text-success]="t.amount < 0"
-                                        >{{ getFormattedAmount(t) }}
+                                        >{{ getAmountString(t) }}
                                     </span>
                                     @if (t.pending) {
                                         <span class="pending-text"
@@ -391,7 +391,7 @@
                                         t.amount < 0 && !t.pending
                                     "
                                 >
-                                    {{ getFormattedAmount(t) }}
+                                    {{ getAmountString(t) }}
                                 </div>
                             </td>
                             <td class="d-none d-sm-table-cell">

@@ -101,7 +101,7 @@ export class AccountsComponent implements OnInit {
                         this.alertSvc.addErrorAlert(
                             'Something went wrong. Please report this issue.',
                             [
-                                `Failed to find item with id ${account.itemId} for account ${account.id}`,
+                                `Failed to find item ${account.itemId} for account ${account.id}`,
                             ]
                         )
                         return
@@ -323,7 +323,7 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    getFormattedDate(date: Date): string {
+    getDateString(date: Date): string {
         return new Date(date).toLocaleString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -333,14 +333,14 @@ export class AccountsComponent implements OnInit {
         })
     }
 
-    getFormattedCurrentBalance(acc: Account): string {
+    getCurrentBalanceString(acc: Account): string {
         return this.currencySvc.format(
             acc.currentBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
         )
     }
 
-    getFormattedAvailableBalance(acc: Account): string {
+    getAvailableBalanceString(acc: Account): string {
         return this.currencySvc.format(
             acc.availableBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
