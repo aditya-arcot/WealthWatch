@@ -54,6 +54,16 @@ export class AccountFilterComponent implements OnInit, OnChanges {
         )
     }
 
+    getSelectedAccountsString(): string {
+        if (this.selectedAccountIds.size === 0) {
+            return 'Select Accounts'
+        }
+        if (this.selectedAccountIds.size === this.accounts.length) {
+            return 'All Selected'
+        }
+        return `${this.selectedAccountIds.size} Selected`
+    }
+
     getItemAccounts(itemId: number): Account[] {
         return this.accounts.filter((a) => a.itemId === itemId)
     }
@@ -86,7 +96,10 @@ export class AccountFilterComponent implements OnInit, OnChanges {
     }
 
     filterApplied(): boolean {
-        return this.originalSelectedAccountIds.size !== 0
+        return (
+            this.originalSelectedAccountIds.size !== 0 &&
+            this.originalSelectedAccountIds.size !== this.accounts.length
+        )
     }
 
     invert() {

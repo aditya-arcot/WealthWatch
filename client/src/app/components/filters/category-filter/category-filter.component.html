@@ -18,17 +18,13 @@
                         data-bs-toggle="dropdown"
                         data-bs-auto-close="outside"
                     >
-                        @if (selectedCategoryIds.size === 0) {
-                            Select Categories
-                        } @else {
-                            {{ selectedCategoryIds.size }} Selected
-                        }
+                        {{ getSelectedCategoriesString() }}
                     </button>
-                    <ul class="dropdown-menu p-0">
+                    <ul class="dropdown-menu p-0 py-1">
                         @for (c of categories; track $index) {
                             <li>
                                 <div
-                                    class="dropdown-item form-check form-switch py-0 px-2 m-0"
+                                    class="dropdown-item form-check form-switch py-0 ps-2 pe-4 m-0"
                                 >
                                     <input
                                         id="category-{{ c.id }}"

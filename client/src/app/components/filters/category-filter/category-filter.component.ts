@@ -50,6 +50,16 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
         this.selectedCategoryIds = new Set(this.originalSelectedCategoryIds)
     }
 
+    getSelectedCategoriesString(): string {
+        if (this.selectedCategoryIds.size === 0) {
+            return 'Select Categories'
+        }
+        if (this.selectedCategoryIds.size === this.categories.length) {
+            return 'All Selected'
+        }
+        return `${this.selectedCategoryIds.size} Selected`
+    }
+
     inputChecked(id: number): boolean {
         return this.selectedCategoryIds.has(id)
     }
@@ -95,7 +105,10 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
     }
 
     filterApplied(): boolean {
-        return this.originalSelectedCategoryIds.size !== 0
+        return (
+            this.originalSelectedCategoryIds.size !== 0 &&
+            this.originalSelectedCategoryIds.size !== this.categories.length
+        )
     }
 
     invert() {
