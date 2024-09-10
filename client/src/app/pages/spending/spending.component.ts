@@ -23,6 +23,7 @@ import { CurrencyService } from '../../services/currency.service'
 import { LoggerService } from '../../services/logger.service'
 import { PercentService } from '../../services/percent.service'
 import { SpendingService } from '../../services/spending.service'
+import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 import { checkDatesEqual } from '../../utilities/date.utility'
 
 @Component({
@@ -312,7 +313,8 @@ export class SpendingComponent implements OnInit {
         this.updateCharts()
     }
 
-    toggleIncludeBills(): void {
+    toggleIncludeBills(event: MouseEvent | KeyboardEvent): void {
+        if (!handleCheckboxSelect(event)) return
         this.loading = true
         const billsCategory = this.categories.find(
             (c) => c.id === CategoryEnum.Bills

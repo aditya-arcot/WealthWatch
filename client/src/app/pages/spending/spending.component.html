@@ -21,7 +21,8 @@
                     type="checkbox"
                     tabindex="0"
                     [checked]="includeBills"
-                    (click)="toggleIncludeBills()"
+                    (click)="toggleIncludeBills($event)"
+                    (keydown)="toggleIncludeBills($event)"
                 />
                 <label class="form-check-label" for="includeBills">
                     Include Bills

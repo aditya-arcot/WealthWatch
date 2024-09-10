@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms'
 import { Account } from '../../../models/account'
 import { Item } from '../../../models/item'
+import { handleCheckboxSelect } from '../../../utilities/checkbox.utility'
 
 @Component({
     selector: 'app-account-filter',
@@ -62,17 +63,8 @@ export class AccountFilterComponent implements OnInit, OnChanges {
     }
 
     handleAccountSelect(event: MouseEvent | KeyboardEvent, accountId: number) {
-        if (!(event.target instanceof HTMLInputElement)) {
-            return
-        }
+        if (!handleCheckboxSelect(event)) return
         const checkbox = event.target as HTMLInputElement
-
-        if (event instanceof KeyboardEvent) {
-            // space bar press also generates a click event
-            if (event.key !== 'Enter') return
-            checkbox.checked = !checkbox.checked
-        }
-
         if (checkbox.checked) {
             this.selectedAccountIds.add(accountId)
         } else {
