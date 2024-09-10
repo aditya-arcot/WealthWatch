@@ -74,22 +74,29 @@ const startMainApp = () => {
 
 const startWebhookApp = () => {
     logger.debug('configuring webhook app')
-    const webhookApp = express()
+    const app = express()
 
     logger.debug('configuring middleware')
-    webhookApp.use(express.json())
-    webhookApp.use(express.urlencoded({ extended: true }))
-    webhookApp.use(logRequestResponse)
+    app.use(
+        helmet({
+            contentSecurityPolicy: {
+                reportOnly: !production,
+            },
+        })
+    )
+    app.use(express.json())
+    app.use(express.urlencoded({ extended: true }))
+    app.use(logRequestResponse)
 
     logger.debug('configuring routes')
-    webhookApp.use('/status', (_req, res) => res.send('ok'))
-    webhookApp.post('/webhooks', catchAsync(processWebhook))
-    webhookApp.use(handleUnmatchedRoute)
-    webhookApp.use(handleError)
+    app.use('/status', (_req, res) => res.send('ok'))
+    app.post('/webhooks', catchAsync(processWebhook))
+    app.use(handleUnmatchedRoute)
+    app.use(handleError)
 
     logger.debug('starting webhook app')
     const webhookPort = 3001
-    webhookApp.listen(webhookPort, () => {
+    app.listen(webhookPort, () => {
         logger.info(`webhook app running on port ${webhookPort}`)
     })
 }
