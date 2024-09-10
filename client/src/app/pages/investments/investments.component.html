@@ -1,0 +1,157 @@
+<app-loading-spinner [loading]="loading"></app-loading-spinner>
+
+<h2 class="text-center mb-3">Investments</h2>
+
+@if (!items.length) {
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-10 col-sm-8 col-md-6 col-xl-4">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h4 class="text-center mb-0">
+                            No accounts with investments
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+} @else {
+    @for (item of items; track $index) {
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="container-fluid position-relative mb-2 p-0">
+                    <h4 class="card-title mb-1">{{ item.institutionName }}</h4>
+                </div>
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="text-start">Name</th>
+                            <th
+                                scope="col"
+                                class="text-end d-none d-sm-table-cell"
+                            >
+                                Last Price
+                            </th>
+                            <th scope="col" class="text-end">Gain / Loss</th>
+                            <th
+                                scope="col"
+                                class="text-end d-none d-lg-table-cell"
+                            >
+                                Quantity
+                            </th>
+                            <th
+                                scope="col"
+                                class="text-end d-none d-sm-table-cell"
+                            >
+                                Value
+                            </th>
+                            <th
+                                scope="col"
+                                class="text-end d-none d-lg-table-cell"
+                            >
+                                Cost Basis
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider small-text">
+                        @for (account of item.accounts; track $index) {
+                            <tr class="medium-text account-row">
+                                <td colspan="6" class="text-center fw-bold p-2">
+                                    <h5 class="mb-0">{{ account.name }}</h5>
+                                </td>
+                            </tr>
+                            @for (holding of account.holdings; track $index) {
+                                <tr>
+                                    <td>
+                                        @if (holding.ticker !== null) {
+                                            <div>{{ holding.ticker }}</div>
+                                            <div class="tiny-text text-muted">
+                                                {{ holding.name }} |
+                                                {{
+                                                    getTypeString(
+                                                        holding.typeId
+                                                    )
+                                                }}
+                                            </div>
+                                        } @else {
+                                            <div>{{ holding.name }}</div>
+                                            <div class="tiny-text text-muted">
+                                                {{
+                                                    getTypeString(
+                                                        holding.typeId
+                                                    )
+                                                }}
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="text-end d-none d-sm-table-cell">
+                                        {{ getPriceString(holding) }}
+                                    </td>
+                                    <td
+                                        [ngClass]="getGainLossClass(holding)"
+                                        class="text-end"
+                                    >
+                                        <div>
+                                            {{ getGainLossString(holding) }}
+                                        </div>
+                                        <div class="tiny-text">
+                                            {{
+                                                getGainLossPercentString(
+                                                    holding
+                                                )
+                                            }}
+                                        </div>
+                                    </td>
+                                    <td class="text-end d-none d-lg-table-cell">
+                                        {{ getQuantityString(holding) }}
+                                    </td>
+                                    <td class="text-end d-none d-sm-table-cell">
+                                        {{ getValueString(holding) }}
+                                    </td>
+                                    <td class="text-end d-none d-lg-table-cell">
+                                        {{ getCostBasisString(holding) }}
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <td class="fw-bold">Total</td>
+                                <td
+                                    class="text-end d-none d-sm-table-cell"
+                                ></td>
+                                <td
+                                    [ngClass]="getTotalGainLossClass(account)"
+                                    class="text-end fw-bold"
+                                >
+                                    <div>
+                                        {{ getTotalGainLossString(account) }}
+                                    </div>
+                                    <div class="tiny-text">
+                                        {{
+                                            getTotalGainLossPercentString(
+                                                account
+                                            )
+                                        }}
+                                    </div>
+                                </td>
+                                <td
+                                    class="text-end d-none d-lg-table-cell"
+                                ></td>
+                                <td
+                                    class="text-end fw-bold d-none d-sm-table-cell"
+                                >
+                                    {{ getTotalValueString(account) }}
+                                </td>
+                                <td
+                                    class="text-end fw-bold d-none d-lg-table-cell"
+                                >
+                                    {{ getTotalCostBasisString(account) }}
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}

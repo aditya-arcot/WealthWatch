@@ -21,7 +21,7 @@ import {
 import { plaidWebhookVerificationKeyGet } from '../plaid/webhookMethods.js'
 import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utils/logger.js'
-import { deactivateItemMain, syncItemData } from './itemController.js'
+import { deactivateItemMain, syncTransactions } from './itemController.js'
 
 export const processWebhook = async (req: Request, res: Response) => {
     logger.debug('processing webhook')
@@ -192,7 +192,7 @@ const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    await syncItemData(item)
+    await syncTransactions(item)
 
     logger.debug({ itemId }, 'handled transactions sync webhook')
 }

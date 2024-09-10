@@ -41,4 +41,17 @@ VALUES
     ('Link Update'),
     ('Link Update With Accounts');
 
+INSERT INTO
+    security_types (name)
+VALUES
+    ('Cash'),
+    ('Cryptocurrency'),
+    ('Derivative'),
+    ('Equity'),
+    ('ETF'),
+    ('Fixed Income'),
+    ('Loan'),
+    ('Mutual Fund'),
+    ('Other');
+
 COMMIT;

@@ -1,7 +1,8 @@
 import { Queue, Worker } from 'bullmq'
+import { syncInvestments } from '../controllers/investmentController.js'
 import {
     refreshItemBalances,
-    syncItemData,
+    syncTransactions,
 } from '../controllers/itemController.js'
 import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
@@ -57,7 +58,8 @@ export const initializeItemWorker = () => {
 
             switch (type) {
                 case ItemJobType.SyncItem: {
-                    await syncItemData(item)
+                    await syncTransactions(item)
+                    await syncInvestments(item)
                     break
                 }
                 case ItemJobType.RefreshItemBalances: {

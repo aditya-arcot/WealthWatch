@@ -10,6 +10,10 @@
     transform: translateY(-50%);
 }
 
+::ng-deep .tiny-text {
+    font-size: 12px;
+}
+
 ::ng-deep .small-text {
     font-size: 14px;
 }

@@ -1,4 +1,4 @@
-import { Account } from './account'
+import { Account, AccountWithHoldings } from './account'
 
 // 3 hours
 export const refreshCooldown = 1000 * 60 * 60 * 3
@@ -19,4 +19,8 @@ export interface Item {
 
 export interface ItemWithAccounts extends Item {
     accounts: Account[]
+}
+
+export interface ItemWithAccountsWithHoldings extends Item {
+    accounts: AccountWithHoldings[]
 }

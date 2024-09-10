@@ -122,8 +122,8 @@ export const deactivateItemMain = async (item: Item) => {
     await modifyItemActiveWithId(item.id, false)
 }
 
-export const syncItemData = async (item: Item) => {
-    logger.debug({ id: item.id }, 'syncing item data')
+export const syncTransactions = async (item: Item) => {
+    logger.debug({ id: item.id }, 'syncing item transactions')
 
     const accounts = await plaidAccountsGet(item)
     if (accounts.length > 0) {

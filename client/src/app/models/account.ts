@@ -1,3 +1,5 @@
+import { HoldingWithSecurity } from './holding'
+
 export interface Account {
     id: number
     itemId: number
@@ -12,4 +14,8 @@ export interface Account {
     creditLimit: number | null
     type: string
     subtype: string | null
+}
+
+export interface AccountWithHoldings extends Account {
+    holdings: HoldingWithSecurity[]
 }
