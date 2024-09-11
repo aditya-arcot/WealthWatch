@@ -14,7 +14,12 @@ import {
 import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
-import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
+import {
+    inCooldown,
+    Item,
+    ItemWithAccounts,
+    refreshCooldown,
+} from '../../models/item'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
@@ -260,13 +265,12 @@ export class AccountsComponent implements OnInit {
     }
 
     refreshItem(item: Item): void {
-        const lastRefreshed = item.lastRefreshed
-            ? new Date(item.lastRefreshed)
-            : null
-        const lastRefreshTime = lastRefreshed ? lastRefreshed.getTime() : 0
-        if (Date.now() - lastRefreshTime < refreshCooldown) {
+        if (inCooldown(item.lastRefreshed)) {
+            const lastRefreshed = item.lastRefreshed
+                ? new Date(item.lastRefreshed)
+                : null
             const nextRefresh = new Date(
-                lastRefreshTime + refreshCooldown
+                (lastRefreshed?.getTime() ?? 0) + refreshCooldown
             ).toLocaleTimeString(undefined, { timeStyle: 'short' })
             this.alertSvc.addErrorAlert(
                 `${item.institutionName} data was recently refreshed`,

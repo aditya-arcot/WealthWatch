@@ -145,8 +145,8 @@ CREATE TABLE items (
     institution_name TEXT NOT NULL,
     healthy BOOLEAN NOT NULL,
     cursor TEXT,
-    last_synced TIMESTAMPTZ,
     last_refreshed TIMESTAMPTZ,
+    transactions_last_refreshed TIMESTAMPTZ,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

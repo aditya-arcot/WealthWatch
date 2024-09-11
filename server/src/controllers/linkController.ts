@@ -12,7 +12,11 @@ import {
     plaidLinkTokenCreate,
     plaidPublicTokenExchange,
 } from '../plaid/tokenMethods.js'
-import { queueSyncItem } from '../queues/itemQueue.js'
+import {
+    queueSyncItemBalances,
+    queueSyncItemInvestments,
+    queueSyncItemTransactions,
+} from '../queues/itemQueue.js'
 import { queueLogPlaidLinkEvent } from '../queues/logQueue.js'
 import { logger } from '../utils/logger.js'
 
@@ -97,13 +101,16 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         institutionName: institution.name,
         healthy: true,
         cursor: null,
-        lastSynced: null,
         lastRefreshed: null,
+        transactionsLastRefreshed: null,
     }
     const newItem = await insertItem(item)
     if (!newItem) throw new HttpError('failed to insert item')
 
-    await queueSyncItem(newItem)
+    logger.debug('queueing item syncs')
+    await queueSyncItemTransactions(newItem)
+    await queueSyncItemBalances(newItem)
+    await queueSyncItemInvestments(newItem)
 
     return res.status(204).send()
 }
