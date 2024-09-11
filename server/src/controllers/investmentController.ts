@@ -4,7 +4,6 @@ import {
     fetchActiveHoldingsWithUserId,
     insertHoldings,
 } from '../database/holdingQueries.js'
-import { fetchActiveItemsWithUserId } from '../database/itemQueries.js'
 import {
     fetchSecurities,
     insertSecurities,
@@ -18,18 +17,6 @@ import {
     plaidInvestmentsHoldingsGet,
 } from '../plaid/investmentMethods.js'
 import { logger } from '../utils/logger.js'
-
-export const syncUserInvestments = async (req: Request, res: Response) => {
-    logger.debug('syncing user investments')
-
-    const userId = req.session.user?.id
-    if (userId === undefined) throw new HttpError('missing user id', 400)
-
-    const items = await fetchActiveItemsWithUserId(userId)
-    await Promise.all(items.map(async (item) => await syncInvestments(item)))
-
-    return res.status(204).send()
-}
 
 export const syncInvestments = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item investments')

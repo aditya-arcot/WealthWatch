@@ -1,8 +1,5 @@
 import express from 'express'
-import {
-    getUserHoldings,
-    syncUserInvestments,
-} from '../controllers/investmentController.js'
+import { getUserHoldings } from '../controllers/investmentController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 
 const router = express.Router()
@@ -13,20 +10,6 @@ const router = express.Router()
  *   name: Investments
  *   description: Investments management
  */
-
-/**
- * @swagger
- * /investments/sync:
- *   post:
- *     summary: Sync the logged in user's investments
- *     tags: [Investments]
- *     responses:
- *       204:
- *         description: Synced the logged in user's investments
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.route('/sync').post(catchAsync(syncUserInvestments))
 
 /**
  * @swagger
