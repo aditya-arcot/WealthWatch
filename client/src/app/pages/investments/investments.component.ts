@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { ChartOptions } from 'chart.js'
+import { BaseChartDirective } from 'ng2-charts'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account, AccountWithHoldings } from '../../models/account'
@@ -14,19 +16,54 @@ import { InvestmentService } from '../../services/investment.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
 import { PercentService } from '../../services/percent.service'
+import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 
 @Component({
     standalone: true,
-    imports: [LoadingSpinnerComponent, CommonModule],
+    imports: [LoadingSpinnerComponent, CommonModule, BaseChartDirective],
     templateUrl: './investments.component.html',
     styleUrl: './investments.component.css',
 })
 export class InvestmentsComponent implements OnInit {
+    @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
+
     loading = false
 
     items: ItemWithAccountsWithHoldings[] = []
     accounts: Account[] = []
     holdings: HoldingWithSecurity[] = []
+
+    selectedAccountIds: Set<number> = new Set<number>()
+
+    pieChartLabels: string[] = []
+    pieChartLabelAccountIds: number[] = []
+    pieChartDataset: number[] = []
+    pieChartOptions: ChartOptions<'pie'> = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: (tooltipItem) => {
+                        const val = tooltipItem.parsed
+                        return ' ' + this.currencySvc.format(val, 'USD')
+                    },
+                },
+            },
+            legend: {
+                display: false,
+            },
+            autocolors: {
+                mode: 'data',
+                customize: (context) => {
+                    return {
+                        background: context.colors.background,
+                        border: 'white',
+                    }
+                },
+            },
+        },
+    }
 
     constructor(
         private logger: LoggerService,
@@ -56,6 +93,7 @@ export class InvestmentsComponent implements OnInit {
             )
             .subscribe(() => {
                 this.mapData()
+                this.processData()
                 this.loading = false
             })
     }
@@ -142,7 +180,119 @@ export class InvestmentsComponent implements OnInit {
 
         this.items = this.items.filter((i) => i.accounts.length > 0)
 
+        this.selectedAccountIds = new Set<number>(
+            this.items
+                .map((i) => i.accounts)
+                .flat()
+                .map((a) => a.id)
+        )
+
         this.logger.debug('mapped data', this.items)
+    }
+
+    processData(): void {
+        this.pieChartLabels = []
+        this.pieChartLabelAccountIds = []
+        this.pieChartDataset = []
+
+        this.items.forEach((i) => {
+            i.accounts.forEach((a) => {
+                a.holdings.forEach((h) => {
+                    this.addHoldingToPieChart(i, a, h)
+                })
+            })
+        })
+
+        this.updateCharts()
+        this.logger.debug('processed data for pie chart')
+    }
+
+    updateCharts(): void {
+        this.charts.forEach((chart) => chart.chart?.update())
+    }
+
+    addAccountToPieChart(accountId: number): void {
+        this.selectedAccountIds.add(accountId)
+        this.items.forEach((i) => {
+            i.accounts.forEach((a) => {
+                if (a.id === accountId) {
+                    a.holdings.forEach((h) => {
+                        this.addHoldingToPieChart(i, a, h)
+                    })
+                }
+            })
+        })
+    }
+
+    addHoldingToPieChart(
+        i: ItemWithAccountsWithHoldings,
+        a: AccountWithHoldings,
+        h: HoldingWithSecurity
+    ): void {
+        const name = h.ticker ?? h.name ?? 'Unknown'
+        const account = `${i.institutionName} ${a.name}`
+        this.pieChartLabels.push(`${name} (${account})`)
+        this.pieChartLabelAccountIds.push(a.id)
+        this.pieChartDataset.push(h.value)
+    }
+
+    removeAccountFromPieChart(accountId: number): void {
+        this.selectedAccountIds.delete(accountId)
+
+        const newLabels: string[] = []
+        const newLabelsAccountIds: number[] = []
+        const newData: number[] = []
+
+        this.pieChartLabelAccountIds.forEach((id, idx) => {
+            if (id !== accountId) {
+                newLabels.push(this.pieChartLabels[idx])
+                newLabelsAccountIds.push(id)
+                newData.push(this.pieChartDataset[idx])
+            }
+        })
+
+        this.pieChartLabels = newLabels
+        this.pieChartLabelAccountIds = newLabelsAccountIds
+        this.pieChartDataset = newData
+    }
+
+    getSelectAccountsString(): string {
+        if (this.selectedAccountIds.size === 0) {
+            return 'Select Accounts'
+        }
+        const accounts = this.items.map((i) => i.accounts).flat().length
+        if (this.selectedAccountIds.size === accounts) {
+            return 'All Accounts Selected'
+        }
+        return `${this.selectedAccountIds.size} Selected`
+    }
+
+    accountSelected(id: number) {
+        return this.selectedAccountIds.has(id)
+    }
+
+    handleAccountSelect(event: MouseEvent | KeyboardEvent, accountId: number) {
+        if (!handleCheckboxSelect(event)) return
+        const checkbox = event.target as HTMLInputElement
+        if (checkbox.checked) {
+            this.addAccountToPieChart(accountId)
+        } else {
+            this.removeAccountFromPieChart(accountId)
+        }
+        this.updateCharts()
+    }
+
+    invertAccountsSelection() {
+        this.items
+            .map((i) => i.accounts)
+            .flat()
+            .forEach((a) => {
+                if (!this.selectedAccountIds.has(a.id)) {
+                    this.addAccountToPieChart(a.id)
+                } else {
+                    this.removeAccountFromPieChart(a.id)
+                }
+            })
     }
 
     getGainLossClass(holding: HoldingWithSecurity): string {
@@ -182,6 +332,21 @@ export class InvestmentsComponent implements OnInit {
             return ''
         }
         return ` (${holding.ticker})`
+    }
+
+    getNameString(holding: HoldingWithSecurity): string {
+        if (holding.name === null) {
+            return 'Unknown'
+        }
+        return holding.name
+    }
+
+    getNameTypeString(holding: HoldingWithSecurity): string {
+        const type = SecurityTypeEnum[holding.typeId]
+        if (holding.name === null) {
+            return type
+        }
+        return `${holding.name} | ${type}`
     }
 
     getTypeString(typeId: number): string {
@@ -232,6 +397,16 @@ export class InvestmentsComponent implements OnInit {
             holding.costBasis,
             holding.unofficialCurrencyCode ?? holding.isoCurrencyCode
         )
+    }
+
+    getCostBasisPerShareString(holding: HoldingWithSecurity): string {
+        if (holding.costBasis === null) return ''
+        const costBasisPerShare = holding.costBasis / holding.quantity
+        const formatted = this.currencySvc.format(
+            costBasisPerShare,
+            holding.unofficialCurrencyCode ?? holding.isoCurrencyCode
+        )
+        return `${formatted} / share`
     }
 
     getTotalGainLossString(account: AccountWithHoldings): string {

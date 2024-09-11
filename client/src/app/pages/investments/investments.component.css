@@ -1,3 +1,23 @@
 .account-row td {
     background-color: lightgrey;
 }
+
+.dropdown {
+    max-width: 300px;
+}
+
+.dropdown-header {
+    color: black;
+}
+
+.dropdown-menu {
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
+.pie-chart-div {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 300px;
+    max-height: 300px;
+}
