@@ -18,7 +18,7 @@
     </div>
 } @else {
     <div class="row">
-        <div class="col-lg-8 px-2 pe-lg-1">
+        <div class="col-lg-8 order-2 px-2 pe-lg-1">
             @for (item of items; track $index) {
                 <div class="card mb-2">
                     <div class="card-body">
@@ -221,7 +221,9 @@
                 </div>
             }
         </div>
-        <div class="d-none d-lg-block col-4 px-2 ps-1">
+        <div
+            class="col col-sm-8 col-md-6 mx-auto px-2 col-lg-4 order-1 order-lg-2 ps-lg-1"
+        >
             <div class="card mb-2 sticky-div">
                 <div class="card-body">
                     <h5 class="card-title text-center mb-2">
@@ -300,7 +302,6 @@
                             <div class="pie-chart-div">
                                 <canvas
                                     baseChart
-                                    #pieChart
                                     type="pie"
                                     [datasets]="[{ data: pieChartDataset }]"
                                     [labels]="pieChartLabels"
