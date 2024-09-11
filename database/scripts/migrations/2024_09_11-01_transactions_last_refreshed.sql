@@ -10,7 +10,7 @@ RENAME COLUMN last_synced TO transactions_last_refreshed;
 UPDATE items
 SET transactions_last_refreshed = null;
 
-ALTER TABLE items
+UPDATE items
 SET last_refreshed = null;
 
 COMMIT;
