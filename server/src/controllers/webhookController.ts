@@ -13,6 +13,7 @@ import {
 import { HttpError } from '../models/error.js'
 import { NotificationTypeEnum } from '../models/notification.js'
 import {
+    HoldingsWebhookCodeEnum,
     ItemWebhookCodeEnum,
     TransactionsWebhookCodeEnum,
     Webhook,
@@ -21,6 +22,7 @@ import {
 import { plaidWebhookVerificationKeyGet } from '../plaid/webhookMethods.js'
 import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utils/logger.js'
+import { syncInvestments } from './investmentController.js'
 import { deactivateItemMain, syncTransactions } from './itemController.js'
 
 export const processWebhook = async (req: Request, res: Response) => {
@@ -106,6 +108,13 @@ export const handleWebhook = async (webhook: Webhook) => {
             await handleTransactionsWebhook(webhookCode, itemId)
             break
         }
+        case WebhookTypeEnum.Holdings: {
+            const itemId = webhook.data.item_id
+            if (itemId === undefined)
+                throw new HttpError('missing item id', 400)
+            await handleHoldingsWebhook(webhookCode, itemId)
+            break
+        }
         case WebhookTypeEnum.Item: {
             const itemId = webhook.data.item_id
             if (itemId === undefined)
@@ -145,6 +154,20 @@ const handleTransactionsWebhook = async (
     }
 
     logger.debug({ webhookCode, itemId }, 'handled transactions webhook')
+}
+
+const handleHoldingsWebhook = async (webhookCode: string, itemId: string) => {
+    logger.debug({ webhookCode, itemId }, 'handling holdings webhook')
+
+    const webhookCodeEnum = webhookCode as HoldingsWebhookCodeEnum
+    switch (webhookCodeEnum) {
+        case HoldingsWebhookCodeEnum.DefaultUpdate: {
+            await handleHoldingsDefaultUpdateWebhook(itemId)
+            break
+        }
+        default:
+            throw new HttpError('unknown webhook code', 400)
+    }
 }
 
 const handleItemWebhook = async (webhookCode: string, itemId: string) => {
@@ -195,6 +218,16 @@ const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
     await syncTransactions(item)
 
     logger.debug({ itemId }, 'handled transactions sync webhook')
+}
+
+const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {
+    logger.debug({ itemId }, 'handling holdings default webhook')
+
+    const item = await fetchActiveItemWithPlaidId(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await syncInvestments(item)
+
+    logger.debug({ itemId }, 'handled holdings default webhook')
 }
 
 const handleItemErrorWebhook = async (itemId: string) => {
