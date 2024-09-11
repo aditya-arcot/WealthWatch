@@ -2,6 +2,11 @@
     background-color: lightgrey;
 }
 
+.sticky-div {
+    position: sticky;
+    top: 65px;
+}
+
 .dropdown {
     max-width: 300px;
 }
