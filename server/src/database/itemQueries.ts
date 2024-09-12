@@ -11,8 +11,8 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
         item.institutionName,
         item.healthy,
         item.cursor,
-        item.lastSynced,
         item.lastRefreshed,
+        item.transactionsLastRefreshed,
     ]
 
     const rowCount = 1
@@ -27,8 +27,8 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
             institution_name,
             healthy,
             cursor,
-            last_synced,
-            last_refreshed
+            last_refreshed,
+            transactions_last_refreshed
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
@@ -121,20 +121,28 @@ export const modifyItemLastRefreshedWithPlaidId = async (
     await runQuery(query, [lastRefreshed, plaidId])
 }
 
-export const modifyItemCursorLastSyncedLastRefreshedWithPlaidId = async (
+export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
     plaidId: string,
-    cursor: string | null,
-    lastSynced: Date
+    transactionsLastRefreshed: Date
 ) => {
     const query = `
         UPDATE items
-        SET
-            cursor = $1,
-            last_synced = $2,
-            last_refreshed = $2
-        WHERE plaid_id = $3
+        SET transactions_last_refreshed = $1
+        WHERE plaid_id = $2
     `
-    await runQuery(query, [cursor, lastSynced, plaidId])
+    await runQuery(query, [transactionsLastRefreshed, plaidId])
+}
+
+export const modifyItemCursorWithPlaidId = async (
+    plaidId: string,
+    cursor: string | null
+) => {
+    const query = `
+        UPDATE items
+        SET cursor = $1
+        WHERE plaid_id = $2
+    `
+    await runQuery(query, [cursor, plaidId])
 }
 
 interface DbItem {
@@ -147,8 +155,8 @@ interface DbItem {
     institution_name: string
     healthy: boolean
     cursor: string | null
-    last_synced: Date | null
     last_refreshed: Date | null
+    transactions_last_refreshed: Date | null
 }
 
 const mapDbItem = (dbItem: DbItem): Item => ({
@@ -161,6 +169,6 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     institutionName: dbItem.institution_name,
     healthy: dbItem.healthy,
     cursor: dbItem.cursor,
-    lastSynced: dbItem.last_synced,
     lastRefreshed: dbItem.last_refreshed,
+    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
 })

@@ -11,15 +11,15 @@ export class CurrencyService {
         }),
     }
 
-    formatAmount(amount: number | null, currency: string | null): string {
+    format(amount: number | null, currency: string | null): string {
         if (amount === null) return ''
         if (currency === null) return amount.toString()
-        if (!this.formatters[amount]) {
-            this.formatters[amount] = new Intl.NumberFormat('en-US', {
+        if (!this.formatters[currency]) {
+            this.formatters[currency] = new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency,
             })
         }
-        return this.formatters[amount].format(amount)
+        return this.formatters[currency].format(amount)
     }
 }

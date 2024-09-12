@@ -127,7 +127,15 @@ export class TransactionsComponent implements OnInit {
                     return throwError(() => err)
                 })
             )
-            .subscribe(() => (this.loading = false))
+            .subscribe(() => {
+                this.selectedCategoryIds = new Set(
+                    this.categories.map((c) => c.id)
+                )
+                this.selectedAccountIds = new Set(
+                    this.accounts.map((a) => a.id)
+                )
+                this.loading = false
+            })
     }
 
     loadCategories(): Observable<void> {
@@ -186,19 +194,21 @@ export class TransactionsComponent implements OnInit {
             limit,
             offset,
         }
-        return this.transactionSvc.getTransactions(req).pipe(
-            switchMap((t) => {
-                this.logger.debug('loaded transactions', t)
-                this.transactions = t.transactions
-                this.filteredCount = t.filteredCount
-                this.totalCount = t.totalCount
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load transactions', err)
-                return throwError(() => err)
-            })
-        )
+        return this.transactionSvc
+            .getTransactions(req, this.categories.length, this.accounts.length)
+            .pipe(
+                switchMap((t) => {
+                    this.logger.debug('loaded transactions', t)
+                    this.transactions = t.transactions
+                    this.filteredCount = t.filteredCount
+                    this.totalCount = t.totalCount
+                    return of(undefined)
+                }),
+                catchError((err: HttpErrorResponse) => {
+                    this.logger.error('failed to load transactions', err)
+                    return throwError(() => err)
+                })
+            )
     }
 
     reloadTransactions(): void {
@@ -404,6 +414,9 @@ export class TransactionsComponent implements OnInit {
             ids.size !== this.selectedCategoryIds.size ||
             ![...ids].every((value) => this.selectedCategoryIds!.has(value))
         ) {
+            if (ids.size === 0) {
+                ids = new Set(this.categories.map((c) => c.id))
+            }
             this.selectedCategoryIds = new Set(ids)
             this.currentPage = 1
             this.reloadTransactions()
@@ -415,6 +428,9 @@ export class TransactionsComponent implements OnInit {
             ids.size !== this.selectedAccountIds.size ||
             ![...ids].every((value) => this.selectedAccountIds!.has(value))
         ) {
+            if (ids.size === 0) {
+                ids = new Set(this.accounts.map((a) => a.id))
+            }
             this.selectedAccountIds = new Set(ids)
             this.currentPage = 1
             this.reloadTransactions()
@@ -430,8 +446,8 @@ export class TransactionsComponent implements OnInit {
             this.searchText.length > 0 ||
             this.selectedDateFilter !== DateFilterEnum.ALL ||
             this.selectedAmountFilter !== AmountFilterEnum.ALL ||
-            this.selectedCategoryIds.size !== 0 ||
-            this.selectedAccountIds.size !== 0
+            this.selectedCategoryIds.size !== this.categories.length ||
+            this.selectedAccountIds.size !== this.accounts.length
         )
     }
 
@@ -453,14 +469,14 @@ export class TransactionsComponent implements OnInit {
         this.previousMaxAmount = this.maxAmount
         this.maxAmount = null
 
-        this.selectedCategoryIds = new Set<number>()
-        this.selectedAccountIds = new Set<number>()
+        this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
+        this.selectedAccountIds = new Set(this.accounts.map((a) => a.id))
 
         this.currentPage = 1
         this.reloadTransactions()
     }
 
-    getFormattedDate(t: Transaction): string {
+    getDateString(t: Transaction): string {
         return new Date(t.date).toLocaleDateString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -506,9 +522,9 @@ export class TransactionsComponent implements OnInit {
         this.updateCustomName(t)
     }
 
-    getFormattedAmount(t: Transaction): string {
+    getAmountString(t: Transaction): string {
         const negative = t.amount < 0
-        const formatted = this.currencySvc.formatAmount(
+        const formatted = this.currencySvc.format(
             Math.abs(t.amount),
             t.unofficialCurrencyCode ?? t.isoCurrencyCode
         )

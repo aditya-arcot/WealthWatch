@@ -1,7 +1,11 @@
-import { Account } from './account'
+import { Account, AccountWithHoldings } from './account'
 
 // 3 hours
 export const refreshCooldown = 1000 * 60 * 60 * 3
+export const inCooldown = (timestamp: Date | null) => {
+    if (!timestamp) return false
+    return Date.now() - new Date(timestamp).getTime() < refreshCooldown
+}
 
 export interface Item {
     id: number
@@ -13,10 +17,14 @@ export interface Item {
     institutionName: string
     healthy: boolean
     cursor: string | null
-    lastSynced: Date | null
     lastRefreshed: Date | null
+    transactionsLastRefreshed: Date | null
 }
 
 export interface ItemWithAccounts extends Item {
     accounts: Account[]
+}
+
+export interface ItemWithAccountsWithHoldings extends Item {
+    accounts: AccountWithHoldings[]
 }

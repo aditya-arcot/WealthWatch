@@ -54,12 +54,12 @@ export const insertAccounts = async (
         query += `
             current_balance = EXCLUDED.current_balance,
             available_balance = EXCLUDED.available_balance,
-        `
-    }
-    query += `
             iso_currency_code = EXCLUDED.iso_currency_code,
             unofficial_currency_code = EXCLUDED.unofficial_currency_code,
             credit_limit = EXCLUDED.credit_limit,
+        `
+    }
+    query += `
             type = EXCLUDED.type,
             subtype = EXCLUDED.subtype
         RETURNING *

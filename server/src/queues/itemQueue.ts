@@ -1,7 +1,8 @@
 import { Queue, Worker } from 'bullmq'
 import {
-    refreshItemBalances,
-    syncItemData,
+    syncItemBalances,
+    syncItemInvestments,
+    syncItemTransactions,
 } from '../controllers/itemController.js'
 import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
@@ -11,8 +12,9 @@ import { getRedis } from '../utils/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum ItemJobType {
-    SyncItem = 'Sync',
-    RefreshItemBalances = 'RefreshBalances',
+    SyncTransactions = 'SyncTransactions',
+    SyncBalances = 'SyncBalances',
+    SyncInvestments = 'SyncInvestments',
 }
 
 const itemQueueName = `item-${vars.nodeEnv}`
@@ -31,12 +33,16 @@ export const getItemQueue = () => {
     return itemQueue
 }
 
-export const queueSyncItem = async (item: Item) => {
-    await queueItem(ItemJobType.SyncItem, item)
+export const queueSyncItemTransactions = async (item: Item) => {
+    await queueItem(ItemJobType.SyncTransactions, item)
 }
 
-export const queueRefreshItemBalances = async (item: Item) => {
-    await queueItem(ItemJobType.RefreshItemBalances, item)
+export const queueSyncItemBalances = async (item: Item) => {
+    await queueItem(ItemJobType.SyncBalances, item)
+}
+
+export const queueSyncItemInvestments = async (item: Item) => {
+    await queueItem(ItemJobType.SyncInvestments, item)
 }
 
 const queueItem = async (type: ItemJobType, item: Item) => {
@@ -56,12 +62,16 @@ export const initializeItemWorker = () => {
             if (!item) throw new HttpError('missing item')
 
             switch (type) {
-                case ItemJobType.SyncItem: {
-                    await syncItemData(item)
+                case ItemJobType.SyncTransactions: {
+                    await syncItemTransactions(item)
                     break
                 }
-                case ItemJobType.RefreshItemBalances: {
-                    await refreshItemBalances(item)
+                case ItemJobType.SyncBalances: {
+                    await syncItemBalances(item)
+                    break
+                }
+                case ItemJobType.SyncInvestments: {
+                    await syncItemInvestments(item)
                     break
                 }
                 default:

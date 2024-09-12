@@ -169,13 +169,15 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                                 description: 'The item cursor',
                             },
-                            lastSynced: {
-                                type: 'date',
-                                description: 'The item last synced date',
-                            },
                             lastRefreshed: {
                                 type: 'date',
-                                description: 'The item last refreshed date',
+                                description:
+                                    'The item last refreshed date by the user',
+                            },
+                            transactionsLastRefreshed: {
+                                type: 'date',
+                                description:
+                                    'The item transactions last refreshed date by the user',
                             },
                         },
                     },

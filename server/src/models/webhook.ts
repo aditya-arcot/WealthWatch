@@ -11,6 +11,7 @@ export interface Webhook {
 
 export enum WebhookTypeEnum {
     Transactions = 'TRANSACTIONS',
+    Holdings = 'HOLDINGS',
     Item = 'ITEM',
 }
 
@@ -21,6 +22,10 @@ export enum TransactionsWebhookCodeEnum {
     HistoricalUpdate = 'HISTORICAL_UPDATE',
     DefaultUpdate = 'DEFAULT_UPDATE',
     TransactionsRemoved = 'TRANSACTIONS_REMOVED',
+}
+
+export enum HoldingsWebhookCodeEnum {
+    DefaultUpdate = 'DEFAULT_UPDATE',
 }
 
 export enum ItemWebhookCodeEnum {

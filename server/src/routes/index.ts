@@ -4,6 +4,7 @@ import accountRouter from './accountRoutes.js'
 import authRouter from './authRoutes.js'
 import categoryRouter from './categoryRoutes.js'
 import devRouter from './devRoutes.js'
+import investmentRouter from './investmentRoutes.js'
 import itemRouter from './itemRoutes.js'
 import linkRouter from './linkRoutes.js'
 import notificationRouter from './notificationRoutes.js'
@@ -19,6 +20,7 @@ router.use('/categories', categoryRouter)
 if (!production) {
     router.use('/dev', devRouter)
 }
+router.use('/investments', investmentRouter)
 router.use('/items', itemRouter)
 router.use('/link', linkRouter)
 router.use('/notifications', notificationRouter)

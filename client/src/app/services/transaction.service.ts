@@ -15,7 +15,11 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
-    getTransactions(req: TransactionsRequestParams) {
+    getTransactions(
+        req: TransactionsRequestParams,
+        numCategories: number,
+        numAccounts: number
+    ) {
         let params = new HttpParams()
         if (req.searchQuery !== undefined && req.searchQuery !== '') {
             params = params.set('searchQuery', req.searchQuery)
@@ -35,7 +39,8 @@ export class TransactionService {
         if (
             req.categoryIds !== null &&
             req.categoryIds !== undefined &&
-            req.categoryIds.size > 0
+            req.categoryIds.size > 0 &&
+            req.categoryIds.size !== numCategories
         ) {
             req.categoryIds.forEach(
                 (id) => (params = params.append('categoryId', id))
@@ -44,7 +49,8 @@ export class TransactionService {
         if (
             req.accountIds !== null &&
             req.accountIds !== undefined &&
-            req.accountIds.size > 0
+            req.accountIds.size > 0 &&
+            req.accountIds.size !== numAccounts
         ) {
             req.accountIds.forEach(
                 (id) => (params = params.append('accountId', id))
