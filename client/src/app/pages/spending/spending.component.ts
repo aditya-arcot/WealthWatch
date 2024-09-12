@@ -21,7 +21,9 @@ import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
 import { LoggerService } from '../../services/logger.service'
+import { PercentService } from '../../services/percent.service'
 import { SpendingService } from '../../services/spending.service'
+import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 import { checkDatesEqual } from '../../utilities/date.utility'
 
 @Component({
@@ -92,10 +94,10 @@ export class SpendingComponent implements OnInit {
                 ticks: {
                     callback: (value) => {
                         if (typeof value === 'number') {
-                            return this.currencySvc.formatAmount(value, 'USD')
+                            return this.currencySvc.format(value, 'USD')
                         }
                         const parsed = parseFloat(value)
-                        return this.currencySvc.formatAmount(parsed, 'USD')
+                        return this.currencySvc.format(parsed, 'USD')
                     },
                 },
             },
@@ -111,7 +113,7 @@ export class SpendingComponent implements OnInit {
                     },
                     label: (tooltipItem) => {
                         const val = tooltipItem.parsed.y
-                        return ' ' + this.currencySvc.formatAmount(val, 'USD')
+                        return ' ' + this.currencySvc.format(val, 'USD')
                     },
                 },
             },
@@ -135,7 +137,7 @@ export class SpendingComponent implements OnInit {
                 callbacks: {
                     label: (tooltipItem) => {
                         const val = tooltipItem.parsed
-                        return ' ' + this.currencySvc.formatAmount(val, 'USD')
+                        return ' ' + this.currencySvc.format(val, 'USD')
                     },
                 },
             },
@@ -163,7 +165,8 @@ export class SpendingComponent implements OnInit {
         private categorySvc: CategoryService,
         private currencySvc: CurrencyService,
         private alertSvc: AlertService,
-        private spendingSvc: SpendingService
+        private spendingSvc: SpendingService,
+        private percentSvc: PercentService
     ) {}
 
     ngOnInit(): void {
@@ -310,7 +313,8 @@ export class SpendingComponent implements OnInit {
         this.updateCharts()
     }
 
-    toggleIncludeBills(): void {
+    toggleIncludeBills(event: MouseEvent | KeyboardEvent): void {
+        if (!handleCheckboxSelect(event)) return
         this.loading = true
         const billsCategory = this.categories.find(
             (c) => c.id === CategoryEnum.Bills
@@ -440,13 +444,13 @@ export class SpendingComponent implements OnInit {
 
     getAmountString(total: number): string {
         const negative = total < 0
-        const formatted = this.currencySvc.formatAmount(Math.abs(total), 'USD')
+        const formatted = this.currencySvc.format(Math.abs(total), 'USD')
         if (negative) return `+${formatted}`
         return formatted
     }
 
     getRemainingAmountString(): string {
-        return this.currencySvc.formatAmount(
+        return this.currencySvc.format(
             Math.abs(this.getRemainingAmount()),
             'USD'
         )
@@ -463,15 +467,11 @@ export class SpendingComponent implements OnInit {
         const spendingBillsTotal =
             this.spendingTotal +
             (this.includeBills && this.billsTotal ? this.billsTotal : 0)
-        return this.getPercentString(amount / spendingBillsTotal)
+        return this.percentSvc.format(amount / spendingBillsTotal)
     }
 
     getPercentIncomeString(amount: number | undefined): string {
         if (this.incomeTotal === undefined || this.incomeTotal === 0) return '-'
-        return this.getPercentString((amount ?? 0) / (-1 * this.incomeTotal))
-    }
-
-    getPercentString(decimal: number): string {
-        return `${(decimal * 100).toFixed(1)}%`
+        return this.percentSvc.format((amount ?? 0) / (-1 * this.incomeTotal))
     }
 }

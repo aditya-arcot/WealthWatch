@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router'
 import { AccountsComponent } from './pages/accounts/accounts.component'
 import { HomeComponent } from './pages/home/home.component'
+import { InvestmentsComponent } from './pages/investments/investments.component'
 import { LoginComponent } from './pages/login/login.component'
 import { LogoutComponent } from './pages/logout/logout.component'
 import { NetWorthComponent } from './pages/net-worth/net-worth.component'
@@ -19,6 +20,7 @@ export const routes: Routes = [
     { path: 'accounts', component: AccountsComponent },
     { path: 'transactions', component: TransactionsComponent },
     { path: 'spending', component: SpendingComponent },
+    { path: 'investments', component: InvestmentsComponent },
     { path: 'net-worth', component: NetWorthComponent },
     { path: 'paychecks', component: PaychecksComponent },
     { path: '', redirectTo: '/home', pathMatch: 'full' },

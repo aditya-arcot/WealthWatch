@@ -30,7 +30,7 @@
         <div class="card mb-2">
             <div class="card-body">
                 <div class="container-fluid position-relative mb-2 p-0">
-                    <h5 class="card-title mb-1">{{ item.institutionName }}</h5>
+                    <h4 class="card-title mb-1">{{ item.institutionName }}</h4>
                     <h6
                         class="card-subtitle mb-1 small-text"
                         [class.text-success]="item.healthy"
@@ -42,14 +42,12 @@
                             Unhealthy
                         }
                     </h6>
-                    <h6 class="card-subtitle text-muted small-text">
-                        @if (!item.lastSynced) {
-                            Never synced
-                        } @else {
-                            Last synced:
-                            {{ getFormattedDate(item.lastSynced) }}
-                        }
-                    </h6>
+                    @if (item.lastRefreshed) {
+                        <h6 class="card-subtitle text-muted small-text">
+                            Last refreshed:
+                            {{ getDateString(item.lastRefreshed) }}
+                        </h6>
+                    }
 
                     <div class="d-flex gap-2 position-absolute top-right">
                         <button
@@ -97,10 +95,10 @@
                                     {{ account.type }} ({{ account.subtype }})
                                 </td>
                                 <td>
-                                    {{ getFormattedCurrentBalance(account) }}
+                                    {{ getCurrentBalanceString(account) }}
                                 </td>
                                 <td class="d-none d-md-table-cell">
-                                    {{ getFormattedAvailableBalance(account) }}
+                                    {{ getAvailableBalanceString(account) }}
                                 </td>
                                 <td class="d-none d-sm-table-cell">
                                     &middot;&middot;&middot;&middot;

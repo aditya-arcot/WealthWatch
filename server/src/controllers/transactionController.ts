@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import {
     fetchActiveItemsWithUserId,
-    modifyItemLastRefreshedWithPlaidId,
+    modifyItemTransactionsLastRefreshedWithPlaidId,
 } from '../database/itemQueries.js'
 import {
     fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters,
@@ -10,13 +10,13 @@ import {
     modifyTransactionNoteWithPlaidId,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
-import { refreshCooldown } from '../models/item.js'
-import { plaidTransactionsRefresh } from '../plaid/transactionMethods.js'
+import { inCooldown } from '../models/item.js'
 import {
     parseNumberArrayOrUndefinedFromQueryParam,
     parseNumberOrUndefinedFromQueryParam,
 } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
+import { refreshItemTransactions } from './itemController.js'
 
 export const getUserTransactions = async (req: Request, res: Response) => {
     logger.debug('getting transactions')
@@ -154,17 +154,20 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
     const items = await fetchActiveItemsWithUserId(userId)
     await Promise.all(
         items.map(async (item) => {
-            const lastRefresh = item.lastRefreshed?.getTime() || 0
-            if (Date.now() - lastRefresh >= refreshCooldown) {
-                await plaidTransactionsRefresh(item)
-                await modifyItemLastRefreshedWithPlaidId(
-                    item.plaidId,
-                    new Date()
+            if (inCooldown(item.transactionsLastRefreshed)) {
+                logger.debug(
+                    {
+                        id: item.id,
+                        transactionsLastRefreshed:
+                            item.transactionsLastRefreshed,
+                    },
+                    'transactions refresh cooldown. skipping'
                 )
             } else {
-                logger.debug(
-                    { id: item.id, lastRefresh },
-                    'skipping item refresh (cooldown)'
+                await refreshItemTransactions(item)
+                await modifyItemTransactionsLastRefreshedWithPlaidId(
+                    item.plaidId,
+                    new Date()
                 )
             }
         })

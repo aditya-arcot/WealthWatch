@@ -40,7 +40,7 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
  * @swagger
  * /items/{plaidItemId}/refresh:
  *   post:
- *     summary: Refresh an item's transactions and balances
+ *     summary: Refresh an item (refresh transactions, queue sync balances, queue sync investments)
  *     tags: [Items]
  *     parameters:
  *       - in: path
@@ -51,7 +51,7 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
  *         description: The Plaid item id
  *     responses:
  *       202:
- *         description: Refreshed the item's transactions and queued the balance refresh
+ *         description: Refreshed the item
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

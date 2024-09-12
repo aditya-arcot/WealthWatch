@@ -14,7 +14,12 @@ import {
 import { catchError, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
-import { Item, ItemWithAccounts, refreshCooldown } from '../../models/item'
+import {
+    inCooldown,
+    Item,
+    ItemWithAccounts,
+    refreshCooldown,
+} from '../../models/item'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
@@ -101,7 +106,7 @@ export class AccountsComponent implements OnInit {
                         this.alertSvc.addErrorAlert(
                             'Something went wrong. Please report this issue.',
                             [
-                                `Failed to find item with id ${account.itemId} for account ${account.id}`,
+                                `Failed to find item ${account.itemId} for account ${account.id}`,
                             ]
                         )
                         return
@@ -260,13 +265,12 @@ export class AccountsComponent implements OnInit {
     }
 
     refreshItem(item: Item): void {
-        const lastRefreshed = item.lastRefreshed
-            ? new Date(item.lastRefreshed)
-            : null
-        const lastRefreshTime = lastRefreshed ? lastRefreshed.getTime() : 0
-        if (Date.now() - lastRefreshTime < refreshCooldown) {
+        if (inCooldown(item.lastRefreshed)) {
+            const lastRefreshed = item.lastRefreshed
+                ? new Date(item.lastRefreshed)
+                : null
             const nextRefresh = new Date(
-                lastRefreshTime + refreshCooldown
+                (lastRefreshed?.getTime() ?? 0) + refreshCooldown
             ).toLocaleTimeString(undefined, { timeStyle: 'short' })
             this.alertSvc.addErrorAlert(
                 `${item.institutionName} data was recently refreshed`,
@@ -323,7 +327,7 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    getFormattedDate(date: Date): string {
+    getDateString(date: Date): string {
         return new Date(date).toLocaleString(undefined, {
             month: 'numeric',
             day: 'numeric',
@@ -333,15 +337,15 @@ export class AccountsComponent implements OnInit {
         })
     }
 
-    getFormattedCurrentBalance(acc: Account): string {
-        return this.currencySvc.formatAmount(
+    getCurrentBalanceString(acc: Account): string {
+        return this.currencySvc.format(
             acc.currentBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
         )
     }
 
-    getFormattedAvailableBalance(acc: Account): string {
-        return this.currencySvc.formatAmount(
+    getAvailableBalanceString(acc: Account): string {
+        return this.currencySvc.format(
             acc.availableBalance,
             acc.unofficialCurrencyCode ?? acc.isoCurrencyCode
         )
