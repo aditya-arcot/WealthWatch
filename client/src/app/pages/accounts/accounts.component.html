@@ -63,44 +63,33 @@
                             (click)="deactivateItem(item)"
                             class="btn btn-danger"
                             type="button"
-                            title="Deactivate Item"
+                            title="Unlink Institution"
                         >
                             <i class="bi bi-trash"></i>
-                            <span class="ms-1 d-none d-sm-inline">Delete</span>
+                            <span class="ms-1 d-none d-sm-inline">Unlink</span>
                         </button>
                     </div>
                 </div>
 
-                <table
-                    class="table table-striped table-hover table-sm table-bordered mb-0"
-                >
+                <table class="table table-striped table-sm align-middle mb-0">
                     <thead class="table-dark">
                         <tr>
                             <th scope="col">Name</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Current Balance</th>
-                            <th scope="col" class="d-none d-md-table-cell">
-                                Available Balance
-                            </th>
-                            <th scope="col" class="d-none d-sm-table-cell">
-                                Number
-                            </th>
+                            <th scope="col" class="text-center">Number</th>
                         </tr>
                     </thead>
                     <tbody class="table-group-divider small-text">
                         @for (account of item.accounts; track $index) {
                             <tr>
-                                <td>{{ account.name }}</td>
                                 <td>
-                                    {{ account.type }} ({{ account.subtype }})
+                                    <div>
+                                        {{ account.name }}
+                                    </div>
+                                    <div class="tiny-text text-muted">
+                                        {{ account.subtype }}
+                                    </div>
                                 </td>
-                                <td>
-                                    {{ getCurrentBalanceString(account) }}
-                                </td>
-                                <td class="d-none d-md-table-cell">
-                                    {{ getAvailableBalanceString(account) }}
-                                </td>
-                                <td class="d-none d-sm-table-cell">
+                                <td class="text-center">
                                     &middot;&middot;&middot;&middot;
                                     {{ account.mask }}
                                 </td>

@@ -305,6 +305,11 @@ export class AccountsComponent implements OnInit {
     }
 
     deactivateItem(item: Item): void {
+        if (!confirm('Are you sure you want to unlink this institution?')) {
+            this.logger.debug('canceled item deactivation')
+            return
+        }
+
         this.loading = true
         this.itemSvc
             .deactivateItem(item.plaidId)
