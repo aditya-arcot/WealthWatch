@@ -29,6 +29,7 @@ export class InvestmentsComponent implements OnInit {
 
     loading = false
 
+    unfilteredItems: ItemWithAccountsWithHoldings[] = []
     items: ItemWithAccountsWithHoldings[] = []
     accounts: Account[] = []
     holdings: HoldingWithSecurity[] = []
@@ -102,9 +103,10 @@ export class InvestmentsComponent implements OnInit {
         return this.itemSvc.getItems().pipe(
             switchMap((i) => {
                 this.logger.debug('loaded items', i)
-                this.items = i.map((item) => {
+                this.unfilteredItems = i.map((item) => {
                     return { ...item, accounts: [] }
                 })
+                this.items = []
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -155,7 +157,9 @@ export class InvestmentsComponent implements OnInit {
                 return
             }
 
-            const item = this.items.find((i) => i.id === account?.itemId)
+            const item = this.unfilteredItems.find(
+                (i) => i.id === account?.itemId
+            )
             if (!item) {
                 this.alertSvc.addErrorAlert(
                     'Something went wrong. Please report this issue.',
@@ -178,7 +182,7 @@ export class InvestmentsComponent implements OnInit {
             item.accounts.push(newAccount)
         })
 
-        this.items = this.items.filter((i) => i.accounts.length > 0)
+        this.items = this.unfilteredItems.filter((i) => i.accounts.length > 0)
 
         this.selectedAccountIds = new Set<number>(
             this.items
