@@ -217,6 +217,9 @@ export class AccountsComponent implements OnInit {
                 .updateNotificationsOfTypeToInactive(itemId, withAccounts)
                 .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
                 .subscribe()
+            this.itemSvc
+                .updateItemToHealthy(itemId)
+                .subscribe(() => this.loadAccounts())
             this.router.navigateByUrl('/accounts')
         }
     }
