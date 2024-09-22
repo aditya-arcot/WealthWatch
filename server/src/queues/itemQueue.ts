@@ -95,11 +95,15 @@ export const initializeItemWorker = () => {
             { err },
             `${itemQueueName} queue - failed job (id ${job?.id})`
         )
-        handleJobFailure(itemQueueName, job?.id, job?.data, err).catch(
-            (err) => {
-                logger.error(err, `error handling job failure`)
-            }
-        )
+        handleJobFailure(
+            itemQueueName,
+            job?.id,
+            job?.name,
+            job?.data,
+            err
+        ).catch((err) => {
+            logger.error(err, `error handling job failure`)
+        })
     })
 
     logger.debug('initialized item worker')

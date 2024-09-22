@@ -58,11 +58,15 @@ export const initializeWebhookWorker = () => {
             { err },
             `${webhookQueueName} queue - failed job (id ${job?.id})`
         )
-        handleJobFailure(webhookQueueName, job?.id, job?.data, err).catch(
-            (err) => {
-                logger.error(err, `error handling job failure`)
-            }
-        )
+        handleJobFailure(
+            webhookQueueName,
+            job?.id,
+            job?.name,
+            job?.data,
+            err
+        ).catch((err) => {
+            logger.error(err, `error handling job failure`)
+        })
     })
 
     logger.debug('initialized webhook worker')
