@@ -22,4 +22,8 @@ export class ItemService {
     deactivateItem(plaidItemId: string) {
         return this.http.delete(`${this.baseUrl}/${plaidItemId}`)
     }
+
+    updateItemToHealthy(itemId: number) {
+        return this.http.patch(`${this.baseUrl}/healthy`, { itemId })
+    }
 }
