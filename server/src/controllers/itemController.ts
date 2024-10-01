@@ -7,6 +7,7 @@ import {
     fetchActiveItemWithPlaidId,
     modifyItemActiveWithId,
     modifyItemCursorWithPlaidId,
+    modifyItemHealthyWithId,
     modifyItemLastRefreshedWithPlaidId,
     modifyItemTransactionsLastRefreshedWithPlaidId,
 } from '../database/itemQueries.js'
@@ -228,4 +229,22 @@ export const deactivateItemMain = async (item: Item) => {
     logger.debug({ id: item.id }, 'removing & deactivating item')
     await plaidItemRemove(item)
     await modifyItemActiveWithId(item.id, false)
+}
+
+export const updateUserItemToHealthy = async (req: Request, res: Response) => {
+    logger.debug('updating item to healthy')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const itemId = req.body.itemId
+    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
+
+    const items = await fetchActiveItemsWithUserId(userId)
+    const item = items.filter((i) => i.id === itemId)[0]
+    if (!item) throw new HttpError('item not found', 404)
+
+    await modifyItemHealthyWithId(item.id, true)
+
+    return res.status(204).send()
 }

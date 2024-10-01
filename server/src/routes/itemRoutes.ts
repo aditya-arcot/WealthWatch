@@ -3,6 +3,7 @@ import {
     deactivateItem,
     getUserItems,
     refreshItem,
+    updateUserItemToHealthy,
 } from '../controllers/itemController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -79,5 +80,29 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.route('/:plaidItemId').delete(authenticate, catchAsync(deactivateItem))
+
+/**
+ * @swagger
+ * /items/healthy:
+ *   patch:
+ *     summary: Update an item to healthy
+ *     tags: [Items]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               itemId:
+ *                 type: number
+ *                 required: true
+ *     responses:
+ *       204:
+ *         description: Updated the item to healthy
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/healthy').patch(catchAsync(updateUserItemToHealthy))
 
 export default router

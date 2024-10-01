@@ -148,7 +148,7 @@ export class AccountsComponent implements OnInit {
                         onExit: (
                             error: PlaidErrorObject,
                             metadata: PlaidErrorMetadata
-                        ) => this.handleLinkExit(error, metadata),
+                        ) => this.handleLinkExit(error, metadata, itemId),
                         onEvent: (
                             eventName: string,
                             metadata: PlaidEventMetadata
@@ -217,14 +217,21 @@ export class AccountsComponent implements OnInit {
                 .updateNotificationsOfTypeToInactive(itemId, withAccounts)
                 .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
                 .subscribe()
+            this.itemSvc
+                .updateItemToHealthy(itemId)
+                .subscribe(() => this.loadAccounts())
             this.router.navigateByUrl('/accounts')
         }
     }
 
     handleLinkExit(
         error: PlaidErrorObject | null,
-        metadata: PlaidErrorMetadata
+        metadata: PlaidErrorMetadata,
+        itemId?: number
     ): void {
+        if (itemId !== undefined) {
+            this.router.navigateByUrl('/accounts')
+        }
         const type = 'exit'
         this.logger.debug(type, error, metadata)
         const event: PlaidLinkEvent = {

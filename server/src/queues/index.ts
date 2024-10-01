@@ -55,6 +55,7 @@ export const handleJobSuccess = async (
 export const handleJobFailure = async (
     queueName: string,
     jobId: string | undefined,
+    jobName: string | undefined,
     data: object | null,
     error: Error
 ) => {
@@ -62,6 +63,7 @@ export const handleJobFailure = async (
         id: -1,
         queueName,
         jobId: jobId ?? null,
+        jobName: jobName ?? null,
         success: false,
         data,
         errorName: error.name,

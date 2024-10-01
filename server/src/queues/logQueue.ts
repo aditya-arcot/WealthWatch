@@ -105,7 +105,13 @@ export const initializeLogWorker = () => {
             { err },
             `${logQueueName} queue - failed job (id ${job?.id})`
         )
-        handleJobFailure(logQueueName, job?.id, job?.data, err).catch((err) => {
+        handleJobFailure(
+            logQueueName,
+            job?.id,
+            job?.name,
+            job?.data,
+            err
+        ).catch((err) => {
             logger.error(err, `error handling job failure`)
         })
     })
