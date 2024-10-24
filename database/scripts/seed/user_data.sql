@@ -1,4 +1,4 @@
-START TRANSACTION;
+BEGIN;
 
 INSERT INTO
     users (

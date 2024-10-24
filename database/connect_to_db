@@ -1,9 +1,7 @@
 #!/bin/bash
 
-set -e
-
 show_help() {
-    echo "Usage: delete_old_records [options]"
+    echo "Usage: connect_to_db [options]"
     echo ""
     echo "Options:"
     echo "  --env file     Specify the environment file"
@@ -32,10 +30,7 @@ while [[ "$1" != "" ]]; do
 done
 
 echo "Environment file: $ENV_FILE"
-echo
 
 source ./load_env
 
-echo "deleting old records..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/delete_old_records.sql -v ON_ERROR_STOP=1
-echo
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER
