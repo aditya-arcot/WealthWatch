@@ -132,10 +132,12 @@ export const handleError = (
 ): Response => {
     logger.error({ error: err }, err.message)
     if (err instanceof HttpError) {
-        return res.status(err.statusCode).send(err.message)
+        return res
+            .status(err.status)
+            .send({ message: err.message, code: err.code })
     } else if (err instanceof PlaidApiError) {
-        return res.status(500).send(err.message)
+        return res.status(500).send({ message: err.message })
     } else {
-        return res.status(500).send('Unexpected error')
+        return res.status(500).send({ message: 'Unexpected error' })
     }
 }
