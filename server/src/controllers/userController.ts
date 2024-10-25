@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { fetchActiveItemsWithUserId } from '../database/itemQueries.js'
 import {
     fetchUserWithEmail,
+    fetchUserWithUsername,
     removeUserWithId,
 } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
@@ -44,6 +45,6 @@ export const checkUserExists = async (req: Request, res: Response) => {
         throw new HttpError('missing or invalid username', 400)
 
     const emailExists = !!(await fetchUserWithEmail(email))
-    const usernameExists = !!(await fetchUserWithEmail(username))
+    const usernameExists = !!(await fetchUserWithUsername(username))
     return res.send({ emailExists, usernameExists })
 }
