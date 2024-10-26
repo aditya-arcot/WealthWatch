@@ -2,15 +2,17 @@
 
 <div class="container-fluid position-relative mb-3">
     <h2 class="text-center mb-0">Transactions</h2>
-    <button
-        (click)="refreshTransactions()"
-        class="btn btn-primary position-absolute top-left"
-        type="button"
-        title="Refresh Transactions"
-    >
-        <i class="bi bi-arrow-clockwise"></i>
-        <span class="ms-1 d-none d-md-inline">Refresh Transactions</span>
-    </button>
+    @if (totalCount > 0) {
+        <button
+            (click)="refreshTransactions()"
+            class="btn btn-primary position-absolute top-left"
+            type="button"
+            title="Refresh Transactions"
+        >
+            <i class="bi bi-arrow-clockwise"></i>
+            <span class="ms-1 d-none d-md-inline">Refresh Transactions</span>
+        </button>
+    }
 </div>
 
 @if (totalCount < 1) {

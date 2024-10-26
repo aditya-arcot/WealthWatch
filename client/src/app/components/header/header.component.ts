@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, OnInit } from '@angular/core'
 import {
     NavigationEnd,
     Router,
@@ -27,8 +27,6 @@ import { NotificationsComponent } from '../notifications/notifications.component
     styleUrl: './header.component.css',
 })
 export class HeaderComponent implements OnInit, AfterViewInit {
-    @ViewChild(NotificationsComponent)
-    notificationsComponent!: NotificationsComponent
     loading = false
 
     constructor(
