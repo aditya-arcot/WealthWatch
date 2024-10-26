@@ -118,13 +118,13 @@
                                     <th scope="col" class="text-center">
                                         Name
                                     </th>
-                                    <th scope="col" class="text-center">
-                                        Email
-                                    </th>
                                     <th
                                         scope="col"
-                                        class="text-center d-none d-md-table-cell"
+                                        class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell"
                                     >
+                                        Email
+                                    </th>
+                                    <th scope="col" class="text-center">
                                         Access Code
                                     </th>
                                 </tr>
@@ -145,12 +145,12 @@
                                         <td class="text-center">
                                             {{ getFullName(req) }}
                                         </td>
-                                        <td class="text-center">
+                                        <td
+                                            class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell"
+                                        >
                                             {{ req.email }}
                                         </td>
-                                        <td
-                                            class="text-center d-none d-md-table-cell"
-                                        >
+                                        <td class="text-center">
                                             @if (req.accessCode) {
                                                 {{ req.accessCode }}
                                             } @else {
