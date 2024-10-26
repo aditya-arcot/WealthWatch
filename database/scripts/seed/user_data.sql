@@ -6,24 +6,17 @@ INSERT INTO
         email,
         first_name,
         last_name,
-        password_hash
+        password_hash,
+        admin
     )
 VALUES
     (
-        'john_doe',
-        'john.doe@example.com',
-        'John',
-        'Doe',
-        -- password: testing1
-        '$2a$10$AazhJB7WNHF/VkWStyn6XO70pmLJuXzX0FDhzPZN/JJacPdWcnENK'
-    ),
-    (
-        'jane_smith',
-        'jane.smith@example.com',
-        'Jane',
-        'Smith',
-        -- password: testing2
-        '$2a$10$F16gzv/XcgRJ/vuoRb0FauvGl9Semq2QtoccWYj/6EcxiUEfeiTbG'
+        'aarcot100',
+        'arcot.aditya@utexas.edu',
+        'Aditya',
+        'Arcot',
+        '$2a$10$y/oUd5B8qaopFIjiUCdxVuh8Zt0KLDPc5HOsRz.hncUMAL9UKnJfS',
+        true
     );
 
 COMMIT;
