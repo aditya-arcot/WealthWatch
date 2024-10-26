@@ -13,10 +13,14 @@ export class LinkService {
 
     createLinkToken(itemId?: number, withAccounts?: boolean) {
         const url = `${this.baseUrl}/link-token`
-        return this.http.post<string>(url, {
-            itemId,
-            updateAccounts: withAccounts,
-        })
+        return this.http.post(
+            url,
+            {
+                itemId,
+                updateAccounts: withAccounts,
+            },
+            { responseType: 'text' }
+        )
     }
 
     handleLinkEvent(event: PlaidLinkEvent) {
