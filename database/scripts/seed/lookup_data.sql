@@ -1,6 +1,14 @@
 BEGIN;
 
 INSERT INTO
+    access_request_statuses (name)
+VALUES
+    ('Pending'),
+    ('Rejected'),
+    ('Approved'),
+    ('Completed');
+
+INSERT INTO
     notification_types (name)
 VALUES
     ('Info'),

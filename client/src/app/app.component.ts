@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
         '/startup-error',
         '/login',
         '/logout',
+        '/access-request',
         '/register',
     ]
 

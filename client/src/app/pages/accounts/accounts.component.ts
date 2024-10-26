@@ -131,10 +131,10 @@ export class AccountsComponent implements OnInit {
                     this.loading = false
                     return throwError(() => err)
                 }),
-                switchMap((resp) => {
-                    this.logger.debug('received link token', resp)
+                switchMap((token) => {
+                    this.logger.debug('received link token', token)
                     const config: PlaidConfig = {
-                        token: resp.linkToken,
+                        token,
                         onSuccess: (
                             token: string,
                             metadata: PlaidSuccessMetadata

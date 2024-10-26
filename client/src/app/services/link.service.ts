@@ -13,7 +13,7 @@ export class LinkService {
 
     createLinkToken(itemId?: number, withAccounts?: boolean) {
         const url = `${this.baseUrl}/link-token`
-        return this.http.post<{ linkToken: string }>(url, {
+        return this.http.post<string>(url, {
             itemId,
             updateAccounts: withAccounts,
         })

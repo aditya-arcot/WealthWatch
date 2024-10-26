@@ -4,182 +4,216 @@
             <div class="card">
                 <h3 class="card-header text-center">Register</h3>
                 <div class="card-body">
-                    <form
-                        #registerForm
-                        class="needs-validation"
-                        [formGroup]="registerFormGroup"
-                        novalidate
-                    >
-                        <div class="mb-2">
-                            <label for="firstName">First Name</label>
-                            <input
-                                type="text"
-                                id="firstName"
-                                class="form-control"
-                                formControlName="firstName"
-                                required
-                                autocomplete="given-name"
-                            />
-                            @if (
-                                registerFormGroup.controls[
-                                    'firstName'
-                                ].hasError('required')
-                            ) {
-                                <div class="invalid-feedback">
-                                    First name cannot be empty
-                                </div>
-                            }
-                        </div>
-                        <div class="mb-2">
-                            <label for="lastName">Last Name</label>
-                            <input
-                                type="text"
-                                id="lastName"
-                                class="form-control"
-                                formControlName="lastName"
-                                required
-                                autocomplete="family-name"
-                            />
-                            @if (
-                                registerFormGroup.controls['lastName'].hasError(
-                                    'required'
-                                )
-                            ) {
-                                <div class="invalid-feedback">
-                                    Last name cannot be empty
-                                </div>
-                            }
-                        </div>
-                        <div class="mb-2">
-                            <label for="email">Email</label>
-                            <input
-                                type="email"
-                                id="email"
-                                class="form-control"
-                                formControlName="email"
-                                required
-                                autocomplete="email"
-                            />
-                            @if (
-                                registerFormGroup.controls['email'].hasError(
-                                    'required'
-                                )
-                            ) {
-                                <div class="invalid-feedback">
-                                    Email cannot be empty
-                                </div>
-                            } @else if (
-                                registerFormGroup.controls['email'].hasError(
-                                    'email'
-                                )
-                            ) {
-                                <div class="invalid-feedback">
-                                    Please enter a valid email
-                                </div>
-                            }
-                        </div>
-                        <div class="mb-2">
-                            <label for="username">Username</label>
-                            <input
-                                type="text"
-                                id="username"
-                                class="form-control"
-                                formControlName="username"
-                                required
-                                autocomplete="username"
-                            />
-                            @if (
-                                registerFormGroup.controls['username'].hasError(
-                                    'required'
-                                )
-                            ) {
-                                <div class="invalid-feedback">
-                                    Username cannot be empty
-                                </div>
-                            }
-                        </div>
-                        <div class="mb-3">
-                            <label for="password">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                class="form-control"
-                                formControlName="password"
-                                required
-                                minlength="8"
-                                (input)="
-                                    setConfirmPasswordValidity(confirmPassword)
-                                "
-                                autocomplete="new-password"
-                            />
-                            @if (
-                                registerFormGroup.controls['password'].hasError(
-                                    'required'
-                                )
-                            ) {
-                                <div class="invalid-feedback">
-                                    Password cannot be empty
-                                </div>
-                            } @else if (
-                                registerFormGroup.controls['password'].hasError(
-                                    'minlength'
-                                )
-                            ) {
-                                <div class="invalid-feedback">
-                                    Password cannot be less than 8 characters
-                                </div>
-                            }
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirmPassword"
-                                >Confirm Password</label
-                            >
-                            <input
-                                #confirmPassword
-                                type="password"
-                                id="confirmPassword"
-                                class="form-control"
-                                formControlName="confirmPassword"
-                                required
-                                (input)="
-                                    setConfirmPasswordValidity(confirmPassword)
-                                "
-                                autocomplete="new-password"
-                            />
-                            @if (
-                                registerFormGroup.controls[
-                                    'confirmPassword'
-                                ].hasError('required')
-                            ) {
-                                <div class="invalid-feedback">
-                                    Confirm password cannot be empty
-                                </div>
-                            } @else if (
-                                registerFormGroup.hasError(
-                                    'mismatchedPasswords'
-                                )
-                            ) {
-                                <div class="invalid-feedback">
-                                    Passwords do not match
-                                </div>
-                            }
-                        </div>
-                        <div class="d-flex justify-content-center mb-2">
-                            <button
-                                type="submit"
-                                class="btn btn-primary"
-                                title="Register"
-                            >
-                                Register
-                            </button>
-                        </div>
-                        <div class="mb-0">
-                            <p class="text-center mb-0">
-                                Already have an account?
-                                <a routerLink="/login">Log In</a>
-                            </p>
-                        </div>
-                    </form>
+                    @if (!accessCodeValidated) {
+                        <form
+                            #accessCodeForm
+                            class="needs-validation"
+                            [formGroup]="accessCodeFormGroup"
+                            novalidate
+                        >
+                            <div class="mb-2">
+                                <label for="accessCode">Access Code</label>
+                                <input
+                                    type="text"
+                                    id="accessCode"
+                                    class="form-control"
+                                    formControlName="accessCode"
+                                    required
+                                    minlength="8"
+                                    maxlength="8"
+                                    autocomplete="off"
+                                    (keypress)="
+                                        handleAccessCodeFormKeypress($event)
+                                    "
+                                />
+                                @if (
+                                    accessCodeFormGroup.controls[
+                                        'accessCode'
+                                    ].hasError('required')
+                                ) {
+                                    <div class="invalid-feedback">
+                                        Access code cannot be empty
+                                    </div>
+                                } @else if (
+                                    accessCodeFormGroup.controls[
+                                        'accessCode'
+                                    ].hasError('minlength')
+                                ) {
+                                    <div class="invalid-feedback">
+                                        Access code must be 8 characters
+                                    </div>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-center mb-2">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    title="Submit"
+                                    (click)="validateAccessCodeForm()"
+                                >
+                                    Submit
+                                </button>
+                            </div>
+                            <div class="mb-0">
+                                <p class="text-center mb-0">
+                                    Don't have an access code?
+                                    <a routerLink="/access-request"
+                                        >Request Access</a
+                                    >
+                                </p>
+                            </div>
+                            <div class="mb-0">
+                                <p class="text-center mb-0">
+                                    Already have an account?
+                                    <a routerLink="/login">Log In</a>
+                                </p>
+                            </div>
+                        </form>
+                    } @else {
+                        <form
+                            #registerForm
+                            class="needs-validation"
+                            [formGroup]="registerFormGroup"
+                            novalidate
+                        >
+                            <div class="mb-2">
+                                <label for="name">Name</label>
+                                <input
+                                    [value]="name"
+                                    type="text"
+                                    id="name"
+                                    class="form-control"
+                                    disabled
+                                />
+                            </div>
+                            <div class="mb-2">
+                                <label for="email">Email</label>
+                                <input
+                                    [value]="email"
+                                    type="email"
+                                    id="email"
+                                    class="form-control"
+                                    disabled
+                                />
+                            </div>
+                            <div class="mb-2">
+                                <label for="username">Username</label>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    class="form-control"
+                                    formControlName="username"
+                                    required
+                                    autocomplete="username"
+                                    (keypress)="
+                                        handleRegisterFormKeypress($event)
+                                    "
+                                />
+                                @if (
+                                    registerFormGroup.controls[
+                                        'username'
+                                    ].hasError('required')
+                                ) {
+                                    <div class="invalid-feedback">
+                                        Username cannot be empty
+                                    </div>
+                                }
+                            </div>
+                            <div class="mb-2">
+                                <label for="password">Password</label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    class="form-control"
+                                    formControlName="password"
+                                    required
+                                    minlength="8"
+                                    (input)="
+                                        setConfirmPasswordValidity(
+                                            confirmPassword
+                                        )
+                                    "
+                                    autocomplete="new-password"
+                                    (keypress)="
+                                        handleRegisterFormKeypress($event)
+                                    "
+                                />
+                                @if (
+                                    registerFormGroup.controls[
+                                        'password'
+                                    ].hasError('required')
+                                ) {
+                                    <div class="invalid-feedback">
+                                        Password cannot be empty
+                                    </div>
+                                } @else if (
+                                    registerFormGroup.controls[
+                                        'password'
+                                    ].hasError('minlength')
+                                ) {
+                                    <div class="invalid-feedback">
+                                        Password cannot be less than 8
+                                        characters
+                                    </div>
+                                }
+                            </div>
+                            <div class="mb-2">
+                                <label for="confirmPassword"
+                                    >Confirm Password</label
+                                >
+                                <input
+                                    #confirmPassword
+                                    type="password"
+                                    id="confirmPassword"
+                                    class="form-control"
+                                    formControlName="confirmPassword"
+                                    required
+                                    (input)="
+                                        setConfirmPasswordValidity(
+                                            confirmPassword
+                                        )
+                                    "
+                                    autocomplete="new-password"
+                                    (keypress)="
+                                        handleRegisterFormKeypress($event)
+                                    "
+                                />
+                                @if (
+                                    registerFormGroup.controls[
+                                        'confirmPassword'
+                                    ].hasError('required')
+                                ) {
+                                    <div class="invalid-feedback">
+                                        Confirm password cannot be empty
+                                    </div>
+                                } @else if (
+                                    registerFormGroup.hasError(
+                                        'mismatchedPasswords'
+                                    )
+                                ) {
+                                    <div class="invalid-feedback">
+                                        Passwords do not match
+                                    </div>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-center mb-2">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    title="Register"
+                                    (click)="validateRegisterForm()"
+                                >
+                                    Register
+                                </button>
+                            </div>
+                            <div class="mb-0">
+                                <p class="text-center mb-0">
+                                    Already have an account?
+                                    <a routerLink="/login">Log In</a>
+                                </p>
+                            </div>
+                        </form>
+                    }
                 </div>
             </div>
         </div>

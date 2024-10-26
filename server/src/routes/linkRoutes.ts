@@ -36,9 +36,9 @@ const router = express.Router()
  *       200:
  *         description: Created a link token
  *         content:
- *           application/json:
+ *           text/plain:
  *             schema:
- *               $ref: '#/components/schemas/LinkToken'
+ *               type: string
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

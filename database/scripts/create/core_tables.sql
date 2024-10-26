@@ -1,3 +1,15 @@
+CREATE TABLE access_requests (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    email TEXT NOT NULL UNIQUE,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    status_id INTEGER REFERENCES access_request_statuses(id) NOT NULL,
+    access_code TEXT UNIQUE,
+    reviewer TEXT,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username TEXT NOT NULL UNIQUE,
@@ -5,6 +17,7 @@ CREATE TABLE users (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
+    admin BOOLEAN NOT NULL DEFAULT FALSE,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

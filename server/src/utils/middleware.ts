@@ -116,6 +116,17 @@ export const authenticate = (
     throw new HttpError('Unauthorized', 401)
 }
 
+export const authenticateAdmin = (
+    req: Request,
+    _res: Response,
+    next: NextFunction
+) => {
+    if (req.session && req.session.user && req.session.user.admin) {
+        return next()
+    }
+    throw new HttpError('Unauthorized', 401)
+}
+
 export const handleUnmatchedRoute = (
     req: Request,
     _res: Response,

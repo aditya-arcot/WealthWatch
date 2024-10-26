@@ -66,6 +66,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         }
     }
 
+    isAdmin = () => this.userSvc.getStoredCurrentUser()?.admin ?? false
+
     updateNotificationsToRead(): Observable<undefined> {
         return this.notificationSvc.updateAllNotificationsToRead().pipe(
             switchMap(() => {

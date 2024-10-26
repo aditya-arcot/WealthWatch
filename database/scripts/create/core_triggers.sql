@@ -1,5 +1,10 @@
 -- UPDATE TIMESTAMP
 
+CREATE TRIGGER trigger_access_requests_update_timestamp
+BEFORE UPDATE ON access_requests
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
 CREATE TRIGGER trigger_users_update_timestamp
 BEFORE UPDATE ON users
 FOR EACH ROW
@@ -37,6 +42,11 @@ EXECUTE PROCEDURE set_update_timestamp();
 
 
 -- AUDIT
+
+CREATE TRIGGER trigger_access_requests_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON access_requests
+FOR EACH ROW
+EXECUTE FUNCTION insert_audit_record();
 
 CREATE TRIGGER trigger_users_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON users
