@@ -1,6 +1,5 @@
 import express from 'express'
 import {
-    checkUserExists,
     deleteCurrentUser,
     getCurrentUser,
 } from '../controllers/userController.js'
@@ -42,41 +41,5 @@ router
     .route('/current')
     .get(getCurrentUser)
     .delete(authenticate, catchAsync(deleteCurrentUser))
-
-/**
- * @swagger
- * /users/exists:
- *   post:
- *     summary: Check if a email or username is in use
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 required: true
- *               username:
- *                 type: string
- *                 required: true
- *     responses:
- *       200:
- *         description: Checked if the email or username is in use
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 emailExists:
- *                   type: boolean
- *                 usernameExists:
- *                   type: boolean
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.route('/exists').post(catchAsync(checkUserExists))
 
 export default router

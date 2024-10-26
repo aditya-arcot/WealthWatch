@@ -28,6 +28,39 @@ export const createSwaggerSpec = () => {
             },
             components: {
                 schemas: {
+                    AccessRequest: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                                description: 'The access request id',
+                            },
+                            email: {
+                                type: 'string',
+                                description: 'The user email',
+                            },
+                            firstName: {
+                                type: 'string',
+                                description: 'The user first name',
+                            },
+                            lastName: {
+                                type: 'string',
+                                description: 'The user last name',
+                            },
+                            statusId: {
+                                type: 'number',
+                                description: 'The access request status id',
+                            },
+                            accessCode: {
+                                type: 'string',
+                                description: 'The access code',
+                            },
+                            reviewer: {
+                                type: 'string',
+                                description: 'The access request reviewer',
+                            },
+                        },
+                    },
                     Account: {
                         type: 'object',
                         properties: {
@@ -127,6 +160,78 @@ export const createSwaggerSpec = () => {
                                 type: 'array',
                                 description:
                                     'The category transaction total by date',
+                            },
+                        },
+                    },
+                    HoldingWithSecurity: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                                description: 'The holding id',
+                            },
+                            accountId: {
+                                type: 'number',
+                                description: 'The account id',
+                            },
+                            name: {
+                                type: 'string',
+                                description: 'The holding name',
+                            },
+                            typeId: {
+                                type: 'number',
+                                description: 'The holding type id',
+                            },
+                            cashEquivalent: {
+                                type: 'boolean',
+                                description:
+                                    'The holding cash equivalent status',
+                            },
+                            ticker: {
+                                type: 'string',
+                                description: 'The holding ticker',
+                            },
+                            marketCode: {
+                                type: 'string',
+                                description: 'The holding market code',
+                            },
+                            price: {
+                                type: 'number',
+                                description: 'The holding price',
+                            },
+                            priceAsOf: {
+                                type: 'date',
+                                description: 'The holding price as of date',
+                            },
+                            closePrice: {
+                                type: 'number',
+                                description: 'The holding close price',
+                            },
+                            closePriceAsOf: {
+                                type: 'date',
+                                description:
+                                    'The holding close price as of date',
+                            },
+                            quantity: {
+                                type: 'number',
+                                description: 'The holding quantity',
+                            },
+                            value: {
+                                type: 'number',
+                                description: 'The holding value',
+                            },
+                            costBasis: {
+                                type: 'number',
+                                description: 'The holding cost basis',
+                            },
+                            isoCurrencyCode: {
+                                type: 'string',
+                                description: 'The holding ISO currency code',
+                            },
+                            unofficialCurrencyCode: {
+                                type: 'string',
+                                description:
+                                    'The holding unofficial currency code',
                             },
                         },
                     },
@@ -296,15 +401,6 @@ export const createSwaggerSpec = () => {
                             note: {
                                 type: 'string',
                                 description: 'The transaction note',
-                            },
-                        },
-                    },
-                    LinkToken: {
-                        type: 'object',
-                        properties: {
-                            linkToken: {
-                                type: 'string',
-                                description: 'The link token',
                             },
                         },
                     },

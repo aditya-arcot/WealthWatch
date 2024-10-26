@@ -1,21 +1,14 @@
 import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
-import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    OnInit,
-    ViewChild,
-} from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import {
     AbstractControl,
     FormBuilder,
     FormGroup,
     ReactiveFormsModule,
-    Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-import { catchError, finalize, map, of, switchMap, tap, throwError } from 'rxjs'
+import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
 import { User } from '../../models/user'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
@@ -29,10 +22,17 @@ import { UserService } from '../../services/user.service'
     templateUrl: './register.component.html',
     styleUrl: './register.component.css',
 })
-export class RegisterComponent implements OnInit, AfterViewInit {
+export class RegisterComponent implements OnInit {
+    @ViewChild('accessCodeForm') accessCodeForm!: ElementRef<HTMLFormElement>
     @ViewChild('registerForm') registerForm!: ElementRef<HTMLFormElement>
-    registerFormGroup: FormGroup
+
     loading = false
+    accessCodeFormGroup: FormGroup
+    registerFormGroup: FormGroup
+    accessCodeValidated = false
+    accessCode = ''
+    name = ''
+    email = ''
 
     constructor(
         private formBuilder: FormBuilder,
@@ -42,14 +42,14 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         private authSvc: AuthService,
         private alertSvc: AlertService
     ) {
+        this.accessCodeFormGroup = this.formBuilder.group({
+            accessCode: [],
+        })
         this.registerFormGroup = this.formBuilder.group(
             {
-                firstName: ['', [Validators.required]],
-                lastName: ['', [Validators.required]],
-                email: ['', [Validators.required, Validators.email]],
-                username: ['', [Validators.required]],
-                password: ['', [Validators.required, Validators.minLength(8)]],
-                confirmPassword: ['', [Validators.required]],
+                username: [],
+                password: [],
+                confirmPassword: [],
             },
             { validators: this.validateConfirmPassword }
         )
@@ -77,19 +77,39 @@ export class RegisterComponent implements OnInit, AfterViewInit {
             })
     }
 
-    ngAfterViewInit(): void {
-        this.logger.info('adding event listener')
-        const form = this.registerForm?.nativeElement
-        form.addEventListener('submit', (submitEvent: SubmitEvent) => {
-            if (!this.registerFormGroup.valid || !form.checkValidity()) {
-                this.logger.error('validation error')
-                submitEvent.preventDefault()
-                submitEvent.stopPropagation()
-            } else {
-                this.register()
-            }
-            form.classList.add('was-validated')
-        })
+    handleAccessCodeFormKeypress = (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            this.validateAccessCodeForm()
+        }
+    }
+
+    handleRegisterFormKeypress = (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            this.validateRegisterForm()
+        }
+    }
+
+    validateAccessCodeForm() {
+        const accessCodeForm = this.accessCodeForm?.nativeElement
+        if (
+            !this.accessCodeFormGroup.valid ||
+            !accessCodeForm.checkValidity()
+        ) {
+            this.logger.error('validation error')
+        } else {
+            this.validateAccessCode()
+        }
+        accessCodeForm.classList.add('was-validated')
+    }
+
+    validateRegisterForm() {
+        const registerForm = this.registerForm?.nativeElement
+        if (!this.registerFormGroup.valid || !registerForm.checkValidity()) {
+            this.logger.error('validation error')
+        } else {
+            this.register()
+        }
+        registerForm.classList.add('was-validated')
     }
 
     validateConfirmPassword(control: AbstractControl) {
@@ -120,68 +140,73 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         }
     }
 
-    register() {
+    private validateAccessCode() {
+        this.logger.info('validating access code')
+        this.loading = true
+
+        this.accessCode = this.accessCodeFormGroup.value.accessCode
+        this.authSvc
+            .validateAccessCode(this.accessCode)
+            .pipe(
+                switchMap((resp) => {
+                    this.name = resp.name
+                    this.email = resp.email
+                    this.accessCodeValidated = true
+                    return of(undefined)
+                }),
+                catchError((err: HttpErrorResponse) => {
+                    this.logger.error('error while validating access code')
+                    this.accessCodeFormGroup.patchValue({ accessCode: '' })
+                    return throwError(() => err)
+                }),
+                finalize(() => {
+                    this.loading = false
+                })
+            )
+            .subscribe()
+    }
+
+    private register() {
         this.logger.info('registering')
         this.loading = true
 
-        const firstName = this.registerFormGroup.value.firstName
-        const lastName = this.registerFormGroup.value.lastName
-        const email = this.registerFormGroup.value.email
         const username = this.registerFormGroup.value.username
         const password = this.registerFormGroup.value.password
 
-        this.userSvc
-            .checkUserExists(email, username)
+        this.authSvc
+            .register(this.accessCode, username, password)
             .pipe(
-                switchMap((res) => {
-                    if (res.emailExists || res.usernameExists) {
-                        if (res.emailExists) {
-                            this.alertSvc.addErrorAlert(
-                                'Email is already in use'
-                            )
-                            this.registerFormGroup.patchValue({
-                                email: '',
-                                confirmPassword: '',
-                            })
-                        }
-                        if (res.usernameExists) {
-                            this.alertSvc.addErrorAlert(
-                                'Username is already in use'
-                            )
-                            this.registerFormGroup.patchValue({
-                                username: '',
-                                confirmPassword: '',
-                            })
-                        }
-                        return of(false)
-                    }
-                    return this.authSvc
-                        .register(
-                            firstName,
-                            lastName,
-                            email,
-                            username,
-                            password
-                        )
-                        .pipe(
-                            tap((user) => this.userSvc.storeCurrentUser(user)),
-                            map(() => true)
-                        )
-                }),
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert(
-                        'Registration failed. Try again'
-                    )
-                    return throwError(() => err)
-                }),
-                finalize(() => (this.loading = false))
-            )
-            .subscribe((res) => {
-                if (res) {
+                switchMap((user) => {
+                    this.userSvc.storeCurrentUser(user)
                     this.router.navigateByUrl('/home')
                     this.alertSvc.clearAlerts()
                     this.alertSvc.addSuccessAlert('Success registering')
-                }
-            })
+                    return of(undefined)
+                }),
+                catchError((err: HttpErrorResponse) => {
+                    this.logger.error('error while registering')
+                    if (err.status === 409) {
+                        this.alertSvc.clearAlerts()
+                        this.alertSvc.addErrorAlert(
+                            'An account with that username already exists',
+                            ['Please choose another username or log in']
+                        )
+                        this.registerFormGroup.patchValue({
+                            username: '',
+                            confirmPassword: '',
+                        })
+                        return of(undefined)
+                    }
+                    this.alertSvc.addErrorAlert(
+                        'Registration failed. Please try again'
+                    )
+                    this.registerFormGroup.patchValue({ confirmPassword: '' })
+                    return throwError(() => err)
+                }),
+                finalize(() => {
+                    this.loading = false
+                })
+            )
+            .subscribe()
     }
 }

@@ -29,12 +29,4 @@ export class UserService {
         const url = `${this.baseUrl}/current`
         return this.http.get<User | undefined>(url)
     }
-
-    checkUserExists(email: string, username: string) {
-        const url = `${this.baseUrl}/exists`
-        return this.http.post<{
-            emailExists: boolean
-            usernameExists: boolean
-        }>(url, { email, username })
-    }
 }

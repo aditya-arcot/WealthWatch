@@ -1,4 +1,19 @@
-START TRANSACTION;
+BEGIN;
+
+INSERT INTO
+    access_request_statuses (name)
+VALUES
+    ('Pending'),
+    ('Rejected'),
+    ('Approved'),
+    ('Completed');
+
+INSERT INTO
+    notification_types (name)
+VALUES
+    ('Info'),
+    ('Link Update'),
+    ('Link Update With Accounts');
 
 INSERT INTO
     category_groups (name)
@@ -33,13 +48,6 @@ VALUES
     ('Travel', 2),
     ('Bills', 2),
     ('Ignored', 3);
-
-INSERT INTO
-    notification_types (name)
-VALUES
-    ('Info'),
-    ('Link Update'),
-    ('Link Update With Accounts');
 
 INSERT INTO
     security_types (name)

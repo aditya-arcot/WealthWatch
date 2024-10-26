@@ -6,19 +6,14 @@ show_help() {
     echo "Usage: reset_db [options]"
     echo ""
     echo "Options:"
-    echo "  --users        Seed the database users"
     echo "  --env file     Specify the environment file"
     echo "  -h, --help     Display this help message"
 }
 
-USERS=false
 ENV_FILE="../.env.dev"
 
 while [[ "$1" != "" ]]; do
     case $1 in
-        --users)
-            USERS=true
-            ;;
         --env)
             shift
             ENV_FILE=$1
@@ -36,7 +31,6 @@ while [[ "$1" != "" ]]; do
     shift
 done
 
-echo "Seed users: $USERS"
 echo "Environment file: $ENV_FILE"
 echo
 
@@ -83,16 +77,30 @@ echo "granting permissions..."
 psql $DB_NAME -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 echo
 
-echo "creating tables..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/create_tables.sql -v ON_ERROR_STOP=1
+echo "creating objects..."
+
+echo "creating temp file..."
+TEMP_FILE="scripts/create/temp.sql"
+echo "BEGIN;" > $TEMP_FILE
+cat scripts/create/debug_tables.sql >> $TEMP_FILE
+cat scripts/create/lookup_tables.sql >> $TEMP_FILE
+cat scripts/create/functions.sql >> $TEMP_FILE
+cat scripts/create/core_tables.sql >> $TEMP_FILE
+cat scripts/create/core_views.sql >> $TEMP_FILE
+cat scripts/create/core_triggers.sql >> $TEMP_FILE
+echo "COMMIT;" >> $TEMP_FILE
+
+echo "executing temp file..."
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f $TEMP_FILE -v ON_ERROR_STOP=1
+
+echo "deleting temp file..."
+rm $TEMP_FILE
 echo
 
-echo "seeding reference data..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_reference_data.sql -v ON_ERROR_STOP=1
+echo "seeding lookup data..."
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed/lookup_data.sql -v ON_ERROR_STOP=1
 echo
 
-if [ "$USERS" = true ]; then
-    echo "seeding users..."
-    PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed_users.sql -v ON_ERROR_STOP=1
-    echo
-fi
+echo "seeding user data..."
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed/user_data.sql -v ON_ERROR_STOP=1
+echo

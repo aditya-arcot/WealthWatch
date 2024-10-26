@@ -84,6 +84,15 @@
                 >
                     Paychecks
                 </a> -->
+                @if (isAdmin()) {
+                    <a
+                        class="nav-link"
+                        routerLink="/admin"
+                        routerLinkActive="active"
+                    >
+                        Admin
+                    </a>
+                }
             </div>
         </div>
         <div class="d-none d-lg-flex">

@@ -1,6 +1,7 @@
 import express from 'express'
 import { production } from '../utils/env.js'
 import accountRouter from './accountRoutes.js'
+import adminRouter from './adminRoutes.js'
 import authRouter from './authRoutes.js'
 import categoryRouter from './categoryRoutes.js'
 import devRouter from './devRoutes.js'
@@ -15,6 +16,7 @@ import userRouter from './userRoutes.js'
 
 const router = express.Router()
 router.use('/accounts', accountRouter)
+router.use('/admin', adminRouter)
 router.use('/auth', authRouter)
 router.use('/categories', categoryRouter)
 if (!production) {

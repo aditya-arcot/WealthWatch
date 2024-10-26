@@ -73,7 +73,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
         const form = this.loginForm?.nativeElement
         form.addEventListener('submit', (submitEvent: SubmitEvent) => {
             if (!this.loginFormGroup.valid || !form.checkValidity()) {
-                this.alertSvc.addErrorAlert('Fix inputs and try again')
+                this.logger.error('validation error')
                 submitEvent.preventDefault()
                 submitEvent.stopPropagation()
             } else {
