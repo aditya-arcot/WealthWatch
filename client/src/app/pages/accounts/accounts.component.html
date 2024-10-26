@@ -1,19 +1,18 @@
 <app-loading-spinner [loading]="loading"></app-loading-spinner>
 
-<div class="container-fluid position-relative mb-3">
-    <h2 class="text-center mb-0">Accounts</h2>
-    <button
-        (click)="linkAccount()"
-        class="btn btn-success position-absolute top-left"
-        type="button"
-        title="Link Account"
-    >
-        <i class="bi bi-plus"></i>
-        <span class="ms-1 d-none d-sm-inline">Link an Account</span>
-    </button>
-</div>
-
 @if (!itemsWithAccounts.length) {
+    <div class="container-fluid position-relative mb-3">
+        <h2 class="text-center mb-0">Accounts</h2>
+        <button
+            (click)="linkAccount()"
+            class="btn btn-success position-absolute top-left"
+            type="button"
+            title="Link Account"
+        >
+            <i class="bi bi-plus"></i>
+            <span class="ms-1 d-none d-sm-inline">Link an Account</span>
+        </button>
+    </div>
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-10 col-sm-8 col-md-6 col-xl-4">
@@ -26,79 +25,143 @@
         </div>
     </div>
 } @else {
-    @for (item of itemsWithAccounts; track $index) {
-        <div class="card mb-2">
-            <div class="card-body">
-                <div class="container-fluid position-relative mb-2 p-0">
-                    <h4 class="card-title mb-1">{{ item.institutionName }}</h4>
-                    <h6
-                        class="card-subtitle mb-1 small-text"
-                        [class.text-success]="item.healthy"
-                        [class.text-danger]="!item.healthy"
-                    >
-                        @if (item.healthy) {
-                            Healthy
-                        } @else {
-                            Unhealthy
-                        }
-                    </h6>
-                    @if (item.lastRefreshed) {
-                        <h6 class="card-subtitle text-muted small-text">
-                            Last refreshed:
-                            {{ getDateString(item.lastRefreshed) }}
-                        </h6>
-                    }
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="container-fluid position-relative mb-3">
+                <h2 class="text-center mb-0">Accounts</h2>
+                <button
+                    (click)="linkAccount()"
+                    class="btn btn-success position-absolute top-left"
+                    type="button"
+                    title="Link Account"
+                >
+                    <i class="bi bi-plus"></i>
+                    <span class="ms-1 d-none d-sm-inline">Link an Account</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-                    <div class="d-flex gap-2 position-absolute top-right">
-                        <button
-                            (click)="refreshItem(item)"
-                            class="btn btn-primary"
-                            type="button"
-                            title="Refresh Item"
+    @for (item of itemsWithAccounts; track $index) {
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="container-fluid position-relative mb-2 p-0">
+                            <h4 class="card-title mb-1">
+                                {{ item.institutionName }}
+                            </h4>
+                            <h6
+                                class="card-subtitle mb-1 small-text"
+                                [class.text-success]="item.healthy"
+                                [class.text-danger]="!item.healthy"
+                            >
+                                @if (item.healthy) {
+                                    Healthy
+                                } @else {
+                                    Unhealthy
+                                }
+                            </h6>
+                            @if (item.lastRefreshed) {
+                                <h6 class="card-subtitle text-muted small-text">
+                                    Last refreshed:
+                                    {{ getDateString(item.lastRefreshed) }}
+                                </h6>
+                            }
+
+                            <div
+                                class="d-flex gap-2 position-absolute top-right"
+                            >
+                                <button
+                                    (click)="refreshItem(item)"
+                                    class="btn btn-primary"
+                                    type="button"
+                                    title="Refresh Item"
+                                >
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                    <span class="ms-1 d-none d-sm-inline"
+                                        >Refresh</span
+                                    >
+                                </button>
+                                <button
+                                    (click)="deactivateItem(item)"
+                                    class="btn btn-danger"
+                                    type="button"
+                                    title="Unlink Institution"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                    <span class="ms-1 d-none d-sm-inline"
+                                        >Unlink</span
+                                    >
+                                </button>
+                            </div>
+                        </div>
+
+                        <table
+                            class="table table-striped table-hover table-sm align-middle mb-0"
                         >
-                            <i class="bi bi-arrow-clockwise"></i>
-                            <span class="ms-1 d-none d-sm-inline">Refresh</span>
-                        </button>
-                        <button
-                            (click)="deactivateItem(item)"
-                            class="btn btn-danger"
-                            type="button"
-                            title="Unlink Institution"
-                        >
-                            <i class="bi bi-trash"></i>
-                            <span class="ms-1 d-none d-sm-inline">Unlink</span>
-                        </button>
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" class="w-25">Name</th>
+                                    <th scope="col" class="text-center w-25">
+                                        <span class="d-none d-md-inline"
+                                            >Current Balance</span
+                                        >
+                                        <span class="d-inline d-md-none"
+                                            >Current</span
+                                        >
+                                    </th>
+                                    <th scope="col" class="text-center w-25">
+                                        <span class="d-none d-md-inline"
+                                            >Available Balance</span
+                                        >
+                                        <span class="d-inline d-md-none"
+                                            >Available</span
+                                        >
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        class="text-center d-none d-lg-table-cell w-25"
+                                    >
+                                        Number
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider small-text">
+                                @for (account of item.accounts; track $index) {
+                                    <tr>
+                                        <td class="w-25">
+                                            <div>
+                                                {{ account.name }}
+                                            </div>
+                                            <div class="tiny-text text-muted">
+                                                {{ account.subtype }}
+                                            </div>
+                                        </td>
+                                        <td class="text-center w-25">
+                                            {{
+                                                getCurrentBalanceString(account)
+                                            }}
+                                        </td>
+                                        <td class="text-center w-25">
+                                            {{
+                                                getAvailableBalanceString(
+                                                    account
+                                                )
+                                            }}
+                                        </td>
+                                        <td
+                                            class="text-center d-none d-lg-table-cell w-25"
+                                        >
+                                            &middot;&middot;&middot;&middot;
+                                            {{ account.mask }}
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <table
-                    class="table table-striped table-hover table-sm align-middle mb-0"
-                >
-                    <thead class="table-dark">
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col" class="text-center">Number</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-group-divider small-text">
-                        @for (account of item.accounts; track $index) {
-                            <tr>
-                                <td>
-                                    <div>
-                                        {{ account.name }}
-                                    </div>
-                                    <div class="tiny-text text-muted">
-                                        {{ account.subtype }}
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    &middot;&middot;&middot;&middot;
-                                    {{ account.mask }}
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
             </div>
         </div>
     }
