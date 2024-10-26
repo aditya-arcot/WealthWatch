@@ -1,11 +1,13 @@
 import { capitalizeFirstLetter } from '../utils/format.js'
 
 export class HttpError extends Error {
-    statusCode: number
+    status: number
+    code?: string
 
-    constructor(message: string, statusCode = 500) {
+    constructor(message: string, status = 500, code?: string) {
         super(capitalizeFirstLetter(message))
-        this.statusCode = statusCode
+        this.status = status
+        if (code) this.code = code
     }
 }
 
@@ -20,4 +22,11 @@ export class PlaidApiError extends Error {
         this.type = type
         this.detail = capitalizeFirstLetter(detail)
     }
+}
+
+export enum AccessRequestErrorCodeEnum {
+    UserExists = 'USER_EXISTS',
+    RequestPending = 'REQUEST_PENDING',
+    RequestApproved = 'REQUEST_APPROVED',
+    RequestRejected = 'REQUEST_REJECTED',
 }

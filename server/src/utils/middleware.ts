@@ -116,6 +116,17 @@ export const authenticate = (
     throw new HttpError('Unauthorized', 401)
 }
 
+export const authenticateAdmin = (
+    req: Request,
+    _res: Response,
+    next: NextFunction
+) => {
+    if (req.session && req.session.user && req.session.user.admin) {
+        return next()
+    }
+    throw new HttpError('Unauthorized', 401)
+}
+
 export const handleUnmatchedRoute = (
     req: Request,
     _res: Response,
@@ -132,10 +143,12 @@ export const handleError = (
 ): Response => {
     logger.error({ error: err }, err.message)
     if (err instanceof HttpError) {
-        return res.status(err.statusCode).send(err.message)
+        return res
+            .status(err.status)
+            .send({ message: err.message, code: err.code })
     } else if (err instanceof PlaidApiError) {
-        return res.status(500).send(err.message)
+        return res.status(500).send({ message: err.message })
     } else {
-        return res.status(500).send('Unexpected error')
+        return res.status(500).send({ message: 'Unexpected error' })
     }
 }

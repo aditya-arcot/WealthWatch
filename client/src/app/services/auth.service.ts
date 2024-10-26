@@ -21,18 +21,26 @@ export class AuthService {
         return this.http.post<void>(url, {})
     }
 
-    register(
-        firstName: string,
-        lastName: string,
-        email: string,
-        username: string,
-        password: string
-    ) {
-        const url = `${this.baseUrl}/register`
-        return this.http.post<User>(url, {
+    requestAccess(firstName: string, lastName: string, email: string) {
+        const url = `${this.baseUrl}/access-request`
+        return this.http.post<void>(url, {
             firstName,
             lastName,
             email,
+        })
+    }
+
+    validateAccessCode(accessCode: string) {
+        const url = `${this.baseUrl}/access-code`
+        return this.http.post<{ name: string; email: string }>(url, {
+            accessCode,
+        })
+    }
+
+    register(accessCode: string, username: string, password: string) {
+        const url = `${this.baseUrl}/register`
+        return this.http.post<User>(url, {
+            accessCode,
             username,
             password,
         })

@@ -12,8 +12,8 @@ import {
 import { HttpError } from '../models/error.js'
 import { inCooldown } from '../models/item.js'
 import {
-    parseNumberArrayOrUndefinedFromQueryParam,
-    parseNumberOrUndefinedFromQueryParam,
+    parseNumberArrayOrUndefinedFromParam,
+    parseNumberOrUndefinedFromParam,
 } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 import { refreshItemTransactions } from './itemController.js'
@@ -36,11 +36,11 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     if (typeof endDate !== 'undefined' && typeof endDate !== 'string')
         throw new HttpError('invalid end date', 400)
 
-    const minAmount = parseNumberOrUndefinedFromQueryParam(
+    const minAmount = parseNumberOrUndefinedFromParam(
         req.query['minAmount'],
         true
     )
-    const maxAmount = parseNumberOrUndefinedFromQueryParam(
+    const maxAmount = parseNumberOrUndefinedFromParam(
         req.query['maxAmount'],
         true
     )
@@ -51,17 +51,14 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     ) {
         throw new HttpError('invalid amount range', 400)
     }
-    const categoryId = parseNumberArrayOrUndefinedFromQueryParam(
+    const categoryId = parseNumberArrayOrUndefinedFromParam(
         req.query['categoryId']
     )
-    const accountId = parseNumberArrayOrUndefinedFromQueryParam(
+    const accountId = parseNumberArrayOrUndefinedFromParam(
         req.query['accountId']
     )
-    const limit = parseNumberOrUndefinedFromQueryParam(req.query['limit'], true)
-    const offset = parseNumberOrUndefinedFromQueryParam(
-        req.query['offset'],
-        true
-    )
+    const limit = parseNumberOrUndefinedFromParam(req.query['limit'], true)
+    const offset = parseNumberOrUndefinedFromParam(req.query['offset'], true)
 
     const transactions =
         await fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters(

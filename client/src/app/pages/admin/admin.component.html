@@ -1,0 +1,171 @@
+<app-loading-spinner [loading]="loading"></app-loading-spinner>
+
+<h2 class="text-center mb-3">Admin</h2>
+
+@if (!accessReqs.length) {
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-10 col-sm-8 col-md-6 col-xl-4">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h4 class="text-center mb-0">No access requests</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+} @else {
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-xl-5 px-2 pe-1">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="container-fluid mb-2 p-0">
+                        <h4 class="card-title text-center mb-1">
+                            Pending Access Requests
+                        </h4>
+                    </div>
+                    @if (getPendingRequests().length !== 0) {
+                        <table
+                            class="table table-striped table-hover table-sm align-middle mb-0"
+                        >
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" class="text-center">
+                                        Name
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        Email
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        class="text-center"
+                                        style="width: 1%"
+                                    >
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="small-text">
+                                @for (
+                                    req of getPendingRequests();
+                                    track $index
+                                ) {
+                                    <tr>
+                                        <td class="text-center">
+                                            {{ getFullName(req) }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ req.email }}
+                                        </td>
+                                        <td
+                                            class="d-flex gap-1 justify-content-center"
+                                        >
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-success"
+                                                title="Approve Request"
+                                                (click)="
+                                                    reviewRequest(
+                                                        req,
+                                                        accessRequestStatusEnum.Approved
+                                                    )
+                                                "
+                                            >
+                                                Approve
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-danger"
+                                                title="Reject Request"
+                                                (click)="
+                                                    reviewRequest(
+                                                        req,
+                                                        accessRequestStatusEnum.Rejected
+                                                    )
+                                                "
+                                            >
+                                                Reject
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    } @else {
+                        <div class="text-center">No requests</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-xl-7 px-2 ps-1">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="container-fluid mb-2 p-0">
+                        <h4 class="card-title text-center mb-1">
+                            Reviewed Access Requests
+                        </h4>
+                    </div>
+                    @if (getReviewedRequests().length !== 0) {
+                        <table
+                            class="table table-striped table-hover table-sm align-middle mb-0"
+                        >
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" class="text-center">
+                                        Status
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        Name
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell"
+                                    >
+                                        Email
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        Access Code
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="small-text">
+                                @for (
+                                    req of getReviewedRequests();
+                                    track $index
+                                ) {
+                                    <tr>
+                                        <td
+                                            class="text-center {{
+                                                getStatusClass(req)
+                                            }}"
+                                        >
+                                            {{ getStatusName(req) }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ getFullName(req) }}
+                                        </td>
+                                        <td
+                                            class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell"
+                                        >
+                                            {{ req.email }}
+                                        </td>
+                                        <td class="text-center">
+                                            @if (req.accessCode) {
+                                                {{ req.accessCode }}
+                                            } @else {
+                                                -
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    } @else {
+                        <div class="text-center">No requests</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,5 +1,3 @@
-START TRANSACTION;
-
 DELETE FROM audit
 WHERE create_timestamp < NOW() - INTERVAL '1 week';
 
@@ -12,10 +10,5 @@ WHERE create_timestamp < NOW() - INTERVAL '1 week';
 DELETE FROM plaid_api_requests
 WHERE create_timestamp < NOW() - INTERVAL '1 week';
 
-DELETE FROM webhooks
-WHERE create_timestamp < NOW() - INTERVAL '1 week';
-
 DELETE FROM jobs
 WHERE create_timestamp < NOW() - INTERVAL '1 week';
-
-COMMIT;

@@ -8,6 +8,7 @@ export const insertUser = async (user: User): Promise<User | undefined> => {
         user.firstName,
         user.lastName,
         user.passwordHash,
+        false,
     ]
 
     const rowCount = 1
@@ -18,7 +19,8 @@ export const insertUser = async (user: User): Promise<User | undefined> => {
             email,
             first_name,
             last_name,
-            password_hash
+            password_hash,
+            admin
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
@@ -64,6 +66,7 @@ interface DbUser {
     first_name: string
     last_name: string
     password_hash: string
+    admin: boolean
 }
 
 const mapDbUser = (user: DbUser): User => ({
@@ -73,4 +76,5 @@ const mapDbUser = (user: DbUser): User => ({
     firstName: user.first_name,
     lastName: user.last_name,
     passwordHash: user.password_hash,
+    admin: user.admin,
 })

@@ -1,5 +1,11 @@
 import express from 'express'
-import { login, logout, register } from '../controllers/authController.js'
+import {
+    login,
+    logout,
+    register,
+    requestAccess,
+    validateAccessCode,
+} from '../controllers/authController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
 
@@ -57,9 +63,9 @@ router.route('/logout').post(authenticate, logout)
 
 /**
  * @swagger
- * /auth/register:
+ * /auth/access-request:
  *   post:
- *     summary: Register for a new account
+ *     summary: Request access to the app
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -74,10 +80,63 @@ router.route('/logout').post(authenticate, logout)
  *               lastName:
  *                 type: string
  *                 required: true
- *               username:
+ *               email:
  *                 type: string
  *                 required: true
- *               email:
+ *     responses:
+ *       204:
+ *         description: Requested access
+ */
+router.route('/access-request').post(catchAsync(requestAccess))
+
+/**
+ * @swagger
+ * /auth/access-code:
+ *   post:
+ *     summary: Validate access code
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               accessCode:
+ *                 type: string
+ *                 required: true
+ *     responses:
+ *       200:
+ *         description: Validated access code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ */
+router.route('/access-code').post(catchAsync(validateAccessCode))
+
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register for a new account
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               accessCode:
+ *                 type: string
+ *                 required: true
+ *               username:
  *                 type: string
  *                 required: true
  *               password:

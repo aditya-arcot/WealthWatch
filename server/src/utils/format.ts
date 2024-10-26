@@ -25,7 +25,7 @@ export const toTitleCase = (str: string): string =>
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
 
-export const parseNumberOrUndefinedFromQueryParam = (
+export const parseNumberOrUndefinedFromParam = (
     param: string | string[] | ParsedQs | ParsedQs[] | undefined,
     nonNegative = false
 ): number | undefined => {
@@ -37,7 +37,7 @@ export const parseNumberOrUndefinedFromQueryParam = (
     return num
 }
 
-export const parseNumberArrayOrUndefinedFromQueryParam = (
+export const parseNumberArrayOrUndefinedFromParam = (
     param: string | string[] | ParsedQs | ParsedQs[] | undefined
 ): number[] | undefined => {
     if (param === undefined) return undefined

@@ -1,5 +1,6 @@
 .account-row td {
     background-color: lightgrey;
+    pointer-events: none;
 }
 
 .sticky-div {

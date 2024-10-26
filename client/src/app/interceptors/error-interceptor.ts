@@ -35,7 +35,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                     if (error.status === 0) {
                         errorSubtext.push('No server response')
                     } else {
-                        errorSubtext.push(error.error)
+                        errorSubtext.push(error.error.message)
                         if (error.status === 401) {
                             this.userSvc.clearStoredCurrentUser()
                             this.router.navigateByUrl('/login')
