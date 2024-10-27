@@ -165,7 +165,7 @@ export const syncItemTransactions = async (item: Item) => {
 export const syncItemBalances = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item balances')
     const accounts = await plaidAccountsBalanceGet(item)
-    await insertAccounts(accounts, true)
+    if (accounts) await insertAccounts(accounts, true)
 }
 
 export const syncItemInvestments = async (item: Item) => {
