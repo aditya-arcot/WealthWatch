@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { Holding, Security } from 'plaid'
 import { insertAccounts } from '../database/accountQueries.js'
 import { insertHoldings } from '../database/holdingQueries.js'
 import {
@@ -20,8 +21,9 @@ import {
     insertTransactions,
     removeTransactionsWithPlaidIds,
 } from '../database/transactionQueries.js'
-import { HttpError } from '../models/error.js'
+import { HttpError, PlaidApiError } from '../models/error.js'
 import { inCooldown, Item } from '../models/item.js'
+import { PlaidGeneralErrorCodeEnum } from '../models/plaidApiRequest.js'
 import {
     plaidAccountsBalanceGet,
     plaidAccountsGet,
@@ -95,23 +97,24 @@ export const refreshItem = async (req: Request, res: Response) => {
             'transactions refresh cooldown. skipping'
         )
     } else {
-        await refreshItemTransactions(item)
-        await modifyItemTransactionsLastRefreshedWithPlaidId(
-            item.plaidId,
-            new Date()
-        )
+        if (await refreshItemTransactions(item)) {
+            await modifyItemTransactionsLastRefreshedWithPlaidId(
+                item.plaidId,
+                new Date()
+            )
+        }
     }
 
-    await queueSyncItemBalances(item)
     await queueSyncItemInvestments(item)
+
+    await queueSyncItemBalances(item)
     await modifyItemLastRefreshedWithPlaidId(item.plaidId, new Date())
 
     return res.status(202).send()
 }
 
 export const refreshItemTransactions = async (item: Item) => {
-    logger.debug({ id: item.id }, 'refreshing item transactions')
-    await plaidTransactionsRefresh(item)
+    return await plaidTransactionsRefresh(item)
 }
 
 export const syncItemTransactions = async (item: Item) => {
@@ -177,7 +180,23 @@ export const syncItemInvestments = async (item: Item) => {
         const addedAccounts = await insertAccounts(accounts)
         if (!addedAccounts) throw new HttpError('failed to insert accounts')
 
-        const { holdings, securities } = await plaidInvestmentsHoldingsGet(item)
+        let holdings: Holding[] = []
+        let securities: Security[] = []
+        try {
+            const resp = await plaidInvestmentsHoldingsGet(item)
+            holdings = resp.holdings
+            securities = resp.securities
+        } catch (error) {
+            if (!(error instanceof PlaidApiError)) throw error
+            if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
+                throw error
+            logger.error(error)
+            logger.debug(
+                { id: item.id },
+                'products not supported error. abandoning investments sync'
+            )
+            return
+        }
 
         if (securities.length > 0) {
             logger.debug('inserting investment securities')
