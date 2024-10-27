@@ -4,6 +4,7 @@ import {
     getUserSpendingTotalByCategoryAndDate,
 } from '../controllers/spendingController.js'
 import { catchAsync } from '../utils/catchAsync.js'
+import { authenticate } from '../utils/middleware.js'
 
 const router = express.Router()
 
@@ -45,7 +46,7 @@ const router = express.Router()
  */
 router
     .route('/category')
-    .get(catchAsync(getUserSpendingTotalAndCountByCategory))
+    .get(authenticate, catchAsync(getUserSpendingTotalAndCountByCategory))
 
 /**
  * @swagger
@@ -81,9 +82,11 @@ router
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/CategoryTotalByDate'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router
     .route('/category-and-date')
-    .get(catchAsync(getUserSpendingTotalByCategoryAndDate))
+    .get(authenticate, catchAsync(getUserSpendingTotalByCategoryAndDate))
 
 export default router

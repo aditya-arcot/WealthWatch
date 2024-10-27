@@ -1,6 +1,7 @@
 import express from 'express'
 import { getUserHoldings } from '../controllers/investmentController.js'
 import { catchAsync } from '../utils/catchAsync.js'
+import { authenticate } from '../utils/middleware.js'
 
 const router = express.Router()
 
@@ -29,6 +30,6 @@ const router = express.Router()
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/holdings').get(catchAsync(getUserHoldings))
+router.route('/holdings').get(authenticate, catchAsync(getUserHoldings))
 
 export default router

@@ -137,42 +137,43 @@ const handleGeneralPlaidError = async (
         case PlaidGeneralErrorCodeEnum.ProductsNotSupported:
         case PlaidGeneralErrorCodeEnum.InternalServerError:
         case PlaidGeneralErrorCodeEnum.AdditionalConsentRequired:
-            logger.debug('no error-specific action needed')
+            logger.debug('no action required for error')
             break
 
-        case PlaidGeneralErrorCodeEnum.ItemLoginRequired:
-        case PlaidGeneralErrorCodeEnum.AccessNotGranted:
+        default:
             if (userId === undefined || itemId === undefined) {
-                logger.error('no user id or item id')
-            } else {
-                await insertPersistentLinkUpdateNotification(
-                    NotificationTypeEnum.LinkUpdate,
-                    userId,
-                    itemId
+                logger.error(
+                    { userId, itemId },
+                    'no user id or item id. skipping notification insert'
                 )
-            }
-            break
-
-        case PlaidGeneralErrorCodeEnum.NoAccounts:
-            if (userId === undefined || itemId === undefined) {
-                logger.error('no user id or item id')
             } else {
-                await insertPersistentLinkUpdateNotification(
-                    NotificationTypeEnum.LinkUpdateWithAccounts,
-                    userId,
-                    itemId
-                )
-            }
-            break
+                switch (error) {
+                    case PlaidGeneralErrorCodeEnum.ItemLoginRequired:
+                    case PlaidGeneralErrorCodeEnum.AccessNotGranted:
+                        await insertPersistentLinkUpdateNotification(
+                            NotificationTypeEnum.LinkUpdate,
+                            userId,
+                            itemId
+                        )
+                        break
 
-        case PlaidGeneralErrorCodeEnum.InstitutionNotResponding:
-        case PlaidGeneralErrorCodeEnum.InstitutionDown:
-            if (userId === undefined || itemId === undefined) {
-                logger.error('no user id or item id')
-            } else {
-                await insertInstitutionIssuesNotification(userId, itemId)
+                    case PlaidGeneralErrorCodeEnum.NoAccounts:
+                        await insertPersistentLinkUpdateNotification(
+                            NotificationTypeEnum.LinkUpdateWithAccounts,
+                            userId,
+                            itemId
+                        )
+                        break
+
+                    case PlaidGeneralErrorCodeEnum.InstitutionNotResponding:
+                    case PlaidGeneralErrorCodeEnum.InstitutionDown:
+                        await insertInstitutionIssuesNotification(
+                            userId,
+                            itemId
+                        )
+                        break
+                }
             }
-            break
     }
 }
 

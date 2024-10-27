@@ -1,11 +1,11 @@
 <app-loading-spinner [loading]="loading"></app-loading-spinner>
 
-<div class="container-fluid position-relative mb-3">
+<div class="position-relative mb-3">
     <h2 class="text-center mb-0">Transactions</h2>
     @if (totalCount > 0) {
         <button
             (click)="refreshTransactions()"
-            class="btn btn-primary position-absolute top-left"
+            class="btn btn-primary position-absolute top-right"
             type="button"
             title="Refresh Transactions"
         >
@@ -16,13 +16,11 @@
 </div>
 
 @if (totalCount < 1) {
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-10 col-sm-8 col-md-6 col-xl-4">
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <h4 class="text-center mb-0">No transactions synced</h4>
-                    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-sm-8 col-md-6 col-xl-4">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h4 class="text-center mb-0">No transactions synced</h4>
                 </div>
             </div>
         </div>
