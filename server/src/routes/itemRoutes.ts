@@ -103,6 +103,8 @@ router.route('/:plaidItemId').delete(authenticate, catchAsync(deactivateItem))
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/healthy').patch(catchAsync(updateUserItemToHealthy))
+router
+    .route('/healthy')
+    .patch(authenticate, catchAsync(updateUserItemToHealthy))
 
 export default router

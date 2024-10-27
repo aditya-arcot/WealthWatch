@@ -161,11 +161,12 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
                     'transactions refresh cooldown. skipping'
                 )
             } else {
-                await refreshItemTransactions(item)
-                await modifyItemTransactionsLastRefreshedWithPlaidId(
-                    item.plaidId,
-                    new Date()
-                )
+                if (await refreshItemTransactions(item)) {
+                    await modifyItemTransactionsLastRefreshedWithPlaidId(
+                        item.plaidId,
+                        new Date()
+                    )
+                }
             }
         })
     )

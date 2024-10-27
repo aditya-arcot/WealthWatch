@@ -161,7 +161,7 @@ router
  */
 router
     .route('/:plaidTransactionId/category')
-    .patch(catchAsync(updateTransactionCustomCategoryId))
+    .patch(authenticate, catchAsync(updateTransactionCustomCategoryId))
 
 /**
  * @swagger
@@ -194,7 +194,7 @@ router
  */
 router
     .route('/:plaidTransactionId/note')
-    .patch(catchAsync(updateTransactionNote))
+    .patch(authenticate, catchAsync(updateTransactionNote))
 
 /**
  * @swagger

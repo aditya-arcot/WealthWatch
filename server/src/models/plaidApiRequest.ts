@@ -47,3 +47,7 @@ export enum PlaidGeneralErrorCodeEnum {
 export enum PlaidTransactionErrorCodeEnum {
     TransactionsSyncMutationDuringPagination = 'TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION',
 }
+
+export enum PlaidAccountErrorCodeEnum {
+    LastUpdatedDatetimeOutOfRange = 'LAST_UPDATED_DATETIME_OUT_OF_RANGE',
+}

@@ -1,10 +1,13 @@
+import { formatISO, subDays } from 'date-fns'
 import {
     AccountBase,
     AccountsBalanceGetRequest,
     AccountsGetRequest,
 } from 'plaid'
 import { Account } from '../models/account.js'
+import { PlaidApiError } from '../models/error.js'
 import { Item } from '../models/item.js'
+import { PlaidAccountErrorCodeEnum } from '../models/plaidApiRequest.js'
 import { toTitleCase } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
@@ -27,20 +30,45 @@ export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
 
 export const plaidAccountsBalanceGet = async (
     item: Item
-): Promise<Account[]> => {
+): Promise<Account[] | void> => {
     logger.debug({ id: item.id }, 'getting item account balances')
+
     const params: AccountsBalanceGetRequest = {
         access_token: item.accessToken,
     }
-    const resp = await executePlaidMethod(
-        getPlaidClient().accountsBalanceGet,
-        params,
-        item.userId,
-        item.id
-    )
-    return resp.data.accounts.map((account) =>
-        mapPlaidAccount(account, item.id)
-    )
+    // Capital One
+    if (item.institutionId === 'ins_128026') {
+        const lastUpdated = item.lastRefreshed
+            ? formatISO(item.lastRefreshed)
+            : formatISO(subDays(new Date(), 30))
+        params.options = {
+            min_last_updated_datetime: lastUpdated,
+        }
+    }
+
+    try {
+        const resp = await executePlaidMethod(
+            getPlaidClient().accountsBalanceGet,
+            params,
+            item.userId,
+            item.id
+        )
+        return resp.data.accounts.map((account) =>
+            mapPlaidAccount(account, item.id)
+        )
+    } catch (error) {
+        if (!(error instanceof PlaidApiError)) throw error
+        if (
+            error.code !==
+            PlaidAccountErrorCodeEnum.LastUpdatedDatetimeOutOfRange
+        )
+            throw error
+        logger.error(error)
+        logger.debug(
+            { id: item.id },
+            'last updated datetime out of range error. abandoning item balances sync'
+        )
+    }
 }
 
 export const mapPlaidAccount = (

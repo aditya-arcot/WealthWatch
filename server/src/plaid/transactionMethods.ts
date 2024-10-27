@@ -8,6 +8,7 @@ import { CategoryEnum } from '../models/category.js'
 import { PlaidApiError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import {
+    PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,
     PlaidTransactionsSyncResponse,
 } from '../models/plaidApiRequest.js'
@@ -17,15 +18,30 @@ import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidTransactionsRefresh = async (item: Item) => {
     logger.debug({ id: item.id }, 'refreshing item transactions')
+
     const params: TransactionsRefreshRequest = {
         access_token: item.accessToken,
     }
-    await executePlaidMethod(
-        getPlaidClient().transactionsRefresh,
-        params,
-        item.userId,
-        item.id
-    )
+
+    try {
+        await executePlaidMethod(
+            getPlaidClient().transactionsRefresh,
+            params,
+            item.userId,
+            item.id
+        )
+        return true
+    } catch (error) {
+        if (!(error instanceof PlaidApiError)) throw error
+        if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
+            throw error
+        logger.error(error)
+        logger.debug(
+            { id: item.id },
+            'products not supported error. abandoning transactions refresh'
+        )
+        return false
+    }
 }
 
 export const plaidTransactionsSync = async (
@@ -77,15 +93,20 @@ export const plaidTransactionsSync = async (
         ) {
             throw error
         }
+        logger.error(error)
+
         if (!retry) {
-            logger.error('already retried transactions sync')
+            logger.error(
+                { id: item.id },
+                'transactions sync mutation error. already retried'
+            )
             throw error
         }
-
         logger.debug(
             { id: item.id },
-            'retrying transactions sync after 5 seconds'
+            'transactions sync mutation error. retrying transactions sync after 5 seconds'
         )
+
         await new Promise((resolve) => setTimeout(resolve, 5000))
         return await plaidTransactionsSync(item, false)
     }
