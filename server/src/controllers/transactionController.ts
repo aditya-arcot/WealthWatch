@@ -72,7 +72,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
             limit,
             offset
         )
-    return res.send(transactions)
+    return res.json(transactions)
 }
 
 export const updateTransactionCustomName = async (

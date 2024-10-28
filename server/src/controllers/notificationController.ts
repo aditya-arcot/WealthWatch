@@ -17,7 +17,7 @@ export const getUserNotifications = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const notifications = await fetchActiveNotificationsWithUserId(userId)
-    return res.send(notifications)
+    return res.json(notifications)
 }
 
 export const updateUserNotificationsToRead = async (

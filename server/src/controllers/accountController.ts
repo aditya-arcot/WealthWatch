@@ -10,5 +10,5 @@ export const getUserAccounts = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const accounts = await fetchActiveAccountsWithUserId(userId)
-    return res.send(accounts)
+    return res.json(accounts)
 }

@@ -29,7 +29,7 @@ export const getUserSpendingTotalAndCountByCategory = async (
         startDate,
         endDate
     )
-    return res.send(resp)
+    return res.json(resp)
 }
 
 export const getUserSpendingTotalByCategoryAndDate = async (
@@ -59,5 +59,5 @@ export const getUserSpendingTotalByCategoryAndDate = async (
         startDate,
         endDate
     )
-    return res.send({ dates, totals })
+    return res.json({ dates, totals })
 }

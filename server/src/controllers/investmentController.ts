@@ -15,7 +15,7 @@ export const getUserHoldings = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const holdings = await fetchActiveHoldingsWithUserId(userId)
-    return res.send(holdings)
+    return res.json(holdings)
 }
 
 export const refreshUserInvestments = async (req: Request, res: Response) => {

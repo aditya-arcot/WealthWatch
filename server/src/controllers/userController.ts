@@ -8,7 +8,7 @@ import { removeDeactivateItem } from './itemController.js'
 
 export const getCurrentUser = (req: Request, res: Response) => {
     logger.debug('getting current user')
-    return res.send(req.session.user)
+    return res.json(req.session.user)
 }
 
 export const deleteCurrentUser = async (req: Request, res: Response) => {

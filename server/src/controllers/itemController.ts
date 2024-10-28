@@ -51,7 +51,7 @@ export const getUserItems = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithUserId(userId)
-    return res.send(items)
+    return res.json(items)
 }
 
 export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
