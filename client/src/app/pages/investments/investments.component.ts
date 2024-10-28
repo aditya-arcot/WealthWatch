@@ -211,6 +211,25 @@ export class InvestmentsComponent implements OnInit {
         this.logger.debug('processed data for pie chart')
     }
 
+    refreshInvestments(): void {
+        this.loading = true
+        this.investmentSvc
+            .refreshInvestments()
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert('Failed to refresh investments')
+                    this.loading = false
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.alertSvc.addSuccessAlert('Refreshing investments', [
+                    'Please check back later',
+                ])
+                this.loading = false
+            })
+    }
+
     updateCharts(): void {
         this.charts.forEach((chart) => chart.chart?.update())
     }

@@ -15,4 +15,8 @@ export class InvestmentService {
         const url = `${this.baseUrl}/holdings`
         return this.http.get<HoldingWithSecurity[]>(url)
     }
+
+    refreshInvestments() {
+        return this.http.post(`${this.baseUrl}/refresh`, {})
+    }
 }

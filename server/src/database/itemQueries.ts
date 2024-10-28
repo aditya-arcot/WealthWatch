@@ -13,6 +13,7 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
         item.cursor,
         item.lastRefreshed,
         item.transactionsLastRefreshed,
+        item.investmentsLastRefreshed,
     ]
 
     const rowCount = 1
@@ -28,7 +29,8 @@ export const insertItem = async (item: Item): Promise<Item | undefined> => {
             healthy,
             cursor,
             last_refreshed,
-            transactions_last_refreshed
+            transactions_last_refreshed,
+            investments_last_refreshed
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         RETURNING *
@@ -133,6 +135,18 @@ export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
     await runQuery(query, [transactionsLastRefreshed, plaidId])
 }
 
+export const modifyItemInvestmentsLastRefreshedWithPlaidId = async (
+    plaidId: string,
+    investmentsLastRefreshed: Date
+) => {
+    const query = `
+        UPDATE items
+        SET investments_last_refreshed = $1
+        WHERE plaid_id = $2
+    `
+    await runQuery(query, [investmentsLastRefreshed, plaidId])
+}
+
 export const modifyItemCursorWithPlaidId = async (
     plaidId: string,
     cursor: string | null
@@ -157,6 +171,7 @@ interface DbItem {
     cursor: string | null
     last_refreshed: Date | null
     transactions_last_refreshed: Date | null
+    investments_last_refreshed: Date | null
 }
 
 const mapDbItem = (dbItem: DbItem): Item => ({
@@ -171,4 +186,5 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     cursor: dbItem.cursor,
     lastRefreshed: dbItem.last_refreshed,
     transactionsLastRefreshed: dbItem.transactions_last_refreshed,
+    investmentsLastRefreshed: dbItem.investments_last_refreshed,
 })

@@ -19,6 +19,7 @@ export interface Item {
     cursor: string | null
     lastRefreshed: Date | null
     transactionsLastRefreshed: Date | null
+    investmentsLastRefreshed: Date | null
 }
 
 export interface ItemWithAccounts extends Item {

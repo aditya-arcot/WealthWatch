@@ -1,9 +1,43 @@
-import { Holding as PlaidHolding, Security as PlaidSecurity } from 'plaid'
+import {
+    InvestmentsRefreshRequest,
+    Holding as PlaidHolding,
+    Security as PlaidSecurity,
+} from 'plaid'
+import { PlaidApiError } from '../models/error.js'
 import { Holding } from '../models/holding.js'
 import { Item } from '../models/item.js'
+import { PlaidGeneralErrorCodeEnum } from '../models/plaidApiRequest.js'
 import { Security, SecurityTypeEnum } from '../models/security.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
+
+export const plaidInvestmentsRefresh = async (item: Item) => {
+    logger.debug({ id: item.id }, 'refreshing item investments')
+
+    const params: InvestmentsRefreshRequest = {
+        access_token: item.accessToken,
+    }
+
+    try {
+        await executePlaidMethod(
+            getPlaidClient().investmentsRefresh,
+            params,
+            item.userId,
+            item.id
+        )
+        return true
+    } catch (error) {
+        if (!(error instanceof PlaidApiError)) throw error
+        if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
+            throw error
+        logger.error(error)
+        logger.debug(
+            { id: item.id },
+            'products not supported error. abandoning investments refresh'
+        )
+        return false
+    }
+}
 
 export const plaidInvestmentsHoldingsGet = async (item: Item) => {
     logger.debug({ id: item.id }, 'getting item investment holdings')

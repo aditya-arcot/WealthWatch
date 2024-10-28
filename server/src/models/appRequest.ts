@@ -9,7 +9,7 @@ export interface AppRequest {
     queryParams?: object | null
     routeParams?: object | null
     requestHeaders?: object | null
-    requestBody?: string | null
+    requestBody?: object | null
     remoteAddress?: string | null
     remotePort?: number | null
     session?: object | null

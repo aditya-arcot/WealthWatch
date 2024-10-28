@@ -23,7 +23,7 @@ import { plaidWebhookVerificationKeyGet } from '../plaid/webhookMethods.js'
 import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utils/logger.js'
 import {
-    deactivateItemMain,
+    removeDeactivateItem,
     syncItemInvestments,
     syncItemTransactions,
 } from './itemController.js'
@@ -330,7 +330,7 @@ const handleUserPermissionRevokedWebhook = async (itemId: string) => {
     )
         throw new HttpError('failed to insert item notification')
 
-    await deactivateItemMain(item)
+    await removeDeactivateItem(item)
 
     logger.debug({ itemId }, 'handled user permission revoked webhook')
 }

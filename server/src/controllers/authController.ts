@@ -38,7 +38,7 @@ export const login = async (req: Request, res: Response) => {
         throw new HttpError('incorrect password', 400)
     }
     req.session.user = user
-    return res.send(user)
+    return res.json(user)
 }
 
 export const logout = (req: Request, res: Response) => {
@@ -127,7 +127,7 @@ export const validateAccessCode = async (req: Request, res: Response) => {
         throw new HttpError('invalid access code', 400)
     }
 
-    return res.send({
+    return res.json({
         name: `${accessReq.firstName} ${accessReq.lastName}`,
         email: accessReq.email,
     })
@@ -189,5 +189,5 @@ export const register = async (req: Request, res: Response) => {
     if (!updatedAccessReq)
         throw new HttpError('failed to update access request')
 
-    return res.status(201).send(newUser)
+    return res.status(201).json(newUser)
 }

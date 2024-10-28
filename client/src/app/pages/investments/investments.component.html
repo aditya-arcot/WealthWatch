@@ -1,6 +1,19 @@
 <app-loading-spinner [loading]="loading"></app-loading-spinner>
 
-<h2 class="text-center mb-3">Investments</h2>
+<div class="position-relative mb-3">
+    <h2 class="text-center mb-0">Investments</h2>
+    @if (items.length) {
+        <button
+            (click)="refreshInvestments()"
+            class="btn btn-primary position-absolute top-right"
+            type="button"
+            title="Refresh Investments"
+        >
+            <i class="bi bi-arrow-clockwise"></i>
+            <span class="ms-1 d-none d-md-inline">Refresh Investments</span>
+        </button>
+    }
+</div>
 
 @if (!items.length) {
     <div class="row justify-content-center">

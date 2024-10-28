@@ -34,6 +34,7 @@ CREATE TABLE items (
     cursor TEXT,
     last_refreshed TIMESTAMPTZ,
     transactions_last_refreshed TIMESTAMPTZ,
+    investments_last_refreshed TIMESTAMPTZ,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
