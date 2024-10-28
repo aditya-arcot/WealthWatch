@@ -64,7 +64,7 @@ interface DbAppRequest {
     query_params: object | null
     route_params: object | null
     request_headers: object | null
-    request_body: string | null
+    request_body: object | null
     remote_address: string | null
     remote_port: number | null
     session: object | null
