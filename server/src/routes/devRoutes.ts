@@ -5,10 +5,10 @@ import {
     deleteAllUsers,
     fireSandboxWebhook,
     forceRefreshItemTransactions,
-    forceSyncItemBalances,
-    forceSyncItemInvestments,
-    forceSyncItemTransactions,
     resetSandboxItemLogin,
+    syncItemBalances,
+    syncItemInvestments,
+    syncItemTransactions,
 } from '../controllers/devController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 
@@ -80,9 +80,30 @@ router
 
 /**
  * @swagger
+ * /dev/item/refresh-investments:
+ *   post:
+ *     summary: Refresh an item's investments (ignore cooldown)
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: plaidItemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The Plaid item id
+ *     responses:
+ *       204:
+ *         description: Refreshed the item's investments
+ */
+router
+    .route('/item/refresh-investments')
+    .post(catchAsync(forceRefreshItemTransactions))
+
+/**
+ * @swagger
  * /dev/item/sync-transactions:
  *   post:
- *     summary: Sync an item's transactions (ignore cooldown)
+ *     summary: Sync an item's transactions
  *     tags: [Dev]
  *     parameters:
  *       - in: query
@@ -95,34 +116,13 @@ router
  *       202:
  *         description: Queued sync transactions
  */
-router
-    .route('/item/sync-transactions')
-    .post(catchAsync(forceSyncItemTransactions))
-
-/**
- * @swagger
- * /dev/item/sync-balances:
- *   post:
- *     summary: Sync an item's balances (ignore cooldown)
- *     tags: [Dev]
- *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
- *     responses:
- *       202:
- *         description: Queued sync balances
- */
-router.route('/item/sync-balances').post(catchAsync(forceSyncItemBalances))
+router.route('/item/sync-transactions').post(catchAsync(syncItemTransactions))
 
 /**
  * @swagger
  * /dev/item/sync-investments:
  *   post:
- *     summary: Sync an item's investments (ignore cooldown)
+ *     summary: Sync an item's investments
  *     tags: [Dev]
  *     parameters:
  *       - in: query
@@ -135,9 +135,26 @@ router.route('/item/sync-balances').post(catchAsync(forceSyncItemBalances))
  *       202:
  *         description: Queued sync investments
  */
-router
-    .route('/item/sync-investments')
-    .post(catchAsync(forceSyncItemInvestments))
+router.route('/item/sync-investments').post(catchAsync(syncItemInvestments))
+
+/**
+ * @swagger
+ * /dev/item/sync-balances:
+ *   post:
+ *     summary: Sync an item's balances
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: plaidItemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The Plaid item id
+ *     responses:
+ *       202:
+ *         description: Queued sync balances
+ */
+router.route('/item/sync-balances').post(catchAsync(syncItemBalances))
 
 /**
  * @swagger

@@ -10,7 +10,6 @@ import {
     modifyTransactionNoteWithPlaidId,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
-import { inCooldown } from '../models/item.js'
 import {
     parseNumberArrayOrUndefinedFromParam,
     parseNumberOrUndefinedFromParam,
@@ -151,22 +150,11 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
     const items = await fetchActiveItemsWithUserId(userId)
     await Promise.all(
         items.map(async (item) => {
-            if (inCooldown(item.transactionsLastRefreshed)) {
-                logger.debug(
-                    {
-                        id: item.id,
-                        transactionsLastRefreshed:
-                            item.transactionsLastRefreshed,
-                    },
-                    'transactions refresh cooldown. skipping'
+            if (await refreshItemTransactions(item)) {
+                await modifyItemTransactionsLastRefreshedWithPlaidId(
+                    item.plaidId,
+                    new Date()
                 )
-            } else {
-                if (await refreshItemTransactions(item)) {
-                    await modifyItemTransactionsLastRefreshedWithPlaidId(
-                        item.plaidId,
-                        new Date()
-                    )
-                }
             }
         })
     )

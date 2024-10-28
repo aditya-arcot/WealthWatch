@@ -9,6 +9,7 @@ import {
     modifyItemActiveWithId,
     modifyItemCursorWithPlaidId,
     modifyItemHealthyWithId,
+    modifyItemInvestmentsLastRefreshedWithPlaidId,
     modifyItemLastRefreshedWithPlaidId,
     modifyItemTransactionsLastRefreshedWithPlaidId,
 } from '../database/itemQueries.js'
@@ -32,6 +33,7 @@ import {
     mapPlaidHolding,
     mapPlaidSecurity,
     plaidInvestmentsHoldingsGet,
+    plaidInvestmentsRefresh,
 } from '../plaid/investmentMethods.js'
 import { plaidItemRemove, plaidWebhookUpdate } from '../plaid/itemMethods.js'
 import {
@@ -39,10 +41,7 @@ import {
     plaidTransactionsRefresh,
     plaidTransactionsSync,
 } from '../plaid/transactionMethods.js'
-import {
-    queueSyncItemBalances,
-    queueSyncItemInvestments,
-} from '../queues/itemQueue.js'
+import { queueSyncItemBalances } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserItems = async (req: Request, res: Response) => {
@@ -88,24 +87,19 @@ export const refreshItem = async (req: Request, res: Response) => {
         throw new HttpError('item refresh cooldown', 429)
     }
 
-    if (inCooldown(item.transactionsLastRefreshed)) {
-        logger.debug(
-            {
-                id: item.id,
-                transactionsLastRefreshed: item.transactionsLastRefreshed,
-            },
-            'transactions refresh cooldown. skipping'
+    if (await refreshItemTransactions(item)) {
+        await modifyItemTransactionsLastRefreshedWithPlaidId(
+            item.plaidId,
+            new Date()
         )
-    } else {
-        if (await refreshItemTransactions(item)) {
-            await modifyItemTransactionsLastRefreshedWithPlaidId(
-                item.plaidId,
-                new Date()
-            )
-        }
     }
 
-    await queueSyncItemInvestments(item)
+    if (await refreshItemInvestments(item)) {
+        await modifyItemInvestmentsLastRefreshedWithPlaidId(
+            item.plaidId,
+            new Date()
+        )
+    }
 
     await queueSyncItemBalances(item)
     await modifyItemLastRefreshedWithPlaidId(item.plaidId, new Date())
@@ -113,8 +107,39 @@ export const refreshItem = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const refreshItemTransactions = async (item: Item) => {
+export const refreshItemTransactions = async (
+    item: Item,
+    checkCooldown = true
+) => {
+    if (checkCooldown && inCooldown(item.transactionsLastRefreshed)) {
+        logger.debug(
+            {
+                id: item.id,
+                transactionsLastRefreshed: item.transactionsLastRefreshed,
+            },
+            'transactions refresh cooldown. skipping'
+        )
+        return false
+    }
     return await plaidTransactionsRefresh(item)
+}
+
+export const refreshItemInvestments = async (
+    item: Item,
+    checkCooldown = true
+) => {
+    if (checkCooldown && inCooldown(item.investmentsLastRefreshed)) {
+        logger.debug(
+            {
+                id: item.id,
+                investmentsLastRefreshed: item.investmentsLastRefreshed,
+            },
+            'investments refresh cooldown. skipping'
+        )
+        return false
+    }
+    await plaidInvestmentsRefresh(item)
+    return true
 }
 
 export const syncItemTransactions = async (item: Item) => {
@@ -163,12 +188,6 @@ export const syncItemTransactions = async (item: Item) => {
     } else {
         logger.debug('no accounts. skipping transaction updates')
     }
-}
-
-export const syncItemBalances = async (item: Item) => {
-    logger.debug({ id: item.id }, 'syncing item balances')
-    const accounts = await plaidAccountsBalanceGet(item)
-    if (accounts) await insertAccounts(accounts, true)
 }
 
 export const syncItemInvestments = async (item: Item) => {
@@ -230,6 +249,12 @@ export const syncItemInvestments = async (item: Item) => {
     }
 }
 
+export const syncItemBalances = async (item: Item) => {
+    logger.debug({ id: item.id }, 'syncing item balances')
+    const accounts = await plaidAccountsBalanceGet(item)
+    if (accounts) await insertAccounts(accounts, true)
+}
+
 export const deactivateItem = async (req: Request, res: Response) => {
     logger.debug('deactivating item')
 
@@ -239,12 +264,12 @@ export const deactivateItem = async (req: Request, res: Response) => {
 
     const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
-    await deactivateItemMain(item)
+    await removeDeactivateItem(item)
 
     return res.status(204).send()
 }
 
-export const deactivateItemMain = async (item: Item) => {
+export const removeDeactivateItem = async (item: Item) => {
     logger.debug({ id: item.id }, 'removing & deactivating item')
     await plaidItemRemove(item)
     await modifyItemActiveWithId(item.id, false)

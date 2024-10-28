@@ -41,7 +41,7 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
  * @swagger
  * /items/{plaidItemId}/refresh:
  *   post:
- *     summary: Refresh an item (refresh transactions, queue sync balances, queue sync investments)
+ *     summary: Refresh an item (refresh transactions, refresh investments, queue sync balances)
  *     tags: [Items]
  *     parameters:
  *       - in: path

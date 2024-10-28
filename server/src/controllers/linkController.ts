@@ -103,14 +103,15 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         cursor: null,
         lastRefreshed: null,
         transactionsLastRefreshed: null,
+        investmentsLastRefreshed: null,
     }
     const newItem = await insertItem(item)
     if (!newItem) throw new HttpError('failed to insert item')
 
     logger.debug('queueing item syncs')
     await queueSyncItemTransactions(newItem)
-    await queueSyncItemBalances(newItem)
     await queueSyncItemInvestments(newItem)
+    await queueSyncItemBalances(newItem)
 
     return res.status(204).send()
 }

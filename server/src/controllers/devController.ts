@@ -22,8 +22,9 @@ import {
 } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
 import {
-    deactivateItemMain,
+    refreshItemInvestments,
     refreshItemTransactions,
+    removeDeactivateItem,
 } from './itemController.js'
 
 export const deleteAllUsers = async (req: Request, res: Response) => {
@@ -47,7 +48,7 @@ const deactivateItems = async (deleteUsers = false) => {
             const items = await fetchActiveItemsWithUserId(user.id)
             await Promise.all(
                 items.map(async (item) => {
-                    await deactivateItemMain(item)
+                    await removeDeactivateItem(item)
                 })
             )
 
@@ -91,14 +92,15 @@ export const createSandboxItem = async (req: Request, res: Response) => {
         cursor: null,
         lastRefreshed: null,
         transactionsLastRefreshed: null,
+        investmentsLastRefreshed: null,
     }
     const newItem = await insertItem(item)
     if (!newItem) throw new HttpError('failed to insert item')
 
     logger.debug('queueing item syncs')
     await queueSyncItemTransactions(newItem)
-    await queueSyncItemBalances(newItem)
     await queueSyncItemInvestments(newItem)
+    await queueSyncItemBalances(newItem)
 
     return res.status(204).send()
 }
@@ -115,16 +117,30 @@ export const forceRefreshItemTransactions = async (
 
     const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
-    await refreshItemTransactions(item)
+    await refreshItemTransactions(item, false)
 
     return res.status(204).send()
 }
 
-export const forceSyncItemTransactions = async (
+export const forceRefreshItemInvestments = async (
     req: Request,
     res: Response
 ) => {
-    logger.debug('force syncing item transactions')
+    logger.debug('force refreshing item investments')
+
+    const plaidItemId = req.query['plaidItemId']
+    if (typeof plaidItemId !== 'string')
+        throw new HttpError('missing or invalid Plaid item id', 400)
+
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await refreshItemInvestments(item, false)
+
+    res.status(204).send()
+}
+
+export const syncItemTransactions = async (req: Request, res: Response) => {
+    logger.debug('syncing item transactions')
 
     const plaidItemId = req.query['plaidItemId']
     if (typeof plaidItemId !== 'string')
@@ -137,22 +153,8 @@ export const forceSyncItemTransactions = async (
     return res.status(202).send()
 }
 
-export const forceSyncItemBalances = async (req: Request, res: Response) => {
-    logger.debug('force syncing item balances')
-
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
-
-    const item = await fetchActiveItemWithPlaidId(plaidItemId)
-    if (!item) throw new HttpError('item not found', 404)
-    await queueSyncItemBalances(item)
-
-    return res.status(202).send()
-}
-
-export const forceSyncItemInvestments = async (req: Request, res: Response) => {
-    logger.debug('force syncing item investments')
+export const syncItemInvestments = async (req: Request, res: Response) => {
+    logger.debug('syncing item investments')
 
     const plaidItemId = req.query['plaidItemId']
     if (typeof plaidItemId !== 'string')
@@ -161,6 +163,20 @@ export const forceSyncItemInvestments = async (req: Request, res: Response) => {
     const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemInvestments(item)
+
+    return res.status(202).send()
+}
+
+export const syncItemBalances = async (req: Request, res: Response) => {
+    logger.debug('syncing item balances')
+
+    const plaidItemId = req.query['plaidItemId']
+    if (typeof plaidItemId !== 'string')
+        throw new HttpError('missing or invalid Plaid item id', 400)
+
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await queueSyncItemBalances(item)
 
     return res.status(202).send()
 }

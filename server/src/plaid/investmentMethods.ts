@@ -1,9 +1,26 @@
-import { Holding as PlaidHolding, Security as PlaidSecurity } from 'plaid'
+import {
+    InvestmentsRefreshRequest,
+    Holding as PlaidHolding,
+    Security as PlaidSecurity,
+} from 'plaid'
 import { Holding } from '../models/holding.js'
 import { Item } from '../models/item.js'
 import { Security, SecurityTypeEnum } from '../models/security.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
+
+export const plaidInvestmentsRefresh = async (item: Item) => {
+    logger.debug({ id: item.id }, 'refreshing item investments')
+    const params: InvestmentsRefreshRequest = {
+        access_token: item.accessToken,
+    }
+    await executePlaidMethod(
+        getPlaidClient().investmentsRefresh,
+        params,
+        item.userId,
+        item.id
+    )
+}
 
 export const plaidInvestmentsHoldingsGet = async (item: Item) => {
     logger.debug({ id: item.id }, 'getting item investment holdings')
