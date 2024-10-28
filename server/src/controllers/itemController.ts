@@ -138,8 +138,7 @@ export const refreshItemInvestments = async (
         )
         return false
     }
-    await plaidInvestmentsRefresh(item)
-    return true
+    return await plaidInvestmentsRefresh(item)
 }
 
 export const syncItemTransactions = async (item: Item) => {
