@@ -17,4 +17,5 @@ export interface Item {
     cursor: string | null
     lastRefreshed: Date | null
     transactionsLastRefreshed: Date | null
+    investmentsLastRefreshed: Date | null
 }

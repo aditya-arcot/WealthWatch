@@ -31,7 +31,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
 
     if (itemId === undefined) {
         const linkToken = await plaidLinkTokenCreate(userId)
-        return res.send(linkToken)
+        return res.json({ linkToken })
     }
 
     if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
@@ -43,7 +43,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
     if (!item) throw new HttpError('item not found', 404)
 
     const linkToken = await plaidLinkTokenCreate(userId, item, updateAccounts)
-    return res.send(linkToken)
+    return res.json({ linkToken })
 }
 
 export const handleLinkEvent = async (req: Request, res: Response) => {
@@ -103,14 +103,15 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         cursor: null,
         lastRefreshed: null,
         transactionsLastRefreshed: null,
+        investmentsLastRefreshed: null,
     }
     const newItem = await insertItem(item)
     if (!newItem) throw new HttpError('failed to insert item')
 
     logger.debug('queueing item syncs')
     await queueSyncItemTransactions(newItem)
-    await queueSyncItemBalances(newItem)
     await queueSyncItemInvestments(newItem)
+    await queueSyncItemBalances(newItem)
 
     return res.status(204).send()
 }

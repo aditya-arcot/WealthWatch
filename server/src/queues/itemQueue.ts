@@ -13,8 +13,8 @@ import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum ItemJobType {
     SyncTransactions = 'SyncTransactions',
-    SyncBalances = 'SyncBalances',
     SyncInvestments = 'SyncInvestments',
+    SyncBalances = 'SyncBalances',
 }
 
 const itemQueueName = `item-${vars.nodeEnv}`
@@ -37,12 +37,12 @@ export const queueSyncItemTransactions = async (item: Item) => {
     await queueItem(ItemJobType.SyncTransactions, item)
 }
 
-export const queueSyncItemBalances = async (item: Item) => {
-    await queueItem(ItemJobType.SyncBalances, item)
-}
-
 export const queueSyncItemInvestments = async (item: Item) => {
     await queueItem(ItemJobType.SyncInvestments, item)
+}
+
+export const queueSyncItemBalances = async (item: Item) => {
+    await queueItem(ItemJobType.SyncBalances, item)
 }
 
 const queueItem = async (type: ItemJobType, item: Item) => {
@@ -66,12 +66,12 @@ export const initializeItemWorker = () => {
                     await syncItemTransactions(item)
                     break
                 }
-                case ItemJobType.SyncBalances: {
-                    await syncItemBalances(item)
-                    break
-                }
                 case ItemJobType.SyncInvestments: {
                     await syncItemInvestments(item)
+                    break
+                }
+                case ItemJobType.SyncBalances: {
+                    await syncItemBalances(item)
                     break
                 }
                 default:

@@ -12,7 +12,7 @@ import { logger } from '../utils/logger.js'
 export const getAccessRequests = async (_req: Request, res: Response) => {
     logger.debug('getting access requests')
     const reqs = await fetchAccessRequests()
-    return res.send(reqs)
+    return res.json(reqs)
 }
 
 export const reviewAccessRequest = async (req: Request, res: Response) => {

@@ -145,10 +145,10 @@ export const handleError = (
     if (err instanceof HttpError) {
         return res
             .status(err.status)
-            .send({ message: err.message, code: err.code })
+            .json({ message: err.message, code: err.code })
     } else if (err instanceof PlaidApiError) {
-        return res.status(500).send({ message: err.message })
+        return res.status(500).json({ message: err.message })
     } else {
-        return res.status(500).send({ message: 'Unexpected error' })
+        return res.status(500).json({ message: 'Unexpected error' })
     }
 }

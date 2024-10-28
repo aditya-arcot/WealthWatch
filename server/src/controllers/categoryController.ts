@@ -5,5 +5,5 @@ import { logger } from '../utils/logger.js'
 export const getCategories = async (_req: Request, res: Response) => {
     logger.debug('getting categories')
     const categories = await fetchCategories()
-    return res.send(categories)
+    return res.json(categories)
 }

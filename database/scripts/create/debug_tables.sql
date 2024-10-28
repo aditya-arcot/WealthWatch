@@ -20,13 +20,13 @@ CREATE TABLE app_requests (
     query_params JSON,
     route_params JSON,
     request_headers JSON,
-    request_body TEXT,
+    request_body JSON,
     remote_address TEXT,
     remote_port INTEGER,
     session JSON,
     response_status INTEGER NOT NULL,
     response_headers JSON,
-    response_body TEXT,
+    response_body TEXT, -- cannot use JSON. swagger responses are not JSON
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
