@@ -123,7 +123,10 @@ export const mapPlaidTransaction = (
 
     const primaryCategory = transaction.personal_finance_category?.primary
     const detailedCategory = transaction.personal_finance_category?.detailed
-    const categoryId = mapPlaidCategory(primaryCategory, detailedCategory)
+    const categoryId = mapPlaidTransactionCategory(
+        primaryCategory,
+        detailedCategory
+    )
 
     // link previous pending transaction
     const pendingTransaction = existingTransactions.find(
@@ -157,7 +160,7 @@ export const mapPlaidTransaction = (
     }
 }
 
-const mapPlaidCategory = (
+const mapPlaidTransactionCategory = (
     primary: string | undefined,
     detailed: string | undefined
 ): number => {

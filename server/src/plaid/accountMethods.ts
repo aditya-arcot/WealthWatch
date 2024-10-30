@@ -87,10 +87,10 @@ export const mapPlaidAccount = (
     unofficialCurrencyCode: account.balances.unofficial_currency_code,
     creditLimit: account.balances.limit,
     type: toTitleCase(account.type),
-    subtype: mapAccountSubtype(account.subtype),
+    subtype: mapPlaidAccountSubtype(account.subtype),
 })
 
-const mapAccountSubtype = (subtype: string | null): string | null => {
+const mapPlaidAccountSubtype = (subtype: string | null): string | null => {
     if (subtype === null) return null
 
     if (plaidLowercaseSubtypes.includes(subtype)) return subtype.toLowerCase()

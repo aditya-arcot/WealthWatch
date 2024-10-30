@@ -28,3 +28,15 @@ CREATE TABLE security_types (
     name TEXT UNIQUE NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE student_loan_status_types (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name TEXT UNIQUE NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE student_loan_repayment_plan_types (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name TEXT UNIQUE NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

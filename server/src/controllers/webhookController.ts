@@ -15,6 +15,7 @@ import { NotificationTypeEnum } from '../models/notification.js'
 import {
     HoldingsWebhookCodeEnum,
     ItemWebhookCodeEnum,
+    LiabilitiesWebhookCodeEnum,
     TransactionsWebhookCodeEnum,
     Webhook,
     WebhookTypeEnum,
@@ -25,6 +26,7 @@ import { logger } from '../utils/logger.js'
 import {
     removeDeactivateItem,
     syncItemInvestments,
+    syncItemLiabilities,
     syncItemTransactions,
 } from './itemController.js'
 
@@ -118,6 +120,13 @@ export const handleWebhook = async (webhook: Webhook) => {
             await handleHoldingsWebhook(webhookCode, itemId)
             break
         }
+        case WebhookTypeEnum.Liabilities: {
+            const itemId = webhook.data.item_id
+            if (itemId === undefined)
+                throw new HttpError('missing item id', 400)
+            await handleLiabilitiesWebhook(webhookCode, itemId)
+            break
+        }
         case WebhookTypeEnum.Item: {
             const itemId = webhook.data.item_id
             if (itemId === undefined)
@@ -173,6 +182,23 @@ const handleHoldingsWebhook = async (webhookCode: string, itemId: string) => {
     }
 }
 
+const handleLiabilitiesWebhook = async (
+    webhookCode: string,
+    itemId: string
+) => {
+    logger.debug({ webhookCode, itemId }, 'handling liabilities webhook')
+
+    const webhookCodeEnum = webhookCode as LiabilitiesWebhookCodeEnum
+    switch (webhookCodeEnum) {
+        case LiabilitiesWebhookCodeEnum.DefaultUpdate: {
+            await handleLiabilitiesDefaultUpdateWebhook(itemId)
+            break
+        }
+        default:
+            throw new HttpError('unknown webhook code', 400)
+    }
+}
+
 const handleItemWebhook = async (webhookCode: string, itemId: string) => {
     logger.debug({ webhookCode, itemId }, 'handling item webhook')
 
@@ -221,6 +247,16 @@ const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
     await syncItemTransactions(item)
 
     logger.debug({ itemId }, 'handled transactions sync webhook')
+}
+
+const handleLiabilitiesDefaultUpdateWebhook = async (itemId: string) => {
+    logger.debug({ itemId }, 'handling liabilities default webhook')
+
+    const item = await fetchActiveItemWithPlaidId(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await syncItemLiabilities(item)
+
+    logger.debug({ itemId }, 'handled liabilities default webhook')
 }
 
 const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {

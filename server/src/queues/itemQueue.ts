@@ -1,7 +1,9 @@
 import { Queue, Worker } from 'bullmq'
 import {
+    syncItemAccounts,
     syncItemBalances,
     syncItemInvestments,
+    syncItemLiabilities,
     syncItemTransactions,
 } from '../controllers/itemController.js'
 import { HttpError } from '../models/error.js'
@@ -14,6 +16,7 @@ import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 enum ItemJobType {
     SyncTransactions = 'SyncTransactions',
     SyncInvestments = 'SyncInvestments',
+    SyncLiabilities = 'SyncLiabilities',
     SyncBalances = 'SyncBalances',
 }
 
@@ -33,21 +36,39 @@ export const getItemQueue = () => {
     return itemQueue
 }
 
-export const queueSyncItemTransactions = async (item: Item) => {
-    await queueItem(ItemJobType.SyncTransactions, item)
+export const queueSyncItemTransactions = async (
+    item: Item,
+    syncAccounts = false
+) => {
+    await queueItem(ItemJobType.SyncTransactions, item, syncAccounts)
 }
 
-export const queueSyncItemInvestments = async (item: Item) => {
-    await queueItem(ItemJobType.SyncInvestments, item)
+export const queueSyncItemInvestments = async (
+    item: Item,
+    syncAccounts = false
+) => {
+    await queueItem(ItemJobType.SyncInvestments, item, syncAccounts)
+}
+
+export const queueSyncItemLiabilities = async (
+    item: Item,
+    syncAccounts = false
+) => {
+    await queueItem(ItemJobType.SyncLiabilities, item, syncAccounts)
 }
 
 export const queueSyncItemBalances = async (item: Item) => {
-    await queueItem(ItemJobType.SyncBalances, item)
+    // separate account sync unnecessary
+    await queueItem(ItemJobType.SyncBalances, item, false)
 }
 
-const queueItem = async (type: ItemJobType, item: Item) => {
+const queueItem = async (
+    type: ItemJobType,
+    item: Item,
+    syncAccounts: boolean
+) => {
     logger.debug(`${itemQueueName} queue - adding job (${type})`)
-    await getItemQueue().add(type, { item })
+    await getItemQueue().add(type, { item, syncAccounts })
 }
 
 export const initializeItemWorker = () => {
@@ -58,8 +79,12 @@ export const initializeItemWorker = () => {
             logger.debug(
                 `${itemQueueName} queue - starting job (id ${job.id}, ${type})`
             )
+
             const item: Item | undefined = job.data.item
             if (!item) throw new HttpError('missing item')
+
+            const syncAccounts: boolean = job.data.syncAccounts
+            if (syncAccounts) await syncItemAccounts(item)
 
             switch (type) {
                 case ItemJobType.SyncTransactions: {
@@ -68,6 +93,10 @@ export const initializeItemWorker = () => {
                 }
                 case ItemJobType.SyncInvestments: {
                     await syncItemInvestments(item)
+                    break
+                }
+                case ItemJobType.SyncLiabilities: {
+                    await syncItemLiabilities(item)
                     break
                 }
                 case ItemJobType.SyncBalances: {

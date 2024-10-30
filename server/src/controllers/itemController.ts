@@ -1,6 +1,9 @@
 import { Request, Response } from 'express'
 import { Holding, Security } from 'plaid'
-import { insertAccounts } from '../database/accountQueries.js'
+import {
+    fetchActiveAccountsWithUserId,
+    insertAccounts,
+} from '../database/accountQueries.js'
 import { insertHoldings } from '../database/holdingQueries.js'
 import {
     fetchActiveItems,
@@ -13,6 +16,11 @@ import {
     modifyItemLastRefreshedWithPlaidId,
     modifyItemTransactionsLastRefreshedWithPlaidId,
 } from '../database/itemQueries.js'
+import {
+    insertCreditCardLiabilities,
+    insertMortgageLiabilities,
+    insertStudentLoanLiabilities,
+} from '../database/liabilityQueries.js'
 import {
     fetchSecurities,
     insertSecurities,
@@ -36,6 +44,12 @@ import {
     plaidInvestmentsRefresh,
 } from '../plaid/investmentMethods.js'
 import { plaidItemRemove, plaidWebhookUpdate } from '../plaid/itemMethods.js'
+import {
+    mapPlaidCreditCardLiability,
+    mapPlaidMortgageLiability,
+    mapPlaidStudentLoanLiability,
+    plaidLiabilitiesGet,
+} from '../plaid/liabilityMethods.js'
 import {
     mapPlaidTransaction,
     plaidTransactionsRefresh,
@@ -141,15 +155,24 @@ export const refreshItemInvestments = async (
     return await plaidInvestmentsRefresh(item)
 }
 
-export const syncItemTransactions = async (item: Item) => {
-    logger.debug({ id: item.id }, 'syncing item transactions')
+export const syncItemAccounts = async (item: Item) => {
+    logger.debug({ id: item.id }, 'syncing item accounts')
 
     const accounts = await plaidAccountsGet(item)
     if (accounts.length > 0) {
         logger.debug('inserting accounts')
         const addedAccounts = await insertAccounts(accounts)
         if (!addedAccounts) throw new HttpError('failed to insert accounts')
+    } else {
+        logger.debug('no accounts to insert')
+    }
+}
 
+export const syncItemTransactions = async (item: Item) => {
+    logger.debug({ id: item.id }, 'syncing item transactions')
+
+    const accounts = await fetchActiveAccountsWithUserId(item.userId)
+    if (accounts.length > 0) {
         const { added, modified, removed, cursor } =
             await plaidTransactionsSync(item)
 
@@ -162,9 +185,7 @@ export const syncItemTransactions = async (item: Item) => {
                 )
             ).transactions
             const addTransactions = added.map((t) => {
-                const account = addedAccounts.find(
-                    (a) => a.plaidId === t.account_id
-                )
+                const account = accounts.find((a) => a.plaidId === t.account_id)
                 if (!account) throw new HttpError('account not found', 404)
                 return mapPlaidTransaction(t, account.id, existingTransactions)
             })
@@ -192,12 +213,8 @@ export const syncItemTransactions = async (item: Item) => {
 export const syncItemInvestments = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item investments')
 
-    const accounts = await plaidAccountsGet(item)
+    const accounts = await fetchActiveAccountsWithUserId(item.userId)
     if (accounts.length > 0) {
-        logger.debug('inserting accounts')
-        const addedAccounts = await insertAccounts(accounts)
-        if (!addedAccounts) throw new HttpError('failed to insert accounts')
-
         let holdings: Holding[] = []
         let securities: Security[] = []
         try {
@@ -228,7 +245,7 @@ export const syncItemInvestments = async (item: Item) => {
             logger.debug('inserting investment holdings')
             const existingSecurities = await fetchSecurities()
             const addHoldings = holdings.map((holding) => {
-                const account = addedAccounts.find(
+                const account = accounts.find(
                     (a) => a.plaidId === holding.account_id
                 )
                 if (!account) throw new HttpError('account not found', 404)
@@ -245,6 +262,53 @@ export const syncItemInvestments = async (item: Item) => {
         }
     } else {
         logger.debug('no accounts. skipping investment updates')
+    }
+}
+
+export const syncItemLiabilities = async (item: Item) => {
+    logger.debug({ id: item.id }, 'syncing item liabilities')
+
+    const accounts = await fetchActiveAccountsWithUserId(item.userId)
+    if (accounts.length > 0) {
+        const { credit, mortgage, student } = await plaidLiabilitiesGet(item)
+
+        if (credit && credit.length > 0) {
+            logger.debug('inserting credit card liabilities')
+            const addCreditCardLiabilities = credit.map((c) => {
+                const account = accounts.find((a) => a.plaidId === c.account_id)
+                if (!account) throw new HttpError('account not found', 404)
+                return mapPlaidCreditCardLiability(c, account.id)
+            })
+            await insertCreditCardLiabilities(addCreditCardLiabilities)
+        } else {
+            logger.debug('no credit card liabilities. skipping')
+        }
+
+        if (mortgage && mortgage.length > 0) {
+            logger.debug('inserting mortgage liabilities')
+            const addMortgageLiabilities = mortgage.map((m) => {
+                const account = accounts.find((a) => a.plaidId === m.account_id)
+                if (!account) throw new HttpError('account not found', 404)
+                return mapPlaidMortgageLiability(m, account.id)
+            })
+            await insertMortgageLiabilities(addMortgageLiabilities)
+        } else {
+            logger.debug('no mortgage liabilities. skipping')
+        }
+
+        if (student && student.length > 0) {
+            logger.debug('inserting student loan liabilities')
+            const addStudentLoanLiabilities = student.map((s) => {
+                const account = accounts.find((a) => a.plaidId === s.account_id)
+                if (!account) throw new HttpError('account not found', 404)
+                return mapPlaidStudentLoanLiability(s, account.id)
+            })
+            await insertStudentLoanLiabilities(addStudentLoanLiabilities)
+        } else {
+            logger.debug('no student loan liabilities. skipping')
+        }
+    } else {
+        logger.debug('no accounts. skipping liability updates')
     }
 }
 
