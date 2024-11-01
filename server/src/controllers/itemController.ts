@@ -8,6 +8,7 @@ import {
     fetchActiveItems,
     fetchActiveItemsWithUserId,
     fetchActiveItemWithPlaidId,
+    fetchActiveItemWithUserIdAndId,
     modifyItemActiveWithId,
     modifyItemCursorWithPlaidId,
     modifyItemHealthyWithId,
@@ -329,8 +330,7 @@ export const updateUserItemToHealthy = async (req: Request, res: Response) => {
     const itemId = req.body.itemId
     if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
 
-    const items = await fetchActiveItemsWithUserId(userId)
-    const item = items.filter((i) => i.id === itemId)[0]
+    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     await modifyItemHealthyWithId(item.id, true)

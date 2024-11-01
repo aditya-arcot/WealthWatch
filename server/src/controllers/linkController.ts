@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
-    fetchActiveItemsWithUserId,
+    fetchActiveItemWithUserIdAndId,
     fetchActiveItemWithUserIdAndInstitutionId,
     insertItem,
 } from '../database/itemQueries.js'
@@ -40,8 +40,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
     if (updateAccounts !== undefined && typeof updateAccounts !== 'boolean')
         throw new HttpError('invalid update accounts flag', 400)
 
-    const items = await fetchActiveItemsWithUserId(userId)
-    const item = items.filter((i) => i.id === itemId)[0]
+    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const linkToken = await plaidLinkTokenCreate(userId, item, updateAccounts)

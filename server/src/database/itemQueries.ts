@@ -79,6 +79,22 @@ export const fetchActiveItemsWithUserId = async (
     return rows.map(mapDbItem)
 }
 
+export const fetchActiveItemWithUserIdAndId = async (
+    userId: number,
+    itemId: number
+): Promise<Item | undefined> => {
+    const query = `
+        SELECT *
+        FROM active_items
+        WHERE user_id = $1
+            AND id = $2
+        LIMIT 1
+    `
+    const rows = (await runQuery<DbItem>(query, [userId, itemId])).rows
+    if (!rows[0]) return
+    return mapDbItem(rows[0])
+}
+
 export const fetchActiveItemWithUserIdAndInstitutionId = async (
     userId: number,
     institutionId: string
