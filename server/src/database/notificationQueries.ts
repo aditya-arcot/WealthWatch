@@ -1,28 +1,8 @@
 import { DatabaseError } from '../models/error.js'
-import { Item } from '../models/item.js'
-import { Notification, NotificationTypeEnum } from '../models/notification.js'
+import { Notification } from '../models/notification.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertItemNotification = (
-    type: NotificationTypeEnum,
-    item: Item,
-    message: string,
-    persistent: boolean = false
-) => {
-    const notification: Notification = {
-        id: -1,
-        typeId: type,
-        userId: item.userId,
-        itemId: item.id,
-        message,
-        persistent,
-        read: false,
-        active: true,
-    }
-    return insertNotification(notification)
-}
-
-const insertNotification = async (n: Notification): Promise<void> => {
+export const insertNotification = async (n: Notification): Promise<void> => {
     const values: unknown[] = [
         n.userId,
         n.typeId,
@@ -96,16 +76,18 @@ export const modifyNotificationToInactiveWithUserIdAndId = async (
         throw new DatabaseError('failed to modify notification to inactive')
 }
 
-export const modifyNotificationsToInactiveWithUserIdAndTypeId = async (
+export const modifyNotificationsToInactiveWithUserIdItemIdAndTypeId = async (
     userId: number,
+    itemId: number,
     typeId: number
 ): Promise<void> => {
-    const values = [userId, typeId]
+    const values = [userId, itemId, typeId]
     const query = `
         UPDATE notifications
         SET active = false
         WHERE user_id = $1
-            AND type_id = $2
+            AND item_id = $2
+            AND type_id = $3
     `
     const result = await runQuery(query, values)
     if (!result.rowCount)

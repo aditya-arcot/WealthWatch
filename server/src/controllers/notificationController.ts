@@ -2,12 +2,17 @@ import { Request, Response } from 'express'
 import { fetchActiveItemsWithUserId } from '../database/itemQueries.js'
 import {
     fetchActiveNotificationsWithUserId,
-    modifyNotificationsToInactiveWithUserIdAndTypeId,
+    insertNotification,
+    modifyNotificationsToInactiveWithUserIdItemIdAndTypeId,
     modifyNotificationsToReadWithUserId,
     modifyNotificationToInactiveWithUserIdAndId,
 } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
-import { NotificationTypeEnum } from '../models/notification.js'
+import { Item } from '../models/item.js'
+import {
+    createNotification,
+    NotificationTypeEnum,
+} from '../models/notification.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserNotifications = async (req: Request, res: Response) => {
@@ -74,13 +79,67 @@ export const updateUserNotificationsToInactive = async (
 
     const typeEnum = notificationTypeId as NotificationTypeEnum
     if (!Object.values(NotificationTypeEnum).includes(typeEnum)) {
-        throw new HttpError('invalid notificationtype', 400)
+        throw new HttpError('invalid notification type', 400)
     }
 
-    await modifyNotificationsToInactiveWithUserIdAndTypeId(
+    await modifyNotificationsToInactiveWithUserIdItemIdAndTypeId(
         userId,
+        itemId,
         notificationTypeId
     )
 
     return res.status(204).send()
+}
+
+export const insertInfoNotification = (item: Item, message: string) => {
+    logger.debug(
+        {
+            itemId: item.id,
+            message,
+        },
+        'inserting info notification'
+    )
+    const notification = createNotification(
+        NotificationTypeEnum.Info,
+        item,
+        message
+    )
+    return insertNotification(notification)
+}
+
+export const insertLinkUpdateNotification = (item: Item, message: string) => {
+    logger.debug(
+        {
+            itemId: item.id,
+            message,
+        },
+        'inserting link update notification'
+    )
+    const notification = createNotification(
+        NotificationTypeEnum.LinkUpdate,
+        item,
+        message,
+        true
+    )
+    return insertNotification(notification)
+}
+
+export const insertLinkUpdateWithAccountsNotification = (
+    item: Item,
+    message: string
+) => {
+    logger.debug(
+        {
+            itemId: item.id,
+            message,
+        },
+        'inserting link update with accounts notification'
+    )
+    const notification = createNotification(
+        NotificationTypeEnum.LinkUpdateWithAccounts,
+        item,
+        message,
+        true
+    )
+    return insertNotification(notification)
 }

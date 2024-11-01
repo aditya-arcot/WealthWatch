@@ -6,10 +6,7 @@ import {
     fetchActiveItemWithPlaidId,
     modifyItemHealthyWithId,
 } from '../database/itemQueries.js'
-import {
-    insertItemNotification,
-    modifyNotificationsToInactiveWithUserIdAndTypeId,
-} from '../database/notificationQueries.js'
+import { modifyNotificationsToInactiveWithUserIdItemIdAndTypeId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { NotificationTypeEnum } from '../models/notification.js'
 import {
@@ -30,6 +27,11 @@ import {
     syncItemLiabilities,
     syncItemTransactions,
 } from './itemController.js'
+import {
+    insertInfoNotification,
+    insertLinkUpdateNotification,
+    insertLinkUpdateWithAccountsNotification,
+} from './notificationController.js'
 
 export const processWebhook = async (req: Request, res: Response) => {
     logger.debug('processing webhook')
@@ -281,12 +283,8 @@ const handleItemErrorWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, false)
 
-    await insertItemNotification(
-        NotificationTypeEnum.LinkUpdate,
-        item,
-        `${item.institutionName} connection error`,
-        true
-    )
+    const message = `${item.institutionName} connection error`
+    await insertLinkUpdateNotification(item, message)
 
     logger.debug({ itemId }, 'handled item error webhook')
 }
@@ -299,16 +297,14 @@ const handleItemLoginRepairedWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, true)
 
-    await modifyNotificationsToInactiveWithUserIdAndTypeId(
+    await modifyNotificationsToInactiveWithUserIdItemIdAndTypeId(
         item.userId,
+        item.id,
         NotificationTypeEnum.LinkUpdate
     )
 
-    await insertItemNotification(
-        NotificationTypeEnum.Info,
-        item,
-        `${item.institutionName} connection repaired`
-    )
+    const message = `${item.institutionName} connection repaired`
+    await insertInfoNotification(item, message)
 
     logger.debug({ itemId }, 'handled item login repaired webhook')
 }
@@ -318,11 +314,9 @@ const handleItemNewAccountsAvailableWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    await insertItemNotification(
-        NotificationTypeEnum.LinkUpdateWithAccounts,
-        item,
-        `New ${item.institutionName} accounts available`
-    )
+
+    const message = `New ${item.institutionName} accounts available`
+    await insertLinkUpdateWithAccountsNotification(item, message)
 
     logger.debug({ itemId }, 'handled item new accounts available webhook')
 }
@@ -332,11 +326,9 @@ const handleItemPendingExpirationWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    await insertItemNotification(
-        NotificationTypeEnum.LinkUpdate,
-        item,
-        `${item.institutionName} connection pending expiration`
-    )
+
+    const message = `${item.institutionName} connection pending expiration`
+    await insertLinkUpdateNotification(item, message)
 
     logger.debug({ itemId }, 'handled item pending expiration webhook')
 }
@@ -349,13 +341,10 @@ const handleUserPermissionRevokedWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, false)
 
-    await insertItemNotification(
-        NotificationTypeEnum.Info,
-        item,
-        `${item.institutionName} permission revoked`
-    )
-
     await removeDeactivateItem(item)
+
+    const message = `${item.institutionName} permission revoked. Data will be removed`
+    await insertInfoNotification(item, message)
 
     logger.debug({ itemId }, 'handled user permission revoked webhook')
 }
@@ -368,12 +357,8 @@ const handleItemUserAccountRevokedWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, false)
 
-    await insertItemNotification(
-        NotificationTypeEnum.LinkUpdate,
-        item,
-        `${item.institutionName} user account revoked`,
-        true
-    )
+    const message = `${item.institutionName} user account revoked`
+    await insertLinkUpdateNotification(item, message)
 
     logger.debug({ itemId }, 'handled user account revoked webhook')
 }
