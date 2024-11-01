@@ -89,11 +89,7 @@ export const updateTransactionCustomName = async (
     if (customName !== null && typeof customName !== 'string')
         throw new HttpError('missing or invalid name', 400)
 
-    const transaction = await modifyTransactionCustomNameWithPlaidId(
-        plaidTransactionId,
-        customName
-    )
-    if (!transaction) throw new HttpError('failed to modify transaction')
+    await modifyTransactionCustomNameWithPlaidId(plaidTransactionId, customName)
 
     return res.status(204).send()
 }
@@ -112,11 +108,10 @@ export const updateTransactionCustomCategoryId = async (
     if (customCategoryId !== null && typeof customCategoryId !== 'number')
         throw new HttpError('missing or invalid category id', 400)
 
-    const transaction = await modifyTransactionCustomCategoryIdWithPlaidId(
+    await modifyTransactionCustomCategoryIdWithPlaidId(
         plaidTransactionId,
         customCategoryId
     )
-    if (!transaction) throw new HttpError('failed to modify transaction')
 
     return res.status(204).send()
 }
@@ -132,11 +127,7 @@ export const updateTransactionNote = async (req: Request, res: Response) => {
     if (note !== null && typeof note !== 'string')
         throw new HttpError('missing or invalid note', 400)
 
-    const transaction = await modifyTransactionNoteWithPlaidId(
-        plaidTransactionId,
-        note
-    )
-    if (!transaction) throw new HttpError('failed to modify transaction')
+    await modifyTransactionNoteWithPlaidId(plaidTransactionId, note)
 
     return res.status(204).send()
 }

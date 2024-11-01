@@ -1,9 +1,8 @@
+import { DatabaseError } from '../models/error.js'
 import { Holding, HoldingWithSecurity } from '../models/holding.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertHoldings = async (
-    holdings: Holding[]
-): Promise<Holding[] | undefined> => {
+export const insertHoldings = async (holdings: Holding[]): Promise<void> => {
     if (!holdings.length) return
 
     const values: unknown[] = []
@@ -52,12 +51,10 @@ export const insertHoldings = async (
             vested_value = EXCLUDED.vested_value,
             iso_currency_code = EXCLUDED.iso_currency_code,
             unofficial_currency_code = EXCLUDED.unofficial_currency_code
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbHolding>(query, values)).rows
-    if (!rows.length) return
-    return rows.map(mapDbHolding)
+    const result = await runQuery(query, values)
+    if (!result.rowCount) throw new DatabaseError('failed to insert holdings')
 }
 
 export const fetchActiveHoldingsWithUserId = async (
@@ -99,36 +96,6 @@ export const fetchActiveHoldingsWithUserId = async (
     const rows = (await runQuery<DbHoldingWithSecurity>(query, [userId])).rows
     return rows.map(mapDbHoldingWithSecurity)
 }
-
-interface DbHolding {
-    id: number
-    account_id: number
-    security_id: number
-    cost_basis: number | null
-    price: number
-    price_as_of: Date | null
-    quantity: number
-    value: number
-    vested_quantity: number | null
-    vested_value: number | null
-    iso_currency_code: string | null
-    unofficial_currency_code: string | null
-}
-
-const mapDbHolding = (holding: DbHolding): Holding => ({
-    id: holding.id,
-    accountId: holding.account_id,
-    securityId: holding.security_id,
-    costBasis: holding.cost_basis,
-    price: holding.price,
-    priceAsOf: holding.price_as_of,
-    quantity: holding.quantity,
-    value: holding.value,
-    vestedQuantity: holding.vested_quantity,
-    vestedValue: holding.vested_value,
-    isoCurrencyCode: holding.iso_currency_code,
-    unofficialCurrencyCode: holding.unofficial_currency_code,
-})
 
 interface DbHoldingWithSecurity {
     id: number

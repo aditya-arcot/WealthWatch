@@ -47,7 +47,7 @@ export const plaidTransactionsRefresh = async (item: Item) => {
 export const plaidTransactionsSync = async (
     item: Item,
     retry = true
-): Promise<PlaidTransactionsSyncResponse> => {
+): Promise<PlaidTransactionsSyncResponse | undefined> => {
     logger.debug({ id: item.id }, 'retrieving item transactions updates')
 
     let cursor = item.cursor
@@ -98,7 +98,7 @@ export const plaidTransactionsSync = async (
         if (!retry) {
             logger.error(
                 { id: item.id },
-                'transactions sync mutation error. already retried'
+                'transactions sync mutation error. already retried. abandoning transactions sync'
             )
             throw error
         }
@@ -108,7 +108,7 @@ export const plaidTransactionsSync = async (
         )
 
         await new Promise((resolve) => setTimeout(resolve, 5000))
-        return await plaidTransactionsSync(item, false)
+        return plaidTransactionsSync(item, false)
     }
 }
 

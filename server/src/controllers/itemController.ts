@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { Holding, Security } from 'plaid'
 import {
     fetchActiveAccountsWithUserId,
     insertAccounts,
@@ -30,9 +29,8 @@ import {
     insertTransactions,
     removeTransactionsWithPlaidIds,
 } from '../database/transactionQueries.js'
-import { HttpError, PlaidApiError } from '../models/error.js'
+import { HttpError } from '../models/error.js'
 import { inCooldown, Item } from '../models/item.js'
-import { PlaidGeneralErrorCodeEnum } from '../models/plaidApiRequest.js'
 import {
     plaidAccountsBalanceGet,
     plaidAccountsGet,
@@ -121,10 +119,10 @@ export const refreshItem = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const refreshItemTransactions = async (
+export const refreshItemTransactions = (
     item: Item,
     checkCooldown = true
-) => {
+): Promise<boolean> => {
     if (checkCooldown && inCooldown(item.transactionsLastRefreshed)) {
         logger.debug(
             {
@@ -133,15 +131,15 @@ export const refreshItemTransactions = async (
             },
             'transactions refresh cooldown. skipping'
         )
-        return false
+        return Promise.resolve(false)
     }
-    return await plaidTransactionsRefresh(item)
+    return plaidTransactionsRefresh(item)
 }
 
-export const refreshItemInvestments = async (
+export const refreshItemInvestments = (
     item: Item,
     checkCooldown = true
-) => {
+): Promise<boolean> => {
     if (checkCooldown && inCooldown(item.investmentsLastRefreshed)) {
         logger.debug(
             {
@@ -150,9 +148,9 @@ export const refreshItemInvestments = async (
             },
             'investments refresh cooldown. skipping'
         )
-        return false
+        return Promise.resolve(false)
     }
-    return await plaidInvestmentsRefresh(item)
+    return plaidInvestmentsRefresh(item)
 }
 
 export const syncItemAccounts = async (item: Item) => {
@@ -161,8 +159,7 @@ export const syncItemAccounts = async (item: Item) => {
     const accounts = await plaidAccountsGet(item)
     if (accounts.length > 0) {
         logger.debug('inserting accounts')
-        const addedAccounts = await insertAccounts(accounts)
-        if (!addedAccounts) throw new HttpError('failed to insert accounts')
+        await insertAccounts(accounts)
     } else {
         logger.debug('no accounts to insert')
     }
@@ -173,8 +170,12 @@ export const syncItemTransactions = async (item: Item) => {
 
     const accounts = await fetchActiveAccountsWithUserId(item.userId)
     if (accounts.length > 0) {
-        const { added, modified, removed, cursor } =
-            await plaidTransactionsSync(item)
+        const resp = await plaidTransactionsSync(item)
+        if (!resp) {
+            logger.debug('skipping transactions sync')
+            return
+        }
+        const { added, modified, removed, cursor } = resp
 
         added.concat(modified)
         if (added.length > 0) {
@@ -189,18 +190,13 @@ export const syncItemTransactions = async (item: Item) => {
                 if (!account) throw new HttpError('account not found', 404)
                 return mapPlaidTransaction(t, account.id, existingTransactions)
             })
-            const addedTransactions = await insertTransactions(addTransactions)
-            if (!addedTransactions)
-                throw new HttpError('failed to insert transactions')
+            await insertTransactions(addTransactions)
         }
 
         if (removed.length > 0) {
             logger.debug('removing transactions')
             const removeIds = removed.map((t) => t.transaction_id)
-            const removedTransactions =
-                await removeTransactionsWithPlaidIds(removeIds)
-            if (!removedTransactions)
-                throw new HttpError('failed to remove transactions')
+            await removeTransactionsWithPlaidIds(removeIds)
         }
 
         logger.debug('updating cursor')
@@ -215,30 +211,17 @@ export const syncItemInvestments = async (item: Item) => {
 
     const accounts = await fetchActiveAccountsWithUserId(item.userId)
     if (accounts.length > 0) {
-        let holdings: Holding[] = []
-        let securities: Security[] = []
-        try {
-            const resp = await plaidInvestmentsHoldingsGet(item)
-            holdings = resp.holdings
-            securities = resp.securities
-        } catch (error) {
-            if (!(error instanceof PlaidApiError)) throw error
-            if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
-                throw error
-            logger.error(error)
-            logger.debug(
-                { id: item.id },
-                'products not supported error. abandoning investments sync'
-            )
+        const resp = await plaidInvestmentsHoldingsGet(item)
+        if (!resp) {
+            logger.debug('skipping investments sync')
             return
         }
+        const { holdings, securities } = resp
 
         if (securities.length > 0) {
             logger.debug('inserting investment securities')
             const addSecurities = securities.map(mapPlaidSecurity)
-            const addedSecurities = await insertSecurities(addSecurities)
-            if (!addedSecurities)
-                throw new HttpError('failed to insert securities')
+            await insertSecurities(addSecurities)
         }
 
         if (holdings.length > 0) {
@@ -257,8 +240,7 @@ export const syncItemInvestments = async (item: Item) => {
 
                 return mapPlaidHolding(holding, account.id, security.id)
             })
-            const addedHoldings = await insertHoldings(addHoldings)
-            if (!addedHoldings) throw new HttpError('failed to insert holdings')
+            await insertHoldings(addHoldings)
         }
     } else {
         logger.debug('no accounts. skipping investment updates')

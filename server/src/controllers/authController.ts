@@ -108,8 +108,7 @@ export const requestAccess = async (req: Request, res: Response) => {
         accessCode: null,
         reviewer: null,
     }
-    const newRequest = await insertAccessRequest(accessReq)
-    if (!newRequest) throw new HttpError('failed to insert access request')
+    await insertAccessRequest(accessReq)
     return res.status(204).send()
 }
 
@@ -179,15 +178,11 @@ export const register = async (req: Request, res: Response) => {
         admin: false,
     }
     const newUser = await insertUser(user)
-    if (!newUser) throw new HttpError('failed to insert user')
     req.session.user = newUser
 
-    const updatedAccessReq = await modifyAccessRequestStatusWithId(
+    await modifyAccessRequestStatusWithId(
         accessReq.id,
         AccessRequestStatusEnum.Completed
     )
-    if (!updatedAccessReq)
-        throw new HttpError('failed to update access request')
-
     return res.status(201).json(newUser)
 }

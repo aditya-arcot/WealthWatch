@@ -30,7 +30,7 @@ export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
 
 export const plaidAccountsBalanceGet = async (
     item: Item
-): Promise<Account[] | void> => {
+): Promise<Account[] | undefined> => {
     logger.debug({ id: item.id }, 'getting item account balances')
 
     const params: AccountsBalanceGetRequest = {
@@ -68,6 +68,7 @@ export const plaidAccountsBalanceGet = async (
             { id: item.id },
             'last updated datetime out of range error. abandoning item balances sync'
         )
+        return
     }
 }
 

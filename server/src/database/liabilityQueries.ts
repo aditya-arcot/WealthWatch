@@ -1,14 +1,14 @@
+import { DatabaseError } from '../models/error.js'
 import {
     CreditCardLiability,
     MortgageLiability,
     StudentLoanLiability,
-    StudentLoanStatusTypeEnum,
 } from '../models/liability.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertCreditCardLiabilities = async (
     creditCardLiabilities: CreditCardLiability[]
-): Promise<CreditCardLiability[] | undefined> => {
+): Promise<void> => {
     if (!creditCardLiabilities.length) return
 
     const values: unknown[] = []
@@ -52,17 +52,16 @@ export const insertCreditCardLiabilities = async (
             last_statement_balance = EXCLUDED.last_statement_balance,
             next_payment_due_date = EXCLUDED.next_payment_due_date,
             minimum_payment_amount = EXCLUDED.minimum_payment_amount
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbCreditCardLiability>(query, values)).rows
-    if (!rows.length) return
-    return rows.map(mapDbCreditCardLiability)
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to insert credit card liabilities')
 }
 
 export const insertMortgageLiabilities = async (
     mortgageLiabilities: MortgageLiability[]
-): Promise<MortgageLiability[] | undefined> => {
+): Promise<void> => {
     if (!mortgageLiabilities.length) return
 
     const values: unknown[] = []
@@ -139,17 +138,16 @@ export const insertMortgageLiabilities = async (
             next_payment_amount = EXCLUDED.next_payment_amount,
             ytd_interest_paid = EXCLUDED.ytd_interest_paid,
             ytd_principal_paid = EXCLUDED.ytd_principal_paid
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbMortgageLiability>(query, values)).rows
-    if (!rows.length) return
-    return rows.map(mapDbMortgageLiability)
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to insert mortgage liabilities')
 }
 
 export const insertStudentLoanLiabilities = async (
     studentLoanLiabilities: StudentLoanLiability[]
-): Promise<StudentLoanLiability[] | undefined> => {
+): Promise<void> => {
     if (!studentLoanLiabilities.length) return
 
     const values: unknown[] = []
@@ -235,144 +233,9 @@ export const insertStudentLoanLiabilities = async (
             minimum_payment_amount = EXCLUDED.minimum_payment_amount,
             ytd_interest_paid = EXCLUDED.ytd_interest_paid,
             ytd_principal_paid = EXCLUDED.ytd_principal_paid
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbStudentLoanLiability>(query, values)).rows
-    if (!rows.length) return
-    return rows.map(mapDbStudentLoanLiability)
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to student loan liabilities')
 }
-
-interface DbCreditCardLiability {
-    id: number
-    account_id: number
-    aprs: object
-    overdue: boolean | null
-    last_payment_date: Date | null
-    last_payment_amount: number | null
-    last_statement_date: Date | null
-    last_statement_balance: number | null
-    next_payment_due_date: Date | null
-    minimum_payment_amount: number | null
-}
-
-const mapDbCreditCardLiability = (
-    creditCardLiabilities: DbCreditCardLiability
-): CreditCardLiability => ({
-    id: creditCardLiabilities.id,
-    accountId: creditCardLiabilities.account_id,
-    aprs: creditCardLiabilities.aprs,
-    overdue: creditCardLiabilities.overdue,
-    lastPaymentDate: creditCardLiabilities.last_payment_date,
-    lastPaymentAmount: creditCardLiabilities.last_payment_amount,
-    lastStatementDate: creditCardLiabilities.last_statement_date,
-    lastStatementBalance: creditCardLiabilities.last_statement_balance,
-    nextPaymentDueDate: creditCardLiabilities.next_payment_due_date,
-    minimumPaymentAmount: creditCardLiabilities.minimum_payment_amount,
-})
-
-interface DbMortgageLiability {
-    id: number
-    account_id: number
-    type: string | null
-    interest_rate_type: string | null
-    interest_rate_percent: number | null
-    term: string | null
-    address: string | null
-    origination_date: Date | null
-    origination_principal: number | null
-    maturity_date: Date | null
-    late_fee: number | null
-    escrow_balance: number | null
-    prepayment_penalty: boolean | null
-    private_insurance: boolean | null
-    past_due_amount: number | null
-    last_payment_date: Date | null
-    last_payment_amount: number | null
-    next_payment_due_date: Date | null
-    next_payment_amount: number | null
-    ytd_interest_paid: number | null
-    ytd_principal_paid: number | null
-}
-
-const mapDbMortgageLiability = (
-    mortgageLiability: DbMortgageLiability
-): MortgageLiability => ({
-    id: mortgageLiability.id,
-    accountId: mortgageLiability.account_id,
-    type: mortgageLiability.type,
-    interestRateType: mortgageLiability.interest_rate_type,
-    interestRatePercent: mortgageLiability.interest_rate_percent,
-    term: mortgageLiability.term,
-    address: mortgageLiability.address,
-    originationDate: mortgageLiability.origination_date,
-    originationPrincipal: mortgageLiability.origination_principal,
-    maturityDate: mortgageLiability.maturity_date,
-    lateFee: mortgageLiability.late_fee,
-    escrowBalance: mortgageLiability.escrow_balance,
-    prepaymentPenalty: mortgageLiability.prepayment_penalty,
-    privateInsurance: mortgageLiability.private_insurance,
-    pastDueAmount: mortgageLiability.past_due_amount,
-    lastPaymentDate: mortgageLiability.last_payment_date,
-    lastPaymentAmount: mortgageLiability.last_payment_amount,
-    nextPaymentDueDate: mortgageLiability.next_payment_due_date,
-    nextPaymentAmount: mortgageLiability.next_payment_amount,
-    ytdInterestPaid: mortgageLiability.ytd_interest_paid,
-    ytdPrincipalPaid: mortgageLiability.ytd_principal_paid,
-})
-
-interface DbStudentLoanLiability {
-    id: number
-    account_id: number
-    name: string | null
-    interest_rate_percent: number
-    status_type_id: StudentLoanStatusTypeEnum | null
-    status_end_date: Date | null
-    overdue: boolean | null
-    origination_date: Date | null
-    origination_principal: number | null
-    disbursement_dates: string | null
-    outstanding_interest: number | null
-    expected_payoff_date: Date | null
-    guarantor: string | null
-    servicer_address: string | null
-    repayment_plan_type_id: number | null
-    repayment_plan_description: string | null
-    last_payment_date: Date | null
-    last_payment_amount: number | null
-    last_statement_date: Date | null
-    last_statement_balance: number | null
-    next_payment_due_date: Date | null
-    minimum_payment_amount: number | null
-    ytd_interest_paid: number | null
-    ytd_principal_paid: number | null
-}
-
-const mapDbStudentLoanLiability = (
-    studentLoanLiability: DbStudentLoanLiability
-): StudentLoanLiability => ({
-    id: studentLoanLiability.id,
-    accountId: studentLoanLiability.account_id,
-    name: studentLoanLiability.name,
-    interestRatePercent: studentLoanLiability.interest_rate_percent,
-    statusTypeId: studentLoanLiability.status_type_id,
-    statusEndDate: studentLoanLiability.status_end_date,
-    overdue: studentLoanLiability.overdue,
-    originationDate: studentLoanLiability.origination_date,
-    originationPrincipal: studentLoanLiability.origination_principal,
-    disbursementDates: studentLoanLiability.disbursement_dates,
-    outstandingInterest: studentLoanLiability.outstanding_interest,
-    expectedPayoffDate: studentLoanLiability.expected_payoff_date,
-    guarantor: studentLoanLiability.guarantor,
-    servicerAddress: studentLoanLiability.servicer_address,
-    repaymentPlanTypeId: studentLoanLiability.repayment_plan_type_id,
-    repaymentPlanDescription: studentLoanLiability.repayment_plan_description,
-    lastPaymentDate: studentLoanLiability.last_payment_date,
-    lastPaymentAmount: studentLoanLiability.last_payment_amount,
-    lastStatementDate: studentLoanLiability.last_statement_date,
-    lastStatementBalance: studentLoanLiability.last_statement_balance,
-    nextPaymentDueDate: studentLoanLiability.next_payment_due_date,
-    minimumPaymentAmount: studentLoanLiability.minimum_payment_amount,
-    ytdInterestPaid: studentLoanLiability.ytd_interest_paid,
-    ytdPrincipalPaid: studentLoanLiability.ytd_principal_paid,
-})

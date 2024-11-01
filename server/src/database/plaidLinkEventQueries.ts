@@ -2,11 +2,12 @@ import {
     constructInsertQueryParamsPlaceholder,
     runQuery,
 } from '../database/index.js'
+import { DatabaseError } from '../models/error.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 
 export const insertPlaidLinkEvent = async (
     event: PlaidLinkEvent
-): Promise<PlaidLinkEvent | undefined> => {
+): Promise<void> => {
     const values: unknown[] = [
         event.userId,
         event.timestamp,
@@ -40,42 +41,9 @@ export const insertPlaidLinkEvent = async (
             error_message
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbPlaidLinkEvent>(query, values, true)).rows
-    if (!rows[0]) return
-    return mapDbLinkEvent(rows[0])
+    const result = await runQuery(query, values, true)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to insert plaid link event')
 }
-
-interface DbPlaidLinkEvent {
-    id: number
-    user_id: number
-    timestamp: Date
-    type: string
-    session_id: string
-    request_id: string | null
-    institution_id: string | null
-    institution_name: string | null
-    public_token: string | null
-    status: string | null
-    error_type: string | null
-    error_code: string | null
-    error_message: string | null
-}
-
-const mapDbLinkEvent = (dbLinkEvent: DbPlaidLinkEvent): PlaidLinkEvent => ({
-    id: dbLinkEvent.id,
-    userId: dbLinkEvent.user_id,
-    timestamp: dbLinkEvent.timestamp,
-    type: dbLinkEvent.type,
-    sessionId: dbLinkEvent.session_id,
-    requestId: dbLinkEvent.request_id,
-    institutionId: dbLinkEvent.institution_id,
-    institutionName: dbLinkEvent.institution_name,
-    publicToken: dbLinkEvent.public_token,
-    status: dbLinkEvent.status,
-    errorType: dbLinkEvent.error_type,
-    errorCode: dbLinkEvent.error_code,
-    errorMessage: dbLinkEvent.error_message,
-})

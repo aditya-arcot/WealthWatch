@@ -29,8 +29,7 @@ export const updateUserNotificationsToRead = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const notifications = await modifyNotificationsToReadWithUserId(userId)
-    if (!notifications) throw new HttpError('failed to modify notifications')
+    await modifyNotificationsToReadWithUserId(userId)
 
     return res.status(204).send()
 }
@@ -48,11 +47,7 @@ export const updateUserNotificationToInactive = async (
     if (typeof notificationId !== 'number')
         throw new HttpError('invalid notification id', 400)
 
-    const notification = await modifyNotificationToInactiveWithUserIdAndId(
-        userId,
-        notificationId
-    )
-    if (!notification) throw new HttpError('failed to modify notification')
+    await modifyNotificationToInactiveWithUserIdAndId(userId, notificationId)
 
     return res.status(204).send()
 }
@@ -82,12 +77,10 @@ export const updateUserNotificationsToInactive = async (
         throw new HttpError('invalid notificationtype', 400)
     }
 
-    const notifications =
-        await modifyNotificationsToInactiveWithUserIdAndTypeId(
-            userId,
-            notificationTypeId
-        )
-    if (!notifications) throw new HttpError('failed to modify notifications')
+    await modifyNotificationsToInactiveWithUserIdAndTypeId(
+        userId,
+        notificationTypeId
+    )
 
     return res.status(204).send()
 }
