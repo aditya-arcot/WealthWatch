@@ -25,6 +25,7 @@ import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utils/logger.js'
 import {
     removeDeactivateItem,
+    syncItemAccounts,
     syncItemInvestments,
     syncItemLiabilities,
     syncItemTransactions,
@@ -244,19 +245,10 @@ const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+    await syncItemAccounts(item)
     await syncItemTransactions(item)
 
     logger.debug({ itemId }, 'handled transactions sync webhook')
-}
-
-const handleLiabilitiesDefaultUpdateWebhook = async (itemId: string) => {
-    logger.debug({ itemId }, 'handling liabilities default webhook')
-
-    const item = await fetchActiveItemWithPlaidId(itemId)
-    if (!item) throw new HttpError('item not found', 404)
-    await syncItemLiabilities(item)
-
-    logger.debug({ itemId }, 'handled liabilities default webhook')
 }
 
 const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {
@@ -264,9 +256,21 @@ const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+    await syncItemAccounts(item)
     await syncItemInvestments(item)
 
     logger.debug({ itemId }, 'handled holdings default webhook')
+}
+
+const handleLiabilitiesDefaultUpdateWebhook = async (itemId: string) => {
+    logger.debug({ itemId }, 'handling liabilities default webhook')
+
+    const item = await fetchActiveItemWithPlaidId(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await syncItemAccounts(item)
+    await syncItemLiabilities(item)
+
+    logger.debug({ itemId }, 'handled liabilities default webhook')
 }
 
 const handleItemErrorWebhook = async (itemId: string) => {

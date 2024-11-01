@@ -10,7 +10,6 @@ import { Item } from '../models/item.js'
 import {
     PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,
-    PlaidTransactionsSyncResponse,
 } from '../models/plaidApiRequest.js'
 import { Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
@@ -44,16 +43,23 @@ export const plaidTransactionsRefresh = async (item: Item) => {
     }
 }
 
+type PlaidTransactionsSyncResponse = {
+    added: PlaidTransaction[]
+    modified: PlaidTransaction[]
+    removed: PlaidRemovedTransaction[]
+    cursor: string | null
+}
+
 export const plaidTransactionsSync = async (
     item: Item,
     retry = true
 ): Promise<PlaidTransactionsSyncResponse | undefined> => {
     logger.debug({ id: item.id }, 'retrieving item transactions updates')
 
+    let added: PlaidTransaction[] = []
+    let modified: PlaidTransaction[] = []
+    let removed: PlaidRemovedTransaction[] = []
     let cursor = item.cursor
-    let added: Array<PlaidTransaction> = []
-    let modified: Array<PlaidTransaction> = []
-    let removed: Array<PlaidRemovedTransaction> = []
     let hasMore = true
 
     try {
