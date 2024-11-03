@@ -1,4 +1,4 @@
-CREATE TABLE audit (
+CREATE TABLE debug.audit (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     operation CHAR(1) NOT NULL CHECK (operation IN ('I', 'U', 'D')),
     table_name TEXT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE audit (
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE app_requests (
+CREATE TABLE debug.app_requests (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     request_id TEXT NOT NULL,
     user_id INTEGER,
@@ -30,7 +30,7 @@ CREATE TABLE app_requests (
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE plaid_link_events (
+CREATE TABLE debug.plaid_link_events (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER,
     timestamp TIMESTAMPTZ NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE plaid_link_events (
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE plaid_api_requests (
+CREATE TABLE debug.plaid_api_requests (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER,
     item_id INTEGER,
@@ -64,7 +64,7 @@ CREATE TABLE plaid_api_requests (
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE jobs (
+CREATE TABLE debug.jobs (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     queue_name TEXT NOT NULL,
     job_id TEXT,

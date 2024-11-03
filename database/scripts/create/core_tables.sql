@@ -1,4 +1,4 @@
-CREATE TABLE access_requests (
+CREATE TABLE core.access_requests (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE access_requests (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE users (
+CREATE TABLE core.users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
@@ -22,7 +22,7 @@ CREATE TABLE users (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE items (
+CREATE TABLE core.items (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     plaid_id TEXT UNIQUE NOT NULL,
@@ -39,20 +39,7 @@ CREATE TABLE items (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE notifications (
-    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    type_id INTEGER REFERENCES notification_types(id) NOT NULL,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
-    message TEXT NOT NULL,
-    persistent BOOLEAN NOT NULL,
-    read BOOLEAN NOT NULL,
-    active BOOLEAN NOT NULL,
-    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE accounts (
+CREATE TABLE core.accounts (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
     plaid_id TEXT UNIQUE NOT NULL,
@@ -70,7 +57,20 @@ CREATE TABLE accounts (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE transactions (
+CREATE TABLE core.notifications (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    type_id INTEGER REFERENCES notification_types(id) NOT NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    persistent BOOLEAN NOT NULL,
+    read BOOLEAN NOT NULL,
+    active BOOLEAN NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE core.transactions (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     plaid_id TEXT UNIQUE NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE transactions (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE securities (
+CREATE TABLE core.securities (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     plaid_id TEXT UNIQUE NOT NULL,
     proxy_plaid_id TEXT,
@@ -112,7 +112,7 @@ CREATE TABLE securities (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE holdings (
+CREATE TABLE core.holdings (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     security_id INTEGER REFERENCES securities(id) ON DELETE CASCADE NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE holdings (
     CONSTRAINT holdings_account_security_unique UNIQUE (account_id, security_id)
 );
 
-CREATE TABLE credit_card_liabilities (
+CREATE TABLE core.credit_card_liabilities (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER UNIQUE REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     aprs JSON,
@@ -145,7 +145,7 @@ CREATE TABLE credit_card_liabilities (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE mortgage_liabilities (
+CREATE TABLE core.mortgage_liabilities (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER UNIQUE REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     type TEXT,
@@ -171,7 +171,7 @@ CREATE TABLE mortgage_liabilities (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE student_loan_liabilities (
+CREATE TABLE core.student_loan_liabilities (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER UNIQUE REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     name TEXT,

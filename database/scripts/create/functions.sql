@@ -1,4 +1,4 @@
-CREATE FUNCTION set_update_timestamp()
+CREATE FUNCTION core.set_update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
     new.update_timestamp = NOW();
@@ -6,7 +6,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION insert_audit_record()
+CREATE FUNCTION debug.insert_audit_record()
 RETURNS TRIGGER AS $$
 BEGIN
     IF (TG_OP = 'INSERT') THEN
