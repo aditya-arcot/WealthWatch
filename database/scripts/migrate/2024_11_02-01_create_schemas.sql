@@ -1,7 +1,6 @@
 /*
-    create schemas, grant permissions, drop public schema, set search path
+    create schemas, grant permissions
     variables - db_name, user
-    requires run by database owner
 */
 
 \if :{?db_name}
@@ -39,9 +38,5 @@ CREATE SCHEMA debug;
 GRANT USAGE, CREATE ON SCHEMA debug TO :user;
 
 GRANT USAGE, CREATE ON SCHEMA debug TO PUBLIC;
-
-DROP SCHEMA public;
-
-ALTER DATABASE :db_name SET search_path TO core, lookup, debug;
 
 COMMIT;
