@@ -1,9 +1,14 @@
-import { Transaction, TransactionsWithCounts } from '../models/transaction.js'
+import { DatabaseError } from '../models/error.js'
+import {
+    PaymentChannelEnum,
+    Transaction,
+    TransactionsWithCounts,
+} from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
     transactions: Transaction[]
-): Promise<Transaction[] | undefined> => {
+): Promise<void> => {
     if (!transactions.length) return
 
     const values: unknown[] = []
@@ -11,8 +16,6 @@ export const insertTransactions = async (
         values.push(
             transaction.accountId,
             transaction.plaidId,
-            transaction.merchantId,
-            transaction.merchant,
             transaction.name,
             transaction.customName,
             transaction.amount,
@@ -21,6 +24,9 @@ export const insertTransactions = async (
             transaction.categoryId,
             transaction.customCategoryId,
             transaction.paymentChannel,
+            transaction.merchantId,
+            transaction.merchant,
+            transaction.location,
             transaction.isoCurrencyCode,
             transaction.unofficialCurrencyCode,
             transaction.date,
@@ -36,8 +42,6 @@ export const insertTransactions = async (
         INSERT INTO transactions (
             account_id,
             plaid_id,
-            merchant_id,
-            merchant,
             name,
             custom_name,
             amount,
@@ -46,6 +50,9 @@ export const insertTransactions = async (
             category_id,
             custom_category_id,
             payment_channel,
+            merchant_id,
+            merchant,
+            location,
             iso_currency_code,
             unofficial_currency_code,
             date,
@@ -67,12 +74,11 @@ export const insertTransactions = async (
             unofficial_currency_code = EXCLUDED.unofficial_currency_code,
             date = EXCLUDED.date,
             pending = EXCLUDED.pending
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbTransaction>(query, values)).rows
-    if (!rows.length) return
-    return rows.map(mapDbTransaction)
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to insert transactions')
 }
 
 export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
@@ -381,69 +387,65 @@ export const fetchActiveTransactionsDailyDateRangeWithUserIdAndDates = async (
 export const modifyTransactionCustomNameWithPlaidId = async (
     plaidId: string,
     name: string | null
-): Promise<Transaction | undefined> => {
+): Promise<void> => {
     const query = `
         UPDATE transactions
         SET custom_name = $2
         WHERE plaid_id = $1
-        RETURNING *
     `
-    const rows = (await runQuery<DbTransaction>(query, [plaidId, name])).rows
-    if (!rows[0]) return
-    return mapDbTransaction(rows[0])
+    const result = await runQuery(query, [plaidId, name])
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify transaction custom name')
 }
 
 export const modifyTransactionCustomCategoryIdWithPlaidId = async (
     plaidId: string,
     categoryId: number | null
-): Promise<Transaction | undefined> => {
+): Promise<void> => {
     const query = `
         UPDATE transactions
         SET custom_category_id = $2
         WHERE plaid_id = $1
-        RETURNING *
     `
-    const rows = (await runQuery<DbTransaction>(query, [plaidId, categoryId]))
-        .rows
-    if (!rows[0]) return
-    return mapDbTransaction(rows[0])
+    const result = await runQuery(query, [plaidId, categoryId])
+    if (!result.rowCount)
+        throw new DatabaseError(
+            'failed to modify transaction custom category id'
+        )
 }
 
 export const modifyTransactionNoteWithPlaidId = async (
     plaidId: string,
     note: string | null
-): Promise<Transaction | undefined> => {
+): Promise<void> => {
     const query = `
         UPDATE transactions
         SET note = $2
         WHERE plaid_id = $1
-        RETURNING *
     `
-    const rows = (await runQuery<DbTransaction>(query, [plaidId, note])).rows
-    if (!rows[0]) return
-    return mapDbTransaction(rows[0])
+    const result = await runQuery(query, [plaidId, note])
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify transaction note')
 }
 
 export const removeTransactionsWithPlaidIds = async (
     plaidIds: string[]
-): Promise<Transaction[] | undefined> => {
+): Promise<void> => {
     if (!plaidIds.length) return
     const query = `
         DELETE FROM transactions
         WHERE plaid_id IN
             (${plaidIds.map((_id, idx) => `$${idx + 1}`).join(', ')})
-        RETURNING *
     `
-    const rows = (await runQuery<DbTransaction>(query, plaidIds)).rows
-    return rows.map(mapDbTransaction)
+    const result = await runQuery(query, plaidIds)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to remove transactions')
 }
 
 interface DbTransaction {
     id: number
     account_id: number
     plaid_id: string
-    merchant_id: string | null
-    merchant: string | null
     name: string
     custom_name: string | null
     amount: number
@@ -451,7 +453,10 @@ interface DbTransaction {
     detailed_category: string | null
     category_id: number
     custom_category_id: number | null
-    payment_channel: string
+    payment_channel: PaymentChannelEnum
+    merchant_id: string | null
+    merchant: string | null
+    location: string | null
     iso_currency_code: string | null
     unofficial_currency_code: string | null
     date: Date
@@ -463,8 +468,6 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     id: dbTransaction.id,
     accountId: dbTransaction.account_id,
     plaidId: dbTransaction.plaid_id,
-    merchantId: dbTransaction.merchant_id,
-    merchant: dbTransaction.merchant,
     name: dbTransaction.name,
     customName: dbTransaction.custom_name,
     amount: dbTransaction.amount,
@@ -473,6 +476,9 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     categoryId: dbTransaction.category_id,
     customCategoryId: dbTransaction.custom_category_id,
     paymentChannel: dbTransaction.payment_channel,
+    merchantId: dbTransaction.merchant_id,
+    merchant: dbTransaction.merchant,
+    location: dbTransaction.location,
     isoCurrencyCode: dbTransaction.iso_currency_code,
     unofficialCurrencyCode: dbTransaction.unofficial_currency_code,
     date: dbTransaction.date,

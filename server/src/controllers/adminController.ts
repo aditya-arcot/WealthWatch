@@ -36,13 +36,11 @@ export const reviewAccessRequest = async (req: Request, res: Response) => {
     const username = req.session.user?.username
     if (username === undefined) throw new HttpError('missing username', 400)
 
-    const accessReq = await modifyAccessRequestStatusAccessCodeReviewerWithId(
+    await modifyAccessRequestStatusAccessCodeReviewerWithId(
         accessRequestId,
         statusId,
         accessCode,
         username
     )
-    if (!accessReq) throw new HttpError('failed to modify access request')
-
     return res.status(204).send()
 }

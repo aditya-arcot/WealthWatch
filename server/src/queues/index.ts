@@ -36,7 +36,7 @@ export const workerOptions = {
     concurrency: 50,
 }
 
-export const handleJobSuccess = async (
+export const handleJobSuccess = (
     queueName: string,
     jobId: string | undefined,
     jobName: string | undefined,
@@ -52,7 +52,7 @@ export const handleJobSuccess = async (
     })
 }
 
-export const handleJobFailure = async (
+export const handleJobFailure = (
     queueName: string,
     jobId: string | undefined,
     jobName: string | undefined,

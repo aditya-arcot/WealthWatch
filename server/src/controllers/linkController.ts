@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
-    fetchActiveItemsWithUserId,
+    fetchActiveItemWithUserIdAndId,
     fetchActiveItemWithUserIdAndInstitutionId,
     insertItem,
 } from '../database/itemQueries.js'
@@ -15,10 +15,12 @@ import {
 import {
     queueSyncItemBalances,
     queueSyncItemInvestments,
+    queueSyncItemLiabilities,
     queueSyncItemTransactions,
 } from '../queues/itemQueue.js'
 import { queueLogPlaidLinkEvent } from '../queues/logQueue.js'
 import { logger } from '../utils/logger.js'
+import { syncItemAccounts } from './itemController.js'
 
 export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
@@ -38,8 +40,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
     if (updateAccounts !== undefined && typeof updateAccounts !== 'boolean')
         throw new HttpError('invalid update accounts flag', 400)
 
-    const items = await fetchActiveItemsWithUserId(userId)
-    const item = items.filter((i) => i.id === itemId)[0]
+    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const linkToken = await plaidLinkTokenCreate(userId, item, updateAccounts)
@@ -108,9 +109,12 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     const newItem = await insertItem(item)
     if (!newItem) throw new HttpError('failed to insert item')
 
+    await syncItemAccounts(newItem)
+
     logger.debug('queueing item syncs')
     await queueSyncItemTransactions(newItem)
     await queueSyncItemInvestments(newItem)
+    await queueSyncItemLiabilities(newItem)
     await queueSyncItemBalances(newItem)
 
     return res.status(204).send()

@@ -2,11 +2,12 @@ import {
     AccessRequest,
     AccessRequestStatusEnum,
 } from '../models/accessRequest.js'
+import { DatabaseError } from '../models/error.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccessRequest = async (
     req: AccessRequest
-): Promise<AccessRequest | undefined> => {
+): Promise<void> => {
     const values: unknown[] = [
         req.email,
         req.firstName,
@@ -28,18 +29,22 @@ export const insertAccessRequest = async (
             reviewer
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbAccessRequest>(query, values)).rows
-    if (!rows[0]) return
-    return mapDbAccessRequest(rows[0])
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to insert access request')
 }
 
 export const fetchAccessRequestWithEmail = async (
     email: string
 ): Promise<AccessRequest | undefined> => {
-    const query = 'SELECT * FROM access_requests WHERE email = $1'
+    const query = `
+        SELECT * 
+        FROM access_requests 
+        WHERE email = $1
+        LIMIT 1
+    `
     const rows = (await runQuery<DbAccessRequest>(query, [email])).rows
     if (!rows[0]) return
     return mapDbAccessRequest(rows[0])
@@ -48,7 +53,12 @@ export const fetchAccessRequestWithEmail = async (
 export const fetchAccessRequestWithAccessCode = async (
     accessCode: string
 ): Promise<AccessRequest | undefined> => {
-    const query = 'SELECT * FROM access_requests WHERE access_code = $1'
+    const query = `
+        SELECT * 
+        FROM access_requests 
+        WHERE access_code = $1
+        LIMIT 1
+    `
     const rows = (await runQuery<DbAccessRequest>(query, [accessCode])).rows
     if (!rows[0]) return
     return mapDbAccessRequest(rows[0])
@@ -69,38 +79,32 @@ export const modifyAccessRequestStatusAccessCodeReviewerWithId = async (
     statusId: number,
     accessCode: string | null,
     reviewer: string | null
-): Promise<AccessRequest | undefined> => {
+): Promise<void> => {
+    const values: unknown[] = [id, statusId, accessCode, reviewer]
     const query = `
         UPDATE access_requests
         SET status_id = $2, access_code = $3, reviewer = $4
         WHERE id = $1
-        RETURNING *
     `
-    const rows = (
-        await runQuery<DbAccessRequest>(query, [
-            id,
-            statusId,
-            accessCode,
-            reviewer,
-        ])
-    ).rows
-    if (!rows[0]) return
-    return mapDbAccessRequest(rows[0])
+    const result = await runQuery(query, values)
+    if (result.rowCount)
+        throw new DatabaseError(
+            'failed to modify access request status, access code, reviewer'
+        )
 }
 
 export const modifyAccessRequestStatusWithId = async (
     id: number,
     statusId: number
-): Promise<AccessRequest | undefined> => {
+): Promise<void> => {
     const query = `
         UPDATE access_requests
         SET status_id = $2
         WHERE id = $1
-        RETURNING *
     `
-    const rows = (await runQuery<DbAccessRequest>(query, [id, statusId])).rows
-    if (!rows[0]) return
-    return mapDbAccessRequest(rows[0])
+    const result = await runQuery(query, [id, statusId])
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify access request status')
 }
 
 interface DbAccessRequest {

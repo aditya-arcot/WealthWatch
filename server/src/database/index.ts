@@ -1,5 +1,5 @@
 import pg, { QueryResult, QueryResultRow } from 'pg'
-import { HttpError } from '../models/error.js'
+import { DatabaseError } from '../models/error.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 
@@ -24,13 +24,13 @@ export const createPool = async (): Promise<void> => {
         await runQuery('SELECT 1')
     } catch (error) {
         await clientPool.end()
-        throw new HttpError('failed to create database pool')
+        throw new DatabaseError('failed to create database pool')
     }
     logger.debug('created database pool')
 }
 
 export const getPool = (): pg.Pool => {
-    if (!clientPool) throw new HttpError('pool not initialized')
+    if (!clientPool) throw new DatabaseError('pool not initialized')
     return clientPool
 }
 
@@ -40,7 +40,7 @@ export const constructInsertQueryParamsPlaceholder = (
     counter: number = 1
 ): string => {
     if (rowCount < 1 || paramCount < 1)
-        throw new HttpError('cannot construct parameters placeholder')
+        throw new DatabaseError('cannot construct parameters placeholder')
 
     const placeholders: string[] = []
     for (let i = 0; i < rowCount; i++) {
@@ -59,7 +59,7 @@ export const runQuery = async <T extends QueryResultRow>(
     skipSuccessLog: boolean = false
 ): Promise<QueryResult<T>> => {
     if (!clientPool) {
-        throw new HttpError('pool not initialized')
+        throw new DatabaseError('pool not initialized')
     }
     const start = Date.now()
 

@@ -1,7 +1,8 @@
+import { DatabaseError } from '../models/error.js'
 import { User } from '../models/user.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertUser = async (user: User): Promise<User | undefined> => {
+export const insertUser = async (user: User): Promise<User> => {
     const values: unknown[] = [
         user.username,
         user.email,
@@ -27,7 +28,7 @@ export const insertUser = async (user: User): Promise<User | undefined> => {
     `
 
     const rows = (await runQuery<DbUser>(query, values)).rows
-    if (!rows[0]) return
+    if (!rows[0]) throw new DatabaseError('failed to insert user')
     return mapDbUser(rows[0])
 }
 
@@ -40,7 +41,12 @@ export const fetchUsers = async (): Promise<User[]> => {
 export const fetchUserWithUsername = async (
     username: string
 ): Promise<User | undefined> => {
-    const query = 'SELECT * FROM users WHERE username = $1'
+    const query = `
+        SELECT * 
+        FROM users 
+        WHERE username = $1
+        LIMIT 1
+    `
     const rows = (await runQuery<DbUser>(query, [username])).rows
     if (!rows[0]) return
     return mapDbUser(rows[0])
@@ -49,14 +55,25 @@ export const fetchUserWithUsername = async (
 export const fetchUserWithEmail = async (
     email: string
 ): Promise<User | undefined> => {
-    const query = 'SELECT * FROM users WHERE email = $1'
+    const query = `
+        SELECT * 
+        FROM users 
+        WHERE email = $1
+        LIMIT 1
+    `
     const rows = (await runQuery<DbUser>(query, [email])).rows
     if (!rows[0]) return
     return mapDbUser(rows[0])
 }
 
 export const removeUserWithId = async (userId: number) => {
-    await runQuery('DELETE FROM users WHERE id = $1', [userId])
+    const query = `
+        DELETE
+        FROM users
+        WHERE id = $1
+    `
+    const result = await runQuery(query, [userId])
+    if (!result.rowCount) throw new DatabaseError('failed to remove user')
 }
 
 interface DbUser {

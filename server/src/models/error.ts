@@ -11,6 +11,12 @@ export class HttpError extends Error {
     }
 }
 
+export class DatabaseError extends Error {
+    constructor(message: string) {
+        super(capitalizeFirstLetter(message))
+    }
+}
+
 export class PlaidApiError extends Error {
     code: string
     type: string

@@ -1,29 +1,8 @@
-import { Item } from '../models/item.js'
-import { Notification, NotificationTypeEnum } from '../models/notification.js'
+import { DatabaseError } from '../models/error.js'
+import { Notification } from '../models/notification.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertItemNotification = async (
-    type: NotificationTypeEnum,
-    item: Item,
-    message: string,
-    persistent: boolean = false
-) => {
-    const notification: Notification = {
-        id: -1,
-        typeId: type,
-        userId: item.userId,
-        itemId: item.id,
-        message,
-        persistent,
-        read: false,
-        active: true,
-    }
-    return await insertNotification(notification)
-}
-
-const insertNotification = async (
-    n: Notification
-): Promise<Notification | undefined> => {
+export const insertNotification = async (n: Notification): Promise<void> => {
     const values: unknown[] = [
         n.userId,
         n.typeId,
@@ -47,12 +26,11 @@ const insertNotification = async (
             active
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbNotification>(query, values)).rows
-    if (!rows[0]) return
-    return mapDbNotification(rows[0])
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to insert notification')
 }
 
 export const fetchActiveNotificationsWithUserId = async (
@@ -70,49 +48,50 @@ export const fetchActiveNotificationsWithUserId = async (
 
 export const modifyNotificationsToReadWithUserId = async (
     userId: number
-): Promise<Notification[]> => {
+): Promise<void> => {
+    const values = [userId]
     const query = `
         UPDATE notifications
         SET read = true
         WHERE user_id = $1
-        RETURNING *
     `
-    const values = [userId]
-    const rows = (await runQuery<DbNotification>(query, values)).rows
-    return rows.map(mapDbNotification)
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify notifications to read')
 }
 
 export const modifyNotificationToInactiveWithUserIdAndId = async (
     userId: number,
     id: number
-): Promise<Notification | undefined> => {
+): Promise<void> => {
+    const values = [userId, id]
     const query = `
         UPDATE notifications
         SET active = false
         WHERE user_id = $1
             AND id = $2
-        RETURNING *
     `
-    const values = [userId, id]
-    const rows = (await runQuery<DbNotification>(query, values)).rows
-    if (!rows[0]) return
-    return mapDbNotification(rows[0])
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify notification to inactive')
 }
 
-export const modifyNotificationsToInactiveWithUserIdAndTypeId = async (
+export const modifyNotificationsToInactiveWithUserIdItemIdAndTypeId = async (
     userId: number,
+    itemId: number,
     typeId: number
-): Promise<Notification[]> => {
+): Promise<void> => {
+    const values = [userId, itemId, typeId]
     const query = `
         UPDATE notifications
         SET active = false
         WHERE user_id = $1
-            AND type_id = $2
-        RETURNING *
+            AND item_id = $2
+            AND type_id = $3
     `
-    const values = [userId, typeId]
-    const rows = (await runQuery<DbNotification>(query, values)).rows
-    return rows.map(mapDbNotification)
+    const result = await runQuery(query, values)
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify notifications to inactive')
 }
 
 interface DbNotification {

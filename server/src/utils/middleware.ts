@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
-import { HttpError, PlaidApiError } from '../models/error.js'
+import { DatabaseError, HttpError, PlaidApiError } from '../models/error.js'
 import { queueLogAppRequest } from '../queues/logQueue.js'
 import { production, stage, vars } from './env.js'
 import { logger } from './logger.js'
@@ -141,13 +141,15 @@ export const handleError = (
     res: Response,
     _next: NextFunction
 ): Response => {
-    logger.error({ error: err }, err.message)
+    logger.error({ err }, 'handling error')
     if (err instanceof HttpError) {
         return res
             .status(err.status)
             .json({ message: err.message, code: err.code })
+    } else if (err instanceof DatabaseError) {
+        return res.status(500).json({ message: 'Database error' })
     } else if (err instanceof PlaidApiError) {
-        return res.status(500).json({ message: err.message })
+        return res.status(500).json({ message: 'Plaid API error' })
     } else {
         return res.status(500).json({ message: 'Unexpected error' })
     }
