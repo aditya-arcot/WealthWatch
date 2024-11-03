@@ -39,18 +39,42 @@ export const plaidInvestmentsRefresh = async (item: Item) => {
     }
 }
 
-export const plaidInvestmentsHoldingsGet = async (item: Item) => {
+type InvestmentsHoldingsResponse = {
+    holdings: PlaidHolding[]
+    securities: PlaidSecurity[]
+}
+
+export const plaidInvestmentsHoldingsGet = async (
+    item: Item
+): Promise<InvestmentsHoldingsResponse | undefined> => {
     logger.debug({ id: item.id }, 'getting item investment holdings')
+
     const params = {
         access_token: item.accessToken,
     }
-    const resp = await executePlaidMethod(
-        getPlaidClient().investmentsHoldingsGet,
-        params,
-        item.userId,
-        item.id
-    )
-    return { holdings: resp.data.holdings, securities: resp.data.securities }
+
+    try {
+        const resp = await executePlaidMethod(
+            getPlaidClient().investmentsHoldingsGet,
+            params,
+            item.userId,
+            item.id
+        )
+        return {
+            holdings: resp.data.holdings,
+            securities: resp.data.securities,
+        }
+    } catch (error) {
+        if (!(error instanceof PlaidApiError)) throw error
+        if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
+            throw error
+        logger.error(error)
+        logger.debug(
+            { id: item.id },
+            'products not supported error. abandoning investment holdings get'
+        )
+        return
+    }
 }
 
 export const mapPlaidSecurity = (security: PlaidSecurity): Security => ({

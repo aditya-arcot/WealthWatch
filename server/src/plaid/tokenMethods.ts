@@ -15,7 +15,7 @@ export const plaidLinkTokenCreate = async (
     userId: number,
     item?: Item,
     updateAccounts: boolean = false
-): Promise<string> => {
+) => {
     logger.debug(
         { itemId: item?.id, userId, updateAccounts },
         'creating link token'

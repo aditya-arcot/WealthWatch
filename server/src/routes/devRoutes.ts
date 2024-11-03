@@ -8,6 +8,7 @@ import {
     resetSandboxItemLogin,
     syncItemBalances,
     syncItemInvestments,
+    syncItemLiabilities,
     syncItemTransactions,
 } from '../controllers/devController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -136,6 +137,25 @@ router.route('/item/sync-transactions').post(catchAsync(syncItemTransactions))
  *         description: Queued sync investments
  */
 router.route('/item/sync-investments').post(catchAsync(syncItemInvestments))
+
+/**
+ * @swagger
+ * /dev/item/sync-liabilities:
+ *   post:
+ *     summary: Sync an item's liabilities (ignore cooldown)
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: plaidItemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The Plaid item id
+ *     responses:
+ *       202:
+ *         description: Queued sync liabilities
+ */
+router.route('/item/sync-liabilities').post(catchAsync(syncItemLiabilities))
 
 /**
  * @swagger

@@ -1,7 +1,8 @@
+import { DatabaseError } from '../models/error.js'
 import { Job } from '../models/job.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertJob = async (job: Job): Promise<Job | undefined> => {
+export const insertJob = async (job: Job): Promise<void> => {
     const values: unknown[] = [
         job.queueName,
         job.jobId,
@@ -27,35 +28,8 @@ export const insertJob = async (job: Job): Promise<Job | undefined> => {
             error_stack
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbJob>(query, values, true)).rows
-    if (!rows[0]) return
-    return mapDbJob(rows[0])
+    const result = await runQuery(query, values, true)
+    if (!result.rowCount) throw new DatabaseError('failed to insert job')
 }
-
-interface DbJob {
-    id: number
-    queue_name: string
-    job_id: string | null
-    job_name: string | null
-    type: string
-    success: boolean
-    data: object | null
-    error_name: string | null
-    error_message: string | null
-    error_stack: string | null
-}
-
-const mapDbJob = (dbJob: DbJob): Job => ({
-    id: dbJob.id,
-    queueName: dbJob.queue_name,
-    jobId: dbJob.job_id,
-    jobName: dbJob.job_name,
-    success: dbJob.success,
-    data: dbJob.data,
-    errorName: dbJob.error_name,
-    errorMessage: dbJob.error_message,
-    errorStack: dbJob.error_stack,
-})

@@ -62,26 +62,19 @@ export const initializeLogWorker = () => {
                 case LogJobType.LogAppRequest: {
                     const req: AppRequest | undefined = job.data.log
                     if (!req) throw new HttpError(`missing ${type}`)
-
-                    const newReq = await insertAppRequest(req)
-                    if (!newReq) throw new HttpError(`failed to insert ${type}`)
+                    await insertAppRequest(req)
                     break
                 }
                 case LogJobType.LogPlaidLinkEvent: {
                     const event: PlaidLinkEvent | undefined = job.data.log
                     if (!event) throw new HttpError(`missing ${type}`)
-
-                    const newEvent = await insertPlaidLinkEvent(event)
-                    if (!newEvent)
-                        throw new HttpError(`failed to insert ${type}`)
+                    await insertPlaidLinkEvent(event)
                     break
                 }
                 case LogJobType.LogPlaidApiRequest: {
                     const req: PlaidApiRequest | undefined = job.data.log
                     if (!req) throw new HttpError(`missing ${type}`)
-
-                    const newReq = await insertPlaidApiRequest(req)
-                    if (!newReq) throw new HttpError(`failed to insert ${type}`)
+                    await insertPlaidApiRequest(req)
                     break
                 }
                 default:

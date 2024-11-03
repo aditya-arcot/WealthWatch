@@ -6,15 +6,13 @@ import {
     fetchActiveItemWithPlaidId,
     modifyItemHealthyWithId,
 } from '../database/itemQueries.js'
-import {
-    insertItemNotification,
-    modifyNotificationsToInactiveWithUserIdAndTypeId,
-} from '../database/notificationQueries.js'
+import { modifyNotificationsToInactiveWithUserIdItemIdAndTypeId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { NotificationTypeEnum } from '../models/notification.js'
 import {
     HoldingsWebhookCodeEnum,
     ItemWebhookCodeEnum,
+    LiabilitiesWebhookCodeEnum,
     TransactionsWebhookCodeEnum,
     Webhook,
     WebhookTypeEnum,
@@ -24,9 +22,16 @@ import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utils/logger.js'
 import {
     removeDeactivateItem,
+    syncItemAccounts,
     syncItemInvestments,
+    syncItemLiabilities,
     syncItemTransactions,
 } from './itemController.js'
+import {
+    insertInfoNotification,
+    insertLinkUpdateNotification,
+    insertLinkUpdateWithAccountsNotification,
+} from './notificationController.js'
 
 export const processWebhook = async (req: Request, res: Response) => {
     logger.debug('processing webhook')
@@ -118,6 +123,13 @@ export const handleWebhook = async (webhook: Webhook) => {
             await handleHoldingsWebhook(webhookCode, itemId)
             break
         }
+        case WebhookTypeEnum.Liabilities: {
+            const itemId = webhook.data.item_id
+            if (itemId === undefined)
+                throw new HttpError('missing item id', 400)
+            await handleLiabilitiesWebhook(webhookCode, itemId)
+            break
+        }
         case WebhookTypeEnum.Item: {
             const itemId = webhook.data.item_id
             if (itemId === undefined)
@@ -173,6 +185,23 @@ const handleHoldingsWebhook = async (webhookCode: string, itemId: string) => {
     }
 }
 
+const handleLiabilitiesWebhook = async (
+    webhookCode: string,
+    itemId: string
+) => {
+    logger.debug({ webhookCode, itemId }, 'handling liabilities webhook')
+
+    const webhookCodeEnum = webhookCode as LiabilitiesWebhookCodeEnum
+    switch (webhookCodeEnum) {
+        case LiabilitiesWebhookCodeEnum.DefaultUpdate: {
+            await handleLiabilitiesDefaultUpdateWebhook(itemId)
+            break
+        }
+        default:
+            throw new HttpError('unknown webhook code', 400)
+    }
+}
+
 const handleItemWebhook = async (webhookCode: string, itemId: string) => {
     logger.debug({ webhookCode, itemId }, 'handling item webhook')
 
@@ -218,6 +247,7 @@ const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+    await syncItemAccounts(item)
     await syncItemTransactions(item)
 
     logger.debug({ itemId }, 'handled transactions sync webhook')
@@ -228,9 +258,21 @@ const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
+    await syncItemAccounts(item)
     await syncItemInvestments(item)
 
     logger.debug({ itemId }, 'handled holdings default webhook')
+}
+
+const handleLiabilitiesDefaultUpdateWebhook = async (itemId: string) => {
+    logger.debug({ itemId }, 'handling liabilities default webhook')
+
+    const item = await fetchActiveItemWithPlaidId(itemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await syncItemAccounts(item)
+    await syncItemLiabilities(item)
+
+    logger.debug({ itemId }, 'handled liabilities default webhook')
 }
 
 const handleItemErrorWebhook = async (itemId: string) => {
@@ -241,15 +283,8 @@ const handleItemErrorWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, false)
 
-    if (
-        !(await insertItemNotification(
-            NotificationTypeEnum.LinkUpdate,
-            item,
-            `${item.institutionName} connection error`,
-            true
-        ))
-    )
-        throw new HttpError('failed to insert item notification')
+    const message = `${item.institutionName} connection error`
+    await insertLinkUpdateNotification(item, message)
 
     logger.debug({ itemId }, 'handled item error webhook')
 }
@@ -262,19 +297,14 @@ const handleItemLoginRepairedWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, true)
 
-    await modifyNotificationsToInactiveWithUserIdAndTypeId(
+    await modifyNotificationsToInactiveWithUserIdItemIdAndTypeId(
         item.userId,
+        item.id,
         NotificationTypeEnum.LinkUpdate
     )
 
-    if (
-        !(await insertItemNotification(
-            NotificationTypeEnum.Info,
-            item,
-            `${item.institutionName} connection repaired`
-        ))
-    )
-        throw new HttpError('failed to insert item notification')
+    const message = `${item.institutionName} connection repaired`
+    await insertInfoNotification(item, message)
 
     logger.debug({ itemId }, 'handled item login repaired webhook')
 }
@@ -284,14 +314,9 @@ const handleItemNewAccountsAvailableWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    if (
-        !(await insertItemNotification(
-            NotificationTypeEnum.LinkUpdateWithAccounts,
-            item,
-            `New ${item.institutionName} accounts available`
-        ))
-    )
-        throw new HttpError('failed to insert item notification')
+
+    const message = `New ${item.institutionName} accounts available`
+    await insertLinkUpdateWithAccountsNotification(item, message)
 
     logger.debug({ itemId }, 'handled item new accounts available webhook')
 }
@@ -301,14 +326,9 @@ const handleItemPendingExpirationWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    if (
-        !(await insertItemNotification(
-            NotificationTypeEnum.LinkUpdate,
-            item,
-            `${item.institutionName} connection pending expiration`
-        ))
-    )
-        throw new HttpError('failed to insert item notification')
+
+    const message = `${item.institutionName} connection pending expiration`
+    await insertLinkUpdateNotification(item, message)
 
     logger.debug({ itemId }, 'handled item pending expiration webhook')
 }
@@ -321,16 +341,10 @@ const handleUserPermissionRevokedWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, false)
 
-    if (
-        !(await insertItemNotification(
-            NotificationTypeEnum.Info,
-            item,
-            `${item.institutionName} permission revoked`
-        ))
-    )
-        throw new HttpError('failed to insert item notification')
-
     await removeDeactivateItem(item)
+
+    const message = `${item.institutionName} permission revoked. Data will be removed`
+    await insertInfoNotification(item, message)
 
     logger.debug({ itemId }, 'handled user permission revoked webhook')
 }
@@ -343,15 +357,8 @@ const handleItemUserAccountRevokedWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, false)
 
-    if (
-        !(await insertItemNotification(
-            NotificationTypeEnum.LinkUpdate,
-            item,
-            `${item.institutionName} user account revoked`,
-            true
-        ))
-    )
-        throw new HttpError('failed to insert item notification')
+    const message = `${item.institutionName} user account revoked`
+    await insertLinkUpdateNotification(item, message)
 
     logger.debug({ itemId }, 'handled user account revoked webhook')
 }

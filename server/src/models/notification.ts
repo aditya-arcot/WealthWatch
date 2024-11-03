@@ -1,3 +1,5 @@
+import { Item } from './item.js'
+
 export interface Notification {
     id: number
     typeId: number
@@ -14,3 +16,19 @@ export enum NotificationTypeEnum {
     LinkUpdate,
     LinkUpdateWithAccounts,
 }
+
+export const createNotification = (
+    type: NotificationTypeEnum,
+    item: Item,
+    message: string,
+    persistent = false
+) => ({
+    id: -1,
+    typeId: type,
+    userId: item.userId,
+    itemId: item.id,
+    message,
+    persistent,
+    read: false,
+    active: true,
+})

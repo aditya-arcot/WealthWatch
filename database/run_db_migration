@@ -6,12 +6,16 @@ show_help() {
     echo "Usage: run_db_migration [options]"
     echo ""
     echo "Options:"
-    echo "  --env file     Specify the environment file"
-    echo "  --script file   Specify the migration script"
-    echo "  -h, --help     Display this help message"
+    echo "  --env file          Specify the environment file"
+    echo "  --script file       Specify the migration script"
+    echo "  --owner             Run as the database owner"
+    echo "  --var name=value    Specify a variable to pass to psql (can be repeated)"
+    echo "  -h, --help          Display this help message"
 }
 
 ENV_FILE="../.env.dev"
+OWNER=false
+declare -a PSQL_VARS
 
 while [[ "$1" != "" ]]; do
     case $1 in
@@ -22,6 +26,13 @@ while [[ "$1" != "" ]]; do
         --script)
             shift
             MIGRATION_SCRIPT=$1
+            ;;
+        --owner)
+            OWNER=true
+            ;;
+        --var)
+            shift
+            PSQL_VARS+=("-v" "$1")
             ;;
         -h | --help)
             show_help
@@ -43,12 +54,26 @@ fi
 
 echo "Migration script: $MIGRATION_SCRIPT"
 echo "Environment file: $ENV_FILE"
+echo "PSQL variables: ${PSQL_VARS[@]}"
 echo
 
 source ./load_env
 
-echo "running db migration script..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f $MIGRATION_SCRIPT -v ON_ERROR_STOP=1
+if [ "$OWNER" = true ]; then
+    echo "running db migration script as database owner..."
+    if ! psql $DB_NAME -f $MIGRATION_SCRIPT -v ON_ERROR_STOP=1 "${PSQL_VARS[@]}"; then
+        echo
+        echo "error running db migration script"
+        exit 1
+    fi
+else 
+    echo "running db migration script as database user..."
+    if ! PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f $MIGRATION_SCRIPT -v ON_ERROR_STOP=1 "${PSQL_VARS[@]}"; then
+        echo
+        echo "error running db migration script"
+        exit 1
+    fi
+fi
 echo
 
 echo "success running db migration script"

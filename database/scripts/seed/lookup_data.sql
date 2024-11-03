@@ -62,4 +62,43 @@ VALUES
     ('Mutual Fund'),
     ('Other');
 
+INSERT INTO
+    student_loan_status_types (name)
+VALUES
+    ('Cancelled'),
+    ('Charged Off'),
+    ('Claim'),
+    ('Consolidated'),
+    ('Deferment'),
+    ('Delinquent'),
+    ('Discharged'),
+    ('Extension'),
+    ('Forbearance'),
+    ('In Grace'),
+    ('In Military'),
+    ('In School'),
+    ('Not Fully Disbursed'),
+    ('Paid In Full'),
+    ('Refunded'),
+    ('Repayment'),
+    ('Transferred'),
+    ('Pending IDR'),
+    ('Other');
+
+INSERT INTO
+    student_loan_repayment_plan_types (name)
+VALUES
+    ('Graduated'),
+    ('Standard'),
+    ('Extended Graduated'),
+    ('Extended Standard'),
+    ('Income Contingent Repayment (ICR)'),
+    ('Income Based Repayment (IBR)'),
+    ('Income Sensitive Repayment (ISR)'),
+    ('Interest Only'),
+    ('Pay As You Earn (PAYE)'),
+    ('Revised Pay As You Earn (REPAYE)'),
+    ('Saving on a Valuable Education (SAVE)'),
+    ('Other');
+
 COMMIT;
