@@ -1,15 +1,12 @@
 import { AxiosError, isAxiosError } from 'axios'
 import { Configuration, PlaidApi, PlaidEnvironments, PlaidError } from 'plaid'
 import {
-    fetchActiveItemsWithUserId,
-    modifyItemHealthyWithId,
-} from '../database/itemQueries.js'
-import {
-    fetchActiveNotificationsWithUserId,
-    insertItemNotification,
-} from '../database/notificationQueries.js'
+    insertInfoNotification,
+    insertLinkUpdateNotification,
+    insertLinkUpdateWithAccountsNotification,
+} from '../controllers/notificationController.js'
+import { fetchActiveItemWithUserIdAndId } from '../database/itemQueries.js'
 import { HttpError, PlaidApiError } from '../models/error.js'
-import { NotificationTypeEnum } from '../models/notification.js'
 import {
     PlaidApiRequest,
     PlaidGeneralErrorCodeEnum,
@@ -74,13 +71,7 @@ export const executePlaidMethod = async <T extends object, P extends object>(
 
         if (isAxiosError(error)) {
             // all errors should be Axios/Plaid errors
-            return await handlePlaidError(
-                error,
-                req,
-                method.name,
-                userId,
-                itemId
-            )
+            return handlePlaidError(error, req, method.name, userId, itemId)
         } else if (error instanceof Error) {
             logger.error(`${method.name} error - ${error.name}`)
             req.errorType = error.name
@@ -140,104 +131,36 @@ const handleGeneralPlaidError = async (
             logger.debug('no action required for error')
             break
 
-        default:
+        default: {
             if (userId === undefined || itemId === undefined) {
-                logger.error(
-                    { userId, itemId },
-                    'no user id or item id. skipping notification insert'
-                )
-            } else {
-                switch (error) {
-                    case PlaidGeneralErrorCodeEnum.ItemLoginRequired:
-                    case PlaidGeneralErrorCodeEnum.AccessNotGranted:
-                        await insertPersistentLinkUpdateNotification(
-                            NotificationTypeEnum.LinkUpdate,
-                            userId,
-                            itemId
-                        )
-                        break
+                throw new HttpError('missing user id or item id', 400)
+            }
 
-                    case PlaidGeneralErrorCodeEnum.NoAccounts:
-                        await insertPersistentLinkUpdateNotification(
-                            NotificationTypeEnum.LinkUpdateWithAccounts,
-                            userId,
-                            itemId
-                        )
-                        break
+            const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
+            if (!item) throw new HttpError('item not found', 404)
 
-                    case PlaidGeneralErrorCodeEnum.InstitutionNotResponding:
-                    case PlaidGeneralErrorCodeEnum.InstitutionDown:
-                        await insertInstitutionIssuesNotification(
-                            userId,
-                            itemId
-                        )
-                        break
+            switch (error) {
+                case PlaidGeneralErrorCodeEnum.ItemLoginRequired:
+                case PlaidGeneralErrorCodeEnum.AccessNotGranted: {
+                    const message = `${item.institutionName} connection error`
+                    await insertLinkUpdateNotification(item, message)
+                    break
+                }
+                case PlaidGeneralErrorCodeEnum.NoAccounts: {
+                    const message = `${item.institutionName} connection error`
+                    await insertLinkUpdateWithAccountsNotification(
+                        item,
+                        message
+                    )
+                    break
+                }
+                case PlaidGeneralErrorCodeEnum.InstitutionNotResponding:
+                case PlaidGeneralErrorCodeEnum.InstitutionDown: {
+                    const message = `${item.institutionName} is experiencing issues. Try again later`
+                    await insertInfoNotification(item, message)
+                    break
                 }
             }
-    }
-}
-
-const insertPersistentLinkUpdateNotification = async (
-    type: NotificationTypeEnum,
-    userId: number,
-    itemId: number
-) => {
-    logger.debug(
-        { type, userId, itemId },
-        'inserting persistent link update notification'
-    )
-
-    const notifications = (
-        await fetchActiveNotificationsWithUserId(userId)
-    ).filter((n) => n.typeId === type && n.itemId === itemId && n.persistent)
-
-    const item = (await fetchActiveItemsWithUserId(userId)).find(
-        (i) => i.id === itemId
-    )
-    if (!item) {
-        logger.error({ userId, itemId }, 'no matching item found')
-        return
-    }
-
-    if (notifications.length !== 0) {
-        logger.debug('persistent link update notification already exists')
-    } else {
-        const message = `${item.institutionName} connection error`
-        if (!(await insertItemNotification(type, item, message, true))) {
-            logger.error('failed to insert persistent link update notification')
-            return
         }
-    }
-
-    await modifyItemHealthyWithId(itemId, false)
-}
-
-const insertInstitutionIssuesNotification = async (
-    userId: number,
-    itemId: number
-) => {
-    logger.debug(
-        { userId, itemId },
-        'inserting institution issues notification'
-    )
-
-    const item = (await fetchActiveItemsWithUserId(userId)).find(
-        (i) => i.id === itemId
-    )
-    if (!item) {
-        logger.error({ userId, itemId }, 'no matching item found')
-    } else {
-        logger.debug('inserting institution issues notification')
-        if (
-            !(await insertItemNotification(
-                NotificationTypeEnum.Info,
-                item,
-                `${item.institutionName} is experiencing issues. Try again later`
-            ))
-        ) {
-            logger.error('failed to insert institution issues notification')
-        }
-
-        await modifyItemHealthyWithId(itemId, false)
     }
 }

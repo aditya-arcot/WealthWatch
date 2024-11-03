@@ -1,10 +1,11 @@
 import { Account } from '../models/account.js'
+import { DatabaseError } from '../models/error.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
     accounts: Account[],
     updateBalances = false
-): Promise<Account[] | undefined> => {
+): Promise<void> => {
     if (!accounts.length) return
 
     const values: unknown[] = []
@@ -62,12 +63,10 @@ export const insertAccounts = async (
     query += `
             type = EXCLUDED.type,
             subtype = EXCLUDED.subtype
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbAccount>(query, values)).rows
-    if (!rows.length) return
-    return rows.map(mapDbAccount)
+    const result = await runQuery(query, values)
+    if (!result.rowCount) throw new DatabaseError('failed to insert accounts')
 }
 
 export const fetchActiveAccountsWithUserId = async (

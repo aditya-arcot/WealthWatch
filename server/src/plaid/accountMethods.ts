@@ -30,7 +30,7 @@ export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
 
 export const plaidAccountsBalanceGet = async (
     item: Item
-): Promise<Account[] | void> => {
+): Promise<Account[] | undefined> => {
     logger.debug({ id: item.id }, 'getting item account balances')
 
     const params: AccountsBalanceGetRequest = {
@@ -68,6 +68,7 @@ export const plaidAccountsBalanceGet = async (
             { id: item.id },
             'last updated datetime out of range error. abandoning item balances sync'
         )
+        return
     }
 }
 
@@ -87,10 +88,10 @@ export const mapPlaidAccount = (
     unofficialCurrencyCode: account.balances.unofficial_currency_code,
     creditLimit: account.balances.limit,
     type: toTitleCase(account.type),
-    subtype: mapAccountSubtype(account.subtype),
+    subtype: mapPlaidAccountSubtype(account.subtype),
 })
 
-const mapAccountSubtype = (subtype: string | null): string | null => {
+const mapPlaidAccountSubtype = (subtype: string | null): string | null => {
     if (subtype === null) return null
 
     if (plaidLowercaseSubtypes.includes(subtype)) return subtype.toLowerCase()

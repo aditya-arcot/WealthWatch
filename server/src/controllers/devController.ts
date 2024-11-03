@@ -18,6 +18,7 @@ import { plaidSandboxFireWebhook } from '../plaid/webhookMethods.js'
 import {
     queueSyncItemBalances,
     queueSyncItemInvestments,
+    queueSyncItemLiabilities,
     queueSyncItemTransactions,
 } from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
@@ -25,6 +26,7 @@ import {
     refreshItemInvestments,
     refreshItemTransactions,
     removeDeactivateItem,
+    syncItemAccounts,
 } from './itemController.js'
 
 export const deleteAllUsers = async (req: Request, res: Response) => {
@@ -97,9 +99,12 @@ export const createSandboxItem = async (req: Request, res: Response) => {
     const newItem = await insertItem(item)
     if (!newItem) throw new HttpError('failed to insert item')
 
+    await syncItemAccounts(newItem)
+
     logger.debug('queueing item syncs')
     await queueSyncItemTransactions(newItem)
     await queueSyncItemInvestments(newItem)
+    await queueSyncItemLiabilities(newItem)
     await queueSyncItemBalances(newItem)
 
     return res.status(204).send()
@@ -148,7 +153,7 @@ export const syncItemTransactions = async (req: Request, res: Response) => {
 
     const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
-    await queueSyncItemTransactions(item)
+    await queueSyncItemTransactions(item, true)
 
     return res.status(202).send()
 }
@@ -162,7 +167,21 @@ export const syncItemInvestments = async (req: Request, res: Response) => {
 
     const item = await fetchActiveItemWithPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
-    await queueSyncItemInvestments(item)
+    await queueSyncItemInvestments(item, true)
+
+    return res.status(202).send()
+}
+
+export const syncItemLiabilities = async (req: Request, res: Response) => {
+    logger.debug('syncing item liabilities')
+
+    const plaidItemId = req.query['plaidItemId']
+    if (typeof plaidItemId !== 'string')
+        throw new HttpError('missing or invalid Plaid item id', 400)
+
+    const item = await fetchActiveItemWithPlaidId(plaidItemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await queueSyncItemLiabilities(item, true)
 
     return res.status(202).send()
 }

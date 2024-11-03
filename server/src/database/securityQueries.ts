@@ -1,9 +1,10 @@
+import { DatabaseError } from '../models/error.js'
 import { Security } from '../models/security.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertSecurities = async (
     securities: Security[]
-): Promise<Security[] | undefined> => {
+): Promise<void> => {
     if (!securities.length) return
 
     const values: unknown[] = []
@@ -59,12 +60,10 @@ export const insertSecurities = async (
             close_price_as_of = EXCLUDED.close_price_as_of,
             iso_currency_code = EXCLUDED.iso_currency_code,
             unofficial_currency_code = EXCLUDED.unofficial_currency_code
-        RETURNING *
     `
 
-    const rows = (await runQuery<DbSecurity>(query, values)).rows
-    if (!rows.length) return
-    return rows.map(mapDbSecurity)
+    const result = await runQuery(query, values)
+    if (!result.rowCount) throw new DatabaseError('failed to insert securities')
 }
 
 export const fetchSecurities = async (): Promise<Security[]> => {
