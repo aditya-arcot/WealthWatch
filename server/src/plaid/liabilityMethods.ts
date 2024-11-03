@@ -157,7 +157,7 @@ const mapPlaidLiabilityAddress = (
     address: PlaidMortgageAddress | PlaidServicerAddress
 ): string | null => {
     if (!address) return null
-    return [
+    const addressString = [
         address.street,
         address.city,
         address.region,
@@ -166,6 +166,8 @@ const mapPlaidLiabilityAddress = (
     ]
         .filter(Boolean)
         .join(', ')
+    if (!addressString.length) return null
+    return addressString
 }
 
 const mapPlaidStudentLoanDisbursementDates = (
