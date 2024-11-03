@@ -1,15 +1,7 @@
 /*
     create schemas, grant permissions
-    variables - db_name, user
+    variables - user
 */
-
-\if :{?db_name}
-    \echo db_name: :db_name
-\else
-   \echo 'error - db_name is not set. exiting...'
-   SELECT 1 / 0;
-   \quit
-\endif
 
 \if :{?user}
     \echo user: :user

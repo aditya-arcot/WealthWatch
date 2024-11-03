@@ -1,3 +1,8 @@
+/*
+    add payment channel constraint
+    add location column
+*/
+
 BEGIN;
 
 ALTER TABLE transactions

@@ -1,5 +1,5 @@
 /*
-    separate db objects into schemas
+    move db objects to new schemas
 */
 
 -- move core tables
