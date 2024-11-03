@@ -2,8 +2,6 @@ export interface Transaction {
     id: number
     accountId: number
     plaidId: string
-    merchantId: string | null
-    merchant: string | null
     name: string
     customName: string | null
     amount: number
@@ -11,7 +9,10 @@ export interface Transaction {
     detailedCategory: string | null
     categoryId: number
     customCategoryId: number | null
-    paymentChannel: string
+    paymentChannel: PaymentChannelEnum
+    merchantId: string | null
+    merchant: string | null
+    location: string | null
     isoCurrencyCode: string | null
     unofficialCurrencyCode: string | null
     date: Date
@@ -23,4 +24,10 @@ export interface TransactionsWithCounts {
     transactions: Transaction[]
     filteredCount: number | null
     totalCount: number
+}
+
+export enum PaymentChannelEnum {
+    Online = 'online',
+    InStore = 'in_store',
+    Other = 'other',
 }

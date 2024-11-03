@@ -74,8 +74,6 @@ CREATE TABLE core.transactions (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     plaid_id TEXT UNIQUE NOT NULL,
-    merchant_id TEXT,
-    merchant TEXT,
     name TEXT NOT NULL,
     custom_name TEXT,
     amount DOUBLE PRECISION NOT NULL,
@@ -84,13 +82,17 @@ CREATE TABLE core.transactions (
     category_id INTEGER REFERENCES categories(id) NOT NULL,
     custom_category_id INTEGER REFERENCES categories(id),
     payment_channel TEXT NOT NULL,
+    merchant_id TEXT,
+    merchant TEXT,
+    location TEXT,
     iso_currency_code TEXT,
     unofficial_currency_code TEXT,
     date TIMESTAMPTZ NOT NULL,
     pending BOOLEAN NOT NULL,
     note TEXT,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT transactions_payment_channel_check CHECK (payment_channel IN ('online', 'in_store', 'other'))
 );
 
 CREATE TABLE core.securities (

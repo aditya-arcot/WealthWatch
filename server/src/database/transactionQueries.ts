@@ -1,5 +1,9 @@
 import { DatabaseError } from '../models/error.js'
-import { Transaction, TransactionsWithCounts } from '../models/transaction.js'
+import {
+    PaymentChannelEnum,
+    Transaction,
+    TransactionsWithCounts,
+} from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
@@ -12,8 +16,6 @@ export const insertTransactions = async (
         values.push(
             transaction.accountId,
             transaction.plaidId,
-            transaction.merchantId,
-            transaction.merchant,
             transaction.name,
             transaction.customName,
             transaction.amount,
@@ -22,6 +24,9 @@ export const insertTransactions = async (
             transaction.categoryId,
             transaction.customCategoryId,
             transaction.paymentChannel,
+            transaction.merchantId,
+            transaction.merchant,
+            transaction.location,
             transaction.isoCurrencyCode,
             transaction.unofficialCurrencyCode,
             transaction.date,
@@ -37,8 +42,6 @@ export const insertTransactions = async (
         INSERT INTO transactions (
             account_id,
             plaid_id,
-            merchant_id,
-            merchant,
             name,
             custom_name,
             amount,
@@ -47,6 +50,9 @@ export const insertTransactions = async (
             category_id,
             custom_category_id,
             payment_channel,
+            merchant_id,
+            merchant,
+            location,
             iso_currency_code,
             unofficial_currency_code,
             date,
@@ -440,8 +446,6 @@ interface DbTransaction {
     id: number
     account_id: number
     plaid_id: string
-    merchant_id: string | null
-    merchant: string | null
     name: string
     custom_name: string | null
     amount: number
@@ -449,7 +453,10 @@ interface DbTransaction {
     detailed_category: string | null
     category_id: number
     custom_category_id: number | null
-    payment_channel: string
+    payment_channel: PaymentChannelEnum
+    merchant_id: string | null
+    merchant: string | null
+    location: string | null
     iso_currency_code: string | null
     unofficial_currency_code: string | null
     date: Date
@@ -461,8 +468,6 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     id: dbTransaction.id,
     accountId: dbTransaction.account_id,
     plaidId: dbTransaction.plaid_id,
-    merchantId: dbTransaction.merchant_id,
-    merchant: dbTransaction.merchant,
     name: dbTransaction.name,
     customName: dbTransaction.custom_name,
     amount: dbTransaction.amount,
@@ -471,6 +476,9 @@ const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     categoryId: dbTransaction.category_id,
     customCategoryId: dbTransaction.custom_category_id,
     paymentChannel: dbTransaction.payment_channel,
+    merchantId: dbTransaction.merchant_id,
+    merchant: dbTransaction.merchant,
+    location: dbTransaction.location,
     isoCurrencyCode: dbTransaction.iso_currency_code,
     unofficialCurrencyCode: dbTransaction.unofficial_currency_code,
     date: dbTransaction.date,

@@ -1,6 +1,8 @@
 import {
+    Location,
     RemovedTransaction as PlaidRemovedTransaction,
     Transaction as PlaidTransaction,
+    TransactionPaymentChannelEnum,
     TransactionsRefreshRequest,
     TransactionsSyncRequest,
 } from 'plaid'
@@ -11,7 +13,7 @@ import {
     PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,
 } from '../models/plaidApiRequest.js'
-import { Transaction } from '../models/transaction.js'
+import { PaymentChannelEnum, Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
@@ -64,16 +66,14 @@ export const plaidTransactionsSync = async (
 
     try {
         while (hasMore) {
-            let params: TransactionsSyncRequest
+            const params: TransactionsSyncRequest = {
+                access_token: item.accessToken,
+                options: {
+                    include_original_description: true,
+                },
+            }
             if (cursor !== null) {
-                params = {
-                    access_token: item.accessToken,
-                    cursor,
-                }
-            } else {
-                params = {
-                    access_token: item.accessToken,
-                }
+                params.cursor = cursor
             }
             const resp = await executePlaidMethod(
                 getPlaidClient().transactionsSync,
@@ -134,6 +134,9 @@ export const mapPlaidTransaction = (
         detailedCategory
     )
 
+    const paymentChannel = mapPlaidPaymentChannel(transaction.payment_channel)
+    const location = mapPlaidLocation(transaction.location)
+
     // link previous pending transaction
     const pendingTransaction = existingTransactions.find(
         (t) => t.plaidId === transaction.pending_transaction_id
@@ -148,16 +151,17 @@ export const mapPlaidTransaction = (
         id: -1,
         accountId,
         plaidId: transaction.transaction_id,
-        merchantId: transaction.merchant_entity_id ?? null,
-        merchant: transaction.merchant_name ?? null,
-        name: transaction.name,
+        name: transaction.original_description ?? transaction.name,
         customName,
         amount: transaction.amount,
         primaryCategory: primaryCategory ?? null,
         detailedCategory: detailedCategory ?? null,
         categoryId,
         customCategoryId,
-        paymentChannel: transaction.payment_channel,
+        paymentChannel,
+        merchantId: transaction.merchant_entity_id ?? null,
+        merchant: transaction.merchant_name ?? null,
+        location,
         isoCurrencyCode: transaction.iso_currency_code,
         unofficialCurrencyCode: transaction.unofficial_currency_code,
         date: new Date(transaction.authorized_date ?? transaction.date),
@@ -252,4 +256,32 @@ const primaryCategoryMap: {
     [PlaidPrimaryCategoryEnum.Transportation]: CategoryEnum.Transportation,
     [PlaidPrimaryCategoryEnum.Travel]: CategoryEnum.Travel,
     [PlaidPrimaryCategoryEnum.RentAndUtilities]: CategoryEnum.Bills,
+}
+
+const mapPlaidPaymentChannel = (
+    paymentChannel: TransactionPaymentChannelEnum
+): PaymentChannelEnum => {
+    switch (paymentChannel) {
+        case TransactionPaymentChannelEnum.InStore:
+            return PaymentChannelEnum.InStore
+        case TransactionPaymentChannelEnum.Online:
+            return PaymentChannelEnum.Online
+        default:
+            return PaymentChannelEnum.Other
+    }
+}
+
+const mapPlaidLocation = (location: Location): string | null => {
+    if (!location) return null
+    const locationString = [
+        location.address,
+        location.city,
+        location.region,
+        location.postal_code,
+        location.country,
+    ]
+        .filter(Boolean)
+        .join(', ')
+    if (!locationString.length) return null
+    return locationString
 }
