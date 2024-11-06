@@ -60,6 +60,19 @@ export const modifyNotificationsToReadWithUserId = async (
         throw new DatabaseError('failed to modify notifications to read')
 }
 
+export const modifyNotificationsToInactiveWithItemId = async (
+    itemId: number
+): Promise<void> => {
+    const query = `
+        UPDATE notifications
+        SET active = false
+        WHERE item_id = $1
+    `
+    const result = await runQuery(query, [itemId])
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify notifications to inactive')
+}
+
 export const modifyNotificationToInactiveWithUserIdAndId = async (
     userId: number,
     id: number
