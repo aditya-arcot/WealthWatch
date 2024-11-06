@@ -40,7 +40,6 @@ export const fetchActiveNotificationsWithUserId = async (
         SELECT *
         FROM active_notifications
         WHERE user_id = $1
-        ORDER BY id DESC
     `
     const rows = (await runQuery<DbNotification>(query, [userId])).rows
     return rows.map(mapDbNotification)
