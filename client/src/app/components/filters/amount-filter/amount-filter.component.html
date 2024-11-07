@@ -1,9 +1,4 @@
-<div
-    #amountFilterModal
-    class="modal modal-sm fade"
-    id="amountFilterModal"
-    tabindex="-1"
->
+<div #amountFilterModal class="modal modal-sm fade" id="amountFilterModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-center p-2">
@@ -14,27 +9,12 @@
                     <label for="filterType">
                         <b>Filter Type</b>
                     </label>
-                    <select
-                        id="filterType"
-                        class="form-select form-select-sm"
-                        [(ngModel)]="selectedFilter"
-                        (change)="handleFilterChange()"
-                    >
-                        <option [value]="amountFilterType.ALL">
-                            All Amounts
-                        </option>
-                        <option [value]="amountFilterType.EXACTLY">
-                            Exactly
-                        </option>
-                        <option [value]="amountFilterType.GREATER_THAN">
-                            Greater Than
-                        </option>
-                        <option [value]="amountFilterType.LESS_THAN">
-                            Less Than
-                        </option>
-                        <option [value]="amountFilterType.BETWEEN">
-                            Between
-                        </option>
+                    <select id="filterType" class="form-select form-select-sm" [(ngModel)]="selectedFilter" (change)="handleFilterChange()">
+                        <option [value]="amountFilterType.ALL">All Amounts</option>
+                        <option [value]="amountFilterType.EXACTLY">Exactly</option>
+                        <option [value]="amountFilterType.GREATER_THAN">Greater Than</option>
+                        <option [value]="amountFilterType.LESS_THAN">Less Than</option>
+                        <option [value]="amountFilterType.BETWEEN">Between</option>
                     </select>
                 </div>
 
@@ -44,10 +24,7 @@
                             <div class="mt-2">
                                 <label for="minAmount">
                                     <b>
-                                        @if (
-                                            selectedFilter ===
-                                            amountFilterType.BETWEEN
-                                        ) {
+                                        @if (selectedFilter === amountFilterType.BETWEEN) {
                                             Min Amount
                                         } @else {
                                             Amount
@@ -60,9 +37,7 @@
                                         id="minAmount"
                                         type="number"
                                         class="form-control"
-                                        [class.invalid-input]="
-                                            !minAmountValid()
-                                        "
+                                        [class.invalid-input]="!minAmountValid()"
                                         [(ngModel)]="minAmount"
                                     />
                                 </div>
@@ -78,17 +53,11 @@
                             </div>
                         }
 
-                        @if (
-                            selectedFilter === amountFilterType.LESS_THAN ||
-                            selectedFilter === amountFilterType.BETWEEN
-                        ) {
+                        @if (selectedFilter === amountFilterType.LESS_THAN || selectedFilter === amountFilterType.BETWEEN) {
                             <div class="mt-2">
                                 <label for="maxAmount">
                                     <b>
-                                        @if (
-                                            selectedFilter ===
-                                            amountFilterType.BETWEEN
-                                        ) {
+                                        @if (selectedFilter === amountFilterType.BETWEEN) {
                                             Max Amount
                                         } @else {
                                             Amount
@@ -101,9 +70,7 @@
                                         id="maxAmount"
                                         type="number"
                                         class="form-control"
-                                        [class.invalid-input]="
-                                            !maxAmountValid()
-                                        "
+                                        [class.invalid-input]="!maxAmountValid()"
                                         [(ngModel)]="maxAmount"
                                     />
                                 </div>
@@ -131,11 +98,7 @@
                     (click)="apply()"
                     title="Apply Filter"
                     data-bs-dismiss="modal"
-                    [disabled]="
-                        !inputsChanged() ||
-                        !minAmountValid() ||
-                        !maxAmountValid()
-                    "
+                    [disabled]="!inputsChanged() || !minAmountValid() || !maxAmountValid()"
                 >
                     <i class="bi bi-check2"></i>
                     Apply
@@ -153,12 +116,7 @@
                     Clear
                 </button>
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-warning"
-                    title="Cancel"
-                    data-bs-dismiss="modal"
-                >
+                <button type="button" class="btn btn-sm btn-warning" title="Cancel" data-bs-dismiss="modal">
                     <i class="bi bi-arrow-left"></i>
                     Cancel
                 </button>

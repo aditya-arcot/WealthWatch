@@ -5,12 +5,7 @@
         <div class="col-10 col-sm-8 col-md-6 col-xl-4">
             <div class="position-relative mb-3">
                 <h2 class="text-center mb-0">Accounts</h2>
-                <button
-                    (click)="linkAccount()"
-                    class="btn btn-success position-absolute top-right"
-                    type="button"
-                    title="Link Account"
-                >
+                <button (click)="linkAccount()" class="btn btn-success position-absolute top-right" type="button" title="Link Account">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>
@@ -30,12 +25,7 @@
         <div class="col-lg-10 col-xl-8">
             <div class="position-relative mb-3">
                 <h2 class="text-center mb-0">Accounts</h2>
-                <button
-                    (click)="linkAccount()"
-                    class="btn btn-success position-absolute top-right"
-                    type="button"
-                    title="Link Account"
-                >
+                <button (click)="linkAccount()" class="btn btn-success position-absolute top-right" type="button" title="Link Account">
                     <i class="bi bi-plus"></i>
                     <span class="ms-1 d-none d-sm-inline">Link an Account</span>
                 </button>
@@ -52,11 +42,7 @@
                             <h4 class="card-title mb-1">
                                 {{ item.institutionName }}
                             </h4>
-                            <h6
-                                class="card-subtitle mb-1 small-text"
-                                [class.text-success]="item.healthy"
-                                [class.text-danger]="!item.healthy"
-                            >
+                            <h6 class="card-subtitle mb-1 small-text" [class.text-success]="item.healthy" [class.text-danger]="!item.healthy">
                                 @if (item.healthy) {
                                     Healthy
                                 } @else {
@@ -70,62 +56,31 @@
                                 </h6>
                             }
 
-                            <div
-                                class="d-flex gap-2 position-absolute top-right"
-                            >
-                                <button
-                                    (click)="refreshItem(item)"
-                                    class="btn btn-primary"
-                                    type="button"
-                                    title="Refresh Item"
-                                >
+                            <div class="d-flex gap-2 position-absolute top-right">
+                                <button (click)="refreshItem(item)" class="btn btn-primary" type="button" title="Refresh Item">
                                     <i class="bi bi-arrow-clockwise"></i>
-                                    <span class="ms-1 d-none d-sm-inline"
-                                        >Refresh</span
-                                    >
+                                    <span class="ms-1 d-none d-sm-inline">Refresh</span>
                                 </button>
-                                <button
-                                    (click)="deactivateItem(item)"
-                                    class="btn btn-danger"
-                                    type="button"
-                                    title="Unlink Institution"
-                                >
+                                <button (click)="deactivateItem(item)" class="btn btn-danger" type="button" title="Unlink Institution">
                                     <i class="bi bi-trash"></i>
-                                    <span class="ms-1 d-none d-sm-inline"
-                                        >Unlink</span
-                                    >
+                                    <span class="ms-1 d-none d-sm-inline">Unlink</span>
                                 </button>
                             </div>
                         </div>
 
-                        <table
-                            class="table table-striped table-hover table-sm align-middle mb-0"
-                        >
+                        <table class="table table-striped table-hover table-sm align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
                                     <th scope="col" class="w-25">Name</th>
                                     <th scope="col" class="text-center w-25">
-                                        <span class="d-none d-md-inline"
-                                            >Current Balance</span
-                                        >
-                                        <span class="d-inline d-md-none"
-                                            >Current</span
-                                        >
+                                        <span class="d-none d-md-inline">Current Balance</span>
+                                        <span class="d-inline d-md-none">Current</span>
                                     </th>
                                     <th scope="col" class="text-center w-25">
-                                        <span class="d-none d-md-inline"
-                                            >Available Balance</span
-                                        >
-                                        <span class="d-inline d-md-none"
-                                            >Available</span
-                                        >
+                                        <span class="d-none d-md-inline">Available Balance</span>
+                                        <span class="d-inline d-md-none">Available</span>
                                     </th>
-                                    <th
-                                        scope="col"
-                                        class="text-center d-none d-lg-table-cell w-25"
-                                    >
-                                        Number
-                                    </th>
+                                    <th scope="col" class="text-center d-none d-lg-table-cell w-25">Number</th>
                                 </tr>
                             </thead>
                             <tbody class="table-group-divider small-text">
@@ -140,20 +95,12 @@
                                             </div>
                                         </td>
                                         <td class="text-center w-25">
-                                            {{
-                                                getCurrentBalanceString(account)
-                                            }}
+                                            {{ getCurrentBalanceString(account) }}
                                         </td>
                                         <td class="text-center w-25">
-                                            {{
-                                                getAvailableBalanceString(
-                                                    account
-                                                )
-                                            }}
+                                            {{ getAvailableBalanceString(account) }}
                                         </td>
-                                        <td
-                                            class="text-center d-none d-lg-table-cell w-25"
-                                        >
+                                        <td class="text-center d-none d-lg-table-cell w-25">
                                             &middot;&middot;&middot;&middot;
                                             {{ account.mask }}
                                         </td>
