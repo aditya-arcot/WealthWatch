@@ -1,5 +1,9 @@
-.account-row td {
-    background-color: lightgrey;
+.account-div:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+.total-row td {
+    background-color: rgba(0, 0, 0, 0.05);
     pointer-events: none;
 }
 
@@ -12,13 +16,13 @@
     max-width: 300px;
 }
 
-.dropdown-header {
-    color: black;
-}
-
 .dropdown-menu {
     max-height: 200px;
     overflow-x: hidden;
+}
+
+.dropdown-header {
+    color: black;
 }
 
 .pie-chart-div {

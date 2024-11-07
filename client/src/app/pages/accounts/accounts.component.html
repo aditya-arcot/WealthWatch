@@ -86,7 +86,7 @@
                             <tbody class="table-group-divider small-text">
                                 @for (account of item.accounts; track $index) {
                                     <tr>
-                                        <td class="w-25">
+                                        <td>
                                             <div>
                                                 {{ account.name }}
                                             </div>
@@ -94,13 +94,13 @@
                                                 {{ account.subtype }}
                                             </div>
                                         </td>
-                                        <td class="text-center w-25">
+                                        <td class="text-center">
                                             {{ getCurrentBalanceString(account) }}
                                         </td>
-                                        <td class="text-center w-25">
+                                        <td class="text-center">
                                             {{ getAvailableBalanceString(account) }}
                                         </td>
-                                        <td class="text-center d-none d-lg-table-cell w-25">
+                                        <td class="text-center d-none d-lg-table-cell">
                                             &middot;&middot;&middot;&middot;
                                             {{ account.mask }}
                                         </td>
