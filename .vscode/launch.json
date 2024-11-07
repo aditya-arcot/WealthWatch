@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Node",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "restart": true,
+            "cwd": "${workspaceFolder}/server",
+            "sourceMaps": true
+        },
+        {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:4200",
+            "webRoot": "${workspaceFolder}/client"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Start Debugging",
+            "configurations": ["Attach to Node", "Launch Chrome"],
+            "preLaunchTask": "start server and client"
+        }
+    ]
+}
