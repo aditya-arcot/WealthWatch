@@ -5,43 +5,20 @@
                 <h4 class="modal-title w-100">Add Note</h4>
             </div>
             <div class="modal-body p-3 py-2">
-                <textarea
-                    class="form-control form-control-sm"
-                    rows="3"
-                    [(ngModel)]="note"
-                ></textarea>
+                <textarea class="form-control form-control-sm" rows="3" [(ngModel)]="note"></textarea>
             </div>
             <div class="modal-footer justify-content-center p-1">
-                <button
-                    type="button"
-                    class="btn btn-sm btn-primary"
-                    (click)="apply()"
-                    title="Apply Note"
-                    data-bs-dismiss="modal"
-                    [disabled]="!noteChanged()"
-                >
+                <button type="button" class="btn btn-sm btn-primary" (click)="apply()" title="Apply Note" data-bs-dismiss="modal" [disabled]="!noteChanged()">
                     <i class="bi bi-check2"></i>
                     Apply
                 </button>
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-danger"
-                    (click)="clear()"
-                    title="Clear Note"
-                    data-bs-dismiss="modal"
-                    [disabled]="!noteExists()"
-                >
+                <button type="button" class="btn btn-sm btn-danger" (click)="clear()" title="Clear Note" data-bs-dismiss="modal" [disabled]="!noteExists()">
                     <i class="bi bi-trash"></i>
                     Clear
                 </button>
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-warning"
-                    title="Cancel"
-                    data-bs-dismiss="modal"
-                >
+                <button type="button" class="btn btn-sm btn-warning" title="Cancel" data-bs-dismiss="modal">
                     <i class="bi bi-arrow-left"></i>
                     Cancel
                 </button>

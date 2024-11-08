@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -33,7 +32,7 @@ import { UserService } from '../../services/user.service'
 @Component({
     selector: 'app-accounts',
     standalone: true,
-    imports: [LoadingSpinnerComponent, DatePipe],
+    imports: [LoadingSpinnerComponent],
     templateUrl: './accounts.component.html',
 })
 export class AccountsComponent implements OnInit {

@@ -1,9 +1,4 @@
-<div
-    #categoryFilterModal
-    class="modal modal-sm fade"
-    id="categoryFilterModal"
-    tabindex="-1"
->
+<div #categoryFilterModal class="modal modal-sm fade" id="categoryFilterModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-center p-2">
@@ -11,55 +6,32 @@
             </div>
             <div class="modal-body p-3 text-center">
                 <div class="dropdown input-group input-group-sm">
-                    <button
-                        class="form-select form-select-sm"
-                        type="button"
-                        title="Select Categories"
-                        data-bs-toggle="dropdown"
-                        data-bs-auto-close="outside"
-                    >
+                    <button class="form-select form-select-sm" type="button" title="Select Categories" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                         {{ getSelectedCategoriesString() }}
                     </button>
                     <ul class="dropdown-menu p-0 py-1">
                         @for (c of categories; track $index) {
                             <li>
-                                <div
-                                    class="dropdown-item form-check form-switch py-0 ps-2 pe-4 m-0"
-                                >
+                                <div class="dropdown-item form-check form-switch py-0 ps-2 pe-4 m-0">
                                     <input
                                         id="category-{{ c.id }}"
                                         class="form-check-input ms-0"
                                         type="checkbox"
                                         [value]="c.id"
                                         [checked]="inputChecked(c.id)"
-                                        (click)="
-                                            handleCategorySelect($event, c.id)
-                                        "
-                                        (keydown)="
-                                            handleCategorySelect($event, c.id)
-                                        "
+                                        (click)="handleCategorySelect($event, c.id)"
+                                        (keydown)="handleCategorySelect($event, c.id)"
                                         tabindex="0"
                                     />
-                                    <label
-                                        class="form-check-label small-text w-100 ms-2"
-                                        for="category-{{ c.id }}"
-                                    >
-                                        <i
-                                            class="bi"
-                                            [ngClass]="getCategoryClass(c)"
-                                        ></i>
+                                    <label class="form-check-label small-text w-100 ms-2" for="category-{{ c.id }}">
+                                        <i class="bi" [ngClass]="getCategoryClass(c)"></i>
                                         {{ c.name }}
                                     </label>
                                 </div>
                             </li>
                         }
                     </ul>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        (click)="invert()"
-                        title="Invert Selection"
-                    >
+                    <button type="button" class="btn btn-sm btn-success" (click)="invert()" title="Invert Selection">
                         <i class="bi bi-arrow-repeat"></i>
                         Invert
                     </button>
@@ -90,12 +62,7 @@
                     Clear
                 </button>
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-warning"
-                    title="Cancel"
-                    data-bs-dismiss="modal"
-                >
+                <button type="button" class="btn btn-sm btn-warning" title="Cancel" data-bs-dismiss="modal">
                     <i class="bi bi-arrow-left"></i>
                     Cancel
                 </button>

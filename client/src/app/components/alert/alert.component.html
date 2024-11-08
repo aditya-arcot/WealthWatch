@@ -3,23 +3,11 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-6">
-                    <div
-                        class="m-2 mb-0 p-3 alert alert-dismissible"
-                        [ngClass]="getAlertClass(alert.type)"
-                        role="alert"
-                    >
+                    <div class="m-2 mb-0 p-3 alert alert-dismissible" [ngClass]="getAlertClass(alert.type)" role="alert">
                         <div class="d-flex align-items-center">
-                            <i
-                                class="bi me-1"
-                                [ngClass]="getAlertIconClass(alert.type)"
-                            ></i>
+                            <i class="bi me-1" [ngClass]="getAlertIconClass(alert.type)"></i>
                             <strong>{{ alert.message }}</strong>
-                            <button
-                                type="button"
-                                class="btn-close"
-                                (click)="removeAlert(alert.id)"
-                                title="Close Alert"
-                            ></button>
+                            <button type="button" class="btn-close" (click)="removeAlert(alert.id)" title="Close Alert"></button>
                         </div>
                         @for (line of alert.subtext; track $index) {
                             <p>{{ line }}</p>

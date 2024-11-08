@@ -1,3 +1,19 @@
+/*
+    recreate views
+*/
+
+BEGIN;
+
+DROP VIEW active_notifications;
+
+DROP VIEW active_holdings;
+
+DROP VIEW active_transactions;
+
+DROP VIEW active_accounts;
+
+DROP VIEW active_items;
+
 CREATE VIEW core.active_items AS
 SELECT *
 FROM items
@@ -51,3 +67,5 @@ SELECT *
 FROM notifications
 WHERE active = TRUE
 ORDER BY id DESC;
+
+COMMIT;

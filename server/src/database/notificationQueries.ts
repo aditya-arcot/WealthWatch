@@ -40,7 +40,6 @@ export const fetchActiveNotificationsWithUserId = async (
         SELECT *
         FROM active_notifications
         WHERE user_id = $1
-        ORDER BY id DESC
     `
     const rows = (await runQuery<DbNotification>(query, [userId])).rows
     return rows.map(mapDbNotification)
@@ -58,6 +57,19 @@ export const modifyNotificationsToReadWithUserId = async (
     const result = await runQuery(query, values)
     if (!result.rowCount)
         throw new DatabaseError('failed to modify notifications to read')
+}
+
+export const modifyNotificationsToInactiveWithItemId = async (
+    itemId: number
+): Promise<void> => {
+    const query = `
+        UPDATE notifications
+        SET active = false
+        WHERE item_id = $1
+    `
+    const result = await runQuery(query, [itemId])
+    if (!result.rowCount)
+        throw new DatabaseError('failed to modify notifications to inactive')
 }
 
 export const modifyNotificationToInactiveWithUserIdAndId = async (

@@ -350,13 +350,6 @@ export class InvestmentsComponent implements OnInit {
         return total
     }
 
-    getTickerString(holding: HoldingWithSecurity): string | null {
-        if (holding.ticker === null) {
-            return ''
-        }
-        return ` (${holding.ticker})`
-    }
-
     getNameString(holding: HoldingWithSecurity): string {
         if (holding.name === null) {
             return 'Unknown'
@@ -364,16 +357,8 @@ export class InvestmentsComponent implements OnInit {
         return holding.name
     }
 
-    getNameTypeString(holding: HoldingWithSecurity): string {
-        const type = SecurityTypeEnum[holding.typeId]
-        if (holding.name === null) {
-            return type
-        }
-        return `${holding.name} | ${type}`
-    }
-
-    getTypeString(typeId: number): string {
-        return SecurityTypeEnum[typeId]
+    getTypeString(holding: HoldingWithSecurity): string {
+        return SecurityTypeEnum[holding.typeId]
     }
 
     getPriceString(holding: HoldingWithSecurity): string {
@@ -429,7 +414,7 @@ export class InvestmentsComponent implements OnInit {
             costBasisPerShare,
             holding.unofficialCurrencyCode ?? holding.isoCurrencyCode
         )
-        return `${formatted} / share`
+        return `${formatted} ea.`
     }
 
     getTotalGainLossString(account: AccountWithHoldings): string {

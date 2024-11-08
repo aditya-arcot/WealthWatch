@@ -1,9 +1,4 @@
-<div
-    #dateFilterModal
-    class="modal modal-sm fade"
-    id="dateFilterModal"
-    tabindex="-1"
->
+<div #dateFilterModal class="modal modal-sm fade" id="dateFilterModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-center p-2">
@@ -14,12 +9,7 @@
                     <label for="dateRange">
                         <b>Date Range</b>
                     </label>
-                    <select
-                        id="dateRange"
-                        class="form-select form-select-sm"
-                        [(ngModel)]="selectedFilter"
-                        (change)="handleFilterChange()"
-                    >
+                    <select id="dateRange" class="form-select form-select-sm" [(ngModel)]="selectedFilter" (change)="handleFilterChange()">
                         @for (key of dateFilterKeys; track $index) {
                             <option [value]="dateFilterType[key]">
                                 {{ dateFilterType[key] }}
@@ -42,9 +32,7 @@
                             (ngModelChange)="setSelectorStartDate($event)"
                         />
                         @if (!startDateValid()) {
-                            <div class="feedback-text small-text">
-                                Start or end date required
-                            </div>
+                            <div class="feedback-text small-text">Start or end date required</div>
                         }
                     </div>
 
@@ -79,22 +67,14 @@
                     (click)="apply()"
                     title="Apply Filter"
                     data-bs-dismiss="modal"
-                    [disabled]="
-                        !inputsChanged() || !startDateValid() || !endDateValid()
-                    "
+                    [disabled]="!inputsChanged() || !startDateValid() || !endDateValid()"
                 >
                     <i class="bi bi-check2"></i>
                     Apply
                 </button>
 
                 @if (showReset) {
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-danger"
-                        (click)="reset()"
-                        title="Reset Filter"
-                        data-bs-dismiss="modal"
-                    >
+                    <button type="button" class="btn btn-sm btn-danger" (click)="reset()" title="Reset Filter" data-bs-dismiss="modal">
                         <i class="bi bi-arrow-counterclockwise"></i>
                         Reset
                     </button>
@@ -112,12 +92,7 @@
                     </button>
                 }
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-warning"
-                    title="Cancel"
-                    data-bs-dismiss="modal"
-                >
+                <button type="button" class="btn btn-sm btn-warning" title="Cancel" data-bs-dismiss="modal">
                     <i class="bi bi-arrow-left"></i>
                     Cancel
                 </button>
