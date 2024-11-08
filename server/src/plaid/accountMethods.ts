@@ -79,6 +79,7 @@ export const mapPlaidAccount = (
     id: -1,
     itemId,
     plaidId: account.account_id,
+    active: true,
     name: account.name,
     mask: account.mask,
     officialName: account.official_name,

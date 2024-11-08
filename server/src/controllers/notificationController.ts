@@ -1,9 +1,7 @@
 import { Request, Response } from 'express'
-import { fetchActiveItemWithUserIdAndId } from '../database/itemQueries.js'
 import {
     fetchActiveNotificationsWithUserId,
     insertNotification,
-    modifyNotificationsToInactiveWithUserIdItemIdAndTypeId,
     modifyNotificationsToReadWithUserId,
     modifyNotificationToInactiveWithUserIdAndId,
 } from '../database/notificationQueries.js'
@@ -53,39 +51,6 @@ export const updateUserNotificationToInactive = async (
         throw new HttpError('invalid notification id', 400)
 
     await modifyNotificationToInactiveWithUserIdAndId(userId, notificationId)
-
-    return res.status(204).send()
-}
-
-export const updateUserNotificationsToInactive = async (
-    req: Request,
-    res: Response
-) => {
-    logger.debug('updating notifications of given type to inactive')
-
-    const userId = req.session.user?.id
-    if (userId === undefined) throw new HttpError('missing user id', 400)
-
-    const itemId = req.body.itemId
-    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
-
-    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
-    if (!item) throw new HttpError('item not found', 404)
-
-    const notificationTypeId = req.body.notificationTypeId
-    if (typeof notificationTypeId !== 'number')
-        throw new HttpError('invalid notification type', 400)
-
-    const typeEnum = notificationTypeId as NotificationTypeEnum
-    if (!Object.values(NotificationTypeEnum).includes(typeEnum)) {
-        throw new HttpError('invalid notification type', 400)
-    }
-
-    await modifyNotificationsToInactiveWithUserIdItemIdAndTypeId(
-        userId,
-        itemId,
-        notificationTypeId
-    )
 
     return res.status(204).send()
 }

@@ -1,8 +1,16 @@
-CREATE VIEW core.active_items AS
-SELECT *
-FROM items
-WHERE active = TRUE
-ORDER BY id;
+/*
+    add active column to accounts
+*/
+
+BEGIN;
+
+ALTER TABLE accounts
+ADD COLUMN active BOOLEAN NOT NULL DEFAULT TRUE;
+
+ALTER TABLE accounts
+ALTER COLUMN active DROP DEFAULT;
+
+DROP VIEW active_accounts CASCADE;
 
 CREATE VIEW core.active_accounts AS
 SELECT ai.user_id, a.*
@@ -47,8 +55,4 @@ JOIN securities s
 	ON h.security_id = s.id
 ORDER BY h.account_id, h.id;
 
-CREATE VIEW core.active_notifications AS
-SELECT *
-FROM notifications
-WHERE active = TRUE
-ORDER BY id DESC;
+COMMIT;

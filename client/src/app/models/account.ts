@@ -4,6 +4,7 @@ export interface Account {
     id: number
     itemId: number
     plaidId: string
+    active: boolean
     name: string
     mask: string | null
     officialName: string | null

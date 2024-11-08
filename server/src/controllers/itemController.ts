@@ -2,16 +2,15 @@ import { Request, Response } from 'express'
 import {
     fetchActiveAccountsWithUserId,
     insertAccounts,
+    modifyAccountsActiveWithPlaidItemId,
 } from '../database/accountQueries.js'
 import { insertHoldings } from '../database/holdingQueries.js'
 import {
     fetchActiveItems,
     fetchActiveItemsWithUserId,
     fetchActiveItemWithPlaidId,
-    fetchActiveItemWithUserIdAndId,
     modifyItemActiveWithId,
     modifyItemCursorWithPlaidId,
-    modifyItemHealthyWithId,
     modifyItemInvestmentsLastRefreshedWithPlaidId,
     modifyItemLastRefreshedWithPlaidId,
     modifyItemTransactionsLastRefreshedWithPlaidId,
@@ -31,6 +30,7 @@ import {
     insertTransactions,
     removeTransactionsWithPlaidIds,
 } from '../database/transactionQueries.js'
+import { Account } from '../models/account.js'
 import { HttpError } from '../models/error.js'
 import { inCooldown, Item } from '../models/item.js'
 import {
@@ -55,7 +55,12 @@ import {
     plaidTransactionsRefresh,
     plaidTransactionsSync,
 } from '../plaid/transactionMethods.js'
-import { queueSyncItemBalances } from '../queues/itemQueue.js'
+import {
+    queueSyncItemBalances,
+    queueSyncItemInvestments,
+    queueSyncItemLiabilities,
+    queueSyncItemTransactions,
+} from '../queues/itemQueue.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserItems = async (req: Request, res: Response) => {
@@ -155,13 +160,34 @@ export const refreshItemInvestments = (
     return plaidInvestmentsRefresh(item)
 }
 
+export const syncItemData = async (item: Item) => {
+    logger.debug({ id: item.id }, 'syncing item data')
+    await syncItemAccounts(item)
+    await queueSyncItemTransactions(item)
+    await queueSyncItemInvestments(item)
+    await queueSyncItemLiabilities(item)
+    await queueSyncItemBalances(item)
+}
+
 export const syncItemAccounts = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item accounts')
-
     const accounts = await plaidAccountsGet(item)
+    await mergeItemAccounts(item, accounts)
+}
+
+const mergeItemAccounts = async (
+    item: Item,
+    accounts: Account[],
+    updateBalances = false
+) => {
+    logger.debug({ id: item.id }, 'merging item accounts')
+
+    logger.debug('deactivating existing accounts')
+    await modifyAccountsActiveWithPlaidItemId(item.plaidId, false)
+
     if (accounts.length > 0) {
         logger.debug('inserting accounts')
-        await insertAccounts(accounts)
+        await insertAccounts(accounts, updateBalances)
     } else {
         logger.debug('no accounts to insert')
     }
@@ -299,7 +325,7 @@ export const syncItemLiabilities = async (item: Item) => {
 export const syncItemBalances = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item balances')
     const accounts = await plaidAccountsBalanceGet(item)
-    if (accounts) await insertAccounts(accounts, true)
+    if (accounts) await mergeItemAccounts(item, accounts, true)
 }
 
 export const deactivateItem = async (req: Request, res: Response) => {
@@ -321,21 +347,4 @@ export const removeDeactivateItem = async (item: Item) => {
     await plaidItemRemove(item)
     await modifyItemActiveWithId(item.id, false)
     await modifyNotificationsToInactiveWithItemId(item.id)
-}
-
-export const updateUserItemToHealthy = async (req: Request, res: Response) => {
-    logger.debug('updating item to healthy')
-
-    const userId = req.session.user?.id
-    if (userId === undefined) throw new HttpError('missing user id', 400)
-
-    const itemId = req.body.itemId
-    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
-
-    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
-    if (!item) throw new HttpError('item not found', 404)
-
-    await modifyItemHealthyWithId(item.id, true)
-
-    return res.status(204).send()
 }
