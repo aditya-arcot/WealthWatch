@@ -1,4 +1,3 @@
-import { JsonPipe } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
@@ -14,7 +13,7 @@ import { LoggerService } from '../../services/logger.service'
 @Component({
     selector: 'app-admin',
     standalone: true,
-    imports: [LoadingSpinnerComponent, JsonPipe],
+    imports: [LoadingSpinnerComponent],
     templateUrl: './admin.component.html',
 })
 export class AdminComponent implements OnInit {

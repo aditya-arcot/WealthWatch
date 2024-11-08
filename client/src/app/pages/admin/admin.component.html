@@ -18,36 +18,19 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <div class="mb-2 p-0">
-                        <h4 class="card-title text-center mb-1">
-                            Pending Access Requests
-                        </h4>
+                        <h4 class="card-title text-center mb-1">Pending Access Requests</h4>
                     </div>
                     @if (getPendingRequests().length !== 0) {
-                        <table
-                            class="table table-striped table-hover table-sm align-middle mb-0"
-                        >
+                        <table class="table table-striped table-hover table-sm align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col" class="text-center">
-                                        Name
-                                    </th>
-                                    <th scope="col" class="text-center">
-                                        Email
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        class="text-center"
-                                        style="width: 1%"
-                                    >
-                                        Actions
-                                    </th>
+                                    <th scope="col" class="text-center">Name</th>
+                                    <th scope="col" class="text-center">Email</th>
+                                    <th scope="col" class="text-center" style="width: 1%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="small-text">
-                                @for (
-                                    req of getPendingRequests();
-                                    track $index
-                                ) {
+                                @for (req of getPendingRequests(); track $index) {
                                     <tr>
                                         <td class="text-center">
                                             {{ getFullName(req) }}
@@ -55,19 +38,12 @@
                                         <td class="text-center">
                                             {{ req.email }}
                                         </td>
-                                        <td
-                                            class="d-flex gap-1 justify-content-center"
-                                        >
+                                        <td class="d-flex gap-1 justify-content-center">
                                             <button
                                                 type="button"
                                                 class="btn btn-sm btn-success"
                                                 title="Approve Request"
-                                                (click)="
-                                                    reviewRequest(
-                                                        req,
-                                                        accessRequestStatusEnum.Approved
-                                                    )
-                                                "
+                                                (click)="reviewRequest(req, accessRequestStatusEnum.Approved)"
                                             >
                                                 Approve
                                             </button>
@@ -75,12 +51,7 @@
                                                 type="button"
                                                 class="btn btn-sm btn-danger"
                                                 title="Reject Request"
-                                                (click)="
-                                                    reviewRequest(
-                                                        req,
-                                                        accessRequestStatusEnum.Rejected
-                                                    )
-                                                "
+                                                (click)="reviewRequest(req, accessRequestStatusEnum.Rejected)"
                                             >
                                                 Reject
                                             </button>
@@ -100,52 +71,28 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <div class="mb-2 p-0">
-                        <h4 class="card-title text-center mb-1">
-                            Reviewed Access Requests
-                        </h4>
+                        <h4 class="card-title text-center mb-1">Reviewed Access Requests</h4>
                     </div>
                     @if (getReviewedRequests().length !== 0) {
-                        <table
-                            class="table table-striped table-hover table-sm align-middle mb-0"
-                        >
+                        <table class="table table-striped table-hover table-sm align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col" class="text-center">
-                                        Status
-                                    </th>
-                                    <th scope="col" class="text-center">
-                                        Name
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell"
-                                    >
-                                        Email
-                                    </th>
-                                    <th scope="col" class="text-center">
-                                        Access Code
-                                    </th>
+                                    <th scope="col" class="text-center">Status</th>
+                                    <th scope="col" class="text-center">Name</th>
+                                    <th scope="col" class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell">Email</th>
+                                    <th scope="col" class="text-center">Access Code</th>
                                 </tr>
                             </thead>
                             <tbody class="small-text">
-                                @for (
-                                    req of getReviewedRequests();
-                                    track $index
-                                ) {
+                                @for (req of getReviewedRequests(); track $index) {
                                     <tr>
-                                        <td
-                                            class="text-center {{
-                                                getStatusClass(req)
-                                            }}"
-                                        >
+                                        <td class="text-center {{ getStatusClass(req) }}">
                                             {{ getStatusName(req) }}
                                         </td>
                                         <td class="text-center">
                                             {{ getFullName(req) }}
                                         </td>
-                                        <td
-                                            class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell"
-                                        >
+                                        <td class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell">
                                             {{ req.email }}
                                         </td>
                                         <td class="text-center">

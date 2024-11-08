@@ -1,9 +1,4 @@
-<div
-    #accountFilterModal
-    class="modal modal-sm fade"
-    id="accountFilterModal"
-    tabindex="-1"
->
+<div #accountFilterModal class="modal modal-sm fade" id="accountFilterModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-center p-2">
@@ -11,51 +6,28 @@
             </div>
             <div class="modal-body p-3">
                 <div class="dropdown input-group input-group-sm">
-                    <button
-                        class="form-select form-select-sm"
-                        type="button"
-                        title="Select Accounts"
-                        data-bs-toggle="dropdown"
-                        data-bs-auto-close="outside"
-                    >
+                    <button class="form-select form-select-sm" type="button" title="Select Accounts" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                         {{ getSelectedAccountsString() }}
                     </button>
                     <ul class="dropdown-menu p-0 pb-1">
                         @for (i of items; track $index) {
-                            <li
-                                class="dropdown-header medium-text py-0 px-2 mt-1"
-                            >
+                            <li class="dropdown-header medium-text py-0 px-2 mt-1">
                                 {{ i.institutionName }}
                             </li>
                             @for (a of getItemAccounts(i.id); track $index) {
                                 <li>
-                                    <div
-                                        class="dropdown-item form-check form-switch py-0 ps-2 pe-4 m-0"
-                                    >
+                                    <div class="dropdown-item form-check form-switch py-0 ps-2 pe-4 m-0">
                                         <input
                                             id="account-{{ a.id }}"
                                             class="form-check-input ms-0"
                                             type="checkbox"
                                             [value]="a.id"
                                             [checked]="inputChecked(a.id)"
-                                            (click)="
-                                                handleAccountSelect(
-                                                    $event,
-                                                    a.id
-                                                )
-                                            "
-                                            (keydown)="
-                                                handleAccountSelect(
-                                                    $event,
-                                                    a.id
-                                                )
-                                            "
+                                            (click)="handleAccountSelect($event, a.id)"
+                                            (keydown)="handleAccountSelect($event, a.id)"
                                             tabindex="0"
                                         />
-                                        <label
-                                            class="form-check-label small-text w-100 ms-2"
-                                            for="account-{{ a.id }}"
-                                        >
+                                        <label class="form-check-label small-text w-100 ms-2" for="account-{{ a.id }}">
                                             {{ a.name }}
                                         </label>
                                     </div>
@@ -63,12 +35,7 @@
                             }
                         }
                     </ul>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        (click)="invert()"
-                        title="Invert Selection"
-                    >
+                    <button type="button" class="btn btn-sm btn-success" (click)="invert()" title="Invert Selection">
                         <i class="bi bi-arrow-repeat"></i>
                         Invert
                     </button>
@@ -99,12 +66,7 @@
                     Clear
                 </button>
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-warning"
-                    title="Cancel"
-                    data-bs-dismiss="modal"
-                >
+                <button type="button" class="btn btn-sm btn-warning" title="Cancel" data-bs-dismiss="modal">
                     <i class="bi bi-arrow-left"></i>
                     Cancel
                 </button>

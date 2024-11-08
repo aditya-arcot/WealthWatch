@@ -14,7 +14,7 @@ import { AuthService } from './services/auth.service'
     standalone: true,
     imports: [RouterOutlet, HeaderComponent, AlertComponent],
     templateUrl: './app.component.html',
-    styleUrl: './app.component.css',
+    styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
     readonly noHeaderPaths = [

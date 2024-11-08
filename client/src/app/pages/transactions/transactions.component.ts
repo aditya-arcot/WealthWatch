@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe, DecimalPipe } from '@angular/common'
+import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -40,8 +40,6 @@ import { checkDatesEqual } from '../../utilities/date.utility'
     selector: 'app-transactions',
     standalone: true,
     imports: [
-        DecimalPipe,
-        DatePipe,
         LoadingSpinnerComponent,
         FormsModule,
         DateFilterComponent,

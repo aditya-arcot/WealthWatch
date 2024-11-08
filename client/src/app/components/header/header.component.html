@@ -4,26 +4,13 @@
     <div class="container-fluid">
         <a class="navbar-brand" routerLink="/home">WealthWatch</a>
         <div class="d-flex d-lg-none">
-            <button
-                class="navbar-toggler me-2"
-                type="button"
-                title="Toggle Navbar"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarNav"
-            >
+            <button class="navbar-toggler me-2" type="button" title="Toggle Navbar" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <button
-                class="btn btn-secondary position-relative me-2"
-                title="Open Notifications"
-                data-bs-toggle="modal"
-                data-bs-target="#notificationsModal"
-            >
+            <button class="btn btn-secondary position-relative me-2" title="Open Notifications" data-bs-toggle="modal" data-bs-target="#notificationsModal">
                 <i class="bi bi-bell"></i>
                 @if (unreadNotifications()) {
-                    <span
-                        class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
-                    >
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
                         <span class="visually-hidden">New alerts</span>
                     </span>
                 }
@@ -35,41 +22,11 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav">
-                <a
-                    class="nav-link"
-                    routerLink="/home"
-                    routerLinkActive="active"
-                >
-                    Home
-                </a>
-                <a
-                    class="nav-link"
-                    routerLink="/accounts"
-                    routerLinkActive="active"
-                >
-                    Accounts
-                </a>
-                <a
-                    class="nav-link"
-                    routerLink="/transactions"
-                    routerLinkActive="active"
-                >
-                    Transactions
-                </a>
-                <a
-                    class="nav-link"
-                    routerLink="/spending"
-                    routerLinkActive="active"
-                >
-                    Spending
-                </a>
-                <a
-                    class="nav-link"
-                    routerLink="/investments"
-                    routerLinkActive="active"
-                >
-                    Investments
-                </a>
+                <a class="nav-link" routerLink="/home" routerLinkActive="active"> Home </a>
+                <a class="nav-link" routerLink="/accounts" routerLinkActive="active"> Accounts </a>
+                <a class="nav-link" routerLink="/transactions" routerLinkActive="active"> Transactions </a>
+                <a class="nav-link" routerLink="/spending" routerLinkActive="active"> Spending </a>
+                <a class="nav-link" routerLink="/investments" routerLinkActive="active"> Investments </a>
                 <!-- <a
                     class="nav-link"
                     routerLink="/net-worth"
@@ -85,28 +42,15 @@
                     Paychecks
                 </a> -->
                 @if (isAdmin()) {
-                    <a
-                        class="nav-link"
-                        routerLink="/admin"
-                        routerLinkActive="active"
-                    >
-                        Admin
-                    </a>
+                    <a class="nav-link" routerLink="/admin" routerLinkActive="active"> Admin </a>
                 }
             </div>
         </div>
         <div class="d-none d-lg-flex">
-            <button
-                class="btn btn-secondary position-relative me-2"
-                title="Open Notifications"
-                data-bs-toggle="modal"
-                data-bs-target="#notificationsModal"
-            >
+            <button class="btn btn-secondary position-relative me-2" title="Open Notifications" data-bs-toggle="modal" data-bs-target="#notificationsModal">
                 <i class="bi bi-bell"></i>
                 @if (unreadNotifications()) {
-                    <span
-                        class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
-                    >
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
                         <span class="visually-hidden">New alerts</span>
                     </span>
                 }

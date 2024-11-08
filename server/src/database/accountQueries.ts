@@ -73,15 +73,9 @@ export const fetchActiveAccountsWithUserId = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `
-        SELECT a.*
-        FROM accounts a
-        WHERE
-            a.item_id IN (
-                SELECT id
-                FROM active_items
-                WHERE user_id = $1
-            )
-        ORDER BY a.id
+        SELECT *
+        FROM active_accounts
+        WHERE user_id = $1
     `
     const rows = (await runQuery<DbAccount>(query, [userId])).rows
     return rows.map(mapDbAccount)
