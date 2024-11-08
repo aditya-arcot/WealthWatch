@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "start server",
+            "type": "shell",
+            "command": "npm run dev",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/server"
+            },
+            "problemMatcher": {
+                "owner": "typescript",
+                "pattern": "$tsc",
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "(.*?)",
+                    "endsPattern": "Watching for file changes."
+                }
+            }
+        },
+        {
+            "label": "start client",
+            "type": "shell",
+            "command": "npm run start",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/client"
+            },
+            "problemMatcher": {
+                "owner": "typescript",
+                "pattern": "$tsc",
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "(.*?)",
+                    "endsPattern": "Application bundle generation complete."
+                }
+            }
+        },
+        {
+            "label": "start server and client",
+            "dependsOn": ["start server", "start client"],
+            "dependsOrder": "sequence"
+        }
+    ]
+}

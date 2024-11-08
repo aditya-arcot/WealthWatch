@@ -5,4 +5,12 @@ module.exports = {
     semi: false,
     singleQuote: true,
     plugins: ['prettier-plugin-organize-imports'],
+    overrides: [
+        {
+            files: '*.html',
+            options: {
+                printWidth: 160,
+            },
+        },
+    ],
 }

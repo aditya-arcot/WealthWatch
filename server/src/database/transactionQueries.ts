@@ -121,11 +121,7 @@ export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
                 )
         }
 
-        let query =
-            initialQuery +
-            `
-        ORDER BY t.date DESC, t.plaid_id
-    `
+        let query = initialQuery
         if (limit !== undefined) {
             query += `
             LIMIT $${placeholder}
@@ -153,17 +149,8 @@ const fetchActiveTransactionsCountWithUserId = async (
 ): Promise<number> => {
     const query = `
         SELECT COUNT(*)::INT
-        FROM transactions t
-        WHERE
-            t.account_id IN (
-                SELECT id
-                FROM accounts
-                WHERE item_id IN (
-                    SELECT id
-                    FROM active_items
-                    WHERE user_id = $1
-                )
-            )
+        FROM active_transactions
+        WHERE user_id = $1
     `
     const rows = (await runQuery<{ count: number }>(query, [userId])).rows
     if (!rows[0]) return -1
@@ -185,18 +172,9 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
     const values: unknown[] = []
 
     let query = `
-        SELECT t.*
-        FROM transactions t
-        WHERE
-            t.account_id IN (
-                SELECT id
-                FROM accounts
-                WHERE item_id IN (
-                    SELECT id
-                    FROM active_items
-                    WHERE user_id = $${placeholder}
-                )
-            )
+        SELECT *
+        FROM active_transactions
+        WHERE user_id = $${placeholder}
     `
     values.push(userId)
     placeholder++
@@ -209,9 +187,9 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
         query += `
             AND LOWER (
                 COALESCE (
-                    t.custom_name,
-                    t.merchant,
-                    t.name
+                    custom_name,
+                    merchant,
+                    name
                 )
             ) LIKE $${placeholder}
         `
@@ -222,8 +200,8 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
     if (startDate !== undefined && endDate !== undefined) {
         filtered = true
         query += `
-            AND t.date >= $${placeholder}
-            AND t.date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
+            AND date >= $${placeholder}
+            AND date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(startDate)
         values.push(endDate)
@@ -231,14 +209,14 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
     } else if (startDate !== undefined) {
         filtered = true
         query += `
-            AND t.date >= $${placeholder}
+            AND date >= $${placeholder}
         `
         values.push(startDate)
         placeholder++
     } else if (endDate !== undefined) {
         filtered = true
         query += `
-            AND t.date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
+            AND date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(endDate)
         placeholder++
@@ -247,7 +225,7 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
     if (minAmount !== undefined && maxAmount !== undefined) {
         filtered = true
         query += `
-            AND ABS(t.amount) >= $${placeholder} AND ABS(t.amount) <= $${placeholder + 1}
+            AND ABS(amount) >= $${placeholder} AND ABS(amount) <= $${placeholder + 1}
         `
         values.push(minAmount)
         values.push(maxAmount)
@@ -255,14 +233,14 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
     } else if (minAmount !== undefined) {
         filtered = true
         query += `
-            AND ABS(t.amount) >= $${placeholder}
+            AND ABS(amount) >= $${placeholder}
         `
         values.push(minAmount)
         placeholder++
     } else if (maxAmount !== undefined) {
         filtered = true
         query += `
-            AND ABS(t.amount) <= $${placeholder}
+            AND ABS(amount) <= $${placeholder}
         `
         values.push(maxAmount)
         placeholder++
@@ -275,8 +253,8 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
             .join(', ')
         query += `
             AND COALESCE (
-                t.custom_category_id,
-                t.category_id
+                custom_category_id,
+                category_id
             ) IN (${idsPlaceholder})
         `
         values.push(...categoryIds)
@@ -289,7 +267,7 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
             .map((_, idx) => `$${idx + placeholder}`)
             .join(', ')
         query += `
-            AND t.account_id IN (${idsPlaceholder})
+            AND account_id IN (${idsPlaceholder})
         `
         values.push(...accountIds)
         placeholder += accountIds.length
@@ -304,7 +282,7 @@ const fetchActiveTransactionsCountWithUserIdAndFilters = async (
 ) => {
     const query = `
         SELECT COUNT(*)::INT
-        FROM (${mainQuery}) AS t
+        FROM (${mainQuery})
     `
     const rows = (await runQuery<{ count: number }>(query, values)).rows
     if (!rows[0]) return -1
@@ -328,16 +306,8 @@ export const fetchActiveTransactionsDailyDateRangeWithUserIdAndDates = async (
                 ) AS category_id,
                 date,
                 amount
-            FROM transactions
-            WHERE account_id IN (
-                SELECT id
-                FROM accounts
-                WHERE item_id IN (
-                    SELECT id
-                    FROM active_items
-                    WHERE user_id = $1
-                )
-            )
+            FROM active_transactions
+            WHERE user_id = $1
         ),
         date_series AS (
             SELECT GENERATE_SERIES (

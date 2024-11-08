@@ -61,37 +61,9 @@ export const fetchActiveHoldingsWithUserId = async (
     userId: number
 ): Promise<HoldingWithSecurity[]> => {
     const query = `
-        SELECT
-            h.id,
-            h.account_id,
-            s.name,
-            s.type_id,
-            s.cash_equivalent,
-            s.ticker,
-            s.market_code,
-            h.price,
-            h.price_as_of,
-            s.close_price,
-            s.close_price_as_of,
-            h.quantity,
-            h.value,
-            h.cost_basis,
-            h.iso_currency_code,
-            h.unofficial_currency_code
-        FROM holdings h
-        JOIN securities s
-        ON s.id = h.security_id
-        WHERE
-            h.account_id IN (
-                SELECT id
-                FROM accounts
-                WHERE item_id IN (
-                    SELECT id
-                    FROM active_items
-                    WHERE user_id = $1
-                )
-            )
-        ORDER BY h.account_id, h.id
+        SELECT *
+        FROM active_holdings
+        WHERE user_id = $1
     `
     const rows = (await runQuery<DbHoldingWithSecurity>(query, [userId])).rows
     return rows.map(mapDbHoldingWithSecurity)

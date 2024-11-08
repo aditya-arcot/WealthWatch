@@ -46,7 +46,6 @@ export const fetchActiveItems = async (): Promise<Item[]> => {
     const query = `
         SELECT *
         FROM active_items
-        ORDER BY id
     `
     const rows = (await runQuery<DbItem>(query)).rows
     return rows.map(mapDbItem)
@@ -73,7 +72,6 @@ export const fetchActiveItemsWithUserId = async (
         SELECT *
         FROM active_items
         WHERE user_id = $1
-        ORDER BY id
     `
     const rows = (await runQuery<DbItem>(query, [userId])).rows
     return rows.map(mapDbItem)

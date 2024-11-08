@@ -21,6 +21,7 @@ import {
     insertMortgageLiabilities,
     insertStudentLoanLiabilities,
 } from '../database/liabilityQueries.js'
+import { modifyNotificationsToInactiveWithItemId } from '../database/notificationQueries.js'
 import {
     fetchSecurities,
     insertSecurities,
@@ -319,6 +320,7 @@ export const removeDeactivateItem = async (item: Item) => {
     logger.debug({ id: item.id }, 'removing & deactivating item')
     await plaidItemRemove(item)
     await modifyItemActiveWithId(item.id, false)
+    await modifyNotificationsToInactiveWithItemId(item.id)
 }
 
 export const updateUserItemToHealthy = async (req: Request, res: Response) => {
