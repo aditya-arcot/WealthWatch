@@ -185,31 +185,37 @@ export class AccountsComponent implements OnInit {
 
         if (itemId === undefined) {
             this.loading = true
-            this.linkSvc.exchangePublicToken(token, metadata).subscribe({
-                next: () => {
+            this.linkSvc
+                .exchangePublicToken(token, metadata)
+                .pipe(
+                    catchError((err: HttpErrorResponse) => {
+                        this.logger.error(
+                            'failed to exchange public token',
+                            err
+                        )
+                        if (err.status === 409) {
+                            this.alertSvc.addErrorAlert(
+                                'This institution has already been linked'
+                            )
+                        } else {
+                            this.alertSvc.addErrorAlert(
+                                'Something went wrong. Please try again'
+                            )
+                        }
+                        this.loading = false
+                        return throwError(() => err)
+                    })
+                )
+                .subscribe(() => {
                     this.logger.debug('exchanged public token')
                     this.alertSvc.addSuccessAlert(
                         'Success linking institution',
-                        ['Loading your accounts']
+                        ['Loading account data']
                     )
                     setTimeout(() => {
                         this.loadAccounts()
                     }, 3000)
-                },
-                error: (err: HttpErrorResponse) => {
-                    this.logger.error('failed to exchange public token', err)
-                    if (err.status === 409) {
-                        this.alertSvc.addErrorAlert(
-                            'This institution has already been linked'
-                        )
-                    } else {
-                        this.alertSvc.addErrorAlert(
-                            'Something went wrong. Please try again'
-                        )
-                    }
-                    this.loading = false
-                },
-            })
+                })
         } else {
             this.logger.debug('removing notifications', itemId, withAccounts)
             this.notificationSvc
