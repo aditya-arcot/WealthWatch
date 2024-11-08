@@ -1,5 +1,6 @@
 import { Account } from '../models/account.js'
 import { DatabaseError } from '../models/error.js'
+import { logger } from '../utils/logger.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
@@ -96,8 +97,7 @@ export const modifyAccountsActiveWithPlaidItemId = async (
             and ai.plaid_id = $2
     `
     const result = await runQuery(query, [active, plaidItemId])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify accounts active')
+    if (!result.rowCount) logger.warn('no accounts modified')
 }
 
 interface DbAccount {

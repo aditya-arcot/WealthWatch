@@ -1,5 +1,6 @@
 import { DatabaseError } from '../models/error.js'
 import { Notification } from '../models/notification.js'
+import { logger } from '../utils/logger.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertNotification = async (n: Notification): Promise<void> => {
@@ -55,8 +56,7 @@ export const modifyNotificationsToReadWithUserId = async (
         WHERE user_id = $1
     `
     const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify notifications to read')
+    if (!result.rowCount) logger.warn('no notifications modified')
 }
 
 export const modifyNotificationsToInactiveWithItemId = async (
@@ -68,8 +68,7 @@ export const modifyNotificationsToInactiveWithItemId = async (
         WHERE item_id = $1
     `
     const result = await runQuery(query, [itemId])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify notifications to inactive')
+    if (!result.rowCount) logger.warn('no notifications modified')
 }
 
 export const modifyNotificationToInactiveWithUserIdAndId = async (
