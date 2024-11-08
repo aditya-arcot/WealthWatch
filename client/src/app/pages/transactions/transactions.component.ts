@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms'
 import {
     catchError,
     debounceTime,
+    finalize,
     Observable,
     of,
     Subject,
@@ -216,11 +217,11 @@ export class TransactionsComponent implements OnInit {
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert('Failed to reload transactions')
                     this.clearFilters()
-                    this.loading = false
                     return throwError(() => err)
-                })
+                }),
+                finalize(() => (this.loading = false))
             )
-            .subscribe(() => (this.loading = false))
+            .subscribe()
     }
 
     refreshTransactions(): void {
