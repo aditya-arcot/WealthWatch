@@ -69,7 +69,7 @@ export class AccountsComponent implements OnInit {
             const withAccounts: string | undefined = params['withAccounts']
             if (withAccounts === undefined) throw Error('missing with accounts')
 
-            this.linkAccount(itemIdNum, withAccounts === 'true')
+            this.linkInstitution(itemIdNum, withAccounts === 'true')
         })
 
         this.loadAccounts()
@@ -117,7 +117,7 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    linkAccount(itemId?: number, withAccounts?: boolean): void {
+    linkInstitution(itemId?: number, withAccounts?: boolean): void {
         this.loading = true
         this.linkSvc
             .createLinkToken(itemId, withAccounts)
@@ -292,6 +292,15 @@ export class AccountsComponent implements OnInit {
             errorMessage: metadata.error_message,
         }
         this.linkSvc.handleLinkEvent(event).subscribe()
+    }
+
+    addAccounts(item: Item): void {
+        this.router.navigate(['/accounts'], {
+            queryParams: {
+                itemId: item.id,
+                withAccounts: true,
+            },
+        })
     }
 
     refreshItem(item: Item): void {
