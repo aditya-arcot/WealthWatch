@@ -18,15 +18,14 @@ import {
     WebhookTypeEnum,
 } from '../models/webhook.js'
 import { plaidWebhookVerificationKeyGet } from '../plaid/webhookMethods.js'
+import {
+    queueSyncItemInvestments,
+    queueSyncItemLiabilities,
+    queueSyncItemTransactions,
+} from '../queues/itemQueue.js'
 import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utils/logger.js'
-import {
-    removeDeactivateItem,
-    syncItemAccounts,
-    syncItemInvestments,
-    syncItemLiabilities,
-    syncItemTransactions,
-} from './itemController.js'
+import { removeDeactivateItem } from './itemController.js'
 import {
     insertInfoNotification,
     insertLinkUpdateNotification,
@@ -247,8 +246,7 @@ const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    await syncItemAccounts(item)
-    await syncItemTransactions(item)
+    await queueSyncItemTransactions(item, true)
 
     logger.debug({ itemId }, 'handled transactions sync webhook')
 }
@@ -258,8 +256,7 @@ const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    await syncItemAccounts(item)
-    await syncItemInvestments(item)
+    await queueSyncItemInvestments(item, true)
 
     logger.debug({ itemId }, 'handled holdings default webhook')
 }
@@ -269,8 +266,7 @@ const handleLiabilitiesDefaultUpdateWebhook = async (itemId: string) => {
 
     const item = await fetchActiveItemWithPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
-    await syncItemAccounts(item)
-    await syncItemLiabilities(item)
+    await queueSyncItemLiabilities(item, true)
 
     logger.debug({ itemId }, 'handled liabilities default webhook')
 }
