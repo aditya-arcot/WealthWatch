@@ -1,7 +1,6 @@
 import express from 'express'
 import {
     getUserNotifications,
-    updateUserNotificationsToInactive,
     updateUserNotificationsToRead,
     updateUserNotificationToInactive,
 } from '../controllers/notificationController.js'
@@ -78,34 +77,5 @@ router
 router
     .route('/inactive')
     .patch(authenticate, catchAsync(updateUserNotificationToInactive))
-
-/**
- * @swagger
- * /notifications/inactive-by-type:
- *   patch:
- *     summary: Update the logged in user's notifications of the specified type to inactive
- *     tags: [Notifications]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               itemId:
- *                 type: number
- *                 required: true
- *               notificationTypeId:
- *                 type: number
- *                 required: true
- *     responses:
- *       204:
- *         description: Updated the logged in user's notifications of the specified type to inactive
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router
-    .route('/inactive-by-type')
-    .patch(authenticate, catchAsync(updateUserNotificationsToInactive))
 
 export default router

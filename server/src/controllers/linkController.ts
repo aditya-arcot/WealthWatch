@@ -4,23 +4,20 @@ import {
     fetchActiveItemWithUserIdAndId,
     fetchActiveItemWithUserIdAndInstitutionId,
     insertItem,
+    modifyItemHealthyWithId,
 } from '../database/itemQueries.js'
+import { modifyNotificationsToInactiveWithUserIdItemIdAndTypeId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
+import { NotificationTypeEnum } from '../models/notification.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 import {
     plaidLinkTokenCreate,
     plaidPublicTokenExchange,
 } from '../plaid/tokenMethods.js'
-import {
-    queueSyncItemBalances,
-    queueSyncItemInvestments,
-    queueSyncItemLiabilities,
-    queueSyncItemTransactions,
-} from '../queues/itemQueue.js'
 import { queueLogPlaidLinkEvent } from '../queues/logQueue.js'
 import { logger } from '../utils/logger.js'
-import { syncItemAccounts } from './itemController.js'
+import { syncItemData } from './itemController.js'
 
 export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
@@ -109,13 +106,43 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     const newItem = await insertItem(item)
     if (!newItem) throw new HttpError('failed to insert item')
 
-    await syncItemAccounts(newItem)
+    await syncItemData(newItem)
 
-    logger.debug('queueing item syncs')
-    await queueSyncItemTransactions(newItem)
-    await queueSyncItemInvestments(newItem)
-    await queueSyncItemLiabilities(newItem)
-    await queueSyncItemBalances(newItem)
+    return res.status(202).send()
+}
 
-    return res.status(204).send()
+export const handleLinkUpdateComplete = async (req: Request, res: Response) => {
+    logger.debug('handling link update complete')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const itemId = req.body.itemId
+    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
+
+    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
+    if (!item) throw new HttpError('item not found', 404)
+
+    logger.debug('updating item to healthy')
+    await modifyItemHealthyWithId(itemId, true)
+
+    const notificationTypeId = req.body.notificationTypeId
+    if (typeof notificationTypeId !== 'number')
+        throw new HttpError('invalid notification type', 400)
+
+    const typeEnum = notificationTypeId as NotificationTypeEnum
+    if (!Object.values(NotificationTypeEnum).includes(typeEnum)) {
+        throw new HttpError('invalid notification type', 400)
+    }
+
+    logger.debug('updating notifications to inactive')
+    await modifyNotificationsToInactiveWithUserIdItemIdAndTypeId(
+        userId,
+        itemId,
+        notificationTypeId
+    )
+
+    await syncItemData(item)
+
+    return res.status(202).send()
 }

@@ -10,7 +10,7 @@ import {
     PlaidLinkHandler,
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
-import { catchError, switchMap, throwError } from 'rxjs'
+import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import {
@@ -217,15 +217,33 @@ export class AccountsComponent implements OnInit {
                     }, 3000)
                 })
         } else {
-            this.logger.debug('removing notifications', itemId, withAccounts)
-            this.notificationSvc
-                .updateNotificationsOfTypeToInactive(itemId, withAccounts)
-                .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
-                .subscribe()
-            this.itemSvc
-                .updateItemToHealthy(itemId)
-                .subscribe(() => this.loadAccounts())
-            this.router.navigateByUrl('/accounts')
+            this.loading = true
+            this.linkSvc
+                .handleLinkUpdateComplete(itemId, withAccounts)
+                .pipe(
+                    catchError((err: HttpErrorResponse) => {
+                        this.logger.error(
+                            'failed to handle link update complete',
+                            err
+                        )
+                        this.alertSvc.addErrorAlert(
+                            'Something went wrong. Please try again'
+                        )
+                        this.loading = false
+                        return throwError(() => err)
+                    }),
+                    finalize(() => this.router.navigateByUrl('/accounts'))
+                )
+                .subscribe(() => {
+                    this.logger.debug('handled link update complete')
+                    this.alertSvc.addSuccessAlert(
+                        'Success linking institution',
+                        ['Loading account data']
+                    )
+                    setTimeout(() => {
+                        this.loadAccounts()
+                    }, 3000)
+                })
         }
     }
 

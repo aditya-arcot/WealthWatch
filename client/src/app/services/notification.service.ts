@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { catchError, tap, throwError } from 'rxjs'
 import { env } from '../../environments/env'
-import { Notification, NotificationTypeEnum } from '../models/notification'
+import { Notification } from '../models/notification'
 import { LoggerService } from './logger.service'
 
 @Injectable({
@@ -37,22 +37,6 @@ export class NotificationService {
     updateNotificationToInactive(notificationId: number) {
         return this.http.patch<void>(`${this.baseUrl}/inactive`, {
             notificationId,
-        })
-    }
-
-    updateNotificationsOfTypeToInactive(
-        itemId: number,
-        withAccounts?: boolean
-    ) {
-        if (withAccounts === undefined || withAccounts === false) {
-            return this.http.patch<void>(`${this.baseUrl}/inactive-by-type`, {
-                itemId,
-                notificationTypeId: NotificationTypeEnum.LinkUpdate,
-            })
-        }
-        return this.http.patch<void>(`${this.baseUrl}/inactive-by-type`, {
-            itemId,
-            notificationTypeId: NotificationTypeEnum.LinkUpdateWithAccounts,
         })
     }
 }
