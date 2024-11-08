@@ -6,6 +6,7 @@ import {
     fireSandboxWebhook,
     forceRefreshItemTransactions,
     resetSandboxItemLogin,
+    syncItem,
     syncItemBalances,
     syncItemInvestments,
     syncItemLiabilities,
@@ -102,6 +103,25 @@ router
 
 /**
  * @swagger
+ * /dev/item/sync:
+ *   post:
+ *     summary: Sync an item
+ *     tags: [Dev]
+ *     parameters:
+ *       - in: query
+ *         name: plaidItemId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The Plaid item id
+ *     responses:
+ *       202:
+ *         description: Queued item syncs
+ */
+router.route('/item/sync').post(catchAsync(syncItem))
+
+/**
+ * @swagger
  * /dev/item/sync-transactions:
  *   post:
  *     summary: Sync an item's transactions
@@ -142,7 +162,7 @@ router.route('/item/sync-investments').post(catchAsync(syncItemInvestments))
  * @swagger
  * /dev/item/sync-liabilities:
  *   post:
- *     summary: Sync an item's liabilities (ignore cooldown)
+ *     summary: Sync an item's liabilities
  *     tags: [Dev]
  *     parameters:
  *       - in: query

@@ -5,7 +5,7 @@
         <div class="col-10 col-sm-8 col-md-6 col-xl-4">
             <div class="position-relative mb-3">
                 <h2 class="text-center mb-0">Accounts</h2>
-                <button (click)="linkAccount()" class="btn btn-success position-absolute top-right" type="button" title="Link Account">
+                <button (click)="linkInstitution()" class="btn btn-success position-absolute top-right" type="button" title="Link Institution">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>
@@ -25,9 +25,9 @@
         <div class="col-lg-10 col-xl-8">
             <div class="position-relative mb-3">
                 <h2 class="text-center mb-0">Accounts</h2>
-                <button (click)="linkAccount()" class="btn btn-success position-absolute top-right" type="button" title="Link Account">
+                <button (click)="linkInstitution()" class="btn btn-success position-absolute top-right" type="button" title="Link Institution">
                     <i class="bi bi-plus"></i>
-                    <span class="ms-1 d-none d-sm-inline">Link an Account</span>
+                    <span class="ms-1 d-none d-sm-inline">Link an Institution</span>
                 </button>
             </div>
         </div>
@@ -56,12 +56,16 @@
                                 </h6>
                             }
 
-                            <div class="d-flex gap-2 position-absolute top-right">
-                                <button (click)="refreshItem(item)" class="btn btn-primary" type="button" title="Refresh Item">
+                            <div class="d-flex gap-1 position-absolute top-right">
+                                <button (click)="addAccounts(item)" class="btn btn-sm btn-success" type="button" title="Add Accounts">
+                                    <i class="bi bi-plus"></i>
+                                    <span class="ms-1 d-none d-sm-inline">Add Accounts</span>
+                                </button>
+                                <button (click)="refreshItem(item)" class="btn btn-sm btn-primary" type="button" title="Refresh Item">
                                     <i class="bi bi-arrow-clockwise"></i>
                                     <span class="ms-1 d-none d-sm-inline">Refresh</span>
                                 </button>
-                                <button (click)="deactivateItem(item)" class="btn btn-danger" type="button" title="Unlink Institution">
+                                <button (click)="deactivateItem(item)" class="btn btn-sm btn-danger" type="button" title="Unlink Institution">
                                     <i class="bi bi-trash"></i>
                                     <span class="ms-1 d-none d-sm-inline">Unlink</span>
                                 </button>

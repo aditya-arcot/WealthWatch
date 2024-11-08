@@ -1,5 +1,6 @@
 import { Account } from '../models/account.js'
 import { DatabaseError } from '../models/error.js'
+import { logger } from '../utils/logger.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
@@ -13,6 +14,7 @@ export const insertAccounts = async (
         values.push(
             account.itemId,
             account.plaidId,
+            account.active,
             account.name,
             account.mask,
             account.officialName,
@@ -33,6 +35,7 @@ export const insertAccounts = async (
         (
             item_id,
             plaid_id,
+            active,
             name,
             mask,
             official_name,
@@ -47,6 +50,7 @@ export const insertAccounts = async (
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         ON CONFLICT (plaid_id)
         DO UPDATE SET
+            active = EXCLUDED.active,
             name = EXCLUDED.name,
             mask = EXCLUDED.mask,
             official_name = EXCLUDED.official_name,
@@ -81,10 +85,26 @@ export const fetchActiveAccountsWithUserId = async (
     return rows.map(mapDbAccount)
 }
 
+export const modifyAccountsActiveWithPlaidItemId = async (
+    plaidItemId: string,
+    active: boolean
+): Promise<void> => {
+    const query = `
+        UPDATE accounts a
+        SET active = $1 
+        FROM active_items ai
+        WHERE ai.id = a.item_id 
+            and ai.plaid_id = $2
+    `
+    const result = await runQuery(query, [active, plaidItemId])
+    if (!result.rowCount) logger.warn('no accounts modified')
+}
+
 interface DbAccount {
     id: number
     item_id: number
     plaid_id: string
+    active: boolean
     name: string
     mask: string | null
     official_name: string | null
@@ -101,6 +121,7 @@ const mapDbAccount = (acc: DbAccount): Account => ({
     id: acc.id,
     itemId: acc.item_id,
     plaidId: acc.plaid_id,
+    active: acc.active,
     name: acc.name,
     mask: acc.mask,
     officialName: acc.official_name,

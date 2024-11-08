@@ -10,7 +10,7 @@ import {
     PlaidLinkHandler,
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
-import { catchError, switchMap, throwError } from 'rxjs'
+import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { Account } from '../../models/account'
 import {
@@ -69,7 +69,7 @@ export class AccountsComponent implements OnInit {
             const withAccounts: string | undefined = params['withAccounts']
             if (withAccounts === undefined) throw Error('missing with accounts')
 
-            this.linkAccount(itemIdNum, withAccounts === 'true')
+            this.linkInstitution(itemIdNum, withAccounts === 'true')
         })
 
         this.loadAccounts()
@@ -117,7 +117,7 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    linkAccount(itemId?: number, withAccounts?: boolean): void {
+    linkInstitution(itemId?: number, withAccounts?: boolean): void {
         this.loading = true
         this.linkSvc
             .createLinkToken(itemId, withAccounts)
@@ -185,41 +185,65 @@ export class AccountsComponent implements OnInit {
 
         if (itemId === undefined) {
             this.loading = true
-            this.linkSvc.exchangePublicToken(token, metadata).subscribe({
-                next: () => {
+            this.linkSvc
+                .exchangePublicToken(token, metadata)
+                .pipe(
+                    catchError((err: HttpErrorResponse) => {
+                        this.logger.error(
+                            'failed to exchange public token',
+                            err
+                        )
+                        if (err.status === 409) {
+                            this.alertSvc.addErrorAlert(
+                                'This institution has already been linked'
+                            )
+                        } else {
+                            this.alertSvc.addErrorAlert(
+                                'Something went wrong. Please try again'
+                            )
+                        }
+                        this.loading = false
+                        return throwError(() => err)
+                    })
+                )
+                .subscribe(() => {
                     this.logger.debug('exchanged public token')
                     this.alertSvc.addSuccessAlert(
                         'Success linking institution',
-                        ['Loading your accounts']
+                        ['Loading account data']
                     )
                     setTimeout(() => {
                         this.loadAccounts()
                     }, 3000)
-                },
-                error: (err: HttpErrorResponse) => {
-                    this.logger.error('failed to exchange public token', err)
-                    if (err.status === 409) {
-                        this.alertSvc.addErrorAlert(
-                            'This institution has already been linked'
+                })
+        } else {
+            this.loading = true
+            this.linkSvc
+                .handleLinkUpdateComplete(itemId, withAccounts)
+                .pipe(
+                    catchError((err: HttpErrorResponse) => {
+                        this.logger.error(
+                            'failed to handle link update complete',
+                            err
                         )
-                    } else {
                         this.alertSvc.addErrorAlert(
                             'Something went wrong. Please try again'
                         )
-                    }
-                    this.loading = false
-                },
-            })
-        } else {
-            this.logger.debug('removing notifications', itemId, withAccounts)
-            this.notificationSvc
-                .updateNotificationsOfTypeToInactive(itemId, withAccounts)
-                .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
-                .subscribe()
-            this.itemSvc
-                .updateItemToHealthy(itemId)
-                .subscribe(() => this.loadAccounts())
-            this.router.navigateByUrl('/accounts')
+                        this.loading = false
+                        return throwError(() => err)
+                    }),
+                    finalize(() => this.router.navigateByUrl('/accounts'))
+                )
+                .subscribe(() => {
+                    this.logger.debug('handled link update complete')
+                    this.alertSvc.addSuccessAlert(
+                        'Success linking institution',
+                        ['Loading account data']
+                    )
+                    setTimeout(() => {
+                        this.loadAccounts()
+                    }, 3000)
+                })
         }
     }
 
@@ -268,6 +292,15 @@ export class AccountsComponent implements OnInit {
             errorMessage: metadata.error_message,
         }
         this.linkSvc.handleLinkEvent(event).subscribe()
+    }
+
+    addAccounts(item: Item): void {
+        this.router.navigate(['/accounts'], {
+            queryParams: {
+                itemId: item.id,
+                withAccounts: true,
+            },
+        })
     }
 
     refreshItem(item: Item): void {

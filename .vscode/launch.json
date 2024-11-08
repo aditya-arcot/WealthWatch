@@ -11,17 +11,19 @@
             "sourceMaps": true
         },
         {
-            "name": "Launch Chrome",
+            "name": "Launch Firefox",
             "request": "launch",
-            "type": "chrome",
+            "type": "firefox",
             "url": "http://localhost:4200",
-            "webRoot": "${workspaceFolder}/client"
+            "webRoot": "${workspaceFolder}/client",
+            "reAttach": true,
+            "reloadOnAttach": true
         }
     ],
     "compounds": [
         {
             "name": "Start Debugging",
-            "configurations": ["Attach to Node", "Launch Chrome"],
+            "configurations": ["Attach to Node", "Launch Firefox"],
             "preLaunchTask": "start server and client"
         }
     ]

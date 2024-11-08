@@ -43,6 +43,7 @@ CREATE TABLE core.accounts (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE NOT NULL,
     plaid_id TEXT UNIQUE NOT NULL,
+    active BOOLEAN NOT NULL,
     name TEXT NOT NULL,
     mask TEXT,
     official_name TEXT,

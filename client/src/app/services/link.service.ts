@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
+import { NotificationTypeEnum } from '../models/notification'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent'
 
 @Injectable({
@@ -27,5 +28,13 @@ export class LinkService {
     exchangePublicToken(publicToken: string, metadata: object) {
         const url = `${this.baseUrl}/public-token`
         return this.http.post<void>(url, { publicToken, metadata })
+    }
+
+    handleLinkUpdateComplete(itemId: number, withAccounts?: boolean) {
+        const notificationTypeId = withAccounts
+            ? NotificationTypeEnum.LinkUpdateWithAccounts
+            : NotificationTypeEnum.LinkUpdate
+        const url = `${this.baseUrl}/link-update`
+        return this.http.post<void>(url, { itemId, notificationTypeId })
     }
 }
