@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
-import { importJWK, JWK, jwtVerify } from 'jose'
+import { importJWK, jwtVerify } from 'jose'
 import { sha256 } from 'js-sha256'
 import { jwtDecode } from 'jwt-decode'
+import { JWKPublicKey } from 'plaid'
 import {
     fetchActiveItemWithPlaidId,
     modifyItemHealthyWithId,
@@ -31,6 +32,8 @@ import {
     insertLinkUpdateNotification,
     insertLinkUpdateWithAccountsNotification,
 } from './notificationController.js'
+
+const webhook_key_cache = new Map<string, JWKPublicKey>()
 
 export const processWebhook = async (req: Request, res: Response) => {
     logger.debug('processing webhook')
@@ -73,10 +76,37 @@ const verifyWebhook = async (token: string, body: string): Promise<void> => {
         throw new HttpError('missing or invalid type', 400)
     }
 
-    const plaidJwk = await plaidWebhookVerificationKeyGet(
-        decodedTokenHeader.kid
-    )
-    const joseJwk: JWK = {
+    const { kid } = decodedTokenHeader
+
+    let plaidJwk = webhook_key_cache.get(kid)
+    if (!plaidJwk) {
+        const idsToUpdate = [kid]
+        webhook_key_cache.forEach((key, id) => {
+            if (key.expired_at === null) idsToUpdate.push(id)
+        })
+
+        await Promise.all(
+            idsToUpdate.map(async (id) => {
+                try {
+                    const jwk = await plaidWebhookVerificationKeyGet(id)
+                    webhook_key_cache.set(id, jwk)
+                } catch (error) {
+                    logger.error(`failed to fetch key for id ${id}`, error)
+                }
+            })
+        )
+
+        plaidJwk = webhook_key_cache.get(kid)
+    }
+
+    if (!plaidJwk) {
+        throw new HttpError('key not found', 400)
+    }
+    if (plaidJwk.expired_at !== null) {
+        throw new HttpError('key expired', 400)
+    }
+
+    const joseJwk = {
         alg: plaidJwk.alg,
         crv: plaidJwk.crv,
         kid: plaidJwk.kid,
