@@ -82,8 +82,7 @@ export const insertLinkUpdateNotification = (item: Item, message: string) => {
     const notification = createNotification(
         NotificationTypeEnum.LinkUpdate,
         item,
-        message,
-        true
+        message
     )
     return insertNotification(notification)
 }
@@ -102,8 +101,7 @@ export const insertLinkUpdateWithAccountsNotification = (
     const notification = createNotification(
         NotificationTypeEnum.LinkUpdateWithAccounts,
         item,
-        message,
-        true
+        message
     )
     return insertNotification(notification)
 }

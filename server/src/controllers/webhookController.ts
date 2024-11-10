@@ -7,7 +7,7 @@ import {
     fetchActiveItemWithPlaidId,
     modifyItemHealthyWithId,
 } from '../database/itemQueries.js'
-import { modifyNotificationsToInactiveWithUserIdItemIdAndTypeId } from '../database/notificationQueries.js'
+import { modifyNotificationsToInactiveWithTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { NotificationTypeEnum } from '../models/notification.js'
 import {
@@ -323,10 +323,10 @@ const handleItemLoginRepairedWebhook = async (itemId: string) => {
 
     await modifyItemHealthyWithId(item.id, true)
 
-    await modifyNotificationsToInactiveWithUserIdItemIdAndTypeId(
+    await modifyNotificationsToInactiveWithTypeIdUserIdAndItemId(
+        NotificationTypeEnum.LinkUpdate,
         item.userId,
-        item.id,
-        NotificationTypeEnum.LinkUpdate
+        item.id
     )
 
     const message = `${item.institutionName} connection repaired`

@@ -1,25 +1,41 @@
 import { DatabaseError } from '../models/error.js'
-import { Notification } from '../models/notification.js'
+import { Notification, NotificationTypeEnum } from '../models/notification.js'
 import { logger } from '../utils/logger.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertNotification = async (n: Notification): Promise<void> => {
+    if (n.typeId !== NotificationTypeEnum.Info && n.itemId !== null) {
+        const existingNotification =
+            await fetchActiveNotificationWithTypeIdUserIdAndItemId(
+                n.typeId,
+                n.userId,
+                n.itemId
+            )
+        if (existingNotification) {
+            await modifyNotificationsToInactiveWithTypeIdUserIdAndItemId(
+                n.typeId,
+                n.userId,
+                n.itemId
+            )
+        }
+    }
+
     const values: unknown[] = [
-        n.userId,
         n.typeId,
+        n.userId,
         n.itemId,
         n.message,
         n.persistent,
-        n.read,
-        n.active,
+        false,
+        true,
     ]
 
     const rowCount = 1
     const paramCount = values.length
     const query = `
         INSERT INTO notifications (
-            user_id,
             type_id,
+            user_id,
             item_id,
             message,
             persistent,
@@ -44,6 +60,25 @@ export const fetchActiveNotificationsWithUserId = async (
     `
     const rows = (await runQuery<DbNotification>(query, [userId])).rows
     return rows.map(mapDbNotification)
+}
+
+export const fetchActiveNotificationWithTypeIdUserIdAndItemId = async (
+    typeId: number,
+    userId: number,
+    itemId: number
+): Promise<Notification | undefined> => {
+    const values: unknown[] = [typeId, userId, itemId]
+    const query = `
+        SELECT *
+        FROM active_notifications
+        WHERE type_id = $1
+            AND user_id = $2
+            AND item_id = $3
+        LIMIT 1
+    `
+    const rows = (await runQuery<DbNotification>(query, values)).rows
+    if (!rows[0]) return
+    return mapDbNotification(rows[0])
 }
 
 export const modifyNotificationsToReadWithUserId = async (
@@ -87,18 +122,18 @@ export const modifyNotificationToInactiveWithUserIdAndId = async (
         throw new DatabaseError('failed to modify notification to inactive')
 }
 
-export const modifyNotificationsToInactiveWithUserIdItemIdAndTypeId = async (
+export const modifyNotificationsToInactiveWithTypeIdUserIdAndItemId = async (
+    typeId: number,
     userId: number,
-    itemId: number,
-    typeId: number
+    itemId: number
 ): Promise<void> => {
-    const values = [userId, itemId, typeId]
+    const values = [typeId, userId, itemId]
     const query = `
         UPDATE notifications
         SET active = false
-        WHERE user_id = $1
-            AND item_id = $2
-            AND type_id = $3
+        WHERE type_id = $1
+            AND user_id = $2
+            AND item_id = $3
     `
     const result = await runQuery(query, values)
     if (!result.rowCount)
