@@ -1,4 +1,4 @@
-import pg, { QueryResult, QueryResultRow } from 'pg'
+import pg, { PoolClient, QueryResult, QueryResultRow } from 'pg'
 import { DatabaseError } from '../models/error.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
@@ -34,6 +34,40 @@ export const getPool = (): pg.Pool => {
     return clientPool
 }
 
+export const stopPool = async (): Promise<void> => {
+    logger.debug('stopping database pool')
+    if (!clientPool) {
+        logger.warn('database pool not initialized')
+        return
+    }
+    await clientPool.end()
+    logger.debug('stopped database pool')
+}
+
+export const beginTransaction = async (): Promise<PoolClient> => {
+    const client = await getPool().connect()
+    await runQuery('BEGIN', [], client)
+    return client
+}
+
+export const commitTransaction = async (client: PoolClient): Promise<void> => {
+    try {
+        await runQuery('COMMIT', [], client)
+    } finally {
+        client.release()
+    }
+}
+
+export const rollbackTransaction = async (
+    client: PoolClient
+): Promise<void> => {
+    try {
+        await runQuery('ROLLBACK', [], client)
+    } finally {
+        client.release()
+    }
+}
+
 export const constructInsertQueryParamsPlaceholder = (
     rowCount: number,
     paramCount: number,
@@ -56,11 +90,9 @@ export const constructInsertQueryParamsPlaceholder = (
 export const runQuery = async <T extends QueryResultRow>(
     query: string,
     params: unknown[] = [],
+    client: PoolClient | null = null,
     skipSuccessLog: boolean = false
 ): Promise<QueryResult<T>> => {
-    if (!clientPool) {
-        throw new DatabaseError('pool not initialized')
-    }
     const start = Date.now()
 
     // replace whitespace with single space, lowercase, trim
@@ -90,7 +122,9 @@ export const runQuery = async <T extends QueryResultRow>(
     }
 
     try {
-        const res = await clientPool.query(query, params)
+        const res = client
+            ? await client.query(query, params)
+            : await getPool().query(query, params)
         const queryLog = {
             duration: Date.now() - start,
             query: collapsedQuery,
@@ -107,14 +141,4 @@ export const runQuery = async <T extends QueryResultRow>(
         logger.error({ queryLog }, 'failed to execute query')
         throw error
     }
-}
-
-export const stopPool = async (): Promise<void> => {
-    logger.debug('stopping database pool')
-    if (!clientPool) {
-        logger.warn('database pool not initialized')
-        return
-    }
-    await clientPool.end()
-    logger.debug('stopped database pool')
 }

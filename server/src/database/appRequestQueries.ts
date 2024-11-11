@@ -46,7 +46,7 @@ export const insertAppRequest = async (request: AppRequest): Promise<void> => {
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
 
-    const result = await runQuery(query, values, true)
+    const result = await runQuery(query, values, null, true)
     if (!result.rowCount)
         throw new DatabaseError('failed to insert app request')
 }

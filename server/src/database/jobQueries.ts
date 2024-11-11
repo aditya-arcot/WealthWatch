@@ -30,6 +30,6 @@ export const insertJob = async (job: Job): Promise<void> => {
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
 
-    const result = await runQuery(query, values, true)
+    const result = await runQuery(query, values, null, true)
     if (!result.rowCount) throw new DatabaseError('failed to insert job')
 }
