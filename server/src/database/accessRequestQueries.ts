@@ -2,7 +2,6 @@ import {
     AccessRequest,
     AccessRequestStatusEnum,
 } from '../models/accessRequest.js'
-import { DatabaseError } from '../models/error.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccessRequest = async (
@@ -30,10 +29,7 @@ export const insertAccessRequest = async (
         )
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
-
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert access request')
+    await runQuery(query, values)
 }
 
 export const fetchAccessRequestWithEmail = async (
@@ -86,11 +82,7 @@ export const modifyAccessRequestStatusAccessCodeReviewerWithId = async (
         SET status_id = $2, access_code = $3, reviewer = $4
         WHERE id = $1
     `
-    const result = await runQuery(query, values)
-    if (result.rowCount)
-        throw new DatabaseError(
-            'failed to modify access request status, access code, reviewer'
-        )
+    await runQuery(query, values)
 }
 
 export const modifyAccessRequestStatusWithId = async (
@@ -102,9 +94,7 @@ export const modifyAccessRequestStatusWithId = async (
         SET status_id = $2
         WHERE id = $1
     `
-    const result = await runQuery(query, [id, statusId])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify access request status')
+    await runQuery(query, [id, statusId])
 }
 
 interface DbAccessRequest {

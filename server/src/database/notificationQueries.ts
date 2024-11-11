@@ -1,6 +1,4 @@
-import { DatabaseError } from '../models/error.js'
 import { Notification, NotificationTypeEnum } from '../models/notification.js'
-import { logger } from '../utils/logger.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertNotification = async (n: Notification): Promise<void> => {
@@ -45,9 +43,7 @@ export const insertNotification = async (n: Notification): Promise<void> => {
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert notification')
+    await runQuery(query, values)
 }
 
 export const fetchActiveNotificationsWithUserId = async (
@@ -90,8 +86,7 @@ export const modifyNotificationsToReadWithUserId = async (
         SET read = true
         WHERE user_id = $1
     `
-    const result = await runQuery(query, values)
-    if (!result.rowCount) logger.warn('no notifications modified')
+    await runQuery(query, values)
 }
 
 export const modifyNotificationsToInactiveWithItemId = async (
@@ -102,8 +97,7 @@ export const modifyNotificationsToInactiveWithItemId = async (
         SET active = false
         WHERE item_id = $1
     `
-    const result = await runQuery(query, [itemId])
-    if (!result.rowCount) logger.warn('no notifications modified')
+    await runQuery(query, [itemId])
 }
 
 export const modifyNotificationToInactiveWithUserIdAndId = async (
@@ -117,9 +111,7 @@ export const modifyNotificationToInactiveWithUserIdAndId = async (
         WHERE user_id = $1
             AND id = $2
     `
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify notification to inactive')
+    await runQuery(query, values)
 }
 
 export const modifyNotificationsToInactiveWithTypeIdUserIdAndItemId = async (
@@ -135,9 +127,7 @@ export const modifyNotificationsToInactiveWithTypeIdUserIdAndItemId = async (
             AND user_id = $2
             AND item_id = $3
     `
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify notifications to inactive')
+    await runQuery(query, values)
 }
 
 interface DbNotification {

@@ -130,6 +130,12 @@ export const runQuery = async <T extends QueryResultRow>(
             query: collapsedQuery,
             rowCount: res.rowCount,
         }
+        if (
+            /^(select|insert|update|delete)\b/.test(query) &&
+            res.rowCount === null
+        ) {
+            throw new DatabaseError('unexpected null row count')
+        }
         if (!skipSuccessLog) logger.debug({ queryLog }, 'executed query')
         return res
     } catch (error) {

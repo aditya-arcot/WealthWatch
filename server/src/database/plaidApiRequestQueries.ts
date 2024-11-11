@@ -1,4 +1,3 @@
-import { DatabaseError } from '../models/error.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -40,7 +39,5 @@ export const insertPlaidApiRequest = async (
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
 
-    const result = await runQuery(query, values, null, true)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert plaid api request')
+    await runQuery(query, values, null, true)
 }

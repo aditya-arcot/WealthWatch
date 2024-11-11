@@ -1,5 +1,4 @@
 import { AppRequest } from '../models/appRequest.js'
-import { DatabaseError } from '../models/error.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAppRequest = async (request: AppRequest): Promise<void> => {
@@ -46,7 +45,5 @@ export const insertAppRequest = async (request: AppRequest): Promise<void> => {
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
 
-    const result = await runQuery(query, values, null, true)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert app request')
+    await runQuery(query, values, null, true)
 }

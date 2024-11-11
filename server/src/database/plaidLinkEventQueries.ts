@@ -2,7 +2,6 @@ import {
     constructInsertQueryParamsPlaceholder,
     runQuery,
 } from '../database/index.js'
-import { DatabaseError } from '../models/error.js'
 import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 
 export const insertPlaidLinkEvent = async (
@@ -43,7 +42,5 @@ export const insertPlaidLinkEvent = async (
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
 
-    const result = await runQuery(query, values, null, true)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert plaid link event')
+    await runQuery(query, values, null, true)
 }
