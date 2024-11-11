@@ -163,6 +163,57 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    CreditCardLiability: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                                description: 'The credit card id',
+                            },
+                            accountId: {
+                                type: 'number',
+                                description: 'The account id',
+                            },
+                            aprs: {
+                                type: 'object',
+                                description: 'The credit card aprs',
+                            },
+                            overdue: {
+                                type: 'boolean',
+                                description: 'The credit card overdue status',
+                            },
+                            lastPaymentDate: {
+                                type: 'date',
+                                description:
+                                    'The credit card last payment date',
+                            },
+                            lastPaymentAmount: {
+                                type: 'number',
+                                description:
+                                    'The credit card last payment amount',
+                            },
+                            lastStatementDate: {
+                                type: 'date',
+                                description:
+                                    'The credit card last statement date',
+                            },
+                            lastStatementBalance: {
+                                type: 'number',
+                                description:
+                                    'The credit card last statement balance',
+                            },
+                            nextPaymentDueDate: {
+                                type: 'date',
+                                description:
+                                    'The credit card next payment due date',
+                            },
+                            minimumPaymentAmount: {
+                                type: 'number',
+                                description:
+                                    'The credit card minimum payment amount',
+                            },
+                        },
+                    },
                     HoldingWithSecurity: {
                         type: 'object',
                         properties: {
@@ -286,6 +337,100 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    Mortgage: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                                description: 'The mortgage id',
+                            },
+                            accountId: {
+                                type: 'number',
+                                description: 'The account id',
+                            },
+                            type: {
+                                type: 'string',
+                                description: 'The mortgage type',
+                            },
+                            interestRateType: {
+                                type: 'string',
+                                description: 'The mortgage interest rate type',
+                            },
+                            interestRatePercent: {
+                                type: 'number',
+                                description:
+                                    'The mortgage interest rate percent',
+                            },
+                            term: {
+                                type: 'string',
+                                description: 'The mortgage term',
+                            },
+                            address: {
+                                type: 'string',
+                                description: 'The mortgage address',
+                            },
+                            originationDate: {
+                                type: 'date',
+                                description: 'The mortgage origination date',
+                            },
+                            originationPrincipal: {
+                                type: 'number',
+                                description:
+                                    'The mortgage origination principal',
+                            },
+                            maturityDate: {
+                                type: 'date',
+                                description: 'The mortgage maturity date',
+                            },
+                            lateFee: {
+                                type: 'number',
+                                description: 'The mortgage late fee',
+                            },
+                            escrowBalance: {
+                                type: 'number',
+                                description: 'The mortgage escrow balance',
+                            },
+                            prepaymentPenalty: {
+                                type: 'boolean',
+                                description:
+                                    'The mortgage prepayment penalty status',
+                            },
+                            privateInsurance: {
+                                type: 'boolean',
+                                description:
+                                    'The mortgage private insurance status',
+                            },
+                            pastDueAmount: {
+                                type: 'number',
+                                description: 'The mortgage past due amount',
+                            },
+                            lastPaymentDate: {
+                                type: 'date',
+                                description: 'The mortgage last payment date',
+                            },
+                            lastPaymentAmount: {
+                                type: 'number',
+                                description: 'The mortgage last payment amount',
+                            },
+                            nextPaymentDueDate: {
+                                type: 'date',
+                                description:
+                                    'The mortgage next payment due date',
+                            },
+                            nextPaymentAmount: {
+                                type: 'number',
+                                description: 'The mortgage next payment amount',
+                            },
+                            ytdInterestPaid: {
+                                type: 'number',
+                                description: 'The mortgage ytd interest paid',
+                            },
+                            ytdPrincipalPaid: {
+                                type: 'number',
+                                description: 'The mortgage ytd principal paid',
+                            },
+                        },
+                    },
                     Notification: {
                         type: 'object',
                         properties: {
@@ -321,6 +466,124 @@ export const createSwaggerSpec = () => {
                             logtailToken: {
                                 type: 'string',
                                 description: 'The Logtail token',
+                            },
+                        },
+                    },
+                    StudentLoanLiability: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                                description: 'The student loan id',
+                            },
+                            accountId: {
+                                type: 'number',
+                                description: 'The account id',
+                            },
+                            name: {
+                                type: 'string',
+                                description: 'The student loan name',
+                            },
+                            interestRatePercent: {
+                                type: 'number',
+                                description:
+                                    'The student loan interest rate percent',
+                            },
+                            statusTypeId: {
+                                type: 'number',
+                                description: 'The student loan status type id',
+                            },
+                            statusEndDate: {
+                                type: 'date',
+                                description: 'The student loan status end date',
+                            },
+                            overdue: {
+                                type: 'boolean',
+                                description: 'The student loan overdue status',
+                            },
+                            originationDate: {
+                                type: 'date',
+                                description:
+                                    'The student loan origination date',
+                            },
+                            originationPrincipal: {
+                                type: 'number',
+                                description:
+                                    'The student loan origination principal',
+                            },
+                            disbursementDates: {
+                                type: 'string',
+                                description:
+                                    'The student loan disbursement dates',
+                            },
+                            outstandingInterest: {
+                                type: 'number',
+                                description:
+                                    'The student loan outstanding interest',
+                            },
+                            expectedPayoffDate: {
+                                type: 'date',
+                                description:
+                                    'The student loan expected payoff date',
+                            },
+                            guarantor: {
+                                type: 'string',
+                                description: 'The student loan guarantor',
+                            },
+                            servicerAddress: {
+                                type: 'string',
+                                description:
+                                    'The student loan servicer address',
+                            },
+                            repaymentPlanTypeId: {
+                                type: 'number',
+                                description:
+                                    'The student loan repayment plan type id',
+                            },
+                            repaymentPlanDescription: {
+                                type: 'string',
+                                description:
+                                    'The student loan repayment plan description',
+                            },
+                            lastPaymentDate: {
+                                type: 'date',
+                                description:
+                                    'The student loan last payment date',
+                            },
+                            lastPaymentAmount: {
+                                type: 'number',
+                                description:
+                                    'The student loan last payment amount',
+                            },
+                            lastStatementDate: {
+                                type: 'date',
+                                description:
+                                    'The student loan last statement date',
+                            },
+                            lastStatementBalance: {
+                                type: 'number',
+                                description:
+                                    'The student loan last statement balance',
+                            },
+                            nextPaymentDueDate: {
+                                type: 'date',
+                                description:
+                                    'The student loan next payment due date',
+                            },
+                            minimumPaymentAmount: {
+                                type: 'number',
+                                description:
+                                    'The student loan minimum payment amount',
+                            },
+                            ytdInterestPaid: {
+                                type: 'number',
+                                description:
+                                    'The student loan ytd interest paid',
+                            },
+                            ytdPrincipalPaid: {
+                                type: 'number',
+                                description:
+                                    'The student loan ytd principal paid',
                             },
                         },
                     },
