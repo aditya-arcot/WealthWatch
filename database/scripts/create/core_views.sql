@@ -13,15 +13,15 @@ WHERE a.active = TRUE
 ORDER BY a.id;
 
 CREATE VIEW core.active_transactions AS
-SELECT aa.user_id, t.*
+SELECT a.user_id, t.*
 FROM transactions t
-JOIN active_accounts aa
-    ON t.account_id = aa.id
+JOIN active_accounts a
+    ON t.account_id = a.id
 ORDER BY t.date DESC, t.id;
 
 CREATE VIEW core.active_holdings AS
 SELECT 
-	aa.user_id,
+	a.user_id,
     h.id,
     h.account_id,
     s.name,
@@ -41,8 +41,8 @@ SELECT
     h.create_timestamp,
     h.update_timestamp
 FROM holdings h
-JOIN active_accounts aa
-    ON h.account_id = aa.id
+JOIN active_accounts a
+    ON h.account_id = a.id
 JOIN securities s 
 	ON h.security_id = s.id
 ORDER BY h.account_id, h.id;
