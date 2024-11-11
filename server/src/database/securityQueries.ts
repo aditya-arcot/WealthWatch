@@ -1,4 +1,3 @@
-import { DatabaseError } from '../models/error.js'
 import { Security } from '../models/security.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -62,8 +61,7 @@ export const insertSecurities = async (
             unofficial_currency_code = EXCLUDED.unofficial_currency_code
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount) throw new DatabaseError('failed to insert securities')
+    await runQuery(query, values)
 }
 
 export const fetchSecurities = async (): Promise<Security[]> => {

@@ -61,7 +61,13 @@
                                     <i class="bi bi-plus"></i>
                                     <span class="ms-1 d-none d-sm-inline">Add Accounts</span>
                                 </button>
-                                <button (click)="refreshItem(item)" class="btn btn-sm btn-primary" type="button" title="Refresh Item">
+                                <button
+                                    (click)="refreshItem(item)"
+                                    class="btn btn-sm btn-primary"
+                                    type="button"
+                                    title="Refresh Item"
+                                    [disabled]="!item.healthy"
+                                >
                                     <i class="bi bi-arrow-clockwise"></i>
                                     <span class="ms-1 d-none d-sm-inline">Refresh</span>
                                 </button>
