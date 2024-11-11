@@ -20,15 +20,14 @@ export enum NotificationTypeEnum {
 export const createNotification = (
     type: NotificationTypeEnum,
     item: Item,
-    message: string,
-    persistent = false
+    message: string
 ) => ({
     id: -1,
     typeId: type,
     userId: item.userId,
     itemId: item.id,
     message,
-    persistent,
+    persistent: type !== NotificationTypeEnum.Info,
     read: false,
     active: true,
 })

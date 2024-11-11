@@ -1,6 +1,4 @@
 import { Account } from '../models/account.js'
-import { DatabaseError } from '../models/error.js'
-import { logger } from '../utils/logger.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
@@ -69,8 +67,7 @@ export const insertAccounts = async (
             subtype = EXCLUDED.subtype
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount) throw new DatabaseError('failed to insert accounts')
+    await runQuery(query, values)
 }
 
 export const fetchActiveAccountsWithUserId = async (
@@ -96,8 +93,7 @@ export const modifyAccountsActiveWithPlaidItemId = async (
         WHERE ai.id = a.item_id 
             and ai.plaid_id = $2
     `
-    const result = await runQuery(query, [active, plaidItemId])
-    if (!result.rowCount) logger.warn('no accounts modified')
+    await runQuery(query, [active, plaidItemId])
 }
 
 interface DbAccount {

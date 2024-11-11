@@ -24,5 +24,6 @@ export const vars = {
     nodeEnv: getEnvVar('NODE_ENV'),
     plaidEnv: getEnvVar('PLAID_ENV'),
 }
+export const dev = vars.nodeEnv === 'dev'
 export const stage = vars.nodeEnv === 'stage'
-export const production = vars.nodeEnv === 'prod' || vars.nodeEnv === 'stage'
+export const production = vars.nodeEnv === 'prod' || stage

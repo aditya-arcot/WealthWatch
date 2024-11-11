@@ -1,4 +1,3 @@
-import { DatabaseError } from '../models/error.js'
 import {
     CreditCardLiability,
     MortgageLiability,
@@ -54,9 +53,7 @@ export const insertCreditCardLiabilities = async (
             minimum_payment_amount = EXCLUDED.minimum_payment_amount
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert credit card liabilities')
+    await runQuery(query, values)
 }
 
 export const insertMortgageLiabilities = async (
@@ -140,9 +137,7 @@ export const insertMortgageLiabilities = async (
             ytd_principal_paid = EXCLUDED.ytd_principal_paid
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert mortgage liabilities')
+    await runQuery(query, values)
 }
 
 export const insertStudentLoanLiabilities = async (
@@ -235,7 +230,5 @@ export const insertStudentLoanLiabilities = async (
             ytd_principal_paid = EXCLUDED.ytd_principal_paid
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to student loan liabilities')
+    await runQuery(query, values)
 }

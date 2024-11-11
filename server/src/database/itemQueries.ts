@@ -118,9 +118,7 @@ export const modifyItemActiveWithId = async (
         SET active = $1
         WHERE id = $2
     `
-    const result = await runQuery(query, [active, id])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify item active')
+    await runQuery(query, [active, id])
 }
 
 export const modifyItemHealthyWithId = async (
@@ -132,9 +130,7 @@ export const modifyItemHealthyWithId = async (
         SET healthy = $1
         WHERE id = $2
     `
-    const result = await runQuery(query, [healthy, id])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify item healthy')
+    await runQuery(query, [healthy, id])
 }
 
 export const modifyItemLastRefreshedWithPlaidId = async (
@@ -146,9 +142,7 @@ export const modifyItemLastRefreshedWithPlaidId = async (
         SET last_refreshed = $1
         WHERE plaid_id = $2
     `
-    const result = await runQuery(query, [lastRefreshed, plaidId])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify item last refreshed')
+    await runQuery(query, [lastRefreshed, plaidId])
 }
 
 export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
@@ -160,11 +154,7 @@ export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
         SET transactions_last_refreshed = $1
         WHERE plaid_id = $2
     `
-    const result = await runQuery(query, [transactionsLastRefreshed, plaidId])
-    if (!result.rowCount)
-        throw new DatabaseError(
-            'failed to modify item transactions last refreshed'
-        )
+    await runQuery(query, [transactionsLastRefreshed, plaidId])
 }
 
 export const modifyItemInvestmentsLastRefreshedWithPlaidId = async (
@@ -176,11 +166,7 @@ export const modifyItemInvestmentsLastRefreshedWithPlaidId = async (
         SET investments_last_refreshed = $1
         WHERE plaid_id = $2
     `
-    const result = await runQuery(query, [investmentsLastRefreshed, plaidId])
-    if (!result.rowCount)
-        throw new DatabaseError(
-            'failed to modify item investments last refreshed'
-        )
+    await runQuery(query, [investmentsLastRefreshed, plaidId])
 }
 
 export const modifyItemCursorWithPlaidId = async (
@@ -192,9 +178,7 @@ export const modifyItemCursorWithPlaidId = async (
         SET cursor = $1
         WHERE plaid_id = $2
     `
-    const result = await runQuery(query, [cursor, plaidId])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify item cursor')
+    await runQuery(query, [cursor, plaidId])
 }
 
 interface DbItem {
