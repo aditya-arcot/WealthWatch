@@ -72,8 +72,7 @@ export const removeUserWithId = async (userId: number) => {
         FROM users
         WHERE id = $1
     `
-    const result = await runQuery(query, [userId])
-    if (!result.rowCount) throw new DatabaseError('failed to remove user')
+    await runQuery(query, [userId])
 }
 
 interface DbUser {

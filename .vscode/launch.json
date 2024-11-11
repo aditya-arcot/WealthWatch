@@ -8,7 +8,11 @@
             "port": 9229,
             "restart": true,
             "cwd": "${workspaceFolder}/server",
-            "sourceMaps": true
+            "sourceMaps": true,
+            "skipFiles": [
+                "<node_internals>/**",
+                "${workspaceFolder}/server/node_modules/**"
+            ]
         },
         {
             "name": "Launch Firefox",

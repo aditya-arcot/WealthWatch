@@ -1,4 +1,3 @@
-import { DatabaseError } from '../models/error.js'
 import {
     PaymentChannelEnum,
     Transaction,
@@ -76,9 +75,7 @@ export const insertTransactions = async (
             pending = EXCLUDED.pending
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to insert transactions')
+    await runQuery(query, values)
 }
 
 export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
@@ -363,9 +360,7 @@ export const modifyTransactionCustomNameWithPlaidId = async (
         SET custom_name = $2
         WHERE plaid_id = $1
     `
-    const result = await runQuery(query, [plaidId, name])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify transaction custom name')
+    await runQuery(query, [plaidId, name])
 }
 
 export const modifyTransactionCustomCategoryIdWithPlaidId = async (
@@ -377,11 +372,7 @@ export const modifyTransactionCustomCategoryIdWithPlaidId = async (
         SET custom_category_id = $2
         WHERE plaid_id = $1
     `
-    const result = await runQuery(query, [plaidId, categoryId])
-    if (!result.rowCount)
-        throw new DatabaseError(
-            'failed to modify transaction custom category id'
-        )
+    await runQuery(query, [plaidId, categoryId])
 }
 
 export const modifyTransactionNoteWithPlaidId = async (
@@ -393,9 +384,7 @@ export const modifyTransactionNoteWithPlaidId = async (
         SET note = $2
         WHERE plaid_id = $1
     `
-    const result = await runQuery(query, [plaidId, note])
-    if (!result.rowCount)
-        throw new DatabaseError('failed to modify transaction note')
+    await runQuery(query, [plaidId, note])
 }
 
 export const removeTransactionsWithPlaidIds = async (
@@ -407,9 +396,7 @@ export const removeTransactionsWithPlaidIds = async (
         WHERE plaid_id IN
             (${plaidIds.map((_id, idx) => `$${idx + 1}`).join(', ')})
     `
-    const result = await runQuery(query, plaidIds)
-    if (!result.rowCount)
-        throw new DatabaseError('failed to remove transactions')
+    await runQuery(query, plaidIds)
 }
 
 interface DbTransaction {

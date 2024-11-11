@@ -6,7 +6,7 @@ import {
     insertItem,
     modifyItemHealthyWithId,
 } from '../database/itemQueries.js'
-import { modifyNotificationsToInactiveWithUserIdItemIdAndTypeId } from '../database/notificationQueries.js'
+import { modifyNotificationsToInactiveWithTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { NotificationTypeEnum } from '../models/notification.js'
@@ -136,10 +136,10 @@ export const handleLinkUpdateComplete = async (req: Request, res: Response) => {
     }
 
     logger.debug('updating notifications to inactive')
-    await modifyNotificationsToInactiveWithUserIdItemIdAndTypeId(
+    await modifyNotificationsToInactiveWithTypeIdUserIdAndItemId(
+        notificationTypeId,
         userId,
-        itemId,
-        notificationTypeId
+        itemId
     )
 
     await syncItemData(item)

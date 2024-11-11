@@ -1,4 +1,3 @@
-import { DatabaseError } from '../models/error.js'
 import { Job } from '../models/job.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -30,6 +29,5 @@ export const insertJob = async (job: Job): Promise<void> => {
         VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
     `
 
-    const result = await runQuery(query, values, true)
-    if (!result.rowCount) throw new DatabaseError('failed to insert job')
+    await runQuery(query, values, null, true)
 }

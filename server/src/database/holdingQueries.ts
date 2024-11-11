@@ -1,4 +1,3 @@
-import { DatabaseError } from '../models/error.js'
 import { Holding, HoldingWithSecurity } from '../models/holding.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -53,8 +52,7 @@ export const insertHoldings = async (holdings: Holding[]): Promise<void> => {
             unofficial_currency_code = EXCLUDED.unofficial_currency_code
     `
 
-    const result = await runQuery(query, values)
-    if (!result.rowCount) throw new DatabaseError('failed to insert holdings')
+    await runQuery(query, values)
 }
 
 export const fetchActiveHoldingsWithUserId = async (
