@@ -42,7 +42,7 @@ export const insertItem = async (item: Item): Promise<Item> => {
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItemWithPlaidId = async (
+export const fetchActiveItemByPlaidId = async (
     plaidId: string
 ): Promise<Item | undefined> => {
     const query = `
@@ -56,7 +56,7 @@ export const fetchActiveItemWithPlaidId = async (
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItemsWithUserId = async (
+export const fetchActiveItemsByUserId = async (
     userId: number
 ): Promise<Item[]> => {
     const query = `
@@ -68,7 +68,7 @@ export const fetchActiveItemsWithUserId = async (
     return rows.map(mapDbItem)
 }
 
-export const fetchActiveItemWithUserIdAndId = async (
+export const fetchActiveItemByUserIdAndId = async (
     userId: number,
     itemId: number
 ): Promise<Item | undefined> => {
@@ -84,7 +84,7 @@ export const fetchActiveItemWithUserIdAndId = async (
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItemWithUserIdAndInstitutionId = async (
+export const fetchActiveItemByUserIdAndInstitutionId = async (
     userId: number,
     institutionId: string
 ): Promise<Item | undefined> => {
@@ -100,19 +100,16 @@ export const fetchActiveItemWithUserIdAndInstitutionId = async (
     return mapDbItem(rows[0])
 }
 
-export const modifyItemActiveWithId = async (
-    id: number,
-    active: boolean
-): Promise<void> => {
+export const modifyItemToInactiveById = async (id: number): Promise<void> => {
     const query = `
         UPDATE items
-        SET active = $1
-        WHERE id = $2
+        SET active = false
+        WHERE id = $1
     `
-    await runQuery(query, [active, id])
+    await runQuery(query, [id])
 }
 
-export const modifyItemHealthyWithId = async (
+export const modifyItemHealthyById = async (
     id: number,
     healthy: boolean
 ): Promise<void> => {
@@ -124,7 +121,7 @@ export const modifyItemHealthyWithId = async (
     await runQuery(query, [healthy, id])
 }
 
-export const modifyItemLastRefreshedWithPlaidId = async (
+export const modifyItemLastRefreshedByPlaidId = async (
     plaidId: string,
     lastRefreshed: Date
 ): Promise<void> => {
@@ -136,7 +133,7 @@ export const modifyItemLastRefreshedWithPlaidId = async (
     await runQuery(query, [lastRefreshed, plaidId])
 }
 
-export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
+export const modifyItemTransactionsLastRefreshedByPlaidId = async (
     plaidId: string,
     transactionsLastRefreshed: Date
 ): Promise<void> => {
@@ -148,7 +145,7 @@ export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
     await runQuery(query, [transactionsLastRefreshed, plaidId])
 }
 
-export const modifyItemInvestmentsLastRefreshedWithPlaidId = async (
+export const modifyItemInvestmentsLastRefreshedByPlaidId = async (
     plaidId: string,
     investmentsLastRefreshed: Date
 ): Promise<void> => {
@@ -160,7 +157,7 @@ export const modifyItemInvestmentsLastRefreshedWithPlaidId = async (
     await runQuery(query, [investmentsLastRefreshed, plaidId])
 }
 
-export const modifyItemCursorWithPlaidId = async (
+export const modifyItemCursorByPlaidId = async (
     plaidId: string,
     cursor: string | null
 ): Promise<void> => {

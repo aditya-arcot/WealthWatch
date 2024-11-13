@@ -12,12 +12,12 @@ export class AdminService {
     constructor(private http: HttpClient) {}
 
     getAccessRequests() {
-        const url = `${this.baseUrl}/access-request`
+        const url = `${this.baseUrl}/access-requests`
         return this.http.get<AccessRequest[]>(url)
     }
 
     reviewAccessRequest(requestId: number, statusId: AccessRequestStatusEnum) {
-        const url = `${this.baseUrl}/access-request/${requestId}`
+        const url = `${this.baseUrl}/access-requests/${requestId}`
         return this.http.patch<void>(url, { statusId })
     }
 }

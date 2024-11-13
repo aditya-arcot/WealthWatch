@@ -1,7 +1,7 @@
 import {
     PaymentChannelEnum,
     Transaction,
-    TransactionsWithCounts,
+    TransactionsAndCounts,
 } from '../models/transaction.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -78,7 +78,7 @@ export const insertTransactions = async (
     await runQuery(query, values)
 }
 
-export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
+export const fetchPaginatedActiveTransactionsAndCountsByUserIdAndFilters =
     async (
         userId: number,
         searchQuery?: string,
@@ -90,15 +90,15 @@ export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
         accountIds?: number[],
         limit?: number,
         offset?: number
-    ): Promise<TransactionsWithCounts> => {
-        const totalCount = await fetchActiveTransactionsCountWithUserId(userId)
+    ): Promise<TransactionsAndCounts> => {
+        const totalCount = await fetchActiveTransactionsCountByUserId(userId)
 
         const {
             filtered,
             query: initialQuery,
             values,
             placeholder,
-        } = constructFetchActiveTransactionsWithUserIdAndFiltersQuery(
+        } = constructFetchActiveTransactionsByUserIdAndFiltersQuery(
             userId,
             searchQuery,
             startDate,
@@ -112,7 +112,7 @@ export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
         let filteredCount: number | null = null
         if (filtered) {
             filteredCount =
-                await fetchActiveTransactionsCountWithUserIdAndFilters(
+                await fetchActiveTransactionsCountByUserIdAndFilters(
                     initialQuery,
                     values
                 )
@@ -141,7 +141,7 @@ export const fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters =
         }
     }
 
-const fetchActiveTransactionsCountWithUserId = async (
+const fetchActiveTransactionsCountByUserId = async (
     userId: number
 ): Promise<number> => {
     const query = `
@@ -155,7 +155,7 @@ const fetchActiveTransactionsCountWithUserId = async (
     return isNaN(count) ? -1 : count
 }
 
-const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
+const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     userId: number,
     searchQuery?: string,
     startDate?: string,
@@ -273,7 +273,7 @@ const constructFetchActiveTransactionsWithUserIdAndFiltersQuery = (
     return { filtered, query, values, placeholder }
 }
 
-const fetchActiveTransactionsCountWithUserIdAndFilters = async (
+const fetchActiveTransactionsCountByUserIdAndFilters = async (
     mainQuery: string,
     values: unknown[]
 ) => {
@@ -287,7 +287,7 @@ const fetchActiveTransactionsCountWithUserIdAndFilters = async (
     return isNaN(count) ? -1 : count
 }
 
-export const fetchActiveTransactionsDailyDateRangeWithUserIdAndDates = async (
+export const fetchActiveTransactionsDateSeriesByUserIdAndDateRange = async (
     userId: number,
     startDate?: string,
     endDate?: string
@@ -345,7 +345,7 @@ export const fetchActiveTransactionsDailyDateRangeWithUserIdAndDates = async (
     return rows.map((row) => row.date)
 }
 
-export const modifyTransactionCustomNameWithPlaidId = async (
+export const modifyTransactionCustomNameByPlaidId = async (
     plaidId: string,
     name: string | null
 ): Promise<void> => {
@@ -357,7 +357,7 @@ export const modifyTransactionCustomNameWithPlaidId = async (
     await runQuery(query, [plaidId, name])
 }
 
-export const modifyTransactionCustomCategoryIdWithPlaidId = async (
+export const modifyTransactionCustomCategoryIdByPlaidId = async (
     plaidId: string,
     categoryId: number | null
 ): Promise<void> => {
@@ -369,7 +369,7 @@ export const modifyTransactionCustomCategoryIdWithPlaidId = async (
     await runQuery(query, [plaidId, categoryId])
 }
 
-export const modifyTransactionNoteWithPlaidId = async (
+export const modifyTransactionNoteByPlaidId = async (
     plaidId: string,
     note: string | null
 ): Promise<void> => {
@@ -381,7 +381,7 @@ export const modifyTransactionNoteWithPlaidId = async (
     await runQuery(query, [plaidId, note])
 }
 
-export const removeTransactionsWithPlaidIds = async (
+export const removeTransactionsByPlaidIds = async (
     plaidIds: string[]
 ): Promise<void> => {
     if (!plaidIds.length) return

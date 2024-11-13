@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import {
-    fetchActiveCreditCardLiabilitiesWithUserId,
-    fetchActiveMortgageLiabilitiesWithUserId,
-    fetchActiveStudentLoanLiabilitiesWithUserId,
+    fetchActiveCreditCardLiabilitiesByUserId,
+    fetchActiveMortgageLiabilitiesByUserId,
+    fetchActiveStudentLoanLiabilitiesByUserId,
 } from '../database/liabilityQueries.js'
 import { HttpError } from '../models/error.js'
 import { logger } from '../utils/logger.js'
@@ -16,8 +16,8 @@ export const getUserCreditCardLiabilities = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const liabilities = await fetchActiveCreditCardLiabilitiesWithUserId(userId)
-    return res.json(liabilities)
+    const resp = await fetchActiveCreditCardLiabilitiesByUserId(userId)
+    return res.json(resp)
 }
 
 export const getUserMortgageLiabilities = async (
@@ -29,8 +29,8 @@ export const getUserMortgageLiabilities = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const liabilities = await fetchActiveMortgageLiabilitiesWithUserId(userId)
-    return res.json(liabilities)
+    const resp = await fetchActiveMortgageLiabilitiesByUserId(userId)
+    return res.json(resp)
 }
 
 export const getUserStudentLoanLiabilities = async (
@@ -42,7 +42,6 @@ export const getUserStudentLoanLiabilities = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const liabilities =
-        await fetchActiveStudentLoanLiabilitiesWithUserId(userId)
-    return res.json(liabilities)
+    const resp = await fetchActiveStudentLoanLiabilitiesByUserId(userId)
+    return res.json(resp)
 }

@@ -1,14 +1,14 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import {
-    fetchAccessRequestWithAccessCode,
-    fetchAccessRequestWithEmail,
+    fetchAccessRequestByAccessCode,
+    fetchAccessRequestByEmail,
     insertAccessRequest,
-    modifyAccessRequestStatusWithId,
+    modifyAccessRequestStatusById,
 } from '../database/accessRequestQueries.js'
 import {
-    fetchUserWithEmail,
-    fetchUserWithUsername,
+    fetchUserByEmail,
+    fetchUserByUsername,
     insertUser,
 } from '../database/userQueries.js'
 import {
@@ -18,33 +18,6 @@ import {
 import { AccessRequestErrorCodeEnum, HttpError } from '../models/error.js'
 import { User } from '../models/user.js'
 import { logger } from '../utils/logger.js'
-
-export const login = async (req: Request, res: Response) => {
-    logger.debug('logging in')
-
-    const username = req.body.username
-    if (typeof username !== 'string')
-        throw new HttpError('missing or invalid username', 400)
-
-    const password = req.body.password
-    if (typeof password !== 'string')
-        throw new HttpError('missing or invalid password', 400)
-
-    const user = await fetchUserWithUsername(username)
-    if (!user) {
-        throw new HttpError('invalid username', 404)
-    }
-    if (!bcrypt.compareSync(password, user.passwordHash)) {
-        throw new HttpError('incorrect password', 400)
-    }
-    req.session.user = user
-    return res.json(user)
-}
-
-export const logout = (req: Request, res: Response) => {
-    logger.debug('logging out')
-    req.session.destroy(() => res.status(204).send())
-}
 
 export const requestAccess = async (req: Request, res: Response) => {
     logger.debug('requesting access')
@@ -61,7 +34,7 @@ export const requestAccess = async (req: Request, res: Response) => {
     if (typeof email !== 'string')
         throw new HttpError('missing or invalid email', 400)
 
-    const emailExists = !!(await fetchUserWithEmail(email))
+    const emailExists = !!(await fetchUserByEmail(email))
     if (emailExists)
         throw new HttpError(
             'user exists',
@@ -69,7 +42,7 @@ export const requestAccess = async (req: Request, res: Response) => {
             AccessRequestErrorCodeEnum.UserExists
         )
 
-    const existingAccessReq = await fetchAccessRequestWithEmail(email)
+    const existingAccessReq = await fetchAccessRequestByEmail(email)
     if (existingAccessReq) {
         switch (existingAccessReq.statusId) {
             case AccessRequestStatusEnum.Pending:
@@ -119,7 +92,7 @@ export const validateAccessCode = async (req: Request, res: Response) => {
     if (typeof accessCode !== 'string')
         throw new HttpError('missing or invalid access code', 400)
 
-    const accessReq = await fetchAccessRequestWithAccessCode(accessCode)
+    const accessReq = await fetchAccessRequestByAccessCode(accessCode)
     if (!accessReq) throw new HttpError('invalid access code', 400)
 
     if (accessReq.statusId !== AccessRequestStatusEnum.Approved) {
@@ -147,7 +120,7 @@ export const register = async (req: Request, res: Response) => {
     if (typeof password !== 'string')
         throw new HttpError('missing or invalid password', 400)
 
-    const accessReq = await fetchAccessRequestWithAccessCode(accessCode)
+    const accessReq = await fetchAccessRequestByAccessCode(accessCode)
     if (!accessReq) throw new HttpError('invalid access code', 400)
 
     if (accessReq.statusId !== AccessRequestStatusEnum.Approved) {
@@ -158,8 +131,8 @@ export const register = async (req: Request, res: Response) => {
     const firstName = accessReq.firstName
     const lastName = accessReq.lastName
 
-    const emailExists = !!(await fetchUserWithEmail(email))
-    const usernameExists = !!(await fetchUserWithUsername(username))
+    const emailExists = !!(await fetchUserByEmail(email))
+    const usernameExists = !!(await fetchUserByUsername(username))
     if (emailExists || usernameExists) {
         throw new HttpError(
             'a user with this email or username already exists',
@@ -180,9 +153,36 @@ export const register = async (req: Request, res: Response) => {
     const newUser = await insertUser(user)
     req.session.user = newUser
 
-    await modifyAccessRequestStatusWithId(
+    await modifyAccessRequestStatusById(
         accessReq.id,
         AccessRequestStatusEnum.Completed
     )
     return res.status(201).json(newUser)
+}
+
+export const login = async (req: Request, res: Response) => {
+    logger.debug('logging in')
+
+    const username = req.body.username
+    if (typeof username !== 'string')
+        throw new HttpError('missing or invalid username', 400)
+
+    const password = req.body.password
+    if (typeof password !== 'string')
+        throw new HttpError('missing or invalid password', 400)
+
+    const user = await fetchUserByUsername(username)
+    if (!user) {
+        throw new HttpError('invalid username', 404)
+    }
+    if (!bcrypt.compareSync(password, user.passwordHash)) {
+        throw new HttpError('incorrect password', 400)
+    }
+    req.session.user = user
+    return res.json(user)
+}
+
+export const logout = (req: Request, res: Response) => {
+    logger.debug('logging out')
+    req.session.destroy(() => res.status(204).send())
 }

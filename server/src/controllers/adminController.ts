@@ -2,7 +2,7 @@ import * as crypto from 'crypto'
 import { Request, Response } from 'express'
 import {
     fetchAccessRequests,
-    modifyAccessRequestStatusAccessCodeReviewerWithId,
+    modifyAccessRequestStatusAccessCodeAndReviewerById,
 } from '../database/accessRequestQueries.js'
 import { AccessRequestStatusEnum } from '../models/accessRequest.js'
 import { HttpError } from '../models/error.js'
@@ -36,7 +36,7 @@ export const reviewAccessRequest = async (req: Request, res: Response) => {
     const username = req.session.user?.username
     if (username === undefined) throw new HttpError('missing username', 400)
 
-    await modifyAccessRequestStatusAccessCodeReviewerWithId(
+    await modifyAccessRequestStatusAccessCodeAndReviewerById(
         accessRequestId,
         statusId,
         accessCode,

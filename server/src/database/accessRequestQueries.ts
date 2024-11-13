@@ -32,7 +32,17 @@ export const insertAccessRequest = async (
     await runQuery(query, values)
 }
 
-export const fetchAccessRequestWithEmail = async (
+export const fetchAccessRequests = async (): Promise<AccessRequest[]> => {
+    const query = `
+        SELECT * 
+        FROM access_requests
+        ORDER BY status_id, email, id
+    `
+    const rows = (await runQuery<DbAccessRequest>(query)).rows
+    return rows.map(mapDbAccessRequest)
+}
+
+export const fetchAccessRequestByEmail = async (
     email: string
 ): Promise<AccessRequest | undefined> => {
     const query = `
@@ -46,7 +56,7 @@ export const fetchAccessRequestWithEmail = async (
     return mapDbAccessRequest(rows[0])
 }
 
-export const fetchAccessRequestWithAccessCode = async (
+export const fetchAccessRequestByAccessCode = async (
     accessCode: string
 ): Promise<AccessRequest | undefined> => {
     const query = `
@@ -60,17 +70,19 @@ export const fetchAccessRequestWithAccessCode = async (
     return mapDbAccessRequest(rows[0])
 }
 
-export const fetchAccessRequests = async (): Promise<AccessRequest[]> => {
+export const modifyAccessRequestStatusById = async (
+    id: number,
+    statusId: number
+): Promise<void> => {
     const query = `
-        SELECT * 
-        FROM access_requests
-        ORDER BY status_id, email, id
+        UPDATE access_requests
+        SET status_id = $2
+        WHERE id = $1
     `
-    const rows = (await runQuery<DbAccessRequest>(query)).rows
-    return rows.map(mapDbAccessRequest)
+    await runQuery(query, [id, statusId])
 }
 
-export const modifyAccessRequestStatusAccessCodeReviewerWithId = async (
+export const modifyAccessRequestStatusAccessCodeAndReviewerById = async (
     id: number,
     statusId: number,
     accessCode: string | null,
@@ -83,18 +95,6 @@ export const modifyAccessRequestStatusAccessCodeReviewerWithId = async (
         WHERE id = $1
     `
     await runQuery(query, values)
-}
-
-export const modifyAccessRequestStatusWithId = async (
-    id: number,
-    statusId: number
-): Promise<void> => {
-    const query = `
-        UPDATE access_requests
-        SET status_id = $2
-        WHERE id = $1
-    `
-    await runQuery(query, [id, statusId])
 }
 
 interface DbAccessRequest {

@@ -38,7 +38,7 @@
                             <h6 class="text-center card-subtitle text-muted mb-1">
                                 {{ getSelectedDateRangeString() }}
                             </h6>
-                            @if (spendingCategoriesTotalAndCount.length === 0) {
+                            @if (spendingCategoryAggregates.length === 0) {
                                 <div class="text-center">No data</div>
                             } @else {
                                 <table class="table table-striped table-hover table-sm table-bordered align-middle mb-0">
@@ -51,7 +51,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="small-text">
-                                        @for (c of spendingCategoriesTotalAndCount; track $index) {
+                                        @for (c of spendingCategoryAggregates; track $index) {
                                             <tr>
                                                 <td>
                                                     {{ getCategoryName(c.categoryId) }}
@@ -157,7 +157,7 @@
                             <h6 class="text-center card-subtitle text-muted mb-1">
                                 {{ getSelectedDateRangeString() }}
                             </h6>
-                            @if (nonSpendingCategoriesTotalAndCount.length === 0) {
+                            @if (nonSpendingCategoryAggregates.length === 0) {
                                 <div class="text-center">No data</div>
                             } @else {
                                 <table class="table table-striped table-hover table-sm table-bordered align-middle mb-0">
@@ -180,7 +180,7 @@
                                                 </td>
                                             </tr>
                                         }
-                                        @for (c of nonSpendingCategoriesTotalAndCount; track $index) {
+                                        @for (c of nonSpendingCategoryAggregates; track $index) {
                                             <tr>
                                                 <td>
                                                     {{ getCategoryName(c.categoryId) }}

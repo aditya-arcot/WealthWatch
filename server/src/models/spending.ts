@@ -1,4 +1,4 @@
-export interface CategoryTotalAndCount {
+export interface CategoryAggregate {
     categoryId: number
     total: number
     count: number

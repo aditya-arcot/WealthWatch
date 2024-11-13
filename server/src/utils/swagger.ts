@@ -132,7 +132,7 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
-                    CategoryTotalAndCount: {
+                    CategoryAggregate: {
                         type: 'object',
                         properties: {
                             categoryId: {

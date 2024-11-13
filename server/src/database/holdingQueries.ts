@@ -55,7 +55,7 @@ export const insertHoldings = async (holdings: Holding[]): Promise<void> => {
     await runQuery(query, values)
 }
 
-export const fetchActiveHoldingsWithUserId = async (
+export const fetchActiveHoldingsByUserId = async (
     userId: number
 ): Promise<HoldingWithSecurity[]> => {
     const query = `

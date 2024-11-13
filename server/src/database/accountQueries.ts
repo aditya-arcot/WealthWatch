@@ -70,7 +70,7 @@ export const insertAccounts = async (
     await runQuery(query, values)
 }
 
-export const fetchActiveAccountsWithUserId = async (
+export const fetchActiveAccountsByUserId = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `
@@ -82,18 +82,17 @@ export const fetchActiveAccountsWithUserId = async (
     return rows.map(mapDbAccount)
 }
 
-export const modifyAccountsActiveWithPlaidItemId = async (
-    plaidItemId: string,
-    active: boolean
+export const modifyAccountsToInactiveByPlaidItemId = async (
+    plaidItemId: string
 ): Promise<void> => {
     const query = `
         UPDATE accounts a
-        SET active = $1 
+        SET active = false
         FROM active_items ai
         WHERE ai.id = a.item_id 
-            and ai.plaid_id = $2
+            and ai.plaid_id = $1
     `
-    await runQuery(query, [active, plaidItemId])
+    await runQuery(query, [plaidItemId])
 }
 
 interface DbAccount {

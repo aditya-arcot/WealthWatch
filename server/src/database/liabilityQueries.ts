@@ -233,7 +233,7 @@ export const insertStudentLoanLiabilities = async (
     await runQuery(query, values)
 }
 
-export const fetchActiveCreditCardLiabilitiesWithUserId = async (
+export const fetchActiveCreditCardLiabilitiesByUserId = async (
     userId: number
 ): Promise<CreditCardLiability[]> => {
     const query = `
@@ -245,7 +245,7 @@ export const fetchActiveCreditCardLiabilitiesWithUserId = async (
     return rows.map(mapDbCreditCardLiability)
 }
 
-export const fetchActiveMortgageLiabilitiesWithUserId = async (
+export const fetchActiveMortgageLiabilitiesByUserId = async (
     userId: number
 ): Promise<MortgageLiability[]> => {
     const query = `
@@ -257,7 +257,7 @@ export const fetchActiveMortgageLiabilitiesWithUserId = async (
     return rows.map(mapDbMortgageLiability)
 }
 
-export const fetchActiveStudentLoanLiabilitiesWithUserId = async (
+export const fetchActiveStudentLoanLiabilitiesByUserId = async (
     userId: number
 ): Promise<StudentLoanLiability[]> => {
     const query = `

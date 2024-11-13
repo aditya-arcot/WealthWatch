@@ -38,7 +38,7 @@ export const fetchUsers = async (): Promise<User[]> => {
     return rows.map(mapDbUser)
 }
 
-export const fetchUserWithUsername = async (
+export const fetchUserByUsername = async (
     username: string
 ): Promise<User | undefined> => {
     const query = `
@@ -52,7 +52,7 @@ export const fetchUserWithUsername = async (
     return mapDbUser(rows[0])
 }
 
-export const fetchUserWithEmail = async (
+export const fetchUserByEmail = async (
     email: string
 ): Promise<User | undefined> => {
     const query = `
@@ -66,7 +66,7 @@ export const fetchUserWithEmail = async (
     return mapDbUser(rows[0])
 }
 
-export const removeUserWithId = async (userId: number) => {
+export const removeUserById = async (userId: number) => {
     const query = `
         DELETE
         FROM users
