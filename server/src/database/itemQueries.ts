@@ -42,15 +42,6 @@ export const insertItem = async (item: Item): Promise<Item> => {
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItems = async (): Promise<Item[]> => {
-    const query = `
-        SELECT *
-        FROM active_items
-    `
-    const rows = (await runQuery<DbItem>(query)).rows
-    return rows.map(mapDbItem)
-}
-
 export const fetchActiveItemWithPlaidId = async (
     plaidId: string
 ): Promise<Item | undefined> => {

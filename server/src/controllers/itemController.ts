@@ -6,7 +6,6 @@ import {
 } from '../database/accountQueries.js'
 import { insertHoldings } from '../database/holdingQueries.js'
 import {
-    fetchActiveItems,
     fetchActiveItemsWithUserId,
     fetchActiveItemWithPlaidId,
     modifyItemActiveWithId,
@@ -43,7 +42,7 @@ import {
     plaidInvestmentsHoldingsGet,
     plaidInvestmentsRefresh,
 } from '../plaid/investmentMethods.js'
-import { plaidItemRemove, plaidWebhookUpdate } from '../plaid/itemMethods.js'
+import { plaidItemRemove } from '../plaid/itemMethods.js'
 import {
     mapPlaidCreditCardLiability,
     mapPlaidMortgageLiability,
@@ -71,21 +70,6 @@ export const getUserItems = async (req: Request, res: Response) => {
 
     const items = await fetchActiveItemsWithUserId(userId)
     return res.json(items)
-}
-
-export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
-    logger.debug('updating webhook for active items')
-
-    const url = req.body.url
-    if (typeof url !== 'string')
-        throw new HttpError('missing or invalid url', 400)
-
-    const items = await fetchActiveItems()
-    await Promise.all(
-        items.map(async (item) => await plaidWebhookUpdate(item, url))
-    )
-
-    return res.status(204).send()
 }
 
 export const refreshItem = async (req: Request, res: Response) => {
