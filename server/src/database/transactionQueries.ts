@@ -296,13 +296,7 @@ export const fetchActiveTransactionsDailyDateRangeWithUserIdAndDates = async (
 
     let query = `
         WITH user_transactions AS (
-            SELECT
-                COALESCE (
-                    custom_category_id,
-                    category_id
-                ) AS category_id,
-                date,
-                amount
+            SELECT date
             FROM active_transactions
             WHERE user_id = $1
         ),

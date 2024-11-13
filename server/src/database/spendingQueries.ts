@@ -21,17 +21,8 @@ export const fetchTotalAndCountByCategoryWithUserIdAndDateRange = async (
                 ) AS category_id,
                 amount,
                 date
-            FROM transactions
-            WHERE
-                account_id IN (
-                    SELECT id
-                    FROM accounts
-                    WHERE item_id IN (
-                        SELECT id
-                        FROM active_items
-                        WHERE user_id = $${placeholder}
-                    )
-                )
+            FROM active_transactions
+            WHERE user_id = $${placeholder}
     `
     values.push(userId)
     placeholder++
@@ -95,16 +86,8 @@ export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
                 ) AS category_id,
                 date,
                 amount
-            FROM transactions
-            WHERE account_id IN (
-                SELECT id
-                FROM accounts
-                WHERE item_id IN (
-                    SELECT id
-                    FROM active_items
-                    WHERE user_id = $1
-                )
-            )
+            FROM active_transactions
+            WHERE user_id = $1
         ),
         date_series AS (
             SELECT GENERATE_SERIES (
