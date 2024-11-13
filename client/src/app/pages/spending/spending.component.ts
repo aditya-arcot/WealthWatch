@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
-import { FormsModule } from '@angular/forms'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
@@ -28,7 +27,6 @@ import { checkDatesEqual } from '../../utilities/date.utility'
     standalone: true,
     imports: [
         LoadingSpinnerComponent,
-        FormsModule,
         BaseChartDirective,
         DateFilterComponent,
         CommonModule,
@@ -58,6 +56,7 @@ export class SpendingComponent implements OnInit {
     billsTotal: number | undefined = undefined
     billsCount: number | undefined = undefined
     spendingTotal = 0
+    nonSpendingTotal = 0
     spendingCategorySummaries: CategorySummary[] = []
     nonSpendingCategorySummaries: CategorySummary[] = []
 
@@ -250,6 +249,7 @@ export class SpendingComponent implements OnInit {
         this.billsTotal = undefined
         this.billsCount = undefined
         this.spendingTotal = 0
+        this.nonSpendingTotal = 0
         this.spendingCategorySummaries = []
         this.nonSpendingCategorySummaries = []
 
@@ -259,34 +259,35 @@ export class SpendingComponent implements OnInit {
         this.barGraphLabels = []
         this.barGraphDatasets = []
 
-        this.categorySummaries.forEach((a) => {
-            const category = this.categories.find((c) => c.id === a.categoryId)
+        this.categorySummaries.forEach((s) => {
+            const category = this.categories.find((c) => c.id === s.categoryId)
             if (!category) return
 
             if (category.id === CategoryEnum.Income) {
-                this.incomeTotal = a.total
-                this.incomeCount = a.count
+                this.incomeTotal = s.total
+                this.incomeCount = s.count
                 return
             } else if (category.id === CategoryEnum.Bills) {
-                this.billsTotal = a.total
-                this.billsCount = a.count
-                if (a.total > 0) {
+                this.billsTotal = s.total
+                this.billsCount = s.count
+                if (s.total > 0) {
                     this.pieChartLabels.push(category.name)
-                    this.pieChartDataset.push(a.total)
+                    this.pieChartDataset.push(s.total)
                 }
                 return
             }
 
             if (category.groupId === CategoryGroupEnum.Spending) {
-                this.spendingTotal += a.total
-                this.spendingCategorySummaries.push(a)
+                this.spendingTotal += s.total
+                this.spendingCategorySummaries.push(s)
 
-                if (a.total > 0) {
+                if (s.total > 0) {
                     this.pieChartLabels.push(category.name)
-                    this.pieChartDataset.push(a.total)
+                    this.pieChartDataset.push(s.total)
                 }
             } else {
-                this.nonSpendingCategorySummaries.push(a)
+                this.nonSpendingTotal += s.total
+                this.nonSpendingCategorySummaries.push(s)
             }
         })
 
@@ -313,43 +314,44 @@ export class SpendingComponent implements OnInit {
         const billsCategory = this.categories.find(
             (c) => c.id === CategoryEnum.Bills
         )
-        if (billsCategory) {
-            if (this.includeBills) {
-                const billsLabelIdx = this.pieChartLabels.findIndex(
-                    (l) => l === billsCategory.name
-                )
-                if (billsLabelIdx !== -1) {
-                    this.pieChartLabels.splice(billsLabelIdx, 1)
-                    this.pieChartDataset.splice(billsLabelIdx, 1)
-                }
+        if (!billsCategory) throw Error('could not find bills category')
 
-                const billsDatasetIdx = this.barGraphDatasets.findIndex(
-                    (d) => d.label === billsCategory.name
-                )
-                if (billsDatasetIdx !== -1) {
-                    this.barGraphDatasets.splice(billsDatasetIdx, 1)
-                }
-            } else {
-                const billsTotal = this.categorySummaries.find(
-                    (s) => s.categoryId === CategoryEnum.Bills
-                )?.total
-                if (billsTotal !== undefined && billsTotal > 0) {
-                    this.pieChartLabels.push(billsCategory.name)
-                    this.pieChartDataset.push(billsTotal)
-                }
+        if (this.includeBills) {
+            const billsLabelIdx = this.pieChartLabels.findIndex(
+                (l) => l === billsCategory.name
+            )
+            if (billsLabelIdx !== -1) {
+                this.pieChartLabels.splice(billsLabelIdx, 1)
+                this.pieChartDataset.splice(billsLabelIdx, 1)
+            }
 
-                const billsTotalByDate = this.totalByCategoryAndDate.find(
-                    (t) => t.categoryId === CategoryEnum.Bills
-                )?.totalByDate
-                if (billsTotalByDate) {
-                    this.barGraphDatasets.push({
-                        label: billsCategory.name,
-                        data: billsTotalByDate,
-                    })
-                }
+            const billsDatasetIdx = this.barGraphDatasets.findIndex(
+                (d) => d.label === billsCategory.name
+            )
+            if (billsDatasetIdx !== -1) {
+                this.barGraphDatasets.splice(billsDatasetIdx, 1)
+            }
+        } else {
+            const billsTotal = this.categorySummaries.find(
+                (s) => s.categoryId === CategoryEnum.Bills
+            )?.total
+            if (billsTotal !== undefined && billsTotal > 0) {
+                this.pieChartLabels.push(billsCategory.name)
+                this.pieChartDataset.push(billsTotal)
+            }
+
+            const billsTotalByDate = this.totalByCategoryAndDate.find(
+                (t) => t.categoryId === CategoryEnum.Bills
+            )?.totalByDate
+            if (billsTotalByDate) {
+                this.barGraphDatasets.push({
+                    label: billsCategory.name,
+                    data: billsTotalByDate,
+                })
             }
         }
         this.includeBills = !this.includeBills
+
         this.updateCharts()
         this.loading = false
     }
@@ -436,6 +438,10 @@ export class SpendingComponent implements OnInit {
         return this.getAmountString(this.spendingTotal)
     }
 
+    getNonSpendingTotalString(): string {
+        return this.getAmountString(this.nonSpendingTotal)
+    }
+
     getAmountString(total: number): string {
         const negative = total < 0
         const formatted = this.currencySvc.format(Math.abs(total), 'USD')
@@ -462,6 +468,13 @@ export class SpendingComponent implements OnInit {
             this.spendingTotal +
             (this.includeBills && this.billsTotal ? this.billsTotal : 0)
         return this.percentSvc.format(amount / spendingBillsTotal)
+    }
+
+    getPercentNonSpendingString(amount: number): string {
+        const nonSpendingBillsTotal =
+            this.nonSpendingTotal +
+            (!this.includeBills && this.billsTotal ? this.billsTotal : 0)
+        return this.percentSvc.format(amount / nonSpendingBillsTotal)
     }
 
     getPercentIncomeString(amount: number | undefined): string {
