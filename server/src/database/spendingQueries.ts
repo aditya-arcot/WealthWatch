@@ -1,11 +1,11 @@
-import { CategoryAggregate, CategoryTotalByDate } from '../models/spending.js'
+import { CategorySummary, CategoryTotalByDate } from '../models/spending.js'
 import { runQuery } from './index.js'
 
-export const fetchCategoryAggregatesByUserIdAndDateRange = async (
+export const fetchCategorySummariesByUserIdAndDateRange = async (
     userId: number,
     startDate?: string,
     endDate?: string
-): Promise<CategoryAggregate[]> => {
+): Promise<CategorySummary[]> => {
     let placeholder = 1
     const values: unknown[] = []
 
@@ -63,8 +63,8 @@ export const fetchCategoryAggregatesByUserIdAndDateRange = async (
             ON c.id = citc.category_id
         ORDER BY c.group_id, c.id
     `
-    const rows = (await runQuery<DbCategoryAggregate>(query, values)).rows
-    return rows.map(mapDbCategoryAggregate)
+    const rows = (await runQuery<DbCategorySummary>(query, values)).rows
+    return rows.map(mapDbCategorySummary)
 }
 
 export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
@@ -187,13 +187,13 @@ export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
     return rows.map(mapDbCategoryTotalByDate)
 }
 
-interface DbCategoryAggregate {
+interface DbCategorySummary {
     category_id: number
     total: number
     count: number
 }
 
-const mapDbCategoryAggregate = (d: DbCategoryAggregate): CategoryAggregate => ({
+const mapDbCategorySummary = (d: DbCategorySummary): CategorySummary => ({
     categoryId: d.category_id,
     total: d.total,
     count: d.count,

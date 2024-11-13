@@ -1,6 +1,6 @@
 import express from 'express'
 import {
-    getUserCategoryAggregates,
+    getUserCategorySummaries,
     getUserSpendingTotalByCategoryAndDate,
 } from '../controllers/spendingController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -17,9 +17,9 @@ const router = express.Router()
 
 /**
  * @swagger
- * /spending/category-aggregates:
+ * /spending/category-summaries:
  *   get:
- *     summary: Retrieve the logged in user's category aggregates
+ *     summary: Retrieve the logged in user's category summaries
  *     tags: [Spending]
  *     parameters:
  *       - in: query
@@ -34,19 +34,19 @@ const router = express.Router()
  *         description: The end date
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's category aggregates
+ *         description: Retrieved a list of the logged in user's category summaries
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/CategoryAggregate'
+ *                 $ref: '#/components/schemas/CategorySummary'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/category-aggregates')
-    .get(authenticate, catchAsync(getUserCategoryAggregates))
+    .route('/category-summaries')
+    .get(authenticate, catchAsync(getUserCategorySummaries))
 
 /**
  * @swagger

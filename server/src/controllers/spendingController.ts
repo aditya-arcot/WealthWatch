@@ -1,17 +1,14 @@
 import { Request, Response } from 'express'
 import {
-    fetchCategoryAggregatesByUserIdAndDateRange,
+    fetchCategorySummariesByUserIdAndDateRange,
     fetchTotalByCategoryAndDateWithUserIdAndDates,
 } from '../database/spendingQueries.js'
 import { fetchActiveTransactionsDateSeriesByUserIdAndDateRange } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
 import { logger } from '../utils/logger.js'
 
-export const getUserCategoryAggregates = async (
-    req: Request,
-    res: Response
-) => {
-    logger.debug('getting category aggregates')
+export const getUserCategorySummaries = async (req: Request, res: Response) => {
+    logger.debug('getting category summaries')
 
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
@@ -24,7 +21,7 @@ export const getUserCategoryAggregates = async (
     if (typeof endDate !== 'undefined' && typeof endDate !== 'string')
         throw new HttpError('invalid end date', 400)
 
-    const resp = await fetchCategoryAggregatesByUserIdAndDateRange(
+    const resp = await fetchCategorySummariesByUserIdAndDateRange(
         userId,
         startDate,
         endDate

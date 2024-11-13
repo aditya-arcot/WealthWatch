@@ -13,7 +13,7 @@ import {
     CategoryGroupEnum,
 } from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
-import { CategoryAggregate, CategoryTotalByDate } from '../../models/spending'
+import { CategorySummary, CategoryTotalByDate } from '../../models/spending'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
@@ -48,7 +48,7 @@ export class SpendingComponent implements OnInit {
     defaultEndDate: Date | null = null
 
     categories: Category[] = []
-    categoryAggregates: CategoryAggregate[] = []
+    categorySummaries: CategorySummary[] = []
     dates: Date[] = []
     totalByCategoryAndDate: CategoryTotalByDate[] = []
 
@@ -58,8 +58,8 @@ export class SpendingComponent implements OnInit {
     billsTotal: number | undefined = undefined
     billsCount: number | undefined = undefined
     spendingTotal = 0
-    spendingCategoryAggregates: CategoryAggregate[] = []
-    nonSpendingCategoryAggregates: CategoryAggregate[] = []
+    spendingCategorySummaries: CategorySummary[] = []
+    nonSpendingCategorySummaries: CategorySummary[] = []
 
     barGraphLabels: string[] = []
     barGraphDatasets: {
@@ -178,7 +178,7 @@ export class SpendingComponent implements OnInit {
         this.loading = true
         this.loadCategories()
             .pipe(
-                switchMap(() => this.loadCategoryAggregates()),
+                switchMap(() => this.loadCategorySummaries()),
                 switchMap(() => this.loadTotalByCategoryAndDate()),
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert('Failed to load data', [
@@ -208,17 +208,17 @@ export class SpendingComponent implements OnInit {
         )
     }
 
-    loadCategoryAggregates(): Observable<void> {
+    loadCategorySummaries(): Observable<void> {
         return this.spendingSvc
-            .getCategoryAggregates(this.startDate, this.endDate)
+            .getCategorySummaries(this.startDate, this.endDate)
             .pipe(
-                switchMap((a) => {
-                    this.logger.debug('loaded category aggregates', a)
-                    this.categoryAggregates = a
+                switchMap((s) => {
+                    this.logger.debug('loaded category summaries', s)
+                    this.categorySummaries = s
                     return of(undefined)
                 }),
                 catchError((err: HttpErrorResponse) => {
-                    this.logger.error('failed to load category aggregates', err)
+                    this.logger.error('failed to load category summaries', err)
                     return throwError(() => err)
                 })
             )
@@ -250,8 +250,8 @@ export class SpendingComponent implements OnInit {
         this.billsTotal = undefined
         this.billsCount = undefined
         this.spendingTotal = 0
-        this.spendingCategoryAggregates = []
-        this.nonSpendingCategoryAggregates = []
+        this.spendingCategorySummaries = []
+        this.nonSpendingCategorySummaries = []
 
         this.pieChartLabels = []
         this.pieChartDataset = []
@@ -259,7 +259,7 @@ export class SpendingComponent implements OnInit {
         this.barGraphLabels = []
         this.barGraphDatasets = []
 
-        this.categoryAggregates.forEach((a) => {
+        this.categorySummaries.forEach((a) => {
             const category = this.categories.find((c) => c.id === a.categoryId)
             if (!category) return
 
@@ -279,14 +279,14 @@ export class SpendingComponent implements OnInit {
 
             if (category.groupId === CategoryGroupEnum.Spending) {
                 this.spendingTotal += a.total
-                this.spendingCategoryAggregates.push(a)
+                this.spendingCategorySummaries.push(a)
 
                 if (a.total > 0) {
                     this.pieChartLabels.push(category.name)
                     this.pieChartDataset.push(a.total)
                 }
             } else {
-                this.nonSpendingCategoryAggregates.push(a)
+                this.nonSpendingCategorySummaries.push(a)
             }
         })
 
@@ -330,8 +330,8 @@ export class SpendingComponent implements OnInit {
                     this.barGraphDatasets.splice(billsDatasetIdx, 1)
                 }
             } else {
-                const billsTotal = this.categoryAggregates.find(
-                    (a) => a.categoryId === CategoryEnum.Bills
+                const billsTotal = this.categorySummaries.find(
+                    (s) => s.categoryId === CategoryEnum.Bills
                 )?.total
                 if (billsTotal !== undefined && billsTotal > 0) {
                     this.pieChartLabels.push(billsCategory.name)
