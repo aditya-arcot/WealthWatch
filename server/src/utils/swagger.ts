@@ -136,6 +136,7 @@ export const createSwaggerSpec = () => {
                                     properties: {
                                         date: {
                                             type: 'string',
+                                            format: 'date-time',
                                         },
                                         total: {
                                             type: 'number',
@@ -161,19 +162,22 @@ export const createSwaggerSpec = () => {
                                 type: 'boolean',
                             },
                             lastPaymentDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             lastPaymentAmount: {
                                 type: 'number',
                             },
                             lastStatementDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             lastStatementBalance: {
                                 type: 'number',
                             },
                             nextPaymentDueDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             minimumPaymentAmount: {
                                 type: 'number',
@@ -208,13 +212,15 @@ export const createSwaggerSpec = () => {
                                 type: 'number',
                             },
                             priceAsOf: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             closePrice: {
                                 type: 'number',
                             },
                             closePriceAsOf: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             quantity: {
                                 type: 'number',
@@ -264,10 +270,12 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                             },
                             lastRefreshed: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             transactionsLastRefreshed: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                         },
                     },
@@ -296,13 +304,15 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                             },
                             originationDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             originationPrincipal: {
                                 type: 'number',
                             },
                             maturityDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             lateFee: {
                                 type: 'number',
@@ -320,13 +330,15 @@ export const createSwaggerSpec = () => {
                                 type: 'number',
                             },
                             lastPaymentDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             lastPaymentAmount: {
                                 type: 'number',
                             },
                             nextPaymentDueDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             nextPaymentAmount: {
                                 type: 'number',
@@ -389,13 +401,15 @@ export const createSwaggerSpec = () => {
                                 type: 'number',
                             },
                             statusEndDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             overdue: {
                                 type: 'boolean',
                             },
                             originationDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             originationPrincipal: {
                                 type: 'number',
@@ -407,7 +421,8 @@ export const createSwaggerSpec = () => {
                                 type: 'number',
                             },
                             expectedPayoffDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             guarantor: {
                                 type: 'string',
@@ -422,19 +437,22 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                             },
                             lastPaymentDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             lastPaymentAmount: {
                                 type: 'number',
                             },
                             lastStatementDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             lastStatementBalance: {
                                 type: 'number',
                             },
                             nextPaymentDueDate: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             minimumPaymentAmount: {
                                 type: 'number',
@@ -496,7 +514,8 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                             },
                             date: {
-                                type: 'date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             pending: {
                                 type: 'boolean',

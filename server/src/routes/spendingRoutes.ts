@@ -77,7 +77,7 @@ router
  *                   type: array
  *                   items:
  *                     type: string
- *                     format: date
+ *                     format: date-time
  *                 totals:
  *                   type: array
  *                   items:
