@@ -96,7 +96,7 @@ export const runQuery = async <T extends QueryResultRow>(
     const start = Date.now()
 
     // replace whitespace with single space, lowercase, trim
-    query = query.replace(/\s+/g, ' ').toLowerCase().trim()
+    query = query.replace(/\s+/g, ' ').trim()
 
     // replace parameterized values with placeholder
     let collapsedQuery = query
