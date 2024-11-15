@@ -299,9 +299,7 @@ export class SpendingComponent implements OnInit {
             if (category.id === CategoryEnum.Bills && !this.includeBills) return
 
             const data = this.dates.map(
-                (date) =>
-                    t.totalByDate.find((d) => d.date === date.toString())
-                        ?.total || 0
+                (date) => t.totalByDate.find((d) => d.date === date)?.total || 0
             )
             this.barGraphDatasets.push({
                 label: category.name,
@@ -350,8 +348,8 @@ export class SpendingComponent implements OnInit {
             if (billsTotalByDate) {
                 const data = this.dates.map(
                     (date) =>
-                        billsTotalByDate.find((d) => d.date === date.toString())
-                            ?.total || 0
+                        billsTotalByDate.find((d) => d.date === date)?.total ||
+                        0
                 )
                 this.barGraphDatasets.push({
                     label: billsCategory.name,

@@ -8,7 +8,7 @@ export interface CategoryTotalByDate {
     categoryId: number
     totalByDate: [
         {
-            date: string
+            date: Date
             total: number
         },
     ]

@@ -210,7 +210,7 @@ interface DbCategoryTotalByDate {
     category_id: number
     total_by_date: [
         {
-            date: string
+            date: Date
             total: number
         },
     ]
