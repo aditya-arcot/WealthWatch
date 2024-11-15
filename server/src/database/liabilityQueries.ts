@@ -203,7 +203,7 @@ export const insertStudentLoanLiabilities = async (
             ytd_interest_paid,
             ytd_principal_paid
         )
-        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}    
+        VALUES ${constructInsertQueryParamsPlaceholder(rowCount, paramCount)}
         ON CONFLICT (account_id)
         DO UPDATE SET
             name = EXCLUDED.name,

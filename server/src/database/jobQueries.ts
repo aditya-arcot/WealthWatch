@@ -16,7 +16,7 @@ export const insertJob = async (job: Job): Promise<void> => {
     const rowCount = 1
     const paramCount = values.length
     const query = `
-        INSERT INTO jobs (
+        INSERT INTO debug.jobs (
             queue_name,
             job_id,
             job_name,

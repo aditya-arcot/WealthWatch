@@ -34,7 +34,7 @@ export const insertAccessRequest = async (
 
 export const fetchAccessRequests = async (): Promise<AccessRequest[]> => {
     const query = `
-        SELECT * 
+        SELECT *
         FROM access_requests
         ORDER BY status_id, email, id
     `
@@ -46,8 +46,8 @@ export const fetchAccessRequestByEmail = async (
     email: string
 ): Promise<AccessRequest | undefined> => {
     const query = `
-        SELECT * 
-        FROM access_requests 
+        SELECT *
+        FROM access_requests
         WHERE email = $1
         LIMIT 1
     `
@@ -60,8 +60,8 @@ export const fetchAccessRequestByAccessCode = async (
     accessCode: string
 ): Promise<AccessRequest | undefined> => {
     const query = `
-        SELECT * 
-        FROM access_requests 
+        SELECT *
+        FROM access_requests
         WHERE access_code = $1
         LIMIT 1
     `

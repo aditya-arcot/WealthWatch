@@ -89,7 +89,7 @@ export const modifyAccountsToInactiveByPlaidItemId = async (
         UPDATE accounts a
         SET active = false
         FROM active_items ai
-        WHERE ai.id = a.item_id 
+        WHERE ai.id = a.item_id
             and ai.plaid_id = $1
     `
     await runQuery(query, [plaidItemId])

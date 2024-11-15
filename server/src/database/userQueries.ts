@@ -42,8 +42,8 @@ export const fetchUserByUsername = async (
     username: string
 ): Promise<User | undefined> => {
     const query = `
-        SELECT * 
-        FROM users 
+        SELECT *
+        FROM users
         WHERE username = $1
         LIMIT 1
     `
@@ -56,8 +56,8 @@ export const fetchUserByEmail = async (
     email: string
 ): Promise<User | undefined> => {
     const query = `
-        SELECT * 
-        FROM users 
+        SELECT *
+        FROM users
         WHERE email = $1
         LIMIT 1
     `

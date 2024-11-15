@@ -26,21 +26,21 @@ export const fetchCategorySummariesByUserIdAndDateRange = async (
 
     if (startDate !== undefined && endDate !== undefined) {
         query += `
-            AND date >= $${placeholder}
-            AND date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
+                AND date >= $${placeholder}
+                AND date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(startDate)
         values.push(endDate)
         placeholder += 2
     } else if (startDate !== undefined) {
         query += `
-            AND date >= $${placeholder}
+                AND date >= $${placeholder}
         `
         values.push(startDate)
         placeholder++
     } else if (endDate !== undefined) {
         query += `
-            AND date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
+                AND date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(endDate)
         placeholder++
@@ -59,7 +59,7 @@ export const fetchCategorySummariesByUserIdAndDateRange = async (
         SELECT
             citc.*
         FROM category_id_total_count citc
-        JOIN categories c
+        JOIN lookup.categories c
             ON c.id = citc.category_id
         ORDER BY c.group_id, c.id
     `
@@ -125,11 +125,11 @@ export const fetchCategoryTotalsByDateWithUserIdAndDateRange = async (
         ),
         filtered_categories AS (
             SELECT c.id as category_id
-            FROM categories c
-            JOIN category_groups cg
+            FROM lookup.categories c
+            JOIN lookup.category_groups cg
                 ON cg.id = c.group_id
-            WHERE 
-                LOWER (cg.name) = 'spending' 
+            WHERE
+                LOWER (cg.name) = 'spending'
                 AND EXISTS (
                     SELECT 1
                     FROM user_transactions ut
@@ -176,12 +176,12 @@ export const fetchCategoryTotalsByDateWithUserIdAndDateRange = async (
             category_id,
             JSON_AGG (
                 JSON_BUILD_OBJECT (
-                    'date', 
+                    'date',
                     TO_CHAR (
-                        date AT TIME ZONE 'UTC', 
+                        date AT TIME ZONE 'UTC',
                         'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                    ), 
-                    'total', 
+                    ),
+                    'total',
                     total
                 )
                 ORDER BY date
