@@ -23,7 +23,10 @@ export class SpendingService {
         return this.http.get<CategorySummary[]>(url, { params })
     }
 
-    getTotalByCategoryAndDate(startDate: Date | null, endDate: Date | null) {
+    getSpendingCategoryTotalsByDate(
+        startDate: Date | null,
+        endDate: Date | null
+    ) {
         let params = new HttpParams()
         if (startDate) {
             params = params.set('startDate', startDate.toISOString())
@@ -31,7 +34,7 @@ export class SpendingService {
         if (endDate) {
             params = params.set('endDate', endDate.toISOString())
         }
-        const url = `${this.baseUrl}/category-and-date`
+        const url = `${this.baseUrl}/category-totals`
         return this.http.get<{ dates: Date[]; totals: CategoryTotalByDate[] }>(
             url,
             { params }

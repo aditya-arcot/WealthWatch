@@ -67,7 +67,7 @@ export const fetchCategorySummariesByUserIdAndDateRange = async (
     return rows.map(mapDbCategorySummary)
 }
 
-export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
+export const fetchCategoryTotalsByDateWithUserIdAndDateRange = async (
     userId: number,
     startDate?: string,
     endDate?: string
@@ -126,28 +126,32 @@ export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
         filtered_categories AS (
             SELECT c.id as category_id
             FROM categories c
-            WHERE EXISTS (
-                SELECT 1
-                FROM user_transactions ut
-                WHERE
-                    c.id = ut.category_id
+            JOIN category_groups cg
+                ON cg.id = c.group_id
+            WHERE 
+                LOWER (cg.name) = 'spending' 
+                AND EXISTS (
+                    SELECT 1
+                    FROM user_transactions ut
+                    WHERE
+                        c.id = ut.category_id
     `
 
     if (startDate !== undefined) {
         query += `
-                    AND ut.date >= $2::TIMESTAMPTZ
+                        AND ut.date >= $2::TIMESTAMPTZ
         `
     }
 
     if (endDate !== undefined) {
         const placeholder = startDate !== undefined ? 3 : 2
         query += `
-                    AND ut.date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
+                        AND ut.date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
         `
     }
 
     query += `
-            )
+                )
         ),
         category_id_date_total AS (
             SELECT
@@ -162,26 +166,29 @@ export const fetchTotalByCategoryAndDateWithUserIdAndDates = async (
                 ) AS total
             FROM date_series ds
             CROSS JOIN filtered_categories fc
-            LEFT JOIN user_transactions ut
+            JOIN user_transactions ut
                 ON fc.category_id = ut.category_id
                 AND ut.date >= ds.date
                 AND ut.date < (ds.date + INTERVAL '1 day')
             GROUP BY fc.category_id, ds.date
-            ORDER BY ds.date
-        ),
-        category_id_total_by_date AS (
-            SELECT
-                category_id,
-                ARRAY_AGG (total) AS total_by_date
-            FROM category_id_date_total
-            GROUP BY category_id
         )
         SELECT
-            citbd.*
-        FROM category_id_total_by_date citbd
-        JOIN categories c
-            ON c.id = citbd.category_id
-        ORDER BY c.group_id, c.id
+            category_id,
+            JSON_AGG (
+                JSON_BUILD_OBJECT (
+                    'date', 
+                    TO_CHAR (
+                        date AT TIME ZONE 'UTC', 
+                        'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                    ), 
+                    'total', 
+                    total
+                )
+                ORDER BY date
+            ) AS total_by_date
+        FROM category_id_date_total
+        GROUP BY category_id
+        ORDER BY category_id
     `
     const rows = (await runQuery<DbCategoryTotalByDate>(query, values)).rows
     return rows.map(mapDbCategoryTotalByDate)
@@ -201,7 +208,12 @@ const mapDbCategorySummary = (d: DbCategorySummary): CategorySummary => ({
 
 interface DbCategoryTotalByDate {
     category_id: number
-    total_by_date: number[]
+    total_by_date: [
+        {
+            date: string
+            total: number
+        },
+    ]
 }
 
 const mapDbCategoryTotalByDate = (

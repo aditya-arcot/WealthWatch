@@ -48,7 +48,7 @@ export class SpendingComponent implements OnInit {
     categories: Category[] = []
     categorySummaries: CategorySummary[] = []
     dates: Date[] = []
-    totalByCategoryAndDate: CategoryTotalByDate[] = []
+    spendingCategoryTotalsByDate: CategoryTotalByDate[] = []
 
     includeBills = true
     incomeTotal: number | undefined = undefined
@@ -225,17 +225,17 @@ export class SpendingComponent implements OnInit {
 
     loadTotalByCategoryAndDate(): Observable<void> {
         return this.spendingSvc
-            .getTotalByCategoryAndDate(this.startDate, this.endDate)
+            .getSpendingCategoryTotalsByDate(this.startDate, this.endDate)
             .pipe(
                 switchMap((t) => {
-                    this.logger.debug('loaded total by category and date', t)
+                    this.logger.debug('loaded spending category totals', t)
                     this.dates = t.dates
-                    this.totalByCategoryAndDate = t.totals
+                    this.spendingCategoryTotalsByDate = t.totals
                     return of(undefined)
                 }),
                 catchError((err: HttpErrorResponse) => {
                     this.logger.error(
-                        'failed to load total by category and date',
+                        'failed to load spending category totals',
                         err
                     )
                     return throwError(() => err)
@@ -293,15 +293,19 @@ export class SpendingComponent implements OnInit {
 
         this.barGraphLabels = this.dates.map((d) => this.getDateString(d))
 
-        this.totalByCategoryAndDate.forEach((t) => {
+        this.spendingCategoryTotalsByDate.forEach((t) => {
             const category = this.categories.find((c) => c.id === t.categoryId)
             if (!category) return
-            if (category.groupId !== CategoryGroupEnum.Spending) return
             if (category.id === CategoryEnum.Bills && !this.includeBills) return
 
+            const data = this.dates.map(
+                (date) =>
+                    t.totalByDate.find((d) => d.date === date.toString())
+                        ?.total || 0
+            )
             this.barGraphDatasets.push({
                 label: category.name,
-                data: t.totalByDate,
+                data,
             })
         })
 
@@ -340,13 +344,18 @@ export class SpendingComponent implements OnInit {
                 this.pieChartDataset.push(billsTotal)
             }
 
-            const billsTotalByDate = this.totalByCategoryAndDate.find(
+            const billsTotalByDate = this.spendingCategoryTotalsByDate.find(
                 (t) => t.categoryId === CategoryEnum.Bills
             )?.totalByDate
             if (billsTotalByDate) {
+                const data = this.dates.map(
+                    (date) =>
+                        billsTotalByDate.find((d) => d.date === date.toString())
+                            ?.total || 0
+                )
                 this.barGraphDatasets.push({
                     label: billsCategory.name,
-                    data: billsTotalByDate,
+                    data,
                 })
             }
         }

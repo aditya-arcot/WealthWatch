@@ -1,7 +1,7 @@
 import express from 'express'
 import {
     getUserCategorySummaries,
-    getUserSpendingTotalByCategoryAndDate,
+    getUserSpendingCategoryTotals,
 } from '../controllers/spendingController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -50,9 +50,9 @@ router
 
 /**
  * @swagger
- * /spending/category-and-date:
+ * /spending/category-totals:
  *   get:
- *     summary: Retrieve the logged in user's spending total by category and date
+ *     summary: Retrieve the logged in user's spending category totals by date
  *     tags: [Spending]
  *     parameters:
  *       - in: query
@@ -67,7 +67,7 @@ router
  *         description: The end date
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's spending total by category and date
+ *         description: Retrieved a list of the logged in user's spending category totals by date
  *         content:
  *           application/json:
  *             schema:
@@ -86,7 +86,7 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/category-and-date')
-    .get(authenticate, catchAsync(getUserSpendingTotalByCategoryAndDate))
+    .route('/category-totals')
+    .get(authenticate, catchAsync(getUserSpendingCategoryTotals))
 
 export default router

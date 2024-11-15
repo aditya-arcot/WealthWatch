@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import {
     fetchCategorySummariesByUserIdAndDateRange,
-    fetchTotalByCategoryAndDateWithUserIdAndDates,
+    fetchCategoryTotalsByDateWithUserIdAndDateRange,
 } from '../database/spendingQueries.js'
 import { fetchActiveTransactionsDateSeriesByUserIdAndDateRange } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
@@ -29,11 +29,11 @@ export const getUserCategorySummaries = async (req: Request, res: Response) => {
     return res.json(resp)
 }
 
-export const getUserSpendingTotalByCategoryAndDate = async (
+export const getUserSpendingCategoryTotals = async (
     req: Request,
     res: Response
 ) => {
-    logger.debug('getting spending total by category and date')
+    logger.debug('getting spending category totals by date')
 
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
@@ -51,7 +51,7 @@ export const getUserSpendingTotalByCategoryAndDate = async (
         startDate,
         endDate
     )
-    const totals = await fetchTotalByCategoryAndDateWithUserIdAndDates(
+    const totals = await fetchCategoryTotalsByDateWithUserIdAndDateRange(
         userId,
         startDate,
         endDate

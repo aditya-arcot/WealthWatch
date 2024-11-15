@@ -6,5 +6,10 @@ export interface CategorySummary {
 
 export interface CategoryTotalByDate {
     categoryId: number
-    totalByDate: number[]
+    totalByDate: [
+        {
+            date: string
+            total: number
+        },
+    ]
 }

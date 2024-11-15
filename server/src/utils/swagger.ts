@@ -158,8 +158,19 @@ export const createSwaggerSpec = () => {
                             },
                             totalByDate: {
                                 type: 'array',
-                                description:
-                                    'The category transaction total by date',
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                        date: {
+                                            type: 'string',
+                                            description: 'The date',
+                                        },
+                                        total: {
+                                            type: 'number',
+                                            description: 'The total',
+                                        },
+                                    },
+                                },
                             },
                         },
                     },
