@@ -21,7 +21,7 @@ export const createSwaggerSpec = () => {
     if (production) throw new HttpError('swagger should not be used in prod')
     const options = {
         definition: {
-            openapi: '3.1.0',
+            openapi: '3.0.3',
             info: {
                 title: `WealthWatch API - ${vars.nodeEnv}`,
                 version: '1.0.0',
