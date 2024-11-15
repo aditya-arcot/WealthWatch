@@ -8,6 +8,7 @@ import { insertHoldings } from '../database/holdingQueries.js'
 import {
     fetchActiveItemByPlaidId,
     fetchActiveItemsByUserId,
+    fetchActiveItemsWithAccountsByUserId,
     modifyItemCursorByPlaidId,
     modifyItemInvestmentsLastRefreshedByPlaidId,
     modifyItemLastRefreshedByPlaidId,
@@ -69,6 +70,16 @@ export const getUserItems = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsByUserId(userId)
+    return res.json(items)
+}
+
+export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
+    logger.debug('getting items with accounts')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const items = await fetchActiveItemsWithAccountsByUserId(userId)
     return res.json(items)
 }
 

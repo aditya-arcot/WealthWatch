@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
-import { Item } from '../models/item'
+import { Item, ItemWithAccounts } from '../models/item'
 
 @Injectable({
     providedIn: 'root',
@@ -13,6 +13,12 @@ export class ItemService {
 
     getItems() {
         return this.http.get<Item[]>(this.baseUrl)
+    }
+
+    getItemsWithAccounts() {
+        return this.http.get<ItemWithAccounts[]>(
+            `${this.baseUrl}/with-accounts`
+        )
     }
 
     refreshItem(plaidItemId: string) {

@@ -95,7 +95,7 @@ export const modifyAccountsToInactiveByPlaidItemId = async (
     await runQuery(query, [plaidItemId])
 }
 
-interface DbAccount {
+export interface DbAccount {
     id: number
     item_id: number
     plaid_id: string
@@ -112,7 +112,7 @@ interface DbAccount {
     subtype: string | null
 }
 
-const mapDbAccount = (acc: DbAccount): Account => ({
+export const mapDbAccount = (acc: DbAccount): Account => ({
     id: acc.id,
     itemId: acc.item_id,
     plaidId: acc.plaid_id,

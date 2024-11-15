@@ -1,5 +1,6 @@
 import { DatabaseError } from '../models/error.js'
-import { Item } from '../models/item.js'
+import { Item, ItemWithAccounts } from '../models/item.js'
+import { DbAccount, mapDbAccount } from './accountQueries.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertItem = async (item: Item): Promise<Item> => {
@@ -66,6 +67,26 @@ export const fetchActiveItemsByUserId = async (
     `
     const rows = (await runQuery<DbItem>(query, [userId])).rows
     return rows.map(mapDbItem)
+}
+
+export const fetchActiveItemsWithAccountsByUserId = async (
+    userId: number
+): Promise<ItemWithAccounts[]> => {
+    const query = `
+        SELECT
+            i.*,
+            ARRAY_AGG (TO_JSONB (a.*)) as accounts
+        FROM items i
+        LEFT JOIN accounts a
+            ON a.item_id = i.id
+            AND a.active = TRUE
+        WHERE i.user_id = $1
+            AND i.active = TRUE
+        GROUP BY i.id
+        HAVING COUNT (a.id) > 0
+    `
+    const rows = (await runQuery<DbItemWithAccounts>(query, [userId])).rows
+    return rows.map(mapDbItemAndAccounts)
 }
 
 export const fetchActiveItemByUserIdAndId = async (
@@ -197,4 +218,26 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     lastRefreshed: dbItem.last_refreshed,
     transactionsLastRefreshed: dbItem.transactions_last_refreshed,
     investmentsLastRefreshed: dbItem.investments_last_refreshed,
+})
+
+interface DbItemWithAccounts extends DbItem {
+    accounts: DbAccount[]
+}
+
+const mapDbItemAndAccounts = (
+    dbItem: DbItemWithAccounts
+): ItemWithAccounts => ({
+    id: dbItem.id,
+    userId: dbItem.user_id,
+    plaidId: dbItem.plaid_id,
+    active: dbItem.active,
+    accessToken: dbItem.access_token,
+    institutionId: dbItem.institution_id,
+    institutionName: dbItem.institution_name,
+    healthy: dbItem.healthy,
+    cursor: dbItem.cursor,
+    lastRefreshed: dbItem.last_refreshed,
+    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
+    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    accounts: dbItem.accounts.map(mapDbAccount),
 })

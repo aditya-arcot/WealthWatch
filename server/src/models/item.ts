@@ -1,3 +1,5 @@
+import { Account } from './account.js'
+
 // 3 hours
 const refreshCooldown = 1000 * 60 * 60 * 3
 export const inCooldown = (timestamp: Date | null) => {
@@ -18,4 +20,8 @@ export interface Item {
     lastRefreshed: Date | null
     transactionsLastRefreshed: Date | null
     investmentsLastRefreshed: Date | null
+}
+
+export interface ItemWithAccounts extends Item {
+    accounts: Account[]
 }

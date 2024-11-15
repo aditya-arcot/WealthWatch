@@ -20,13 +20,11 @@ import {
     refreshCooldown,
 } from '../../models/item'
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
-import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
-import { NotificationService } from '../../services/notification.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -45,11 +43,9 @@ export class AccountsComponent implements OnInit {
         private logger: LoggerService,
         private plaidLinkSvc: NgxPlaidLinkService,
         private alertSvc: AlertService,
-        private accountSvc: AccountService,
         private itemSvc: ItemService,
         private currencySvc: CurrencyService,
         private route: ActivatedRoute,
-        private notificationSvc: NotificationService,
         private router: Router
     ) {}
 
@@ -78,43 +74,17 @@ export class AccountsComponent implements OnInit {
     loadAccounts(): void {
         this.loading = true
         this.itemSvc
-            .getItems()
+            .getItemsWithAccounts()
             .pipe(
-                switchMap((items) => {
-                    this.logger.debug('loaded items', items)
-                    this.itemsWithAccounts = items.map((item) => {
-                        return { ...item, accounts: [] }
-                    })
-                    return this.accountSvc.getAccounts()
-                }),
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert('Failed to load accounts', [
                         err.message,
                     ])
-                    this.loading = false
                     return throwError(() => err)
-                })
+                }),
+                finalize(() => (this.loading = false))
             )
-            .subscribe((accounts) => {
-                this.logger.debug('loaded accounts', accounts)
-                accounts.forEach((account) => {
-                    const item = this.itemsWithAccounts.find(
-                        (item) => item.id === account.itemId
-                    )
-                    if (!item) {
-                        this.alertSvc.addErrorAlert(
-                            'Something went wrong. Please report this issue.',
-                            [
-                                `Failed to find item ${account.itemId} for account ${account.id}`,
-                            ]
-                        )
-                        return
-                    }
-                    item.accounts.push(account)
-                })
-                this.logger.debug('mapped accounts', this.itemsWithAccounts)
-                this.loading = false
-            })
+            .subscribe((items) => (this.itemsWithAccounts = items))
     }
 
     linkInstitution(itemId?: number, withAccounts?: boolean): void {
