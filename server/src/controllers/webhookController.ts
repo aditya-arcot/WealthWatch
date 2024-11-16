@@ -4,10 +4,10 @@ import { sha256 } from 'js-sha256'
 import { jwtDecode } from 'jwt-decode'
 import { JWKPublicKey } from 'plaid'
 import {
-    fetchActiveItemWithPlaidId,
-    modifyItemHealthyWithId,
+    fetchActiveItemByPlaidId,
+    modifyItemHealthyById,
 } from '../database/itemQueries.js'
-import { modifyNotificationsToInactiveWithTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
+import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { NotificationTypeEnum } from '../models/notification.js'
 import {
@@ -274,7 +274,7 @@ const handleItemWebhook = async (webhookCode: string, itemId: string) => {
 const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling transactions sync webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemTransactions(item, true)
 
@@ -284,7 +284,7 @@ const handleTransactionsSyncUpdatesWebhook = async (itemId: string) => {
 const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling holdings default webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemInvestments(item, true)
 
@@ -294,7 +294,7 @@ const handleHoldingsDefaultUpdateWebhook = async (itemId: string) => {
 const handleLiabilitiesDefaultUpdateWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling liabilities default webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemLiabilities(item, true)
 
@@ -304,10 +304,10 @@ const handleLiabilitiesDefaultUpdateWebhook = async (itemId: string) => {
 const handleItemErrorWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling item error webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    await modifyItemHealthyWithId(item.id, false)
+    await modifyItemHealthyById(item.id, false)
 
     const message = `${item.institutionName} connection error`
     await insertLinkUpdateNotification(item, message)
@@ -318,12 +318,12 @@ const handleItemErrorWebhook = async (itemId: string) => {
 const handleItemLoginRepairedWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling item login repaired webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    await modifyItemHealthyWithId(item.id, true)
+    await modifyItemHealthyById(item.id, true)
 
-    await modifyNotificationsToInactiveWithTypeIdUserIdAndItemId(
+    await modifyNotificationsToInactiveByTypeIdUserIdAndItemId(
         NotificationTypeEnum.LinkUpdate,
         item.userId,
         item.id
@@ -338,7 +338,7 @@ const handleItemLoginRepairedWebhook = async (itemId: string) => {
 const handleItemNewAccountsAvailableWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling item new accounts available webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const message = `New ${item.institutionName} accounts available`
@@ -350,7 +350,7 @@ const handleItemNewAccountsAvailableWebhook = async (itemId: string) => {
 const handleItemPendingExpirationWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling item pending expiration webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const message = `${item.institutionName} connection pending expiration`
@@ -362,10 +362,10 @@ const handleItemPendingExpirationWebhook = async (itemId: string) => {
 const handleUserPermissionRevokedWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling item user permission revoked webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    await modifyItemHealthyWithId(item.id, false)
+    await modifyItemHealthyById(item.id, false)
 
     await removeDeactivateItem(item)
 
@@ -378,10 +378,10 @@ const handleUserPermissionRevokedWebhook = async (itemId: string) => {
 const handleItemUserAccountRevokedWebhook = async (itemId: string) => {
     logger.debug({ itemId }, 'handling item user account revoked webhook')
 
-    const item = await fetchActiveItemWithPlaidId(itemId)
+    const item = await fetchActiveItemByPlaidId(itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    await modifyItemHealthyWithId(item.id, false)
+    await modifyItemHealthyById(item.id, false)
 
     const message = `${item.institutionName} user account revoked`
     await insertLinkUpdateNotification(item, message)

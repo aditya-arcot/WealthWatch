@@ -58,19 +58,6 @@ CREATE TABLE core.accounts (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE core.notifications (
-    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    type_id INTEGER REFERENCES notification_types(id) NOT NULL,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
-    message TEXT NOT NULL,
-    persistent BOOLEAN NOT NULL,
-    read BOOLEAN NOT NULL,
-    active BOOLEAN NOT NULL,
-    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
 CREATE TABLE core.transactions (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
@@ -199,6 +186,19 @@ CREATE TABLE core.student_loan_liabilities (
     minimum_payment_amount DOUBLE PRECISION,
     ytd_interest_paid DOUBLE PRECISION,
     ytd_principal_paid DOUBLE PRECISION,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE core.notifications (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    type_id INTEGER REFERENCES notification_types(id) NOT NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    persistent BOOLEAN NOT NULL,
+    read BOOLEAN NOT NULL,
+    active BOOLEAN NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

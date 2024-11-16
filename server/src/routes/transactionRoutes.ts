@@ -1,6 +1,6 @@
 import express from 'express'
 import {
-    getUserTransactions,
+    getUserTransactionsAndCounts,
     refreshUserTransactions,
     updateTransactionCustomCategoryId,
     updateTransactionCustomName,
@@ -22,7 +22,7 @@ const router = express.Router()
  * @swagger
  * /transactions:
  *   get:
- *     summary: Retrieve the logged in user's transactions
+ *     summary: Retrieve the logged in user's transactions and counts
  *     tags: [Transactions]
  *     parameters:
  *       - in: query
@@ -76,26 +76,26 @@ const router = express.Router()
  *         description: The number of transactions to skip
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's transactions
+ *         description: Retrieved a list of the logged in user's transactions and counts
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Transaction'
  *                 totalCount:
  *                   type: integer
  *                   description: The total number of transactions
  *                 filteredCount:
  *                   type: integer
  *                   description: The number of filtered transactions
- *                 transactions:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Transaction'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/').get(authenticate, catchAsync(getUserTransactions))
+router.route('/').get(authenticate, catchAsync(getUserTransactionsAndCounts))
 
 /**
  * @swagger

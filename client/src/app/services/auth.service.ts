@@ -11,16 +11,6 @@ export class AuthService {
 
     constructor(private http: HttpClient) {}
 
-    login(username: string, password: string) {
-        const url = `${this.baseUrl}/login`
-        return this.http.post<User>(url, { username, password })
-    }
-
-    logout() {
-        const url = `${this.baseUrl}/logout`
-        return this.http.post<void>(url, {})
-    }
-
     requestAccess(firstName: string, lastName: string, email: string) {
         const url = `${this.baseUrl}/access-request`
         return this.http.post<void>(url, {
@@ -44,5 +34,15 @@ export class AuthService {
             username,
             password,
         })
+    }
+
+    login(username: string, password: string) {
+        const url = `${this.baseUrl}/login`
+        return this.http.post<User>(url, { username, password })
+    }
+
+    logout() {
+        const url = `${this.baseUrl}/logout`
+        return this.http.post<void>(url, {})
     }
 }

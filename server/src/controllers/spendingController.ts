@@ -1,17 +1,14 @@
 import { Request, Response } from 'express'
 import {
-    fetchTotalAndCountByCategoryWithUserIdAndDateRange,
-    fetchTotalByCategoryAndDateWithUserIdAndDates,
+    fetchCategorySummariesByUserIdAndDateRange,
+    fetchCategoryTotalsByDateWithUserIdAndDateRange,
 } from '../database/spendingQueries.js'
-import { fetchActiveTransactionsDailyDateRangeWithUserIdAndDates } from '../database/transactionQueries.js'
+import { fetchActiveTransactionsDateSeriesByUserIdAndDateRange } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
 import { logger } from '../utils/logger.js'
 
-export const getUserSpendingTotalAndCountByCategory = async (
-    req: Request,
-    res: Response
-) => {
-    logger.debug('getting spending total and count by category')
+export const getUserCategorySummaries = async (req: Request, res: Response) => {
+    logger.debug('getting category summaries')
 
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
@@ -24,7 +21,7 @@ export const getUserSpendingTotalAndCountByCategory = async (
     if (typeof endDate !== 'undefined' && typeof endDate !== 'string')
         throw new HttpError('invalid end date', 400)
 
-    const resp = await fetchTotalAndCountByCategoryWithUserIdAndDateRange(
+    const resp = await fetchCategorySummariesByUserIdAndDateRange(
         userId,
         startDate,
         endDate
@@ -32,11 +29,11 @@ export const getUserSpendingTotalAndCountByCategory = async (
     return res.json(resp)
 }
 
-export const getUserSpendingTotalByCategoryAndDate = async (
+export const getUserSpendingCategoryTotals = async (
     req: Request,
     res: Response
 ) => {
-    logger.debug('getting spending total by category and date')
+    logger.debug('getting spending category totals by date')
 
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
@@ -49,12 +46,12 @@ export const getUserSpendingTotalByCategoryAndDate = async (
     if (typeof endDate !== 'undefined' && typeof endDate !== 'string')
         throw new HttpError('invalid end date', 400)
 
-    const dates = await fetchActiveTransactionsDailyDateRangeWithUserIdAndDates(
+    const dates = await fetchActiveTransactionsDateSeriesByUserIdAndDateRange(
         userId,
         startDate,
         endDate
     )
-    const totals = await fetchTotalByCategoryAndDateWithUserIdAndDates(
+    const totals = await fetchCategoryTotalsByDateWithUserIdAndDateRange(
         userId,
         startDate,
         endDate

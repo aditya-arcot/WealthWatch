@@ -1,7 +1,7 @@
 import express from 'express'
 import {
-    getUserSpendingTotalAndCountByCategory,
-    getUserSpendingTotalByCategoryAndDate,
+    getUserCategorySummaries,
+    getUserSpendingCategoryTotals,
 } from '../controllers/spendingController.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { authenticate } from '../utils/middleware.js'
@@ -17,9 +17,9 @@ const router = express.Router()
 
 /**
  * @swagger
- * /spending/category:
+ * /spending/category-summaries:
  *   get:
- *     summary: Retrieve the logged in user's spending total and count by category
+ *     summary: Retrieve the logged in user's category summaries
  *     tags: [Spending]
  *     parameters:
  *       - in: query
@@ -34,25 +34,25 @@ const router = express.Router()
  *         description: The end date
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's spending total and count by category
+ *         description: Retrieved a list of the logged in user's category summaries
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/CategoryTotalAndCount'
+ *                 $ref: '#/components/schemas/CategorySummary'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/category')
-    .get(authenticate, catchAsync(getUserSpendingTotalAndCountByCategory))
+    .route('/category-summaries')
+    .get(authenticate, catchAsync(getUserCategorySummaries))
 
 /**
  * @swagger
- * /spending/category-and-date:
+ * /spending/category-totals:
  *   get:
- *     summary: Retrieve the logged in user's spending total by category and date
+ *     summary: Retrieve the logged in user's spending category totals by date
  *     tags: [Spending]
  *     parameters:
  *       - in: query
@@ -67,7 +67,7 @@ router
  *         description: The end date
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's spending total by category and date
+ *         description: Retrieved a list of the logged in user's spending category totals by date
  *         content:
  *           application/json:
  *             schema:
@@ -77,7 +77,7 @@ router
  *                   type: array
  *                   items:
  *                     type: string
- *                     format: date
+ *                     format: date-time
  *                 totals:
  *                   type: array
  *                   items:
@@ -86,7 +86,7 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/category-and-date')
-    .get(authenticate, catchAsync(getUserSpendingTotalByCategoryAndDate))
+    .route('/category-totals')
+    .get(authenticate, catchAsync(getUserSpendingCategoryTotals))
 
 export default router

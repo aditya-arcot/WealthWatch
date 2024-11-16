@@ -20,7 +20,7 @@ export interface Transaction {
     note: string | null
 }
 
-export interface TransactionsWithCounts {
+export interface TransactionsAndCounts {
     transactions: Transaction[]
     filteredCount: number | null
     totalCount: number

@@ -4,6 +4,7 @@ import {
     deactivateAllItems,
     deleteAllUsers,
     fireSandboxWebhook,
+    forceRefreshItemInvestments,
     forceRefreshItemTransactions,
     resetSandboxItemLogin,
     syncItem,
@@ -99,7 +100,7 @@ router
  */
 router
     .route('/item/refresh-investments')
-    .post(catchAsync(forceRefreshItemTransactions))
+    .post(catchAsync(forceRefreshItemInvestments))
 
 /**
  * @swagger
