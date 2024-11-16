@@ -77,13 +77,12 @@ export const fetchActiveItemsWithAccountsByUserId = async (
             i.*,
             ARRAY_AGG (TO_JSONB (a.*)) as accounts
         FROM items i
-        LEFT JOIN accounts a
+        JOIN accounts a
             ON a.item_id = i.id
             AND a.active = TRUE
         WHERE i.user_id = $1
             AND i.active = TRUE
         GROUP BY i.id
-        HAVING COUNT (a.id) > 0
     `
     const rows = (await runQuery<DbItemWithAccounts>(query, [userId])).rows
     return rows.map(mapDbItemAndAccounts)
