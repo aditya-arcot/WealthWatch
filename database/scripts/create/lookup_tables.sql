@@ -4,12 +4,6 @@ CREATE TABLE lookup.access_request_statuses (
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE lookup.notification_types (
-    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name TEXT UNIQUE NOT NULL,
-    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
 CREATE TABLE lookup.category_groups (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name TEXT UNIQUE NOT NULL,
@@ -36,6 +30,12 @@ CREATE TABLE lookup.student_loan_status_types (
 );
 
 CREATE TABLE lookup.student_loan_repayment_plan_types (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name TEXT UNIQUE NOT NULL,
+    create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE lookup.notification_types (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name TEXT UNIQUE NOT NULL,
     create_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()

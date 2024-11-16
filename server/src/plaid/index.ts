@@ -5,7 +5,7 @@ import {
     insertLinkUpdateNotification,
     insertLinkUpdateWithAccountsNotification,
 } from '../controllers/notificationController.js'
-import { fetchActiveItemWithUserIdAndId } from '../database/itemQueries.js'
+import { fetchActiveItemByUserIdAndId } from '../database/itemQueries.js'
 import { HttpError, PlaidApiError } from '../models/error.js'
 import {
     PlaidApiRequest,
@@ -136,7 +136,7 @@ const handleGeneralPlaidError = async (
                 throw new HttpError('missing user id or item id', 400)
             }
 
-            const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
+            const item = await fetchActiveItemByUserIdAndId(userId, itemId)
             if (!item) throw new HttpError('item not found', 404)
 
             switch (error) {

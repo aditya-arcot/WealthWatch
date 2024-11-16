@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import {
-    fetchActiveItemsWithUserId,
-    modifyItemTransactionsLastRefreshedWithPlaidId,
+    fetchActiveItemsByUserId,
+    modifyItemTransactionsLastRefreshedByPlaidId,
 } from '../database/itemQueries.js'
 import {
-    fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters,
-    modifyTransactionCustomCategoryIdWithPlaidId,
-    modifyTransactionCustomNameWithPlaidId,
-    modifyTransactionNoteWithPlaidId,
+    fetchPaginatedActiveTransactionsAndCountsByUserIdAndFilters,
+    modifyTransactionCustomCategoryIdByPlaidId,
+    modifyTransactionCustomNameByPlaidId,
+    modifyTransactionNoteByPlaidId,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
 import {
@@ -17,7 +17,10 @@ import {
 import { logger } from '../utils/logger.js'
 import { refreshItemTransactions } from './itemController.js'
 
-export const getUserTransactions = async (req: Request, res: Response) => {
+export const getUserTransactionsAndCounts = async (
+    req: Request,
+    res: Response
+) => {
     logger.debug('getting transactions')
 
     const userId = req.session.user?.id
@@ -59,8 +62,8 @@ export const getUserTransactions = async (req: Request, res: Response) => {
     const limit = parseNumberOrUndefinedFromParam(req.query['limit'], true)
     const offset = parseNumberOrUndefinedFromParam(req.query['offset'], true)
 
-    const transactions =
-        await fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters(
+    const resp =
+        await fetchPaginatedActiveTransactionsAndCountsByUserIdAndFilters(
             userId,
             searchQuery,
             startDate,
@@ -72,7 +75,7 @@ export const getUserTransactions = async (req: Request, res: Response) => {
             limit,
             offset
         )
-    return res.json(transactions)
+    return res.json(resp)
 }
 
 export const updateTransactionCustomName = async (
@@ -89,7 +92,7 @@ export const updateTransactionCustomName = async (
     if (customName !== null && typeof customName !== 'string')
         throw new HttpError('missing or invalid name', 400)
 
-    await modifyTransactionCustomNameWithPlaidId(plaidTransactionId, customName)
+    await modifyTransactionCustomNameByPlaidId(plaidTransactionId, customName)
 
     return res.status(204).send()
 }
@@ -108,7 +111,7 @@ export const updateTransactionCustomCategoryId = async (
     if (customCategoryId !== null && typeof customCategoryId !== 'number')
         throw new HttpError('missing or invalid category id', 400)
 
-    await modifyTransactionCustomCategoryIdWithPlaidId(
+    await modifyTransactionCustomCategoryIdByPlaidId(
         plaidTransactionId,
         customCategoryId
     )
@@ -127,7 +130,7 @@ export const updateTransactionNote = async (req: Request, res: Response) => {
     if (note !== null && typeof note !== 'string')
         throw new HttpError('missing or invalid note', 400)
 
-    await modifyTransactionNoteWithPlaidId(plaidTransactionId, note)
+    await modifyTransactionNoteByPlaidId(plaidTransactionId, note)
 
     return res.status(204).send()
 }
@@ -138,11 +141,11 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const items = await fetchActiveItemsWithUserId(userId)
+    const items = await fetchActiveItemsByUserId(userId)
     await Promise.all(
         items.map(async (item) => {
             if (await refreshItemTransactions(item)) {
-                await modifyItemTransactionsLastRefreshedWithPlaidId(
+                await modifyItemTransactionsLastRefreshedByPlaidId(
                     item.plaidId,
                     new Date()
                 )

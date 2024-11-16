@@ -4,13 +4,13 @@ import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 export const insertNotification = async (n: Notification): Promise<void> => {
     if (n.typeId !== NotificationTypeEnum.Info && n.itemId !== null) {
         const existingNotification =
-            await fetchActiveNotificationWithTypeIdUserIdAndItemId(
+            await fetchActiveNotificationByTypeIdUserIdAndItemId(
                 n.typeId,
                 n.userId,
                 n.itemId
             )
         if (existingNotification) {
-            await modifyNotificationsToInactiveWithTypeIdUserIdAndItemId(
+            await modifyNotificationsToInactiveByTypeIdUserIdAndItemId(
                 n.typeId,
                 n.userId,
                 n.itemId
@@ -46,7 +46,7 @@ export const insertNotification = async (n: Notification): Promise<void> => {
     await runQuery(query, values)
 }
 
-export const fetchActiveNotificationsWithUserId = async (
+export const fetchActiveNotificationsByUserId = async (
     userId: number
 ): Promise<Notification[]> => {
     const query = `
@@ -58,7 +58,7 @@ export const fetchActiveNotificationsWithUserId = async (
     return rows.map(mapDbNotification)
 }
 
-export const fetchActiveNotificationWithTypeIdUserIdAndItemId = async (
+export const fetchActiveNotificationByTypeIdUserIdAndItemId = async (
     typeId: number,
     userId: number,
     itemId: number
@@ -77,7 +77,7 @@ export const fetchActiveNotificationWithTypeIdUserIdAndItemId = async (
     return mapDbNotification(rows[0])
 }
 
-export const modifyNotificationsToReadWithUserId = async (
+export const modifyNotificationsToReadByUserId = async (
     userId: number
 ): Promise<void> => {
     const values = [userId]
@@ -89,7 +89,7 @@ export const modifyNotificationsToReadWithUserId = async (
     await runQuery(query, values)
 }
 
-export const modifyNotificationsToInactiveWithItemId = async (
+export const modifyNotificationsToInactiveByItemId = async (
     itemId: number
 ): Promise<void> => {
     const query = `
@@ -100,7 +100,7 @@ export const modifyNotificationsToInactiveWithItemId = async (
     await runQuery(query, [itemId])
 }
 
-export const modifyNotificationToInactiveWithUserIdAndId = async (
+export const modifyNotificationToInactiveByUserIdAndId = async (
     userId: number,
     id: number
 ): Promise<void> => {
@@ -114,7 +114,7 @@ export const modifyNotificationToInactiveWithUserIdAndId = async (
     await runQuery(query, values)
 }
 
-export const modifyNotificationsToInactiveWithTypeIdUserIdAndItemId = async (
+export const modifyNotificationsToInactiveByTypeIdUserIdAndItemId = async (
     typeId: number,
     userId: number,
     itemId: number

@@ -20,49 +20,6 @@ const router = express.Router()
 
 /**
  * @swagger
- * /auth/login:
- *   post:
- *     summary: Log in using an existing account
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 required: true
- *               password:
- *                 type: string
- *                 required: true
- *     responses:
- *       200:
- *         description: Logged in the user
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- */
-router.route('/login').post(catchAsync(login))
-
-/**
- * @swagger
- * /auth/logout:
- *   post:
- *     summary: Log out
- *     tags: [Auth]
- *     responses:
- *       204:
- *         description: Logged out the current user
- *       401:
- *          $ref: '#/components/responses/Unauthorized'
- */
-router.route('/logout').post(authenticate, logout)
-
-/**
- * @swagger
  * /auth/access-request:
  *   post:
  *     summary: Request access to the app
@@ -151,5 +108,48 @@ router.route('/access-code').post(catchAsync(validateAccessCode))
  *               $ref: '#/components/schemas/User'
  */
 router.route('/register').post(catchAsync(register))
+
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Log in using an existing account
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 required: true
+ *               password:
+ *                 type: string
+ *                 required: true
+ *     responses:
+ *       200:
+ *         description: Logged in the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ */
+router.route('/login').post(catchAsync(login))
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Log out
+ *     tags: [Auth]
+ *     responses:
+ *       204:
+ *         description: Logged out the current user
+ *       401:
+ *          $ref: '#/components/responses/Unauthorized'
+ */
+router.route('/logout').post(authenticate, logout)
 
 export default router

@@ -1,5 +1,15 @@
 import { DatabaseError } from '../models/error.js'
-import { Item } from '../models/item.js'
+import {
+    Item,
+    ItemWithAccounts,
+    ItemWithAccountsWithHoldings,
+} from '../models/item.js'
+import {
+    DbAccount,
+    DbAccountWithHoldings,
+    mapDbAccount,
+    mapDbAccountWithHoldings,
+} from './accountQueries.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertItem = async (item: Item): Promise<Item> => {
@@ -42,16 +52,7 @@ export const insertItem = async (item: Item): Promise<Item> => {
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItems = async (): Promise<Item[]> => {
-    const query = `
-        SELECT *
-        FROM active_items
-    `
-    const rows = (await runQuery<DbItem>(query)).rows
-    return rows.map(mapDbItem)
-}
-
-export const fetchActiveItemWithPlaidId = async (
+export const fetchActiveItemByPlaidId = async (
     plaidId: string
 ): Promise<Item | undefined> => {
     const query = `
@@ -65,7 +66,7 @@ export const fetchActiveItemWithPlaidId = async (
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItemsWithUserId = async (
+export const fetchActiveItemsByUserId = async (
     userId: number
 ): Promise<Item[]> => {
     const query = `
@@ -77,7 +78,60 @@ export const fetchActiveItemsWithUserId = async (
     return rows.map(mapDbItem)
 }
 
-export const fetchActiveItemWithUserIdAndId = async (
+export const fetchActiveItemsWithAccountsByUserId = async (
+    userId: number
+): Promise<ItemWithAccounts[]> => {
+    const query = `
+        SELECT
+            i.*,
+            ARRAY_AGG (TO_JSONB (a.*)) as accounts
+        FROM items i
+        JOIN accounts a
+            ON a.item_id = i.id
+            AND a.active = TRUE
+        WHERE i.user_id = $1
+            AND i.active = TRUE
+        GROUP BY i.id
+    `
+    const rows = (await runQuery<DbItemWithAccounts>(query, [userId])).rows
+    return rows.map(mapDbItemWithAccounts)
+}
+
+export const fetchActiveItemsWithAccountsWithHoldingsByUserId = async (
+    userId: number
+): Promise<ItemWithAccountsWithHoldings[]> => {
+    const query = `
+        SELECT
+            i.*,
+            ARRAY_AGG (
+                TO_JSONB (a.*) || JSONB_BUILD_OBJECT (
+                    'holdings', (
+                        SELECT ARRAY_AGG (TO_JSONB (h.*))
+                        FROM active_holdings h
+                        WHERE h.account_id = a.id
+                    )
+                )
+            ) as accounts
+        FROM items i
+        JOIN accounts a
+            ON a.item_id = i.id
+            AND a.active = TRUE
+        WHERE i.user_id = $1
+            AND i.active = TRUE
+            AND EXISTS (
+                SELECT 1
+                FROM active_holdings h
+                WHERE h.account_id = a.id
+            )
+        GROUP BY i.id
+    `
+    const rows = (
+        await runQuery<DbItemWithAccountsWithHoldings>(query, [userId])
+    ).rows
+    return rows.map(mapDbItemWithAccountsWithHoldings)
+}
+
+export const fetchActiveItemByUserIdAndId = async (
     userId: number,
     itemId: number
 ): Promise<Item | undefined> => {
@@ -93,7 +147,7 @@ export const fetchActiveItemWithUserIdAndId = async (
     return mapDbItem(rows[0])
 }
 
-export const fetchActiveItemWithUserIdAndInstitutionId = async (
+export const fetchActiveItemByUserIdAndInstitutionId = async (
     userId: number,
     institutionId: string
 ): Promise<Item | undefined> => {
@@ -109,19 +163,16 @@ export const fetchActiveItemWithUserIdAndInstitutionId = async (
     return mapDbItem(rows[0])
 }
 
-export const modifyItemActiveWithId = async (
-    id: number,
-    active: boolean
-): Promise<void> => {
+export const modifyItemToInactiveById = async (id: number): Promise<void> => {
     const query = `
         UPDATE items
-        SET active = $1
-        WHERE id = $2
+        SET active = false
+        WHERE id = $1
     `
-    await runQuery(query, [active, id])
+    await runQuery(query, [id])
 }
 
-export const modifyItemHealthyWithId = async (
+export const modifyItemHealthyById = async (
     id: number,
     healthy: boolean
 ): Promise<void> => {
@@ -133,7 +184,7 @@ export const modifyItemHealthyWithId = async (
     await runQuery(query, [healthy, id])
 }
 
-export const modifyItemLastRefreshedWithPlaidId = async (
+export const modifyItemLastRefreshedByPlaidId = async (
     plaidId: string,
     lastRefreshed: Date
 ): Promise<void> => {
@@ -145,7 +196,7 @@ export const modifyItemLastRefreshedWithPlaidId = async (
     await runQuery(query, [lastRefreshed, plaidId])
 }
 
-export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
+export const modifyItemTransactionsLastRefreshedByPlaidId = async (
     plaidId: string,
     transactionsLastRefreshed: Date
 ): Promise<void> => {
@@ -157,7 +208,7 @@ export const modifyItemTransactionsLastRefreshedWithPlaidId = async (
     await runQuery(query, [transactionsLastRefreshed, plaidId])
 }
 
-export const modifyItemInvestmentsLastRefreshedWithPlaidId = async (
+export const modifyItemInvestmentsLastRefreshedByPlaidId = async (
     plaidId: string,
     investmentsLastRefreshed: Date
 ): Promise<void> => {
@@ -169,7 +220,7 @@ export const modifyItemInvestmentsLastRefreshedWithPlaidId = async (
     await runQuery(query, [investmentsLastRefreshed, plaidId])
 }
 
-export const modifyItemCursorWithPlaidId = async (
+export const modifyItemCursorByPlaidId = async (
     plaidId: string,
     cursor: string | null
 ): Promise<void> => {
@@ -209,4 +260,48 @@ const mapDbItem = (dbItem: DbItem): Item => ({
     lastRefreshed: dbItem.last_refreshed,
     transactionsLastRefreshed: dbItem.transactions_last_refreshed,
     investmentsLastRefreshed: dbItem.investments_last_refreshed,
+})
+
+interface DbItemWithAccounts extends DbItem {
+    accounts: DbAccount[]
+}
+
+const mapDbItemWithAccounts = (
+    dbItem: DbItemWithAccounts
+): ItemWithAccounts => ({
+    id: dbItem.id,
+    userId: dbItem.user_id,
+    plaidId: dbItem.plaid_id,
+    active: dbItem.active,
+    accessToken: dbItem.access_token,
+    institutionId: dbItem.institution_id,
+    institutionName: dbItem.institution_name,
+    healthy: dbItem.healthy,
+    cursor: dbItem.cursor,
+    lastRefreshed: dbItem.last_refreshed,
+    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
+    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    accounts: dbItem.accounts.map(mapDbAccount),
+})
+
+interface DbItemWithAccountsWithHoldings extends DbItem {
+    accounts: DbAccountWithHoldings[]
+}
+
+const mapDbItemWithAccountsWithHoldings = (
+    dbItem: DbItemWithAccountsWithHoldings
+): ItemWithAccountsWithHoldings => ({
+    id: dbItem.id,
+    userId: dbItem.user_id,
+    plaidId: dbItem.plaid_id,
+    active: dbItem.active,
+    accessToken: dbItem.access_token,
+    institutionId: dbItem.institution_id,
+    institutionName: dbItem.institution_name,
+    healthy: dbItem.healthy,
+    cursor: dbItem.cursor,
+    lastRefreshed: dbItem.last_refreshed,
+    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
+    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    accounts: dbItem.accounts.map(mapDbAccountWithHoldings),
 })

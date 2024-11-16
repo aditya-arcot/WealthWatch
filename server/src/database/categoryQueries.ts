@@ -3,7 +3,7 @@ import { runQuery } from './index.js'
 
 export const fetchCategories = async (): Promise<Category[]> => {
     const query = `
-        SELECT * FROM categories
+        SELECT * FROM lookup.categories
         ORDER BY name
     `
     const rows = (await runQuery<DbCategory>(query)).rows

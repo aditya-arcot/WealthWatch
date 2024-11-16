@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
-import { FormsModule } from '@angular/forms'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
@@ -13,10 +12,7 @@ import {
     CategoryGroupEnum,
 } from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
-import {
-    CategoryTotalAndCount,
-    CategoryTotalByDate,
-} from '../../models/spending'
+import { CategorySummary, CategoryTotalByDate } from '../../models/spending'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
@@ -31,7 +27,6 @@ import { checkDatesEqual } from '../../utilities/date.utility'
     standalone: true,
     imports: [
         LoadingSpinnerComponent,
-        FormsModule,
         BaseChartDirective,
         DateFilterComponent,
         CommonModule,
@@ -51,9 +46,9 @@ export class SpendingComponent implements OnInit {
     defaultEndDate: Date | null = null
 
     categories: Category[] = []
-    totalAndCountByCategory: CategoryTotalAndCount[] = []
+    categorySummaries: CategorySummary[] = []
     dates: Date[] = []
-    totalByCategoryAndDate: CategoryTotalByDate[] = []
+    spendingCategoryTotalsByDate: CategoryTotalByDate[] = []
 
     includeBills = true
     incomeTotal: number | undefined = undefined
@@ -61,8 +56,9 @@ export class SpendingComponent implements OnInit {
     billsTotal: number | undefined = undefined
     billsCount: number | undefined = undefined
     spendingTotal = 0
-    spendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
-    nonSpendingCategoriesTotalAndCount: CategoryTotalAndCount[] = []
+    nonSpendingTotal = 0
+    spendingCategorySummaries: CategorySummary[] = []
+    nonSpendingCategorySummaries: CategorySummary[] = []
 
     barGraphLabels: string[] = []
     barGraphDatasets: {
@@ -181,7 +177,7 @@ export class SpendingComponent implements OnInit {
         this.loading = true
         this.loadCategories()
             .pipe(
-                switchMap(() => this.loadTotalAndCountByCategory()),
+                switchMap(() => this.loadCategorySummaries()),
                 switchMap(() => this.loadTotalByCategoryAndDate()),
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert('Failed to load data', [
@@ -211,20 +207,17 @@ export class SpendingComponent implements OnInit {
         )
     }
 
-    loadTotalAndCountByCategory(): Observable<void> {
+    loadCategorySummaries(): Observable<void> {
         return this.spendingSvc
-            .getTotalAndCountByCategory(this.startDate, this.endDate)
+            .getCategorySummaries(this.startDate, this.endDate)
             .pipe(
-                switchMap((t) => {
-                    this.logger.debug('loaded total and count by category', t)
-                    this.totalAndCountByCategory = t
+                switchMap((s) => {
+                    this.logger.debug('loaded category summaries', s)
+                    this.categorySummaries = s
                     return of(undefined)
                 }),
                 catchError((err: HttpErrorResponse) => {
-                    this.logger.error(
-                        'failed to load total and count by category',
-                        err
-                    )
+                    this.logger.error('failed to load category summaries', err)
                     return throwError(() => err)
                 })
             )
@@ -232,17 +225,17 @@ export class SpendingComponent implements OnInit {
 
     loadTotalByCategoryAndDate(): Observable<void> {
         return this.spendingSvc
-            .getTotalByCategoryAndDate(this.startDate, this.endDate)
+            .getSpendingCategoryTotalsByDate(this.startDate, this.endDate)
             .pipe(
                 switchMap((t) => {
-                    this.logger.debug('loaded total by category and date', t)
+                    this.logger.debug('loaded spending category totals', t)
                     this.dates = t.dates
-                    this.totalByCategoryAndDate = t.totals
+                    this.spendingCategoryTotalsByDate = t.totals
                     return of(undefined)
                 }),
                 catchError((err: HttpErrorResponse) => {
                     this.logger.error(
-                        'failed to load total by category and date',
+                        'failed to load spending category totals',
                         err
                     )
                     return throwError(() => err)
@@ -256,8 +249,9 @@ export class SpendingComponent implements OnInit {
         this.billsTotal = undefined
         this.billsCount = undefined
         this.spendingTotal = 0
-        this.spendingCategoriesTotalAndCount = []
-        this.nonSpendingCategoriesTotalAndCount = []
+        this.nonSpendingTotal = 0
+        this.spendingCategorySummaries = []
+        this.nonSpendingCategorySummaries = []
 
         this.pieChartLabels = []
         this.pieChartDataset = []
@@ -265,48 +259,51 @@ export class SpendingComponent implements OnInit {
         this.barGraphLabels = []
         this.barGraphDatasets = []
 
-        this.totalAndCountByCategory.forEach((t) => {
-            const category = this.categories.find((c) => c.id === t.categoryId)
+        this.categorySummaries.forEach((s) => {
+            const category = this.categories.find((c) => c.id === s.categoryId)
             if (!category) return
 
             if (category.id === CategoryEnum.Income) {
-                this.incomeTotal = t.total
-                this.incomeCount = t.count
+                this.incomeTotal = s.total
+                this.incomeCount = s.count
                 return
             } else if (category.id === CategoryEnum.Bills) {
-                this.billsTotal = t.total
-                this.billsCount = t.count
-                if (t.total > 0) {
+                this.billsTotal = s.total
+                this.billsCount = s.count
+                if (s.total > 0) {
                     this.pieChartLabels.push(category.name)
-                    this.pieChartDataset.push(t.total)
+                    this.pieChartDataset.push(s.total)
                 }
                 return
             }
 
             if (category.groupId === CategoryGroupEnum.Spending) {
-                this.spendingTotal += t.total
-                this.spendingCategoriesTotalAndCount.push(t)
+                this.spendingTotal += s.total
+                this.spendingCategorySummaries.push(s)
 
-                if (t.total > 0) {
+                if (s.total > 0) {
                     this.pieChartLabels.push(category.name)
-                    this.pieChartDataset.push(t.total)
+                    this.pieChartDataset.push(s.total)
                 }
             } else {
-                this.nonSpendingCategoriesTotalAndCount.push(t)
+                this.nonSpendingTotal += s.total
+                this.nonSpendingCategorySummaries.push(s)
             }
         })
 
         this.barGraphLabels = this.dates.map((d) => this.getDateString(d))
 
-        this.totalByCategoryAndDate.forEach((t) => {
+        this.spendingCategoryTotalsByDate.forEach((t) => {
             const category = this.categories.find((c) => c.id === t.categoryId)
             if (!category) return
-            if (category.groupId !== CategoryGroupEnum.Spending) return
             if (category.id === CategoryEnum.Bills && !this.includeBills) return
 
+            const data = this.dates.map(
+                (date) => t.totalByDate.find((d) => d.date === date)?.total || 0
+            )
             this.barGraphDatasets.push({
                 label: category.name,
-                data: t.totalByDate,
+                data,
             })
         })
 
@@ -319,43 +316,49 @@ export class SpendingComponent implements OnInit {
         const billsCategory = this.categories.find(
             (c) => c.id === CategoryEnum.Bills
         )
-        if (billsCategory) {
-            if (this.includeBills) {
-                const billsLabelIdx = this.pieChartLabels.findIndex(
-                    (l) => l === billsCategory.name
-                )
-                if (billsLabelIdx !== -1) {
-                    this.pieChartLabels.splice(billsLabelIdx, 1)
-                    this.pieChartDataset.splice(billsLabelIdx, 1)
-                }
+        if (!billsCategory) throw Error('could not find bills category')
 
-                const billsDatasetIdx = this.barGraphDatasets.findIndex(
-                    (d) => d.label === billsCategory.name
-                )
-                if (billsDatasetIdx !== -1) {
-                    this.barGraphDatasets.splice(billsDatasetIdx, 1)
-                }
-            } else {
-                const billsTotal = this.totalAndCountByCategory.find(
-                    (t) => t.categoryId === CategoryEnum.Bills
-                )?.total
-                if (billsTotal !== undefined && billsTotal > 0) {
-                    this.pieChartLabels.push(billsCategory.name)
-                    this.pieChartDataset.push(billsTotal)
-                }
+        if (this.includeBills) {
+            const billsLabelIdx = this.pieChartLabels.findIndex(
+                (l) => l === billsCategory.name
+            )
+            if (billsLabelIdx !== -1) {
+                this.pieChartLabels.splice(billsLabelIdx, 1)
+                this.pieChartDataset.splice(billsLabelIdx, 1)
+            }
 
-                const billsTotalByDate = this.totalByCategoryAndDate.find(
-                    (t) => t.categoryId === CategoryEnum.Bills
-                )?.totalByDate
-                if (billsTotalByDate) {
-                    this.barGraphDatasets.push({
-                        label: billsCategory.name,
-                        data: billsTotalByDate,
-                    })
-                }
+            const billsDatasetIdx = this.barGraphDatasets.findIndex(
+                (d) => d.label === billsCategory.name
+            )
+            if (billsDatasetIdx !== -1) {
+                this.barGraphDatasets.splice(billsDatasetIdx, 1)
+            }
+        } else {
+            const billsTotal = this.categorySummaries.find(
+                (s) => s.categoryId === CategoryEnum.Bills
+            )?.total
+            if (billsTotal !== undefined && billsTotal > 0) {
+                this.pieChartLabels.push(billsCategory.name)
+                this.pieChartDataset.push(billsTotal)
+            }
+
+            const billsTotalByDate = this.spendingCategoryTotalsByDate.find(
+                (t) => t.categoryId === CategoryEnum.Bills
+            )?.totalByDate
+            if (billsTotalByDate) {
+                const data = this.dates.map(
+                    (date) =>
+                        billsTotalByDate.find((d) => d.date === date)?.total ||
+                        0
+                )
+                this.barGraphDatasets.push({
+                    label: billsCategory.name,
+                    data,
+                })
             }
         }
         this.includeBills = !this.includeBills
+
         this.updateCharts()
         this.loading = false
     }
@@ -442,6 +445,10 @@ export class SpendingComponent implements OnInit {
         return this.getAmountString(this.spendingTotal)
     }
 
+    getNonSpendingTotalString(): string {
+        return this.getAmountString(this.nonSpendingTotal)
+    }
+
     getAmountString(total: number): string {
         const negative = total < 0
         const formatted = this.currencySvc.format(Math.abs(total), 'USD')
@@ -468,6 +475,13 @@ export class SpendingComponent implements OnInit {
             this.spendingTotal +
             (this.includeBills && this.billsTotal ? this.billsTotal : 0)
         return this.percentSvc.format(amount / spendingBillsTotal)
+    }
+
+    getPercentNonSpendingString(amount: number): string {
+        const nonSpendingBillsTotal =
+            this.nonSpendingTotal +
+            (!this.includeBills && this.billsTotal ? this.billsTotal : 0)
+        return this.percentSvc.format(amount / nonSpendingBillsTotal)
     }
 
     getPercentIncomeString(amount: number | undefined): string {

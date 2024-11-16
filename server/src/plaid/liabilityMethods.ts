@@ -33,8 +33,7 @@ export const plaidLiabilitiesGet = async (item: Item) => {
         return {
             credit: resp.data.liabilities.credit,
             mortgage: resp.data.liabilities.mortgage,
-            student: resp.data.liabilities
-                .student as PlaidStudentLoanLiabilityWithBalance[],
+            student: resp.data.liabilities.student,
         }
     }
     return {
@@ -101,12 +100,8 @@ export const mapPlaidMortgageLiability = (
     ytdPrincipalPaid: liability.ytd_principal_paid,
 })
 
-export type PlaidStudentLoanLiabilityWithBalance = PlaidStudentLoanLiability & {
-    last_statement_balance: number | null
-}
-
 export const mapPlaidStudentLoanLiability = (
-    liability: PlaidStudentLoanLiabilityWithBalance,
+    liability: PlaidStudentLoanLiability,
     accountId: number
 ): StudentLoanLiability => ({
     id: -1,
@@ -144,7 +139,7 @@ export const mapPlaidStudentLoanLiability = (
     lastStatementDate: liability.last_statement_issue_date
         ? new Date(liability.last_statement_issue_date)
         : null,
-    lastStatementBalance: liability.last_statement_balance,
+    lastStatementBalance: liability.last_statement_balance || null,
     nextPaymentDueDate: liability.next_payment_due_date
         ? new Date(liability.next_payment_due_date)
         : null,

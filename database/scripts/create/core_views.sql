@@ -13,15 +13,15 @@ WHERE a.active = TRUE
 ORDER BY a.id;
 
 CREATE VIEW core.active_transactions AS
-SELECT aa.user_id, t.*
+SELECT a.user_id, t.*
 FROM transactions t
-JOIN active_accounts aa
-    ON t.account_id = aa.id
+JOIN active_accounts a
+    ON t.account_id = a.id
 ORDER BY t.date DESC, t.id;
 
 CREATE VIEW core.active_holdings AS
 SELECT 
-	aa.user_id,
+	a.user_id,
     h.id,
     h.account_id,
     s.name,
@@ -41,11 +41,32 @@ SELECT
     h.create_timestamp,
     h.update_timestamp
 FROM holdings h
-JOIN active_accounts aa
-    ON h.account_id = aa.id
+JOIN active_accounts a
+    ON h.account_id = a.id
 JOIN securities s 
 	ON h.security_id = s.id
 ORDER BY h.account_id, h.id;
+
+CREATE VIEW core.active_credit_card_liabilities AS
+SELECT a.user_id, c.*
+FROM credit_card_liabilities c
+JOIN active_accounts a
+    ON c.account_id = a.id
+ORDER BY c.id;
+
+CREATE VIEW core.active_mortgage_liabilities AS
+SELECT a.user_id, m.*
+FROM mortgage_liabilities m
+JOIN active_accounts a
+    ON m.account_id = a.id
+ORDER BY m.id;
+
+CREATE VIEW core.active_student_loan_liabilities AS
+SELECT a.user_id, s.*
+FROM student_loan_liabilities s
+JOIN active_accounts a
+    ON s.account_id = a.id
+ORDER BY s.id;
 
 CREATE VIEW core.active_notifications AS
 SELECT *

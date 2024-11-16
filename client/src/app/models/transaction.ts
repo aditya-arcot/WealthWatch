@@ -31,7 +31,7 @@ export interface TransactionsRequestParams {
     offset?: number
 }
 
-export interface TransactionsWithCounts {
+export interface TransactionsAndCounts {
     transactions: Transaction[]
     filteredCount: number | null
     totalCount: number

@@ -22,7 +22,7 @@ export const insertPlaidApiRequest = async (
     const rowCount = 1
     const paramCount = values.length
     const query = `
-        INSERT INTO plaid_api_requests (
+        INSERT INTO debug.plaid_api_requests (
             user_id,
             item_id,
             timestamp,

@@ -25,7 +25,7 @@ export const insertPlaidLinkEvent = async (
     const rowCount = 1
     const paramCount = values.length
     const query = `
-        INSERT INTO plaid_link_events (
+        INSERT INTO debug.plaid_link_events (
             user_id,
             timestamp,
             type,

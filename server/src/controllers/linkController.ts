@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
-    fetchActiveItemWithUserIdAndId,
-    fetchActiveItemWithUserIdAndInstitutionId,
+    fetchActiveItemByUserIdAndId,
+    fetchActiveItemByUserIdAndInstitutionId,
     insertItem,
-    modifyItemHealthyWithId,
+    modifyItemHealthyById,
 } from '../database/itemQueries.js'
-import { modifyNotificationsToInactiveWithTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
+import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
 import { NotificationTypeEnum } from '../models/notification.js'
@@ -37,7 +37,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
     if (updateAccounts !== undefined && typeof updateAccounts !== 'boolean')
         throw new HttpError('invalid update accounts flag', 400)
 
-    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
+    const item = await fetchActiveItemByUserIdAndId(userId, itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const linkToken = await plaidLinkTokenCreate(userId, item, updateAccounts)
@@ -78,7 +78,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     )
         throw new HttpError('missing institution info', 400)
 
-    const existingItem = await fetchActiveItemWithUserIdAndInstitutionId(
+    const existingItem = await fetchActiveItemByUserIdAndInstitutionId(
         userId,
         institution.institution_id
     )
@@ -120,11 +120,11 @@ export const handleLinkUpdateComplete = async (req: Request, res: Response) => {
     const itemId = req.body.itemId
     if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
 
-    const item = await fetchActiveItemWithUserIdAndId(userId, itemId)
+    const item = await fetchActiveItemByUserIdAndId(userId, itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     logger.debug('updating item to healthy')
-    await modifyItemHealthyWithId(itemId, true)
+    await modifyItemHealthyById(itemId, true)
 
     const notificationTypeId = req.body.notificationTypeId
     if (typeof notificationTypeId !== 'number')
@@ -136,7 +136,7 @@ export const handleLinkUpdateComplete = async (req: Request, res: Response) => {
     }
 
     logger.debug('updating notifications to inactive')
-    await modifyNotificationsToInactiveWithTypeIdUserIdAndItemId(
+    await modifyNotificationsToInactiveByTypeIdUserIdAndItemId(
         notificationTypeId,
         userId,
         itemId

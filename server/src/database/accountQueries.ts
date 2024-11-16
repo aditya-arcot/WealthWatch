@@ -1,4 +1,8 @@
-import { Account } from '../models/account.js'
+import { Account, AccountWithHoldings } from '../models/account.js'
+import {
+    DbHoldingWithSecurity,
+    mapDbHoldingWithSecurity,
+} from './holdingQueries.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
@@ -70,7 +74,7 @@ export const insertAccounts = async (
     await runQuery(query, values)
 }
 
-export const fetchActiveAccountsWithUserId = async (
+export const fetchActiveAccountsByUserId = async (
     userId: number
 ): Promise<Account[]> => {
     const query = `
@@ -82,21 +86,20 @@ export const fetchActiveAccountsWithUserId = async (
     return rows.map(mapDbAccount)
 }
 
-export const modifyAccountsActiveWithPlaidItemId = async (
-    plaidItemId: string,
-    active: boolean
+export const modifyAccountsToInactiveByPlaidItemId = async (
+    plaidItemId: string
 ): Promise<void> => {
     const query = `
         UPDATE accounts a
-        SET active = $1 
+        SET active = false
         FROM active_items ai
-        WHERE ai.id = a.item_id 
-            and ai.plaid_id = $2
+        WHERE ai.id = a.item_id
+            and ai.plaid_id = $1
     `
-    await runQuery(query, [active, plaidItemId])
+    await runQuery(query, [plaidItemId])
 }
 
-interface DbAccount {
+export interface DbAccount {
     id: number
     item_id: number
     plaid_id: string
@@ -113,7 +116,7 @@ interface DbAccount {
     subtype: string | null
 }
 
-const mapDbAccount = (acc: DbAccount): Account => ({
+export const mapDbAccount = (acc: DbAccount): Account => ({
     id: acc.id,
     itemId: acc.item_id,
     plaidId: acc.plaid_id,
@@ -128,4 +131,28 @@ const mapDbAccount = (acc: DbAccount): Account => ({
     creditLimit: acc.credit_limit,
     type: acc.type,
     subtype: acc.subtype,
+})
+
+export interface DbAccountWithHoldings extends DbAccount {
+    holdings: DbHoldingWithSecurity[]
+}
+
+export const mapDbAccountWithHoldings = (
+    acc: DbAccountWithHoldings
+): AccountWithHoldings => ({
+    id: acc.id,
+    itemId: acc.item_id,
+    plaidId: acc.plaid_id,
+    active: acc.active,
+    name: acc.name,
+    mask: acc.mask,
+    officialName: acc.official_name,
+    currentBalance: acc.current_balance,
+    availableBalance: acc.available_balance,
+    isoCurrencyCode: acc.iso_currency_code,
+    unofficialCurrencyCode: acc.unofficial_currency_code,
+    creditLimit: acc.credit_limit,
+    type: acc.type,
+    subtype: acc.subtype,
+    holdings: acc.holdings.map(mapDbHoldingWithSecurity),
 })

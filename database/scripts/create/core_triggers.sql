@@ -15,11 +15,6 @@ BEFORE UPDATE ON items
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
-CREATE TRIGGER trigger_notifications_update_timestamp
-BEFORE UPDATE ON notifications
-FOR EACH ROW
-EXECUTE PROCEDURE set_update_timestamp();
-
 CREATE TRIGGER trigger_accounts_update_timestamp
 BEFORE UPDATE ON accounts
 FOR EACH ROW
@@ -55,6 +50,11 @@ BEFORE UPDATE ON student_loan_liabilities
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
+CREATE TRIGGER trigger_notifications_update_timestamp
+BEFORE UPDATE ON notifications
+FOR EACH ROW
+EXECUTE PROCEDURE set_update_timestamp();
+
 -- AUDIT
 
 CREATE TRIGGER trigger_access_requests_insert_audit
@@ -69,11 +69,6 @@ EXECUTE FUNCTION insert_audit_record();
 
 CREATE TRIGGER trigger_items_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON items
-FOR EACH ROW
-EXECUTE FUNCTION insert_audit_record();
-
-CREATE TRIGGER trigger_notifications_insert_audit
-AFTER INSERT OR UPDATE OR DELETE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
@@ -109,5 +104,10 @@ EXECUTE FUNCTION insert_audit_record();
 
 CREATE TRIGGER trigger_student_loan_liabilities_insert_audit
 AFTER INSERT OR UPDATE OR DELETE ON student_loan_liabilities
+FOR EACH ROW
+EXECUTE FUNCTION insert_audit_record();
+
+CREATE TRIGGER trigger_notifications_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();

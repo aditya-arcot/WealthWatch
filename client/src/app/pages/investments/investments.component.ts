@@ -3,13 +3,12 @@ import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
+import { catchError, finalize, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { Account, AccountWithHoldings } from '../../models/account'
+import { AccountWithHoldings } from '../../models/account'
 import { HoldingWithSecurity } from '../../models/holding'
 import { ItemWithAccountsWithHoldings } from '../../models/item'
 import { SecurityTypeEnum } from '../../models/security'
-import { AccountService } from '../../services/account.service'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { InvestmentService } from '../../services/investment.service'
@@ -29,11 +28,7 @@ export class InvestmentsComponent implements OnInit {
 
     loading = false
 
-    unfilteredItems: ItemWithAccountsWithHoldings[] = []
     items: ItemWithAccountsWithHoldings[] = []
-    accounts: Account[] = []
-    holdings: HoldingWithSecurity[] = []
-
     selectedAccountIds: Set<number> = new Set<number>()
 
     pieChartLabels: string[] = []
@@ -70,7 +65,6 @@ export class InvestmentsComponent implements OnInit {
         private logger: LoggerService,
         private alertSvc: AlertService,
         private itemSvc: ItemService,
-        private accountSvc: AccountService,
         private investmentSvc: InvestmentService,
         private currencySvc: CurrencyService,
         private percentSvc: PercentService
@@ -82,108 +76,24 @@ export class InvestmentsComponent implements OnInit {
 
     loadData(): void {
         this.loading = true
-        this.loadItems()
+        this.itemSvc
+            .getItemsWithAccountsWithHoldings()
             .pipe(
-                switchMap(() => this.loadAccounts()),
-                switchMap(() => this.loadHoldings()),
                 catchError((err: HttpErrorResponse) => {
-                    this.logger.error('failed to load data', err.message)
-                    this.loading = false
+                    this.alertSvc.addErrorAlert('Failed to load holdings', [
+                        err.message,
+                    ])
                     return throwError(() => err)
-                })
+                }),
+                finalize(() => (this.loading = false))
             )
-            .subscribe(() => {
-                this.mapData()
+            .subscribe((items) => {
+                this.items = items
                 this.processData()
-                this.loading = false
             })
     }
 
-    loadItems(): Observable<void> {
-        return this.itemSvc.getItems().pipe(
-            switchMap((i) => {
-                this.logger.debug('loaded items', i)
-                this.unfilteredItems = i.map((item) => {
-                    return { ...item, accounts: [] }
-                })
-                this.items = []
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load items', err)
-                return throwError(() => err)
-            })
-        )
-    }
-
-    loadAccounts(): Observable<void> {
-        return this.accountSvc.getAccounts().pipe(
-            switchMap((a) => {
-                this.logger.debug('loaded accounts', a)
-                this.accounts = a
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load accounts', err)
-                return throwError(() => err)
-            })
-        )
-    }
-
-    loadHoldings(): Observable<void> {
-        return this.investmentSvc.getHoldings().pipe(
-            switchMap((h) => {
-                this.logger.debug('loaded holdings', h)
-                this.holdings = h
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load holdings', err)
-                return throwError(() => err)
-            })
-        )
-    }
-
-    mapData(): void {
-        this.holdings.forEach((h) => {
-            const account = this.accounts.find((a) => a.id === h.accountId)
-            if (!account) {
-                this.alertSvc.addErrorAlert(
-                    'Something went wrong. Please report this issue.',
-                    [
-                        `Failed to find account ${h.accountId} for holding ${h.id}`,
-                    ]
-                )
-                return
-            }
-
-            const item = this.unfilteredItems.find(
-                (i) => i.id === account?.itemId
-            )
-            if (!item) {
-                this.alertSvc.addErrorAlert(
-                    'Something went wrong. Please report this issue.',
-                    [
-                        `Failed to find item with id ${account?.itemId} for account ${account?.id}`,
-                    ]
-                )
-                return
-            }
-
-            const existingAccount = item.accounts.find(
-                (a) => a.id === account.id
-            )
-            if (existingAccount) {
-                existingAccount.holdings.push(h)
-                return
-            }
-
-            const newAccount = { ...account, holdings: [h] }
-            item.accounts.push(newAccount)
-        })
-
-        this.items = this.unfilteredItems.filter((i) => i.accounts.length > 0)
-
+    processData(): void {
         this.selectedAccountIds = new Set<number>(
             this.items
                 .map((i) => i.accounts)
@@ -191,10 +101,6 @@ export class InvestmentsComponent implements OnInit {
                 .map((a) => a.id)
         )
 
-        this.logger.debug('mapped data', this.items)
-    }
-
-    processData(): void {
         this.pieChartLabels = []
         this.pieChartLabelAccountIds = []
         this.pieChartDataset = []

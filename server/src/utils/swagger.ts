@@ -21,7 +21,7 @@ export const createSwaggerSpec = () => {
     if (production) throw new HttpError('swagger should not be used in prod')
     const options = {
         definition: {
-            openapi: '3.1.0',
+            openapi: '3.0.3',
             info: {
                 title: `WealthWatch API - ${vars.nodeEnv}`,
                 version: '1.0.0',
@@ -33,31 +33,24 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The access request id',
                             },
                             email: {
                                 type: 'string',
-                                description: 'The user email',
                             },
                             firstName: {
                                 type: 'string',
-                                description: 'The user first name',
                             },
                             lastName: {
                                 type: 'string',
-                                description: 'The user last name',
                             },
                             statusId: {
                                 type: 'number',
-                                description: 'The access request status id',
                             },
                             accessCode: {
                                 type: 'string',
-                                description: 'The access code',
                             },
                             reviewer: {
                                 type: 'string',
-                                description: 'The access request reviewer',
                             },
                         },
                     },
@@ -66,56 +59,42 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The account id',
                             },
                             itemId: {
                                 type: 'number',
-                                description: 'The item id',
                             },
                             accountId: {
                                 type: 'string',
-                                description: 'The Plaid account id',
                             },
                             name: {
                                 type: 'string',
-                                description: 'The account name',
                             },
                             mask: {
                                 type: 'string',
-                                description: 'The account mask',
                             },
                             officialName: {
                                 type: 'string',
-                                description: 'The account official name',
                             },
                             currentBalance: {
                                 type: 'number',
-                                description: 'The account current balance',
                             },
                             availableBalance: {
                                 type: 'number',
-                                description: 'The account available balance',
                             },
                             isoCurrencyCode: {
                                 type: 'string',
-                                description: 'The account ISO currency code',
                             },
                             unofficialCurrencyCode: {
                                 type: 'string',
-                                description:
-                                    'The account unofficial currency code',
                             },
                             creditLimit: {
                                 type: 'number',
-                                description: 'The account credit limit',
                             },
                             type: {
                                 type: 'string',
-                                description: 'The account type',
                             },
                             subtype: {
                                 type: 'string',
-                                description: 'The account subtype',
                             },
                         },
                     },
@@ -124,28 +103,23 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The category id',
                             },
                             name: {
                                 type: 'string',
-                                description: 'The category name',
                             },
                         },
                     },
-                    CategoryTotalAndCount: {
+                    CategorySummary: {
                         type: 'object',
                         properties: {
                             categoryId: {
                                 type: 'number',
-                                description: 'The category id',
                             },
                             total: {
                                 type: 'number',
-                                description: 'The category transaction total',
                             },
                             count: {
                                 type: 'number',
-                                description: 'The category transaction count',
                             },
                         },
                     },
@@ -154,12 +128,59 @@ export const createSwaggerSpec = () => {
                         properties: {
                             categoryId: {
                                 type: 'number',
-                                description: 'The category id',
                             },
                             totalByDate: {
                                 type: 'array',
-                                description:
-                                    'The category transaction total by date',
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                        date: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        total: {
+                                            type: 'number',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    CreditCardLiability: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                            },
+                            accountId: {
+                                type: 'number',
+                            },
+                            aprs: {
+                                type: 'object',
+                            },
+                            overdue: {
+                                type: 'boolean',
+                            },
+                            lastPaymentDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            lastPaymentAmount: {
+                                type: 'number',
+                            },
+                            lastStatementDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            lastStatementBalance: {
+                                type: 'number',
+                            },
+                            nextPaymentDueDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            minimumPaymentAmount: {
+                                type: 'number',
                             },
                         },
                     },
@@ -168,70 +189,53 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The holding id',
                             },
                             accountId: {
                                 type: 'number',
-                                description: 'The account id',
                             },
                             name: {
                                 type: 'string',
-                                description: 'The holding name',
                             },
                             typeId: {
                                 type: 'number',
-                                description: 'The holding type id',
                             },
                             cashEquivalent: {
                                 type: 'boolean',
-                                description:
-                                    'The holding cash equivalent status',
                             },
                             ticker: {
                                 type: 'string',
-                                description: 'The holding ticker',
                             },
                             marketCode: {
                                 type: 'string',
-                                description: 'The holding market code',
                             },
                             price: {
                                 type: 'number',
-                                description: 'The holding price',
                             },
                             priceAsOf: {
-                                type: 'date',
-                                description: 'The holding price as of date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             closePrice: {
                                 type: 'number',
-                                description: 'The holding close price',
                             },
                             closePriceAsOf: {
-                                type: 'date',
-                                description:
-                                    'The holding close price as of date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             quantity: {
                                 type: 'number',
-                                description: 'The holding quantity',
                             },
                             value: {
                                 type: 'number',
-                                description: 'The holding value',
                             },
                             costBasis: {
                                 type: 'number',
-                                description: 'The holding cost basis',
                             },
                             isoCurrencyCode: {
                                 type: 'string',
-                                description: 'The holding ISO currency code',
                             },
                             unofficialCurrencyCode: {
                                 type: 'string',
-                                description:
-                                    'The holding unofficial currency code',
                             },
                         },
                     },
@@ -240,49 +244,110 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The item id',
                             },
                             userId: {
                                 type: 'number',
-                                description: 'The user id',
                             },
                             itemId: {
                                 type: 'string',
-                                description: 'The Plaid item id',
                             },
                             active: {
                                 type: 'boolean',
-                                description: 'The item active status',
                             },
                             accessToken: {
                                 type: 'string',
-                                description: 'The item access token',
                             },
                             institutionId: {
                                 type: 'string',
-                                description: 'The item institution id',
                             },
                             institutionName: {
                                 type: 'string',
-                                description: 'The item institution name',
                             },
                             healthy: {
                                 type: 'boolean',
-                                description: 'The item healthy status',
                             },
                             cursor: {
                                 type: 'string',
-                                description: 'The item cursor',
                             },
                             lastRefreshed: {
-                                type: 'date',
-                                description:
-                                    'The item last refreshed date by the user',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             transactionsLastRefreshed: {
-                                type: 'date',
-                                description:
-                                    'The item transactions last refreshed date by the user',
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                        },
+                    },
+                    Mortgage: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                            },
+                            accountId: {
+                                type: 'number',
+                            },
+                            type: {
+                                type: 'string',
+                            },
+                            interestRateType: {
+                                type: 'string',
+                            },
+                            interestRatePercent: {
+                                type: 'number',
+                            },
+                            term: {
+                                type: 'string',
+                            },
+                            address: {
+                                type: 'string',
+                            },
+                            originationDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            originationPrincipal: {
+                                type: 'number',
+                            },
+                            maturityDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            lateFee: {
+                                type: 'number',
+                            },
+                            escrowBalance: {
+                                type: 'number',
+                            },
+                            prepaymentPenalty: {
+                                type: 'boolean',
+                            },
+                            privateInsurance: {
+                                type: 'boolean',
+                            },
+                            pastDueAmount: {
+                                type: 'number',
+                            },
+                            lastPaymentDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            lastPaymentAmount: {
+                                type: 'number',
+                            },
+                            nextPaymentDueDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            nextPaymentAmount: {
+                                type: 'number',
+                            },
+                            ytdInterestPaid: {
+                                type: 'number',
+                            },
+                            ytdPrincipalPaid: {
+                                type: 'number',
                             },
                         },
                     },
@@ -291,27 +356,21 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The notification id',
                             },
                             userId: {
                                 type: 'number',
-                                description: 'The user id',
                             },
                             typeId: {
                                 type: 'number',
-                                description: 'The notification type id',
                             },
                             message: {
                                 type: 'string',
-                                description: 'The notification message',
                             },
                             read: {
                                 type: 'boolean',
-                                description: 'The notification read status',
                             },
                             active: {
                                 type: 'boolean',
-                                description: 'The notification active status',
                             },
                         },
                     },
@@ -320,7 +379,89 @@ export const createSwaggerSpec = () => {
                         properties: {
                             logtailToken: {
                                 type: 'string',
-                                description: 'The Logtail token',
+                            },
+                        },
+                    },
+                    StudentLoanLiability: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'number',
+                            },
+                            accountId: {
+                                type: 'number',
+                            },
+                            name: {
+                                type: 'string',
+                            },
+                            interestRatePercent: {
+                                type: 'number',
+                            },
+                            statusTypeId: {
+                                type: 'number',
+                            },
+                            statusEndDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            overdue: {
+                                type: 'boolean',
+                            },
+                            originationDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            originationPrincipal: {
+                                type: 'number',
+                            },
+                            disbursementDates: {
+                                type: 'string',
+                            },
+                            outstandingInterest: {
+                                type: 'number',
+                            },
+                            expectedPayoffDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            guarantor: {
+                                type: 'string',
+                            },
+                            servicerAddress: {
+                                type: 'string',
+                            },
+                            repaymentPlanTypeId: {
+                                type: 'number',
+                            },
+                            repaymentPlanDescription: {
+                                type: 'string',
+                            },
+                            lastPaymentDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            lastPaymentAmount: {
+                                type: 'number',
+                            },
+                            lastStatementDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            lastStatementBalance: {
+                                type: 'number',
+                            },
+                            nextPaymentDueDate: {
+                                type: 'string',
+                                format: 'date-time',
+                            },
+                            minimumPaymentAmount: {
+                                type: 'number',
+                            },
+                            ytdInterestPaid: {
+                                type: 'number',
+                            },
+                            ytdPrincipalPaid: {
+                                type: 'number',
                             },
                         },
                     },
@@ -329,78 +470,58 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The transaction id',
                             },
                             accountId: {
                                 type: 'number',
-                                description: 'The account id',
                             },
                             transactionId: {
                                 type: 'string',
-                                description: 'The Plaid transaction id',
                             },
                             merchantId: {
                                 type: 'string',
-                                description: 'The transaction merchant id',
                             },
                             merchant: {
                                 type: 'string',
-                                description: 'The transaction merchant',
                             },
                             name: {
                                 type: 'string',
-                                description: 'The transaction name',
                             },
                             customName: {
                                 type: 'string',
-                                description: 'The transaction custom name',
                             },
                             amount: {
                                 type: 'number',
-                                description: 'The transaction amount',
                             },
                             primaryCategory: {
                                 type: 'string',
-                                description: 'The Plaid category',
                             },
                             detailedCategory: {
                                 type: 'string',
-                                description: 'The Plaid detailed category',
                             },
                             categoryId: {
                                 type: 'number',
-                                description: 'The transaction category id',
                             },
                             customCategoryId: {
                                 type: 'number',
-                                description:
-                                    'The transaction custom category id',
                             },
                             paymentChannel: {
                                 type: 'string',
-                                description: 'The transaction payment channel',
                             },
                             isoCurrencyCode: {
                                 type: 'string',
-                                description:
-                                    'The transaction ISO currency code',
                             },
                             unofficialCurrencyCode: {
                                 type: 'string',
-                                description:
-                                    'The transaction unofficial currency code',
                             },
                             date: {
-                                type: 'date',
-                                description: 'The transaction date',
+                                type: 'string',
+                                format: 'date-time',
                             },
                             pending: {
                                 type: 'boolean',
-                                description: 'The transaction pending status',
                             },
                             note: {
                                 type: 'string',
-                                description: 'The transaction note',
                             },
                         },
                     },
@@ -409,27 +530,21 @@ export const createSwaggerSpec = () => {
                         properties: {
                             id: {
                                 type: 'number',
-                                description: 'The user id',
                             },
                             username: {
                                 type: 'string',
-                                description: 'The user username',
                             },
                             email: {
                                 type: 'string',
-                                description: 'The user email',
                             },
                             firstName: {
                                 type: 'string',
-                                description: 'The user first name',
                             },
                             lastName: {
                                 type: 'string',
-                                description: 'The user last name',
                             },
                             passwordHash: {
                                 type: 'string',
-                                description: 'The user password hash',
                             },
                         },
                     },
