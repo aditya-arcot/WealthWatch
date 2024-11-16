@@ -24,7 +24,7 @@ export const insertAppRequest = async (request: AppRequest): Promise<void> => {
     const rowCount = 1
     const paramCount = values.length
     const query = `
-        INSERT INTO app_requests (
+        INSERT INTO debug.app_requests (
             request_id,
             user_id,
             timestamp,

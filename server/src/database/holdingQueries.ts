@@ -55,19 +55,7 @@ export const insertHoldings = async (holdings: Holding[]): Promise<void> => {
     await runQuery(query, values)
 }
 
-export const fetchActiveHoldingsWithUserId = async (
-    userId: number
-): Promise<HoldingWithSecurity[]> => {
-    const query = `
-        SELECT *
-        FROM active_holdings
-        WHERE user_id = $1
-    `
-    const rows = (await runQuery<DbHoldingWithSecurity>(query, [userId])).rows
-    return rows.map(mapDbHoldingWithSecurity)
-}
-
-interface DbHoldingWithSecurity {
+export interface DbHoldingWithSecurity {
     id: number
     account_id: number
     name: string | null
@@ -86,7 +74,7 @@ interface DbHoldingWithSecurity {
     unofficial_currency_code: string | null
 }
 
-const mapDbHoldingWithSecurity = (
+export const mapDbHoldingWithSecurity = (
     holding: DbHoldingWithSecurity
 ): HoldingWithSecurity => ({
     id: holding.id,

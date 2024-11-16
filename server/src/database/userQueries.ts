@@ -38,12 +38,12 @@ export const fetchUsers = async (): Promise<User[]> => {
     return rows.map(mapDbUser)
 }
 
-export const fetchUserWithUsername = async (
+export const fetchUserByUsername = async (
     username: string
 ): Promise<User | undefined> => {
     const query = `
-        SELECT * 
-        FROM users 
+        SELECT *
+        FROM users
         WHERE username = $1
         LIMIT 1
     `
@@ -52,12 +52,12 @@ export const fetchUserWithUsername = async (
     return mapDbUser(rows[0])
 }
 
-export const fetchUserWithEmail = async (
+export const fetchUserByEmail = async (
     email: string
 ): Promise<User | undefined> => {
     const query = `
-        SELECT * 
-        FROM users 
+        SELECT *
+        FROM users
         WHERE email = $1
         LIMIT 1
     `
@@ -66,7 +66,7 @@ export const fetchUserWithEmail = async (
     return mapDbUser(rows[0])
 }
 
-export const removeUserWithId = async (userId: number) => {
+export const removeUserById = async (userId: number) => {
     const query = `
         DELETE
         FROM users

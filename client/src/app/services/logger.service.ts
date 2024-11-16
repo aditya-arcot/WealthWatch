@@ -14,27 +14,34 @@ export class LoggerService {
         this.logtail = new Logtail(token)
     }
 
-    debug(message: string, ...args: unknown[]): void {
+    debug(message: unknown, ...args: unknown[]): void {
         this.logger.debug(message, ...args)
-        this.logtail?.debug(message, { ...args })
+        this.logtail?.debug(this.formatMessage(message), { ...args })
         this.logtail?.flush()
     }
 
-    info(message: string, ...args: unknown[]): void {
+    info(message: unknown, ...args: unknown[]): void {
         this.logger.info(message, ...args)
-        this.logtail?.info(message, { ...args })
+        this.logtail?.info(this.formatMessage(message), { ...args })
         this.logtail?.flush()
     }
 
-    warn(message: string, ...args: unknown[]): void {
+    warn(message: unknown, ...args: unknown[]): void {
         this.logger.warn(message, ...args)
-        this.logtail?.warn(message, { ...args })
+        this.logtail?.warn(this.formatMessage(message), { ...args })
         this.logtail?.flush()
     }
 
-    error(message: string, ...args: unknown[]): void {
+    error(message: unknown, ...args: unknown[]): void {
         this.logger.error(message, ...args)
-        this.logtail?.error(message, { ...args })
+        this.logtail?.error(this.formatMessage(message), { ...args })
         this.logtail?.flush()
+    }
+
+    formatMessage = (message: unknown): string => {
+        if (typeof message === 'object') {
+            return JSON.stringify(message)
+        }
+        return String(message)
     }
 }

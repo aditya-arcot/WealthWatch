@@ -1,8 +1,4 @@
-import {
-    ItemRemoveRequest,
-    ItemWebhookUpdateRequest,
-    SandboxItemResetLoginRequest,
-} from 'plaid'
+import { ItemRemoveRequest, SandboxItemResetLoginRequest } from 'plaid'
 import { Item } from '../models/item.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
@@ -30,18 +26,4 @@ export const plaidSandboxResetLogin = async (item: Item) => {
         item.id
     )
     return resp.data.reset_login
-}
-
-export const plaidWebhookUpdate = async (item: Item, webhook: string) => {
-    logger.debug({ id: item.id }, 'updating item webhook')
-    const params: ItemWebhookUpdateRequest = {
-        access_token: item.accessToken,
-        webhook,
-    }
-    await executePlaidMethod(
-        getPlaidClient().itemWebhookUpdate,
-        params,
-        item.userId,
-        item.id
-    )
 }

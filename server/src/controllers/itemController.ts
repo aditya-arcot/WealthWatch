@@ -1,34 +1,35 @@
 import { Request, Response } from 'express'
 import {
-    fetchActiveAccountsWithUserId,
+    fetchActiveAccountsByUserId,
     insertAccounts,
-    modifyAccountsActiveWithPlaidItemId,
+    modifyAccountsToInactiveByPlaidItemId,
 } from '../database/accountQueries.js'
 import { insertHoldings } from '../database/holdingQueries.js'
 import {
-    fetchActiveItems,
-    fetchActiveItemsWithUserId,
-    fetchActiveItemWithPlaidId,
-    modifyItemActiveWithId,
-    modifyItemCursorWithPlaidId,
-    modifyItemInvestmentsLastRefreshedWithPlaidId,
-    modifyItemLastRefreshedWithPlaidId,
-    modifyItemTransactionsLastRefreshedWithPlaidId,
+    fetchActiveItemByPlaidId,
+    fetchActiveItemsByUserId,
+    fetchActiveItemsWithAccountsByUserId,
+    fetchActiveItemsWithAccountsWithHoldingsByUserId,
+    modifyItemCursorByPlaidId,
+    modifyItemInvestmentsLastRefreshedByPlaidId,
+    modifyItemLastRefreshedByPlaidId,
+    modifyItemToInactiveById,
+    modifyItemTransactionsLastRefreshedByPlaidId,
 } from '../database/itemQueries.js'
 import {
     insertCreditCardLiabilities,
     insertMortgageLiabilities,
     insertStudentLoanLiabilities,
 } from '../database/liabilityQueries.js'
-import { modifyNotificationsToInactiveWithItemId } from '../database/notificationQueries.js'
+import { modifyNotificationsToInactiveByItemId } from '../database/notificationQueries.js'
 import {
     fetchSecurities,
     insertSecurities,
 } from '../database/securityQueries.js'
 import {
-    fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters,
+    fetchPaginatedActiveTransactionsAndCountsByUserIdAndFilters,
     insertTransactions,
-    removeTransactionsWithPlaidIds,
+    removeTransactionsByPlaidIds,
 } from '../database/transactionQueries.js'
 import { Account } from '../models/account.js'
 import { HttpError } from '../models/error.js'
@@ -43,7 +44,7 @@ import {
     plaidInvestmentsHoldingsGet,
     plaidInvestmentsRefresh,
 } from '../plaid/investmentMethods.js'
-import { plaidItemRemove, plaidWebhookUpdate } from '../plaid/itemMethods.js'
+import { plaidItemRemove } from '../plaid/itemMethods.js'
 import {
     mapPlaidCreditCardLiability,
     mapPlaidMortgageLiability,
@@ -69,23 +70,31 @@ export const getUserItems = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const items = await fetchActiveItemsWithUserId(userId)
+    const items = await fetchActiveItemsByUserId(userId)
     return res.json(items)
 }
 
-export const updateActiveItemsWebhook = async (req: Request, res: Response) => {
-    logger.debug('updating webhook for active items')
+export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
+    logger.debug('getting items with accounts')
 
-    const url = req.body.url
-    if (typeof url !== 'string')
-        throw new HttpError('missing or invalid url', 400)
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const items = await fetchActiveItems()
-    await Promise.all(
-        items.map(async (item) => await plaidWebhookUpdate(item, url))
-    )
+    const items = await fetchActiveItemsWithAccountsByUserId(userId)
+    return res.json(items)
+}
 
-    return res.status(204).send()
+export const getUserItemsWithAccountsWithHoldings = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('getting items with accounts with holdings')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const items = await fetchActiveItemsWithAccountsWithHoldingsByUserId(userId)
+    return res.json(items)
 }
 
 export const refreshItem = async (req: Request, res: Response) => {
@@ -95,7 +104,7 @@ export const refreshItem = async (req: Request, res: Response) => {
     if (typeof plaidItemId !== 'string')
         throw new HttpError('missing or invalid Plaid item id', 400)
 
-    const item = await fetchActiveItemWithPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
     if (inCooldown(item.lastRefreshed)) {
@@ -107,23 +116,37 @@ export const refreshItem = async (req: Request, res: Response) => {
     }
 
     if (await refreshItemTransactions(item)) {
-        await modifyItemTransactionsLastRefreshedWithPlaidId(
+        await modifyItemTransactionsLastRefreshedByPlaidId(
             item.plaidId,
             new Date()
         )
     }
 
     if (await refreshItemInvestments(item)) {
-        await modifyItemInvestmentsLastRefreshedWithPlaidId(
+        await modifyItemInvestmentsLastRefreshedByPlaidId(
             item.plaidId,
             new Date()
         )
     }
 
     await queueSyncItemBalances(item)
-    await modifyItemLastRefreshedWithPlaidId(item.plaidId, new Date())
+    await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
 
     return res.status(202).send()
+}
+
+export const deactivateItem = async (req: Request, res: Response) => {
+    logger.debug('deactivating item')
+
+    const plaidItemId = req.params['plaidItemId']
+    if (typeof plaidItemId !== 'string')
+        throw new HttpError('missing or invalid Plaid item id', 400)
+
+    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    if (!item) throw new HttpError('item not found', 404)
+    await removeDeactivateItem(item)
+
+    return res.status(204).send()
 }
 
 export const refreshItemTransactions = (
@@ -183,7 +206,7 @@ const mergeItemAccounts = async (
     logger.debug({ id: item.id }, 'merging item accounts')
 
     logger.debug('deactivating existing accounts')
-    await modifyAccountsActiveWithPlaidItemId(item.plaidId, false)
+    await modifyAccountsToInactiveByPlaidItemId(item.plaidId)
 
     if (accounts.length > 0) {
         logger.debug('inserting accounts')
@@ -196,7 +219,7 @@ const mergeItemAccounts = async (
 export const syncItemTransactions = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item transactions')
 
-    const accounts = await fetchActiveAccountsWithUserId(item.userId)
+    const accounts = await fetchActiveAccountsByUserId(item.userId)
     if (accounts.length > 0) {
         const resp = await plaidTransactionsSync(item)
         if (!resp) {
@@ -209,7 +232,7 @@ export const syncItemTransactions = async (item: Item) => {
         if (added.length > 0) {
             logger.debug('inserting transactions')
             const existingTransactions = (
-                await fetchPaginatedActiveTransactionsAndCountsWithUserIdAndFilters(
+                await fetchPaginatedActiveTransactionsAndCountsByUserIdAndFilters(
                     item.userId
                 )
             ).transactions
@@ -224,11 +247,11 @@ export const syncItemTransactions = async (item: Item) => {
         if (removed.length > 0) {
             logger.debug('removing transactions')
             const removeIds = removed.map((t) => t.transaction_id)
-            await removeTransactionsWithPlaidIds(removeIds)
+            await removeTransactionsByPlaidIds(removeIds)
         }
 
         logger.debug('updating cursor')
-        await modifyItemCursorWithPlaidId(item.plaidId, cursor)
+        await modifyItemCursorByPlaidId(item.plaidId, cursor)
     } else {
         logger.debug('no accounts. skipping transaction updates')
     }
@@ -237,7 +260,7 @@ export const syncItemTransactions = async (item: Item) => {
 export const syncItemInvestments = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item investments')
 
-    const accounts = await fetchActiveAccountsWithUserId(item.userId)
+    const accounts = await fetchActiveAccountsByUserId(item.userId)
     if (accounts.length > 0) {
         const resp = await plaidInvestmentsHoldingsGet(item)
         if (!resp) {
@@ -278,7 +301,7 @@ export const syncItemInvestments = async (item: Item) => {
 export const syncItemLiabilities = async (item: Item) => {
     logger.debug({ id: item.id }, 'syncing item liabilities')
 
-    const accounts = await fetchActiveAccountsWithUserId(item.userId)
+    const accounts = await fetchActiveAccountsByUserId(item.userId)
     if (accounts.length > 0) {
         const { credit, mortgage, student } = await plaidLiabilitiesGet(item)
 
@@ -328,23 +351,9 @@ export const syncItemBalances = async (item: Item) => {
     if (accounts) await mergeItemAccounts(item, accounts, true)
 }
 
-export const deactivateItem = async (req: Request, res: Response) => {
-    logger.debug('deactivating item')
-
-    const plaidItemId = req.params['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
-
-    const item = await fetchActiveItemWithPlaidId(plaidItemId)
-    if (!item) throw new HttpError('item not found', 404)
-    await removeDeactivateItem(item)
-
-    return res.status(204).send()
-}
-
 export const removeDeactivateItem = async (item: Item) => {
     logger.debug({ id: item.id }, 'removing & deactivating item')
     await plaidItemRemove(item)
-    await modifyItemActiveWithId(item.id, false)
-    await modifyNotificationsToInactiveWithItemId(item.id)
+    await modifyItemToInactiveById(item.id)
+    await modifyNotificationsToInactiveByItemId(item.id)
 }

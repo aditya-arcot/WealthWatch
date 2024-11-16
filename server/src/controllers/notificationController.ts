@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import {
-    fetchActiveNotificationsWithUserId,
+    fetchActiveNotificationsByUserId,
     insertNotification,
-    modifyNotificationsToReadWithUserId,
-    modifyNotificationToInactiveWithUserIdAndId,
+    modifyNotificationsToReadByUserId,
+    modifyNotificationToInactiveByUserIdAndId,
 } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
 import { Item } from '../models/item.js'
@@ -19,7 +19,7 @@ export const getUserNotifications = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const notifications = await fetchActiveNotificationsWithUserId(userId)
+    const notifications = await fetchActiveNotificationsByUserId(userId)
     return res.json(notifications)
 }
 
@@ -32,7 +32,7 @@ export const updateUserNotificationsToRead = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    await modifyNotificationsToReadWithUserId(userId)
+    await modifyNotificationsToReadByUserId(userId)
 
     return res.status(204).send()
 }
@@ -50,7 +50,7 @@ export const updateUserNotificationToInactive = async (
     if (typeof notificationId !== 'number')
         throw new HttpError('invalid notification id', 400)
 
-    await modifyNotificationToInactiveWithUserIdAndId(userId, notificationId)
+    await modifyNotificationToInactiveByUserIdAndId(userId, notificationId)
 
     return res.status(204).send()
 }

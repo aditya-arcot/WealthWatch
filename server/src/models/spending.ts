@@ -1,4 +1,4 @@
-export interface CategoryTotalAndCount {
+export interface CategorySummary {
     categoryId: number
     total: number
     count: number
@@ -6,5 +6,10 @@ export interface CategoryTotalAndCount {
 
 export interface CategoryTotalByDate {
     categoryId: number
-    totalByDate: number[]
+    totalByDate: [
+        {
+            date: Date
+            total: number
+        },
+    ]
 }

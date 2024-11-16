@@ -17,7 +17,7 @@ const router = express.Router()
 
 /**
  * @swagger
- * /admin/access-request:
+ * /admin/access-requests:
  *   get:
  *     summary: Get access requests
  *     tags: [Admin]
@@ -34,12 +34,12 @@ const router = express.Router()
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/access-request')
+    .route('/access-requests')
     .get(authenticateAdmin, catchAsync(getAccessRequests))
 
 /**
  * @swagger
- * /admin/access-request/:requestId:
+ * /admin/access-requests/:requestId:
  *   patch:
  *     summary: Review access request
  *     tags: [Admin]
@@ -67,7 +67,7 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/access-request/:requestId')
+    .route('/access-requests/:requestId')
     .patch(authenticateAdmin, catchAsync(reviewAccessRequest))
 
 export default router
