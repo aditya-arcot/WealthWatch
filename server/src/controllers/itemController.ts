@@ -9,6 +9,7 @@ import {
     fetchActiveItemByPlaidId,
     fetchActiveItemsByUserId,
     fetchActiveItemsWithAccountsByUserId,
+    fetchActiveItemsWithAccountsWithHoldingsByUserId,
     modifyItemCursorByPlaidId,
     modifyItemInvestmentsLastRefreshedByPlaidId,
     modifyItemLastRefreshedByPlaidId,
@@ -80,6 +81,19 @@ export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithAccountsByUserId(userId)
+    return res.json(items)
+}
+
+export const getUserItemsWithAccountsWithHoldings = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('getting items with accounts with holdings')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const items = await fetchActiveItemsWithAccountsWithHoldingsByUserId(userId)
     return res.json(items)
 }
 

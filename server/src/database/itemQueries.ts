@@ -1,6 +1,15 @@
 import { DatabaseError } from '../models/error.js'
-import { Item, ItemWithAccounts } from '../models/item.js'
-import { DbAccount, mapDbAccount } from './accountQueries.js'
+import {
+    Item,
+    ItemWithAccounts,
+    ItemWithAccountsWithHoldings,
+} from '../models/item.js'
+import {
+    DbAccount,
+    DbAccountWithHoldings,
+    mapDbAccount,
+    mapDbAccountWithHoldings,
+} from './accountQueries.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertItem = async (item: Item): Promise<Item> => {
@@ -85,7 +94,41 @@ export const fetchActiveItemsWithAccountsByUserId = async (
         GROUP BY i.id
     `
     const rows = (await runQuery<DbItemWithAccounts>(query, [userId])).rows
-    return rows.map(mapDbItemAndAccounts)
+    return rows.map(mapDbItemWithAccounts)
+}
+
+export const fetchActiveItemsWithAccountsWithHoldingsByUserId = async (
+    userId: number
+): Promise<ItemWithAccountsWithHoldings[]> => {
+    const query = `
+        SELECT
+            i.*,
+            ARRAY_AGG (
+                TO_JSONB (a.*) || JSONB_BUILD_OBJECT (
+                    'holdings', (
+                        SELECT ARRAY_AGG (TO_JSONB (h.*))
+                        FROM active_holdings h
+                        WHERE h.account_id = a.id
+                    )
+                )
+            ) as accounts
+        FROM items i
+        JOIN accounts a
+            ON a.item_id = i.id
+            AND a.active = TRUE
+        WHERE i.user_id = $1
+            AND i.active = TRUE
+            AND EXISTS (
+                SELECT 1
+                FROM active_holdings h
+                WHERE h.account_id = a.id
+            )
+        GROUP BY i.id
+    `
+    const rows = (
+        await runQuery<DbItemWithAccountsWithHoldings>(query, [userId])
+    ).rows
+    return rows.map(mapDbItemWithAccountsWithHoldings)
 }
 
 export const fetchActiveItemByUserIdAndId = async (
@@ -223,7 +266,7 @@ interface DbItemWithAccounts extends DbItem {
     accounts: DbAccount[]
 }
 
-const mapDbItemAndAccounts = (
+const mapDbItemWithAccounts = (
     dbItem: DbItemWithAccounts
 ): ItemWithAccounts => ({
     id: dbItem.id,
@@ -239,4 +282,26 @@ const mapDbItemAndAccounts = (
     transactionsLastRefreshed: dbItem.transactions_last_refreshed,
     investmentsLastRefreshed: dbItem.investments_last_refreshed,
     accounts: dbItem.accounts.map(mapDbAccount),
+})
+
+interface DbItemWithAccountsWithHoldings extends DbItem {
+    accounts: DbAccountWithHoldings[]
+}
+
+const mapDbItemWithAccountsWithHoldings = (
+    dbItem: DbItemWithAccountsWithHoldings
+): ItemWithAccountsWithHoldings => ({
+    id: dbItem.id,
+    userId: dbItem.user_id,
+    plaidId: dbItem.plaid_id,
+    active: dbItem.active,
+    accessToken: dbItem.access_token,
+    institutionId: dbItem.institution_id,
+    institutionName: dbItem.institution_name,
+    healthy: dbItem.healthy,
+    cursor: dbItem.cursor,
+    lastRefreshed: dbItem.last_refreshed,
+    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
+    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    accounts: dbItem.accounts.map(mapDbAccountWithHoldings),
 })

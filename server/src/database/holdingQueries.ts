@@ -67,7 +67,7 @@ export const fetchActiveHoldingsByUserId = async (
     return rows.map(mapDbHoldingWithSecurity)
 }
 
-interface DbHoldingWithSecurity {
+export interface DbHoldingWithSecurity {
     id: number
     account_id: number
     name: string | null
@@ -86,7 +86,7 @@ interface DbHoldingWithSecurity {
     unofficial_currency_code: string | null
 }
 
-const mapDbHoldingWithSecurity = (
+export const mapDbHoldingWithSecurity = (
     holding: DbHoldingWithSecurity
 ): HoldingWithSecurity => ({
     id: holding.id,

@@ -3,6 +3,7 @@ import {
     deactivateItem,
     getUserItems,
     getUserItemsWithAccounts,
+    getUserItemsWithAccountsWithHoldings,
     refreshItem,
 } from '../controllers/itemController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -66,6 +67,44 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
 router
     .route('/with-accounts')
     .get(authenticate, catchAsync(getUserItemsWithAccounts))
+
+/**
+ * @swagger
+ * /items/with-accounts/with-holdings:
+ *   get:
+ *     summary: Retrieve the logged in user's items with accounts with holdings
+ *     tags: [Items]
+ *     responses:
+ *       200:
+ *         description: Retrieved the logged in user's items with accounts with holdings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/Item'
+ *                   - type: object
+ *                     properties:
+ *                       accounts:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           allOf:
+ *                             - $ref: '#/components/schemas/Account'
+ *                             - type: object
+ *                               properties:
+ *                                 holdings:
+ *                                   type: array
+ *                                   items:
+ *                                     $ref: '#/components/schemas/HoldingWithSecurity'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/with-accounts/with-holdings')
+    .get(authenticate, catchAsync(getUserItemsWithAccountsWithHoldings))
 
 /**
  * @swagger

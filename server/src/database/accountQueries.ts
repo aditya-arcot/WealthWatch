@@ -1,4 +1,8 @@
-import { Account } from '../models/account.js'
+import { Account, AccountWithHoldings } from '../models/account.js'
+import {
+    DbHoldingWithSecurity,
+    mapDbHoldingWithSecurity,
+} from './holdingQueries.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
@@ -127,4 +131,28 @@ export const mapDbAccount = (acc: DbAccount): Account => ({
     creditLimit: acc.credit_limit,
     type: acc.type,
     subtype: acc.subtype,
+})
+
+export interface DbAccountWithHoldings extends DbAccount {
+    holdings: DbHoldingWithSecurity[]
+}
+
+export const mapDbAccountWithHoldings = (
+    acc: DbAccountWithHoldings
+): AccountWithHoldings => ({
+    id: acc.id,
+    itemId: acc.item_id,
+    plaidId: acc.plaid_id,
+    active: acc.active,
+    name: acc.name,
+    mask: acc.mask,
+    officialName: acc.official_name,
+    currentBalance: acc.current_balance,
+    availableBalance: acc.available_balance,
+    isoCurrencyCode: acc.iso_currency_code,
+    unofficialCurrencyCode: acc.unofficial_currency_code,
+    creditLimit: acc.credit_limit,
+    type: acc.type,
+    subtype: acc.subtype,
+    holdings: acc.holdings.map(mapDbHoldingWithSecurity),
 })
