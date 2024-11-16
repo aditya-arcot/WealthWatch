@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { fetchActiveHoldingsByUserId } from '../database/holdingQueries.js'
 import {
     fetchActiveItemsByUserId,
     modifyItemInvestmentsLastRefreshedByPlaidId,
@@ -7,16 +6,6 @@ import {
 import { HttpError } from '../models/error.js'
 import { logger } from '../utils/logger.js'
 import { refreshItemInvestments } from './itemController.js'
-
-export const getUserHoldings = async (req: Request, res: Response) => {
-    logger.debug('getting holdings')
-
-    const userId = req.session.user?.id
-    if (userId === undefined) throw new HttpError('missing user id', 400)
-
-    const holdings = await fetchActiveHoldingsByUserId(userId)
-    return res.json(holdings)
-}
 
 export const refreshUserInvestments = async (req: Request, res: Response) => {
     logger.debug('refreshing investments')
