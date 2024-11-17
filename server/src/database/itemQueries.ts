@@ -104,10 +104,11 @@ export const fetchActiveItemsWithAccountsWithHoldingsByUserId = async (
         SELECT
             i.*,
             ARRAY_AGG (
-                TO_JSONB (a.*) || JSONB_BUILD_OBJECT (
+                TO_JSONB (a.*) ||
+                JSONB_BUILD_OBJECT (
                     'holdings', (
                         SELECT ARRAY_AGG (TO_JSONB (h.*))
-                        FROM active_holdings h
+                        FROM holdings_with_security h
                         WHERE h.account_id = a.id
                     )
                 )
@@ -120,7 +121,7 @@ export const fetchActiveItemsWithAccountsWithHoldingsByUserId = async (
             AND i.active = TRUE
             AND EXISTS (
                 SELECT 1
-                FROM active_holdings h
+                FROM holdings h
                 WHERE h.account_id = a.id
             )
         GROUP BY i.id

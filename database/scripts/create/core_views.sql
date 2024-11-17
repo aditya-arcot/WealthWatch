@@ -19,9 +19,8 @@ JOIN active_accounts a
     ON t.account_id = a.id
 ORDER BY t.date DESC, t.id;
 
-CREATE VIEW core.active_holdings AS
+CREATE VIEW core.holdings_with_security AS
 SELECT 
-	a.user_id,
     h.id,
     h.account_id,
     s.name,
@@ -41,8 +40,6 @@ SELECT
     h.create_timestamp,
     h.update_timestamp
 FROM holdings h
-JOIN active_accounts a
-    ON h.account_id = a.id
 JOIN securities s 
 	ON h.security_id = s.id
 ORDER BY h.account_id, h.id;
