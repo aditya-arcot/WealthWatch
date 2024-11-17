@@ -270,18 +270,7 @@ interface DbItemWithAccounts extends DbItem {
 const mapDbItemWithAccounts = (
     dbItem: DbItemWithAccounts
 ): ItemWithAccounts => ({
-    id: dbItem.id,
-    userId: dbItem.user_id,
-    plaidId: dbItem.plaid_id,
-    active: dbItem.active,
-    accessToken: dbItem.access_token,
-    institutionId: dbItem.institution_id,
-    institutionName: dbItem.institution_name,
-    healthy: dbItem.healthy,
-    cursor: dbItem.cursor,
-    lastRefreshed: dbItem.last_refreshed,
-    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
-    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    ...mapDbItem(dbItem),
     accounts: dbItem.accounts.map(mapDbAccount),
 })
 
@@ -292,17 +281,6 @@ interface DbItemWithAccountsWithHoldings extends DbItem {
 const mapDbItemWithAccountsWithHoldings = (
     dbItem: DbItemWithAccountsWithHoldings
 ): ItemWithAccountsWithHoldings => ({
-    id: dbItem.id,
-    userId: dbItem.user_id,
-    plaidId: dbItem.plaid_id,
-    active: dbItem.active,
-    accessToken: dbItem.access_token,
-    institutionId: dbItem.institution_id,
-    institutionName: dbItem.institution_name,
-    healthy: dbItem.healthy,
-    cursor: dbItem.cursor,
-    lastRefreshed: dbItem.last_refreshed,
-    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
-    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    ...mapDbItem(dbItem),
     accounts: dbItem.accounts.map(mapDbAccountWithHoldings),
 })
