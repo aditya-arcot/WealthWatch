@@ -1,4 +1,4 @@
-export interface CreditCardLiability {
+export interface CreditCard {
     id: number
     accountId: number
     aprs: object
@@ -11,7 +11,7 @@ export interface CreditCardLiability {
     minimumPaymentAmount: number | null
 }
 
-export interface MortgageLiability {
+export interface Mortgage {
     id: number
     accountId: number
     type: string | null
@@ -35,7 +35,7 @@ export interface MortgageLiability {
     ytdPrincipalPaid: number | null
 }
 
-export interface StudentLoanLiability {
+export interface StudentLoan {
     id: number
     accountId: number
     name: string | null

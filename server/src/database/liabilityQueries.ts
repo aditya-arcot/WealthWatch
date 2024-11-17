@@ -1,17 +1,13 @@
-import {
-    CreditCardLiability,
-    MortgageLiability,
-    StudentLoanLiability,
-} from '../models/liability.js'
+import { CreditCard, Mortgage, StudentLoan } from '../models/liability.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
-export const insertCreditCardLiabilities = async (
-    creditCardLiabilities: CreditCardLiability[]
+export const insertCreditCards = async (
+    creditCards: CreditCard[]
 ): Promise<void> => {
-    if (!creditCardLiabilities.length) return
+    if (!creditCards.length) return
 
     const values: unknown[] = []
-    creditCardLiabilities.forEach((c) => {
+    creditCards.forEach((c) => {
         values.push(
             c.accountId,
             JSON.stringify(c.aprs),
@@ -25,10 +21,10 @@ export const insertCreditCardLiabilities = async (
         )
     })
 
-    const rowCount = creditCardLiabilities.length
+    const rowCount = creditCards.length
     const paramCount = Math.floor(values.length / rowCount)
     const query = `
-        INSERT INTO credit_card_liabilities
+        INSERT INTO credit_cards
         (
             account_id,
             aprs,
@@ -56,13 +52,11 @@ export const insertCreditCardLiabilities = async (
     await runQuery(query, values)
 }
 
-export const insertMortgageLiabilities = async (
-    mortgageLiabilities: MortgageLiability[]
-): Promise<void> => {
-    if (!mortgageLiabilities.length) return
+export const insertMortgages = async (mortgages: Mortgage[]): Promise<void> => {
+    if (!mortgages.length) return
 
     const values: unknown[] = []
-    mortgageLiabilities.forEach((m) => {
+    mortgages.forEach((m) => {
         values.push(
             m.accountId,
             m.type,
@@ -87,10 +81,10 @@ export const insertMortgageLiabilities = async (
         )
     })
 
-    const rowCount = mortgageLiabilities.length
+    const rowCount = mortgages.length
     const paramCount = Math.floor(values.length / rowCount)
     const query = `
-        INSERT INTO mortgage_liabilities
+        INSERT INTO mortgages
         (
             account_id,
             type,
@@ -140,13 +134,13 @@ export const insertMortgageLiabilities = async (
     await runQuery(query, values)
 }
 
-export const insertStudentLoanLiabilities = async (
-    studentLoanLiabilities: StudentLoanLiability[]
+export const insertStudentLoans = async (
+    studentLoans: StudentLoan[]
 ): Promise<void> => {
-    if (!studentLoanLiabilities.length) return
+    if (!studentLoans.length) return
 
     const values: unknown[] = []
-    studentLoanLiabilities.forEach((s) => {
+    studentLoans.forEach((s) => {
         values.push(
             s.accountId,
             s.name,
@@ -174,10 +168,10 @@ export const insertStudentLoanLiabilities = async (
         )
     })
 
-    const rowCount = studentLoanLiabilities.length
+    const rowCount = studentLoans.length
     const paramCount = Math.floor(values.length / rowCount)
     const query = `
-        INSERT INTO student_loan_liabilities
+        INSERT INTO student_loans
         (
             account_id,
             name,
@@ -233,43 +227,7 @@ export const insertStudentLoanLiabilities = async (
     await runQuery(query, values)
 }
 
-export const fetchActiveCreditCardLiabilitiesByUserId = async (
-    userId: number
-): Promise<CreditCardLiability[]> => {
-    const query = `
-        SELECT *
-        FROM active_credit_card_liabilities
-        WHERE user_id = $1
-    `
-    const rows = (await runQuery<DbCreditCardLiability>(query, [userId])).rows
-    return rows.map(mapDbCreditCardLiability)
-}
-
-export const fetchActiveMortgageLiabilitiesByUserId = async (
-    userId: number
-): Promise<MortgageLiability[]> => {
-    const query = `
-        SELECT *
-        FROM active_mortgage_liabilities
-        WHERE user_id = $1
-    `
-    const rows = (await runQuery<DbMortgageLiability>(query, [userId])).rows
-    return rows.map(mapDbMortgageLiability)
-}
-
-export const fetchActiveStudentLoanLiabilitiesByUserId = async (
-    userId: number
-): Promise<StudentLoanLiability[]> => {
-    const query = `
-        SELECT *
-        FROM active_student_loan_liabilities
-        WHERE user_id = $1
-    `
-    const rows = (await runQuery<DbStudentLoanLiability>(query, [userId])).rows
-    return rows.map(mapDbStudentLoanLiability)
-}
-
-interface DbCreditCardLiability {
+export interface DbCreditCard {
     id: number
     account_id: number
     aprs: object
@@ -282,9 +240,7 @@ interface DbCreditCardLiability {
     minimum_payment_amount: number | null
 }
 
-const mapDbCreditCardLiability = (
-    card: DbCreditCardLiability
-): CreditCardLiability => ({
+export const mapDbCreditCard = (card: DbCreditCard): CreditCard => ({
     id: card.id,
     accountId: card.account_id,
     aprs: card.aprs,
@@ -297,7 +253,7 @@ const mapDbCreditCardLiability = (
     minimumPaymentAmount: card.minimum_payment_amount,
 })
 
-interface DbMortgageLiability {
+export interface DbMortgage {
     id: number
     account_id: number
     type: string | null
@@ -321,9 +277,7 @@ interface DbMortgageLiability {
     ytd_principal_paid: number | null
 }
 
-const mapDbMortgageLiability = (
-    mortgage: DbMortgageLiability
-): MortgageLiability => ({
+export const mapDbMortgage = (mortgage: DbMortgage): Mortgage => ({
     id: mortgage.id,
     accountId: mortgage.account_id,
     type: mortgage.type,
@@ -347,7 +301,7 @@ const mapDbMortgageLiability = (
     ytdPrincipalPaid: mortgage.ytd_principal_paid,
 })
 
-interface DbStudentLoanLiability {
+export interface DbStudentLoan {
     id: number
     account_id: number
     name: string
@@ -374,9 +328,7 @@ interface DbStudentLoanLiability {
     ytd_principal_paid: number | null
 }
 
-const mapDbStudentLoanLiability = (
-    studentLoan: DbStudentLoanLiability
-): StudentLoanLiability => ({
+export const mapDbStudentLoan = (studentLoan: DbStudentLoan): StudentLoan => ({
     id: studentLoan.id,
     accountId: studentLoan.account_id,
     name: studentLoan.name,

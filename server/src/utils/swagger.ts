@@ -146,7 +146,7 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
-                    CreditCardLiability: {
+                    CreditCard: {
                         type: 'object',
                         properties: {
                             id: {
@@ -382,7 +382,7 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
-                    StudentLoanLiability: {
+                    StudentLoan: {
                         type: 'object',
                         properties: {
                             id: {

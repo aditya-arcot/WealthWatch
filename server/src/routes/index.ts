@@ -7,7 +7,6 @@ import categoryRouter from './categoryRoutes.js'
 import devRouter from './devRoutes.js'
 import investmentRouter from './investmentRoutes.js'
 import itemRouter from './itemRoutes.js'
-import liabilitiesRouter from './liabilityRoutes.js'
 import linkRouter from './linkRoutes.js'
 import notificationRouter from './notificationRoutes.js'
 import secretsRouter from './secretsRoutes.js'
@@ -25,7 +24,6 @@ if (!production) {
 }
 router.use('/investments', investmentRouter)
 router.use('/items', itemRouter)
-router.use('/liabilities', liabilitiesRouter)
 router.use('/link', linkRouter)
 router.use('/notifications', notificationRouter)
 router.use('/secrets', secretsRouter)
