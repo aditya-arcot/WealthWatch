@@ -1,7 +1,7 @@
 export interface Category {
-    id: number
+    id: CategoryEnum
     name: string
-    groupId: number
+    groupId: CategoryGroupEnum
 }
 
 export enum CategoryEnum {

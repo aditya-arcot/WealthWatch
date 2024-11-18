@@ -2,7 +2,7 @@ import { Item } from './item.js'
 
 export interface Notification {
     id: number
-    typeId: number
+    typeId: NotificationTypeEnum
     userId: number
     itemId: number | null
     message: string
