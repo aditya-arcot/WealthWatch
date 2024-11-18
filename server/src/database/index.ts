@@ -23,6 +23,7 @@ export const createPool = async (): Promise<void> => {
     try {
         await runQuery('SELECT 1')
     } catch (error) {
+        logger.error(error)
         await clientPool.end()
         throw new DatabaseError('failed to create database pool')
     }
