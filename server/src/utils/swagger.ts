@@ -123,122 +123,6 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
-                    CategoryTotalByDate: {
-                        type: 'object',
-                        properties: {
-                            categoryId: {
-                                type: 'number',
-                            },
-                            totalByDate: {
-                                type: 'array',
-                                items: {
-                                    type: 'object',
-                                    properties: {
-                                        date: {
-                                            type: 'string',
-                                            format: 'date-time',
-                                        },
-                                        total: {
-                                            type: 'number',
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                    CreditCard: {
-                        type: 'object',
-                        properties: {
-                            id: {
-                                type: 'number',
-                            },
-                            accountId: {
-                                type: 'number',
-                            },
-                            aprs: {
-                                type: 'object',
-                            },
-                            overdue: {
-                                type: 'boolean',
-                            },
-                            lastPaymentDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            lastPaymentAmount: {
-                                type: 'number',
-                            },
-                            lastStatementDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            lastStatementBalance: {
-                                type: 'number',
-                            },
-                            nextPaymentDueDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            minimumPaymentAmount: {
-                                type: 'number',
-                            },
-                        },
-                    },
-                    HoldingWithSecurity: {
-                        type: 'object',
-                        properties: {
-                            id: {
-                                type: 'number',
-                            },
-                            accountId: {
-                                type: 'number',
-                            },
-                            name: {
-                                type: 'string',
-                            },
-                            typeId: {
-                                type: 'number',
-                            },
-                            cashEquivalent: {
-                                type: 'boolean',
-                            },
-                            ticker: {
-                                type: 'string',
-                            },
-                            marketCode: {
-                                type: 'string',
-                            },
-                            price: {
-                                type: 'number',
-                            },
-                            priceAsOf: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            closePrice: {
-                                type: 'number',
-                            },
-                            closePriceAsOf: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            quantity: {
-                                type: 'number',
-                            },
-                            value: {
-                                type: 'number',
-                            },
-                            costBasis: {
-                                type: 'number',
-                            },
-                            isoCurrencyCode: {
-                                type: 'string',
-                            },
-                            unofficialCurrencyCode: {
-                                type: 'string',
-                            },
-                        },
-                    },
                     Item: {
                         type: 'object',
                         properties: {
@@ -279,75 +163,100 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
-                    Mortgage: {
+                    ItemWithAccounts: {
                         type: 'object',
+                        allOf: [
+                            {
+                                $ref: '#/components/schemas/Item',
+                            },
+                        ],
                         properties: {
-                            id: {
-                                type: 'number',
+                            accounts: {
+                                type: 'array',
+                                items: {
+                                    $ref: '#/components/schemas/Account',
+                                },
                             },
-                            accountId: {
-                                type: 'number',
+                        },
+                    },
+                    ItemWithAccountsWithHoldings: {
+                        type: 'object',
+                        allOf: [
+                            {
+                                $ref: '#/components/schemas/Item',
                             },
-                            type: {
-                                type: 'string',
-                            },
-                            interestRateType: {
-                                type: 'string',
-                            },
-                            interestRatePercent: {
-                                type: 'number',
-                            },
-                            term: {
-                                type: 'string',
-                            },
-                            address: {
-                                type: 'string',
-                            },
-                            originationDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            originationPrincipal: {
-                                type: 'number',
-                            },
-                            maturityDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            lateFee: {
-                                type: 'number',
-                            },
-                            escrowBalance: {
-                                type: 'number',
-                            },
-                            prepaymentPenalty: {
-                                type: 'boolean',
-                            },
-                            privateInsurance: {
-                                type: 'boolean',
-                            },
-                            pastDueAmount: {
-                                type: 'number',
-                            },
-                            lastPaymentDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            lastPaymentAmount: {
-                                type: 'number',
-                            },
-                            nextPaymentDueDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            nextPaymentAmount: {
-                                type: 'number',
-                            },
-                            ytdInterestPaid: {
-                                type: 'number',
-                            },
-                            ytdPrincipalPaid: {
-                                type: 'number',
+                        ],
+                        properties: {
+                            accounts: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    allOf: [
+                                        {
+                                            $ref: '#/components/schemas/Account',
+                                        },
+                                    ],
+                                    properties: {
+                                        holdings: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'object',
+                                                properties: {
+                                                    id: {
+                                                        type: 'number',
+                                                    },
+                                                    accountId: {
+                                                        type: 'number',
+                                                    },
+                                                    name: {
+                                                        type: 'string',
+                                                    },
+                                                    typeId: {
+                                                        type: 'number',
+                                                    },
+                                                    cashEquivalent: {
+                                                        type: 'boolean',
+                                                    },
+                                                    ticker: {
+                                                        type: 'string',
+                                                    },
+                                                    marketCode: {
+                                                        type: 'string',
+                                                    },
+                                                    price: {
+                                                        type: 'number',
+                                                    },
+                                                    priceAsOf: {
+                                                        type: 'string',
+                                                        format: 'date-time',
+                                                    },
+                                                    closePrice: {
+                                                        type: 'number',
+                                                    },
+                                                    closePriceAsOf: {
+                                                        type: 'string',
+                                                        format: 'date-time',
+                                                    },
+                                                    quantity: {
+                                                        type: 'number',
+                                                    },
+                                                    value: {
+                                                        type: 'number',
+                                                    },
+                                                    costBasis: {
+                                                        type: 'number',
+                                                    },
+                                                    isoCurrencyCode: {
+                                                        type: 'string',
+                                                    },
+                                                    unofficialCurrencyCode: {
+                                                        type: 'string',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
                             },
                         },
                     },
@@ -382,146 +291,115 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
-                    StudentLoan: {
+                    SpendingCategoryTotals: {
                         type: 'object',
                         properties: {
-                            id: {
-                                type: 'number',
+                            dates: {
+                                type: 'array',
+                                items: {
+                                    type: 'string',
+                                    format: 'date-time',
+                                },
                             },
-                            accountId: {
-                                type: 'number',
-                            },
-                            name: {
-                                type: 'string',
-                            },
-                            interestRatePercent: {
-                                type: 'number',
-                            },
-                            statusTypeId: {
-                                type: 'number',
-                            },
-                            statusEndDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            overdue: {
-                                type: 'boolean',
-                            },
-                            originationDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            originationPrincipal: {
-                                type: 'number',
-                            },
-                            disbursementDates: {
-                                type: 'string',
-                            },
-                            outstandingInterest: {
-                                type: 'number',
-                            },
-                            expectedPayoffDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            guarantor: {
-                                type: 'string',
-                            },
-                            servicerAddress: {
-                                type: 'string',
-                            },
-                            repaymentPlanTypeId: {
-                                type: 'number',
-                            },
-                            repaymentPlanDescription: {
-                                type: 'string',
-                            },
-                            lastPaymentDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            lastPaymentAmount: {
-                                type: 'number',
-                            },
-                            lastStatementDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            lastStatementBalance: {
-                                type: 'number',
-                            },
-                            nextPaymentDueDate: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            minimumPaymentAmount: {
-                                type: 'number',
-                            },
-                            ytdInterestPaid: {
-                                type: 'number',
-                            },
-                            ytdPrincipalPaid: {
-                                type: 'number',
+                            totals: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                        categoryId: {
+                                            type: 'number',
+                                        },
+                                        totalByDate: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'object',
+                                                properties: {
+                                                    date: {
+                                                        type: 'string',
+                                                        format: 'date-time',
+                                                    },
+                                                    total: {
+                                                        type: 'number',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
                             },
                         },
                     },
-                    Transaction: {
+                    TransactionsAndCounts: {
                         type: 'object',
                         properties: {
-                            id: {
+                            transactions: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                        id: {
+                                            type: 'number',
+                                        },
+                                        accountId: {
+                                            type: 'number',
+                                        },
+                                        transactionId: {
+                                            type: 'string',
+                                        },
+                                        merchantId: {
+                                            type: 'string',
+                                        },
+                                        merchant: {
+                                            type: 'string',
+                                        },
+                                        name: {
+                                            type: 'string',
+                                        },
+                                        customName: {
+                                            type: 'string',
+                                        },
+                                        amount: {
+                                            type: 'number',
+                                        },
+                                        primaryCategory: {
+                                            type: 'string',
+                                        },
+                                        detailedCategory: {
+                                            type: 'string',
+                                        },
+                                        categoryId: {
+                                            type: 'number',
+                                        },
+                                        customCategoryId: {
+                                            type: 'number',
+                                        },
+                                        paymentChannel: {
+                                            type: 'string',
+                                        },
+                                        isoCurrencyCode: {
+                                            type: 'string',
+                                        },
+                                        unofficialCurrencyCode: {
+                                            type: 'string',
+                                        },
+                                        date: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        pending: {
+                                            type: 'boolean',
+                                        },
+                                        note: {
+                                            type: 'string',
+                                        },
+                                    },
+                                },
+                            },
+                            filteredCounts: {
                                 type: 'number',
                             },
-                            accountId: {
+                            totalCount: {
                                 type: 'number',
-                            },
-                            transactionId: {
-                                type: 'string',
-                            },
-                            merchantId: {
-                                type: 'string',
-                            },
-                            merchant: {
-                                type: 'string',
-                            },
-                            name: {
-                                type: 'string',
-                            },
-                            customName: {
-                                type: 'string',
-                            },
-                            amount: {
-                                type: 'number',
-                            },
-                            primaryCategory: {
-                                type: 'string',
-                            },
-                            detailedCategory: {
-                                type: 'string',
-                            },
-                            categoryId: {
-                                type: 'number',
-                            },
-                            customCategoryId: {
-                                type: 'number',
-                            },
-                            paymentChannel: {
-                                type: 'string',
-                            },
-                            isoCurrencyCode: {
-                                type: 'string',
-                            },
-                            unofficialCurrencyCode: {
-                                type: 'string',
-                            },
-                            date: {
-                                type: 'string',
-                                format: 'date-time',
-                            },
-                            pending: {
-                                type: 'boolean',
-                            },
-                            note: {
-                                type: 'string',
                             },
                         },
                     },

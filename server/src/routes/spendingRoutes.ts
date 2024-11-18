@@ -71,17 +71,7 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 dates:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: date-time
- *                 totals:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/CategoryTotalByDate'
+ *               $ref: '#/components/schemas/SpendingCategoryTotals'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

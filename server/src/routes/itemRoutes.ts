@@ -52,15 +52,7 @@ router.route('/').get(authenticate, catchAsync(getUserItems))
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 allOf:
- *                   - $ref: '#/components/schemas/Item'
- *                   - type: object
- *                     properties:
- *                       accounts:
- *                         type: array
- *                         items:
- *                           $ref: '#/components/schemas/Account'
+ *                 $ref: '#/components/schemas/ItemWithAccounts'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -82,23 +74,7 @@ router
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 allOf:
- *                   - $ref: '#/components/schemas/Item'
- *                   - type: object
- *                     properties:
- *                       accounts:
- *                         type: array
- *                         items:
- *                           type: object
- *                           allOf:
- *                             - $ref: '#/components/schemas/Account'
- *                             - type: object
- *                               properties:
- *                                 holdings:
- *                                   type: array
- *                                   items:
- *                                     $ref: '#/components/schemas/HoldingWithSecurity'
+ *                 $ref: '#/components/schemas/ItemWithAccountsWithHoldings'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
