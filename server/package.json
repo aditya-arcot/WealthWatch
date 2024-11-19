@@ -40,15 +40,13 @@
         "js-sha256": "^0.11.0",
         "jwt-decode": "^4.0.0",
         "method-override": "^3.0.0",
-        "morgan": "^1.10.0",
         "pg": "^8.12.0",
         "pino": "^9.2.0",
         "pino-pretty": "^11.2.1",
         "plaid": "^30.0.0",
         "qs": "^6.13.0",
         "swagger-jsdoc": "^6.2.8",
-        "swagger-ui-express": "^5.0.1",
-        "typescript": "^5.4.5"
+        "swagger-ui-express": "^5.0.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.4.0",
@@ -56,7 +54,6 @@
         "@types/connect-pg-simple": "^7.0.3",
         "@types/cookie-parser": "^1.4.7",
         "@types/cors": "^2.8.17",
-        "@types/eslint__js": "^8.42.3",
         "@types/express": "^4.17.21",
         "@types/express-session": "^1.18.0",
         "@types/method-override": "^0.0.35",
@@ -68,6 +65,7 @@
         "eslint": "^9.14.0",
         "globals": "^15.3.0",
         "tsc-watch": "^6.2.0",
+        "typescript": "^5.4.5",
         "typescript-eslint": "^8.0.0"
     }
 }
