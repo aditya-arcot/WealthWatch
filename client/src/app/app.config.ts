@@ -4,9 +4,10 @@ import {
     withInterceptorsFromDi,
 } from '@angular/common/http'
 import {
-    APP_INITIALIZER,
     ApplicationConfig,
     importProvidersFrom,
+    inject,
+    provideAppInitializer,
     provideZoneChangeDetection,
 } from '@angular/core'
 import { Title } from '@angular/platform-browser'
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes),
         provideHttpClient(withInterceptorsFromDi()),
+        provideAppInitializer(() => inject(StartupService).startup()),
         importProvidersFrom(
             LoggerModule.forRoot({
                 level:
@@ -33,13 +35,6 @@ export const appConfig: ApplicationConfig = {
                         : NgxLoggerLevel.DEBUG,
             })
         ),
-        {
-            provide: APP_INITIALIZER,
-            useFactory: (startupSvc: StartupService) => () =>
-                startupSvc.startup(),
-            deps: [StartupService],
-            multi: true,
-        },
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptor,

@@ -120,7 +120,7 @@ CREATE TABLE core.holdings (
     CONSTRAINT holdings_account_security_unique UNIQUE (account_id, security_id)
 );
 
-CREATE TABLE core.credit_card_liabilities (
+CREATE TABLE core.credit_cards (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER UNIQUE REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     aprs JSON,
@@ -135,7 +135,7 @@ CREATE TABLE core.credit_card_liabilities (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE core.mortgage_liabilities (
+CREATE TABLE core.mortgages (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER UNIQUE REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     type TEXT,
@@ -161,7 +161,7 @@ CREATE TABLE core.mortgage_liabilities (
     update_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE core.student_loan_liabilities (
+CREATE TABLE core.student_loans (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     account_id INTEGER UNIQUE REFERENCES accounts(id) ON DELETE CASCADE NOT NULL,
     name TEXT,

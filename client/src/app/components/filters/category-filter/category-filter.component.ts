@@ -14,7 +14,6 @@ import { Category, CategoryEnum, categoryIcons } from '../../../models/category'
 
 @Component({
     selector: 'app-category-filter',
-    standalone: true,
     imports: [FormsModule, CommonModule],
     templateUrl: './category-filter.component.html',
     styleUrl: './category-filter.component.css',

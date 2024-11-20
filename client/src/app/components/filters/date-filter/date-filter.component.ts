@@ -17,7 +17,6 @@ import { checkDatesEqual } from '../../../utilities/date.utility'
 
 @Component({
     selector: 'app-date-filter',
-    standalone: true,
     imports: [FormsModule],
     templateUrl: './date-filter.component.html',
 })

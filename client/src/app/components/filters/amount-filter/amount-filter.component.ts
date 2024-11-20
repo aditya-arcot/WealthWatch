@@ -14,7 +14,6 @@ import { AlertService } from '../../../services/alert.service'
 
 @Component({
     selector: 'app-amount-filter',
-    standalone: true,
     imports: [FormsModule],
     templateUrl: './amount-filter.component.html',
 })

@@ -140,17 +140,15 @@ export const handleError = (
     _req: Request,
     res: Response,
     _next: NextFunction
-): Response => {
+) => {
     logger.error({ err }, 'handling error')
     if (err instanceof HttpError) {
-        return res
-            .status(err.status)
-            .json({ message: err.message, code: err.code })
+        res.status(err.status).json({ message: err.message, code: err.code })
     } else if (err instanceof DatabaseError) {
-        return res.status(500).json({ message: 'Database error' })
+        res.status(500).json({ message: 'Database error' })
     } else if (err instanceof PlaidApiError) {
-        return res.status(500).json({ message: 'Plaid API error' })
+        res.status(500).json({ message: 'Plaid API error' })
     } else {
-        return res.status(500).json({ message: 'Unexpected error' })
+        res.status(500).json({ message: 'Unexpected error' })
     }
 }

@@ -5,7 +5,7 @@ export interface Security {
     institutionId: string | null
     institutionSecurityId: string | null
     name: string | null
-    typeId: number
+    typeId: SecurityTypeEnum
     ticker: string | null
     marketCode: string | null
     cashEquivalent: boolean

@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms'
 
 @Component({
     selector: 'app-note',
-    standalone: true,
     imports: [FormsModule],
     templateUrl: './note.component.html',
 })

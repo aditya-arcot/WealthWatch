@@ -6,7 +6,6 @@ import { AlertService } from '../../services/alert.service'
 
 @Component({
     selector: 'app-alert',
-    standalone: true,
     imports: [CommonModule],
     templateUrl: './alert.component.html',
     styleUrl: './alert.component.css',

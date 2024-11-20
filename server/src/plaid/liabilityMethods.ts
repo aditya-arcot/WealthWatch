@@ -1,17 +1,17 @@
 import {
-    CreditCardLiability as PlaidCreditCardLiability,
+    CreditCardLiability as PlaidCreditCard,
+    MortgageLiability as PlaidMortgage,
     MortgagePropertyAddress as PlaidMortgageAddress,
-    MortgageLiability as PlaidMortgageLiability,
     ServicerAddressData as PlaidServicerAddress,
-    StudentLoan as PlaidStudentLoanLiability,
+    StudentLoan as PlaidStudentLoan,
     StudentRepaymentPlanTypeEnum as PlaidStudentLoanRepaymentTypeEnum,
     StudentLoanStatusTypeEnum as PlaidStudentLoanStatusTypeEnum,
 } from 'plaid'
 import { Item } from '../models/item.js'
 import {
-    CreditCardLiability,
-    MortgageLiability,
-    StudentLoanLiability,
+    CreditCard,
+    Mortgage,
+    StudentLoan,
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
 } from '../models/liability.js'
@@ -43,109 +43,107 @@ export const plaidLiabilitiesGet = async (item: Item) => {
     }
 }
 
-export const mapPlaidCreditCardLiability = (
-    liability: PlaidCreditCardLiability,
+export const mapPlaidCreditCard = (
+    card: PlaidCreditCard,
     accountId: number
-): CreditCardLiability => ({
+): CreditCard => ({
     id: -1,
     accountId,
-    aprs: liability.aprs,
-    overdue: liability.is_overdue,
-    lastPaymentDate: liability.last_payment_date
-        ? new Date(liability.last_payment_date)
+    aprs: card.aprs,
+    overdue: card.is_overdue,
+    lastPaymentDate: card.last_payment_date
+        ? new Date(card.last_payment_date)
         : null,
-    lastPaymentAmount: liability.last_payment_amount,
-    lastStatementDate: liability.last_statement_issue_date
-        ? new Date(liability.last_statement_issue_date)
+    lastPaymentAmount: card.last_payment_amount,
+    lastStatementDate: card.last_statement_issue_date
+        ? new Date(card.last_statement_issue_date)
         : null,
-    lastStatementBalance: liability.last_statement_balance,
-    nextPaymentDueDate: liability.next_payment_due_date
-        ? new Date(liability.next_payment_due_date)
+    lastStatementBalance: card.last_statement_balance,
+    nextPaymentDueDate: card.next_payment_due_date
+        ? new Date(card.next_payment_due_date)
         : null,
-    minimumPaymentAmount: liability.minimum_payment_amount,
+    minimumPaymentAmount: card.minimum_payment_amount,
 })
 
-export const mapPlaidMortgageLiability = (
-    liability: PlaidMortgageLiability,
+export const mapPlaidMortgage = (
+    mortgage: PlaidMortgage,
     accountId: number
-): MortgageLiability => ({
+): Mortgage => ({
     id: -1,
     accountId,
-    type: liability.loan_type_description,
-    interestRateType: liability.interest_rate.type,
-    interestRatePercent: liability.interest_rate.percentage,
-    term: liability.loan_term,
-    address: mapPlaidLiabilityAddress(liability.property_address),
-    originationDate: liability.origination_date
-        ? new Date(liability.origination_date)
+    type: mortgage.loan_type_description,
+    interestRateType: mortgage.interest_rate.type,
+    interestRatePercent: mortgage.interest_rate.percentage,
+    term: mortgage.loan_term,
+    address: mapPlaidLiabilityAddress(mortgage.property_address),
+    originationDate: mortgage.origination_date
+        ? new Date(mortgage.origination_date)
         : null,
-    originationPrincipal: liability.origination_principal_amount,
-    maturityDate: liability.maturity_date
-        ? new Date(liability.maturity_date)
+    originationPrincipal: mortgage.origination_principal_amount,
+    maturityDate: mortgage.maturity_date
+        ? new Date(mortgage.maturity_date)
         : null,
-    lateFee: liability.current_late_fee,
-    escrowBalance: liability.escrow_balance,
-    prepaymentPenalty: liability.has_prepayment_penalty,
-    privateInsurance: liability.has_pmi,
-    pastDueAmount: liability.past_due_amount,
-    lastPaymentDate: liability.last_payment_date
-        ? new Date(liability.last_payment_date)
+    lateFee: mortgage.current_late_fee,
+    escrowBalance: mortgage.escrow_balance,
+    prepaymentPenalty: mortgage.has_prepayment_penalty,
+    privateInsurance: mortgage.has_pmi,
+    pastDueAmount: mortgage.past_due_amount,
+    lastPaymentDate: mortgage.last_payment_date
+        ? new Date(mortgage.last_payment_date)
         : null,
-    lastPaymentAmount: liability.last_payment_amount,
-    nextPaymentDueDate: liability.next_payment_due_date
-        ? new Date(liability.next_payment_due_date)
+    lastPaymentAmount: mortgage.last_payment_amount,
+    nextPaymentDueDate: mortgage.next_payment_due_date
+        ? new Date(mortgage.next_payment_due_date)
         : null,
-    nextPaymentAmount: liability.next_monthly_payment,
-    ytdInterestPaid: liability.ytd_interest_paid,
-    ytdPrincipalPaid: liability.ytd_principal_paid,
+    nextPaymentAmount: mortgage.next_monthly_payment,
+    ytdInterestPaid: mortgage.ytd_interest_paid,
+    ytdPrincipalPaid: mortgage.ytd_principal_paid,
 })
 
-export const mapPlaidStudentLoanLiability = (
-    liability: PlaidStudentLoanLiability,
+export const mapPlaidStudentLoan = (
+    loan: PlaidStudentLoan,
     accountId: number
-): StudentLoanLiability => ({
+): StudentLoan => ({
     id: -1,
     accountId,
-    name: liability.loan_name,
-    interestRatePercent: liability.interest_rate_percentage,
-    statusTypeId: mapPlaidStudentLoanLiabilityStatusType(
-        liability.loan_status.type
-    ),
-    statusEndDate: liability.loan_status.end_date
-        ? new Date(liability.loan_status.end_date)
+    name: loan.loan_name,
+    interestRatePercent: loan.interest_rate_percentage,
+    statusTypeId: mapPlaidStudentLoanStatusType(loan.loan_status.type),
+    statusEndDate: loan.loan_status.end_date
+        ? new Date(loan.loan_status.end_date)
         : null,
-    overdue: liability.is_overdue,
-    originationDate: liability.origination_date
-        ? new Date(liability.origination_date)
+    overdue: loan.is_overdue,
+    originationDate: loan.origination_date
+        ? new Date(loan.origination_date)
         : null,
-    originationPrincipal: liability.origination_principal_amount,
+    originationPrincipal: loan.origination_principal_amount,
     disbursementDates: mapPlaidStudentLoanDisbursementDates(
-        liability.disbursement_dates
+        loan.disbursement_dates
     ),
-    outstandingInterest: liability.outstanding_interest_amount,
-    expectedPayoffDate: liability.expected_payoff_date
-        ? new Date(liability.expected_payoff_date)
+    outstandingInterest: loan.outstanding_interest_amount,
+    expectedPayoffDate: loan.expected_payoff_date
+        ? new Date(loan.expected_payoff_date)
         : null,
-    guarantor: liability.guarantor,
-    servicerAddress: mapPlaidLiabilityAddress(liability.servicer_address),
+    guarantor: loan.guarantor,
+    servicerAddress: mapPlaidLiabilityAddress(loan.servicer_address),
     repaymentPlanTypeId: mapPlaidStudentLoanRepaymentPlanType(
-        liability.repayment_plan.type
+        loan.repayment_plan.type
     ),
-    repaymentPlanDescription: liability.repayment_plan.description,
-    lastPaymentDate: liability.last_payment_date
-        ? new Date(liability.last_payment_date)
+    repaymentPlanDescription: loan.repayment_plan.description,
+    lastPaymentDate: loan.last_payment_date
+        ? new Date(loan.last_payment_date)
         : null,
-    lastPaymentAmount: liability.last_payment_amount,
-    lastStatementDate: liability.last_statement_issue_date
-        ? new Date(liability.last_statement_issue_date)
+    lastPaymentAmount: loan.last_payment_amount,
+    lastStatementDate: loan.last_statement_issue_date
+        ? new Date(loan.last_statement_issue_date)
         : null,
-    lastStatementBalance: liability.last_statement_balance || null,
-    nextPaymentDueDate: liability.next_payment_due_date
-        ? new Date(liability.next_payment_due_date)
+    lastStatementBalance: loan.last_statement_balance || null,
+    nextPaymentDueDate: loan.next_payment_due_date
+        ? new Date(loan.next_payment_due_date)
         : null,
-    minimumPaymentAmount: liability.minimum_payment_amount,
-    ytdInterestPaid: liability.ytd_interest_paid,
-    ytdPrincipalPaid: liability.ytd_principal_paid,
+    minimumPaymentAmount: loan.minimum_payment_amount,
+    ytdInterestPaid: loan.ytd_interest_paid,
+    ytdPrincipalPaid: loan.ytd_principal_paid,
 })
 
 const mapPlaidLiabilityAddress = (
@@ -172,7 +170,7 @@ const mapPlaidStudentLoanDisbursementDates = (
     return dates.join(' | ')
 }
 
-const mapPlaidStudentLoanLiabilityStatusType = (
+const mapPlaidStudentLoanStatusType = (
     type: PlaidStudentLoanStatusTypeEnum | null
 ): StudentLoanStatusTypeEnum | null => {
     if (!type) return null

@@ -1,8 +1,10 @@
+import { SecurityTypeEnum } from './security'
+
 export interface HoldingWithSecurity {
     id: number
     accountId: number
     name: string | null
-    typeId: number
+    typeId: SecurityTypeEnum
     cashEquivalent: boolean
     ticker: string | null
     marketCode: string | null

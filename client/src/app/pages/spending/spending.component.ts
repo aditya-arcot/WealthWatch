@@ -24,7 +24,6 @@ import { checkDatesEqual } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-spending',
-    standalone: true,
     imports: [
         LoadingSpinnerComponent,
         BaseChartDirective,

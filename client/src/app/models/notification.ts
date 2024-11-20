@@ -1,10 +1,10 @@
 export interface Notification {
     id: number
-    typeId: number
+    typeId: NotificationTypeEnum
     userId: number
     itemId: number | null
     message: string
-    persistent: string
+    persistent: boolean
     read: boolean
     active: boolean
 }
