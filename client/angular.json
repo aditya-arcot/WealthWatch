@@ -36,7 +36,7 @@
             "prefix": "app",
             "architect": {
                 "build": {
-                    "builder": "@angular-devkit/build-angular:application",
+                    "builder": "@angular/build:application",
                     "options": {
                         "outputPath": "dist",
                         "index": "src/index.html",
@@ -131,7 +131,7 @@
                     "defaultConfiguration": "prod"
                 },
                 "serve": {
-                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "builder": "@angular/build:dev-server",
                     "configurations": {
                         "dev": {
                             "buildTarget": "client:build:dev"
@@ -140,7 +140,7 @@
                     "defaultConfiguration": "dev"
                 },
                 "extract-i18n": {
-                    "builder": "@angular-devkit/build-angular:extract-i18n"
+                    "builder": "@angular/build:extract-i18n"
                 },
                 "lint": {
                     "builder": "@angular-eslint/builder:lint",

@@ -49,7 +49,9 @@ const startMainApp = () => {
     app.use(createCsrfMiddleware())
 
     logger.debug('configuring routes')
-    app.use('/status', (_req, res) => res.status(204).send())
+    app.use('/status', (_req, res) => {
+        res.sendStatus(204)
+    })
     app.get('/csrf-token', (req, res) => {
         const token = req.csrfToken!()
         res.json({ csrfToken: token })
@@ -89,7 +91,9 @@ const startWebhookApp = () => {
     app.use(logRequestResponse)
 
     logger.debug('configuring routes')
-    app.use('/status', (_req, res) => res.status(204).send())
+    app.use('/status', (_req, res) => {
+        res.sendStatus(204)
+    })
     app.post('/webhooks', catchAsync(processWebhook))
     app.use(handleUnmatchedRoute)
     app.use(handleError)

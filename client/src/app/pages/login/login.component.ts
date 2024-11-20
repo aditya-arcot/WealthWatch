@@ -23,7 +23,6 @@ import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-login',
-    standalone: true,
     imports: [ReactiveFormsModule, CommonModule, RouterLink],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',

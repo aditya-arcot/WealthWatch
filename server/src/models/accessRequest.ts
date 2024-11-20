@@ -3,7 +3,7 @@ export interface AccessRequest {
     email: string
     firstName: string
     lastName: string
-    statusId: number
+    statusId: AccessRequestStatusEnum
     accessCode: string | null
     reviewer: string | null
 }

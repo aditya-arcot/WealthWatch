@@ -1,0 +1,10 @@
+ignores: [
+    "@angular/compiler",
+    "@angular/platform-browser-dynamic",
+    "bootstrap",
+    "bootstrap-icons",
+    "@angular/build",
+    "@angular/compiler-cli",
+    "@types/node",
+    "lint-staged"
+]

@@ -104,10 +104,11 @@ export const fetchActiveItemsWithAccountsWithHoldingsByUserId = async (
         SELECT
             i.*,
             ARRAY_AGG (
-                TO_JSONB (a.*) || JSONB_BUILD_OBJECT (
+                TO_JSONB (a.*) ||
+                JSONB_BUILD_OBJECT (
                     'holdings', (
                         SELECT ARRAY_AGG (TO_JSONB (h.*))
-                        FROM active_holdings h
+                        FROM holdings_with_security h
                         WHERE h.account_id = a.id
                     )
                 )
@@ -120,7 +121,7 @@ export const fetchActiveItemsWithAccountsWithHoldingsByUserId = async (
             AND i.active = TRUE
             AND EXISTS (
                 SELECT 1
-                FROM active_holdings h
+                FROM holdings h
                 WHERE h.account_id = a.id
             )
         GROUP BY i.id
@@ -269,18 +270,7 @@ interface DbItemWithAccounts extends DbItem {
 const mapDbItemWithAccounts = (
     dbItem: DbItemWithAccounts
 ): ItemWithAccounts => ({
-    id: dbItem.id,
-    userId: dbItem.user_id,
-    plaidId: dbItem.plaid_id,
-    active: dbItem.active,
-    accessToken: dbItem.access_token,
-    institutionId: dbItem.institution_id,
-    institutionName: dbItem.institution_name,
-    healthy: dbItem.healthy,
-    cursor: dbItem.cursor,
-    lastRefreshed: dbItem.last_refreshed,
-    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
-    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    ...mapDbItem(dbItem),
     accounts: dbItem.accounts.map(mapDbAccount),
 })
 
@@ -291,17 +281,6 @@ interface DbItemWithAccountsWithHoldings extends DbItem {
 const mapDbItemWithAccountsWithHoldings = (
     dbItem: DbItemWithAccountsWithHoldings
 ): ItemWithAccountsWithHoldings => ({
-    id: dbItem.id,
-    userId: dbItem.user_id,
-    plaidId: dbItem.plaid_id,
-    active: dbItem.active,
-    accessToken: dbItem.access_token,
-    institutionId: dbItem.institution_id,
-    institutionName: dbItem.institution_name,
-    healthy: dbItem.healthy,
-    cursor: dbItem.cursor,
-    lastRefreshed: dbItem.last_refreshed,
-    transactionsLastRefreshed: dbItem.transactions_last_refreshed,
-    investmentsLastRefreshed: dbItem.investments_last_refreshed,
+    ...mapDbItem(dbItem),
     accounts: dbItem.accounts.map(mapDbAccountWithHoldings),
 })

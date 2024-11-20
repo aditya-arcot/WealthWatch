@@ -17,9 +17,9 @@ import {
     modifyItemTransactionsLastRefreshedByPlaidId,
 } from '../database/itemQueries.js'
 import {
-    insertCreditCardLiabilities,
-    insertMortgageLiabilities,
-    insertStudentLoanLiabilities,
+    insertCreditCards,
+    insertMortgages,
+    insertStudentLoans,
 } from '../database/liabilityQueries.js'
 import { modifyNotificationsToInactiveByItemId } from '../database/notificationQueries.js'
 import {
@@ -46,9 +46,9 @@ import {
 } from '../plaid/investmentMethods.js'
 import { plaidItemRemove } from '../plaid/itemMethods.js'
 import {
-    mapPlaidCreditCardLiability,
-    mapPlaidMortgageLiability,
-    mapPlaidStudentLoanLiability,
+    mapPlaidCreditCard,
+    mapPlaidMortgage,
+    mapPlaidStudentLoan,
     plaidLiabilitiesGet,
 } from '../plaid/liabilityMethods.js'
 import {
@@ -306,39 +306,39 @@ export const syncItemLiabilities = async (item: Item) => {
         const { credit, mortgage, student } = await plaidLiabilitiesGet(item)
 
         if (credit && credit.length > 0) {
-            logger.debug('inserting credit card liabilities')
-            const addCreditCardLiabilities = credit.map((c) => {
+            logger.debug('inserting credit cards')
+            const addCreditCards = credit.map((c) => {
                 const account = accounts.find((a) => a.plaidId === c.account_id)
                 if (!account) throw new HttpError('account not found', 404)
-                return mapPlaidCreditCardLiability(c, account.id)
+                return mapPlaidCreditCard(c, account.id)
             })
-            await insertCreditCardLiabilities(addCreditCardLiabilities)
+            await insertCreditCards(addCreditCards)
         } else {
-            logger.debug('no credit card liabilities. skipping')
+            logger.debug('no credit cards. skipping')
         }
 
         if (mortgage && mortgage.length > 0) {
-            logger.debug('inserting mortgage liabilities')
-            const addMortgageLiabilities = mortgage.map((m) => {
+            logger.debug('inserting mortgages')
+            const addMortgages = mortgage.map((m) => {
                 const account = accounts.find((a) => a.plaidId === m.account_id)
                 if (!account) throw new HttpError('account not found', 404)
-                return mapPlaidMortgageLiability(m, account.id)
+                return mapPlaidMortgage(m, account.id)
             })
-            await insertMortgageLiabilities(addMortgageLiabilities)
+            await insertMortgages(addMortgages)
         } else {
-            logger.debug('no mortgage liabilities. skipping')
+            logger.debug('no mortgages. skipping')
         }
 
         if (student && student.length > 0) {
-            logger.debug('inserting student loan liabilities')
-            const addStudentLoanLiabilities = student.map((s) => {
+            logger.debug('inserting student loans')
+            const addStudentLoans = student.map((s) => {
                 const account = accounts.find((a) => a.plaidId === s.account_id)
                 if (!account) throw new HttpError('account not found', 404)
-                return mapPlaidStudentLoanLiability(s, account.id)
+                return mapPlaidStudentLoan(s, account.id)
             })
-            await insertStudentLoanLiabilities(addStudentLoanLiabilities)
+            await insertStudentLoans(addStudentLoans)
         } else {
-            logger.debug('no student loan liabilities. skipping')
+            logger.debug('no student loans. skipping')
         }
     } else {
         logger.debug('no accounts. skipping liability updates')

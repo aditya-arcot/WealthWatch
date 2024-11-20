@@ -16,7 +16,6 @@ import { NotificationsComponent } from '../notifications/notifications.component
 
 @Component({
     selector: 'app-header',
-    standalone: true,
     imports: [
         RouterLink,
         RouterLinkActive,

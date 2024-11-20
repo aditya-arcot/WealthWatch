@@ -80,18 +80,7 @@ const router = express.Router()
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 transactions:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Transaction'
- *                 totalCount:
- *                   type: integer
- *                   description: The total number of transactions
- *                 filteredCount:
- *                   type: integer
- *                   description: The number of filtered transactions
+ *               $ref: '#/components/schemas/TransactionsAndCounts'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

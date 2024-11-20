@@ -140,19 +140,6 @@ export interface DbAccountWithHoldings extends DbAccount {
 export const mapDbAccountWithHoldings = (
     acc: DbAccountWithHoldings
 ): AccountWithHoldings => ({
-    id: acc.id,
-    itemId: acc.item_id,
-    plaidId: acc.plaid_id,
-    active: acc.active,
-    name: acc.name,
-    mask: acc.mask,
-    officialName: acc.official_name,
-    currentBalance: acc.current_balance,
-    availableBalance: acc.available_balance,
-    isoCurrencyCode: acc.iso_currency_code,
-    unofficialCurrencyCode: acc.unofficial_currency_code,
-    creditLimit: acc.credit_limit,
-    type: acc.type,
-    subtype: acc.subtype,
+    ...mapDbAccount(acc),
     holdings: acc.holdings.map(mapDbHoldingWithSecurity),
 })
