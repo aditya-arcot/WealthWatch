@@ -15,7 +15,6 @@ import { handleCheckboxSelect } from '../../../utilities/checkbox.utility'
 
 @Component({
     selector: 'app-account-filter',
-    standalone: true,
     imports: [FormsModule],
     templateUrl: './account-filter.component.html',
     styleUrl: './account-filter.component.css',

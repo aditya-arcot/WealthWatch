@@ -39,7 +39,6 @@ import { checkDatesEqual } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-transactions',
-    standalone: true,
     imports: [
         LoadingSpinnerComponent,
         FormsModule,

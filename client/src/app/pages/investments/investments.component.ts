@@ -18,7 +18,6 @@ import { PercentService } from '../../services/percent.service'
 import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 
 @Component({
-    standalone: true,
     imports: [LoadingSpinnerComponent, CommonModule, BaseChartDirective],
     templateUrl: './investments.component.html',
     styleUrl: './investments.component.css',

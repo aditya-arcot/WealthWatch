@@ -29,7 +29,6 @@ import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-accounts',
-    standalone: true,
     imports: [LoadingSpinnerComponent],
     templateUrl: './accounts.component.html',
 })

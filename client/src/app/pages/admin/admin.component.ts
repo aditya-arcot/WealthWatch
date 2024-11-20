@@ -12,7 +12,6 @@ import { LoggerService } from '../../services/logger.service'
 
 @Component({
     selector: 'app-admin',
-    standalone: true,
     imports: [LoadingSpinnerComponent],
     templateUrl: './admin.component.html',
 })

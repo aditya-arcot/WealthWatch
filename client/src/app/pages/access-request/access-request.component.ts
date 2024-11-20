@@ -23,7 +23,6 @@ import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-access-request',
-    standalone: true,
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './access-request.component.html',
     styleUrl: './access-request.component.css',

@@ -3,7 +3,7 @@ ignores: [
     "@angular/platform-browser-dynamic",
     "bootstrap",
     "bootstrap-icons",
-    "@angular-devkit/build-angular",
+    "@angular/build",
     "@angular/compiler-cli",
     "@types/node",
     "lint-staged"
