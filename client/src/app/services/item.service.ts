@@ -20,22 +20,22 @@ export class ItemService {
     }
 
     getItemsWithAccounts() {
-        return this.http.get<ItemWithAccounts[]>(
-            `${this.baseUrl}/with-accounts`
-        )
+        const url = `${this.baseUrl}/with-accounts`
+        return this.http.get<ItemWithAccounts[]>(url)
     }
 
     getItemsWithAccountsWithHoldings() {
-        return this.http.get<ItemWithAccountsWithHoldings[]>(
-            `${this.baseUrl}/with-accounts/with-holdings`
-        )
+        const url = `${this.baseUrl}/with-accounts/with-holdings`
+        return this.http.get<ItemWithAccountsWithHoldings[]>(url)
     }
 
     refreshItem(plaidItemId: string) {
-        return this.http.post(`${this.baseUrl}/${plaidItemId}/refresh`, {})
+        const url = `${this.baseUrl}/${plaidItemId}/refresh`
+        return this.http.post(url, {})
     }
 
     deactivateItem(plaidItemId: string) {
-        return this.http.delete(`${this.baseUrl}/${plaidItemId}`)
+        const url = `${this.baseUrl}/${plaidItemId}`
+        return this.http.delete(url)
     }
 }

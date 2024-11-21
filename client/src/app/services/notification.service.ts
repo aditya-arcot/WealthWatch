@@ -31,11 +31,13 @@ export class NotificationService {
     }
 
     updateAllNotificationsToRead() {
-        return this.http.patch<void>(`${this.baseUrl}/read`, {})
+        const url = `${this.baseUrl}/read`
+        return this.http.patch<void>(url, {})
     }
 
     updateNotificationToInactive(notificationId: number) {
-        return this.http.patch<void>(`${this.baseUrl}/inactive`, {
+        const url = `${this.baseUrl}/inactive`
+        return this.http.patch<void>(url, {
             notificationId,
         })
     }

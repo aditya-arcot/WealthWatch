@@ -11,6 +11,7 @@ export class InvestmentService {
     constructor(private http: HttpClient) {}
 
     refreshInvestments() {
-        return this.http.post(`${this.baseUrl}/refresh`, {})
+        const url = `${this.baseUrl}/refresh`
+        return this.http.post(url, {})
     }
 }

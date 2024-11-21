@@ -12,7 +12,7 @@ export class CurrencyService {
     }
 
     format(amount: number | null, currency: string | null): string {
-        if (amount === null) return ''
+        if (amount === null) return '-'
         if (currency === null) return amount.toString()
         if (!this.formatters[currency]) {
             this.formatters[currency] = new Intl.NumberFormat('en-US', {
