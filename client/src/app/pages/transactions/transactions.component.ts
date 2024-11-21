@@ -530,7 +530,7 @@ export class TransactionsComponent implements OnInit {
         return formatted
     }
 
-    getCategoryId(t: Transaction): number {
+    getCategoryId(t: Transaction): CategoryEnum {
         return t.customCategoryId ?? t.categoryId
     }
 
@@ -555,8 +555,7 @@ export class TransactionsComponent implements OnInit {
     }
 
     getCategoryClass(t: Transaction): string {
-        const categoryId = this.getCategoryId(t) as CategoryEnum
-        return categoryIcons[categoryId]
+        return categoryIcons[this.getCategoryId(t)]
     }
 
     openNoteModal(t: Transaction): void {
