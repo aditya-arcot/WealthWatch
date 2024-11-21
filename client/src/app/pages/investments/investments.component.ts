@@ -293,7 +293,7 @@ export class InvestmentsComponent implements OnInit {
         if (gainLoss === null) return ''
         if (holding.costBasis === null) return ''
         const percent = gainLoss / holding.costBasis
-        const formatted = this.percentSvc.format(percent)
+        const formatted = this.percentSvc.formatDecimal(percent)
         if (percent > 0) return `+${formatted}`
         return formatted
     }
@@ -336,7 +336,7 @@ export class InvestmentsComponent implements OnInit {
         const gainLoss = this.getTotalGainLoss(account)
         const costBasis = this.getTotalCostBasis(account)
         const percent = gainLoss / costBasis
-        const formatted = this.percentSvc.format(percent)
+        const formatted = this.percentSvc.formatDecimal(percent)
         if (percent > 0) return `+${formatted}`
         return formatted
     }

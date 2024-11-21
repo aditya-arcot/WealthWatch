@@ -473,18 +473,20 @@ export class SpendingComponent implements OnInit {
         const spendingBillsTotal =
             this.spendingTotal +
             (this.includeBills && this.billsTotal ? this.billsTotal : 0)
-        return this.percentSvc.format(amount / spendingBillsTotal)
+        return this.percentSvc.formatDecimal(amount / spendingBillsTotal)
     }
 
     getPercentNonSpendingString(amount: number): string {
         const nonSpendingBillsTotal =
             this.nonSpendingTotal +
             (!this.includeBills && this.billsTotal ? this.billsTotal : 0)
-        return this.percentSvc.format(amount / nonSpendingBillsTotal)
+        return this.percentSvc.formatDecimal(amount / nonSpendingBillsTotal)
     }
 
     getPercentIncomeString(amount: number | undefined): string {
         if (this.incomeTotal === undefined || this.incomeTotal === 0) return '-'
-        return this.percentSvc.format((amount ?? 0) / (-1 * this.incomeTotal))
+        return this.percentSvc.formatDecimal(
+            (amount ?? 0) / (-1 * this.incomeTotal)
+        )
     }
 }
