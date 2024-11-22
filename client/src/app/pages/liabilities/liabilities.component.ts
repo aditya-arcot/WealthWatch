@@ -26,11 +26,11 @@ import {
 } from '../../models/liability'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
-import { DateService } from '../../services/date.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
-import { PercentService } from '../../services/percent.service'
-import { StringService } from '../../services/string.service'
+import { formatDate } from '../../utilities/date.utility'
+import { formatPercent } from '../../utilities/number.utility'
+import { capitalize } from '../../utilities/string.utility'
 
 @Component({
     standalone: true,
@@ -48,10 +48,7 @@ export class LiabilitiesComponent implements OnInit {
         private logger: LoggerService,
         private alertSvc: AlertService,
         private itemSvc: ItemService,
-        private currencySvc: CurrencyService,
-        private percentSvc: PercentService,
-        private stringSvc: StringService,
-        private dateSvc: DateService
+        private currencySvc: CurrencyService
     ) {}
 
     ngOnInit(): void {
@@ -194,7 +191,7 @@ export class LiabilitiesComponent implements OnInit {
     getInterestRatePercentString(
         acc: StudentLoanAccount | MortgageAccount
     ): string {
-        return this.percentSvc.formatPercent(acc.interestRatePercent, 2)
+        return formatPercent(acc.interestRatePercent, 2)
     }
 
     getStudentLoanStatusName(acc: StudentLoanAccount): string {
@@ -227,7 +224,7 @@ export class LiabilitiesComponent implements OnInit {
         if (acc.interestRateType) {
             detail.push(acc.interestRateType)
         }
-        return this.stringSvc.capitalize(detail.join(' '))
+        return capitalize(detail.join(' '))
     }
 
     getMortgageMaturityDateString(acc: MortgageAccount): string {
@@ -256,6 +253,6 @@ export class LiabilitiesComponent implements OnInit {
     }
 
     getDateString(date: Date | null): string {
-        return this.dateSvc.format(date, false)
+        return formatDate(date, false)
     }
 }

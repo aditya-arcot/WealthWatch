@@ -14,8 +14,8 @@ import { CurrencyService } from '../../services/currency.service'
 import { InvestmentService } from '../../services/investment.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
-import { PercentService } from '../../services/percent.service'
 import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
+import { formatDecimalToPercent } from '../../utilities/number.utility'
 
 @Component({
     imports: [LoadingSpinnerComponent, CommonModule, BaseChartDirective],
@@ -65,8 +65,7 @@ export class InvestmentsComponent implements OnInit {
         private alertSvc: AlertService,
         private itemSvc: ItemService,
         private investmentSvc: InvestmentService,
-        private currencySvc: CurrencyService,
-        private percentSvc: PercentService
+        private currencySvc: CurrencyService
     ) {}
 
     ngOnInit(): void {
@@ -292,9 +291,9 @@ export class InvestmentsComponent implements OnInit {
         const gainLoss = this.getGainLoss(holding)
         if (gainLoss === null) return ''
         if (holding.costBasis === null) return ''
-        const percent = gainLoss / holding.costBasis
-        const formatted = this.percentSvc.formatDecimal(percent)
-        if (percent > 0) return `+${formatted}`
+        const ratio = gainLoss / holding.costBasis
+        const formatted = formatDecimalToPercent(ratio)
+        if (ratio > 0) return `+${formatted}`
         return formatted
     }
 
@@ -335,9 +334,9 @@ export class InvestmentsComponent implements OnInit {
     getTotalGainLossPercentString(account: AccountWithHoldings): string {
         const gainLoss = this.getTotalGainLoss(account)
         const costBasis = this.getTotalCostBasis(account)
-        const percent = gainLoss / costBasis
-        const formatted = this.percentSvc.formatDecimal(percent)
-        if (percent > 0) return `+${formatted}`
+        const ratio = gainLoss / costBasis
+        const formatted = formatDecimalToPercent(ratio)
+        if (ratio > 0) return `+${formatted}`
         return formatted
     }
 

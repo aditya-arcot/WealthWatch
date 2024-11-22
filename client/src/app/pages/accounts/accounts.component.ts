@@ -22,11 +22,11 @@ import {
 import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
-import { DateService } from '../../services/date.service'
 import { ItemService } from '../../services/item.service'
 import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
+import { formatDate } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-accounts',
@@ -45,7 +45,6 @@ export class AccountsComponent implements OnInit {
         private alertSvc: AlertService,
         private itemSvc: ItemService,
         private currencySvc: CurrencyService,
-        private dateSvc: DateService,
         private route: ActivatedRoute,
         private router: Router
     ) {}
@@ -343,7 +342,7 @@ export class AccountsComponent implements OnInit {
     }
 
     getLastRefreshedString(item: Item): string {
-        return this.dateSvc.format(item.lastRefreshed)
+        return formatDate(item.lastRefreshed)
     }
 
     getCurrentBalanceString(acc: Account): string {
