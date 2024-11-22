@@ -3,12 +3,21 @@ import {
     Item,
     ItemWithAccounts,
     ItemWithAccountsWithHoldings,
+    ItemWithCreditCardAccounts,
+    ItemWithMortgageAccounts,
+    ItemWithStudentLoanAccounts,
 } from '../models/item.js'
 import {
     DbAccount,
     DbAccountWithHoldings,
+    DbCreditCardAccount,
+    DbMortgageAccount,
+    DbStudentLoanAccount,
+    mapCreditCardAccount,
     mapDbAccount,
     mapDbAccountWithHoldings,
+    mapMortgageAccount,
+    mapStudentLoanAccount,
 } from './accountQueries.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
@@ -130,6 +139,137 @@ export const fetchActiveItemsWithAccountsWithHoldingsByUserId = async (
         await runQuery<DbItemWithAccountsWithHoldings>(query, [userId])
     ).rows
     return rows.map(mapDbItemWithAccountsWithHoldings)
+}
+
+export const fetchActiveItemsWithCreditCardAccounts = async (
+    userId: number
+): Promise<ItemWithCreditCardAccounts[]> => {
+    const query = `
+        WITH credit_card_accounts AS (
+            SELECT
+                a.*,
+                c.aprs,
+                c.overdue,
+                c.last_payment_date,
+                c.last_payment_amount,
+                c.last_statement_date,
+                c.last_statement_balance,
+                c.next_payment_due_date,
+                c.minimum_payment_amount
+            FROM active_accounts a
+            JOIN credit_cards c
+                ON c.account_id = a.id
+            WHERE a.active = TRUE
+        )
+        SELECT
+            i.*,
+            ARRAY_AGG (TO_JSONB (a.*)) as accounts
+        FROM items i
+        JOIN credit_card_accounts a
+            ON a.item_id = i.id
+        WHERE i.user_id = $1
+            AND i.active = TRUE
+        GROUP BY i.id
+    `
+    const rows = (await runQuery<DbItemWithCreditCardAccounts>(query, [userId]))
+        .rows
+    return rows.map(mapDbItemWithCreditCardAccounts)
+}
+
+export const fetchActiveItemsWithMortgageAccounts = async (
+    userId: number
+): Promise<ItemWithMortgageAccounts[]> => {
+    const query = `
+        WITH mortgage_accounts AS (
+            SELECT
+                a.*,
+                m.type AS mortgage_type,
+                m.interest_rate_type,
+                m.interest_rate_percent,
+                m.term,
+                m.address,
+                m.origination_date,
+                m.origination_principal,
+                m.maturity_date,
+                m.late_fee,
+                m.escrow_balance,
+                m.prepayment_penalty,
+                m.private_insurance,
+                m.past_due_amount,
+                m.last_payment_date,
+                m.last_payment_amount,
+                m.next_payment_due_date,
+                m.next_payment_amount,
+                m.ytd_interest_paid,
+                m.ytd_principal_paid
+            FROM active_accounts a
+            JOIN mortgages m
+                ON m.account_id = a.id
+            WHERE a.active = TRUE
+        )
+        SELECT
+            i.*,
+            ARRAY_AGG (TO_JSONB (a.*)) as accounts
+        FROM items i
+        JOIN mortgage_accounts a
+            ON a.item_id = i.id
+        WHERE i.user_id = $1
+            AND i.active = TRUE
+        GROUP BY i.id
+    `
+    const rows = (await runQuery<DbItemWithMortgageAccounts>(query, [userId]))
+        .rows
+    return rows.map(mapDbItemWithMortgageAccounts)
+}
+
+export const fetchActiveItemsWithStudentsLoansAccounts = async (
+    userId: number
+): Promise<ItemWithStudentLoanAccounts[]> => {
+    const query = `
+        WITH student_loan_accounts AS (
+            SELECT
+                a.*,
+                s.name AS student_loan_name,
+                s.interest_rate_percent,
+                s.status_type_id,
+                s.status_end_date,
+                s.overdue,
+                s.origination_date,
+                s.origination_principal,
+                s.disbursement_dates,
+                s.outstanding_interest,
+                s.expected_payoff_date,
+                s.guarantor,
+                s.servicer_address,
+                s.repayment_plan_type_id,
+                s.repayment_plan_description,
+                s.last_payment_date,
+                s.last_payment_amount,
+                s.last_statement_date,
+                s.last_statement_balance,
+                s.next_payment_due_date,
+                s.minimum_payment_amount,
+                s.ytd_interest_paid,
+                s.ytd_principal_paid
+            FROM active_accounts a
+            JOIN student_loans s
+                ON s.account_id = a.id
+            WHERE a.active = TRUE
+        )
+        SELECT
+            i.*,
+            ARRAY_AGG (TO_JSONB (a.*)) as accounts
+        FROM items i
+        JOIN student_loan_accounts a
+            ON a.item_id = i.id
+        WHERE i.user_id = $1
+            AND i.active = TRUE
+        GROUP BY i.id
+    `
+    const rows = (
+        await runQuery<DbItemWithStudentLoanAccounts>(query, [userId])
+    ).rows
+    return rows.map(mapDbItemWithStudentLoanAccounts)
 }
 
 export const fetchActiveItemByUserIdAndId = async (
@@ -283,4 +423,37 @@ const mapDbItemWithAccountsWithHoldings = (
 ): ItemWithAccountsWithHoldings => ({
     ...mapDbItem(dbItem),
     accounts: dbItem.accounts.map(mapDbAccountWithHoldings),
+})
+
+interface DbItemWithCreditCardAccounts extends DbItem {
+    accounts: DbCreditCardAccount[]
+}
+
+const mapDbItemWithCreditCardAccounts = (
+    dbItem: DbItemWithCreditCardAccounts
+): ItemWithCreditCardAccounts => ({
+    ...mapDbItem(dbItem),
+    accounts: dbItem.accounts.map(mapCreditCardAccount),
+})
+
+interface DbItemWithMortgageAccounts extends DbItem {
+    accounts: DbMortgageAccount[]
+}
+
+const mapDbItemWithMortgageAccounts = (
+    dbItem: DbItemWithMortgageAccounts
+): ItemWithMortgageAccounts => ({
+    ...mapDbItem(dbItem),
+    accounts: dbItem.accounts.map(mapMortgageAccount),
+})
+
+interface DbItemWithStudentLoanAccounts extends DbItem {
+    accounts: DbStudentLoanAccount[]
+}
+
+const mapDbItemWithStudentLoanAccounts = (
+    dbItem: DbItemWithStudentLoanAccounts
+): ItemWithStudentLoanAccounts => ({
+    ...mapDbItem(dbItem),
+    accounts: dbItem.accounts.map(mapStudentLoanAccount),
 })
