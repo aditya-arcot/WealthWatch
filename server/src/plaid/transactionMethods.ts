@@ -173,7 +173,7 @@ export const mapPlaidTransaction = (
 const mapPlaidTransactionCategory = (
     primary: string | undefined,
     detailed: string | undefined
-): number => {
+): CategoryEnum => {
     const detailedEnum = detailed as PlaidDetailedCategoryEnum
     if (Object.values(PlaidDetailedCategoryEnum).includes(detailedEnum)) {
         return detailedCategoryMap[detailedEnum]

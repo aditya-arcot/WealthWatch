@@ -1,0 +1,224 @@
+<app-loading-spinner [loading]="loading"></app-loading-spinner>
+
+<h2 class="text-center mb-3">Liabilities</h2>
+
+@if (!creditCardItems.length && !studentLoanItems.length && !mortgageItems.length) {
+    <div class="row justify-content-center">
+        <div class="col-10 col-sm-8 col-md-6 col-xl-4">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h4 class="text-center mb-0">No accounts with liabilities</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+} @else {
+    @if (creditCardItems.length) {
+        <div class="card mb-2">
+            <div class="card-body">
+                <h4 class="card-title text-center mb-0">Credit Cards</h4>
+                @for (item of creditCardItems; track $index) {
+                    @for (acc of item.accounts; track $index) {
+                        <div class="credit-card-div">
+                            <div class="mb-2 p-0">
+                                <h5 class="mb-1">{{ item.institutionName }} {{ acc.name }}</h5>
+                                @if (acc.officialName && acc.mask) {
+                                    <h6 class="small-text text-muted mb-0">{{ acc.officialName }} (&middot;&middot;&middot;&middot;{{ acc.mask }})</h6>
+                                } @else if (acc.officialName) {
+                                    <h6 class="small-text text-muted mb-0">{{ acc.officialName }}</h6>
+                                } @else if (acc.mask) {
+                                    <h6 class="small-text text-muted mb-0">
+                                        &middot;&middot;&middot;&middot;
+                                        {{ acc.mask }}
+                                    </h6>
+                                }
+                                @if (acc.overdue) {
+                                    <h6 class="small-text text-danger mb-0">Overdue</h6>
+                                }
+                            </div>
+                            <table class="table table-striped table-hover table-sm align-middle mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col" class="w-20">Current Balance</th>
+                                        <th scope="col" class="d-none d-lg-table-cell w-20">Credit Limit</th>
+                                        <th scope="col" class="d-none d-lg-table-cell w-20">Last Payment</th>
+                                        <th scope="col" class="d-none d-sm-table-cell w-20">Last Statement</th>
+                                        <th scope="col" class="w-20">Minimum Payment</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small-text">
+                                    <tr>
+                                        <td>{{ getCurrentBalanceString(acc) }}</td>
+                                        <td class="d-none d-lg-table-cell">{{ getCreditLimitString(acc) }}</td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <div>
+                                                {{ getLastPaymentAmountString(acc) }}
+                                            </div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getLastPaymentDateString(acc) }}
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-sm-table-cell">
+                                            <div>
+                                                {{ getLastStatementBalanceString(acc) }}
+                                            </div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getLastStatementDateString(acc) }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>{{ getMinimumPaymentAmountString(acc) }}</div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getNextPaymentDateString(acc) }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+    @if (studentLoanItems.length) {
+        <div class="card mb-2">
+            <div class="card-body">
+                <h4 class="card-title text-center mb-0">Student Loans</h4>
+                @for (item of studentLoanItems; track $index) {
+                    @for (acc of item.accounts; track $index) {
+                        <div class="student-loan-div">
+                            <div class="mb-2 p-0">
+                                <h5 class="mb-1">{{ item.institutionName }} {{ acc.name }}</h5>
+                                @if (acc.studentLoanName && acc.mask) {
+                                    <h6 class="small-text text-muted mb-0">{{ acc.studentLoanName }} (&middot;&middot;&middot;&middot;{{ acc.mask }})</h6>
+                                } @else if (acc.studentLoanName) {
+                                    <h6 class="small-text text-muted mb-0">{{ acc.studentLoanName }}</h6>
+                                } @else if (acc.mask) {
+                                    <h6 class="small-text text-muted mb-0">
+                                        &middot;&middot;&middot;&middot;
+                                        {{ acc.mask }}
+                                    </h6>
+                                }
+                                @if (acc.overdue) {
+                                    <h6 class="small-text text-danger mb-0">Overdue</h6>
+                                }
+                            </div>
+                            <table class="table table-striped table-hover table-sm align-middle mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col" class="w-10">Current Balance</th>
+                                        <th scope="col" class="d-none d-lg-table-cell w-10">Interest Rate</th>
+                                        <th scope="col" class="d-none d-xl-table-cell w-10">Status</th>
+                                        <th scope="col" class="d-none d-xl-table-cell w-10">Payoff Date</th>
+                                        <th scope="col" class="d-none d-lg-table-cell w-10">Last Payment</th>
+                                        <th scope="col" class="d-none d-sm-table-cell w-10">Last Statement</th>
+                                        <th scope="col" class="w-10">Minimum Payment</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small-text">
+                                    <tr>
+                                        <td>{{ getCurrentBalanceString(acc) }}</td>
+                                        <td class="d-none d-lg-table-cell">{{ getInterestRatePercentString(acc) }}</td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div>
+                                                {{ getStudentLoanStatusName(acc) }}
+                                                @if (acc.repaymentPlanTypeId) {
+                                                    ({{ getStudentLoanRepaymentPlanName(acc) }})
+                                                }
+                                            </div>
+                                            <div class="tiny-text text-muted">Ends {{ getStudentLoanStatusEndDate(acc) }}</div>
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">{{ getStudentLoanPayoffDateString(acc) }}</td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <div>
+                                                {{ getLastPaymentAmountString(acc) }}
+                                            </div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getLastPaymentDateString(acc) }}
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-sm-table-cell">
+                                            <div>
+                                                {{ getLastStatementBalanceString(acc) }}
+                                            </div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getLastStatementDateString(acc) }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>{{ getMinimumPaymentAmountString(acc) }}</div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getNextPaymentDateString(acc) }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+    @if (mortgageItems.length) {
+        <div class="card mb-2">
+            <div class="card-body">
+                <h4 class="card-title text-center mb-0">Mortgages</h4>
+                @for (item of mortgageItems; track $index) {
+                    @for (acc of item.accounts; track $index) {
+                        <div class="mortgage-div">
+                            <div class="mb-2 p-0">
+                                <h5 class="mb-1">{{ item.institutionName }} {{ acc.name }}</h5>
+                                @if (acc.address) {
+                                    <h6 class="text-muted mb-0">{{ acc.address }}</h6>
+                                }
+                            </div>
+                            <table class="table table-striped table-hover table-sm align-middle mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col" class="w-15">Current Balance</th>
+                                        <th scope="col" class="d-none d-lg-table-cell w-15">Interest Rate</th>
+                                        <th scope="col" class="d-none d-xl-table-cell w-15">Maturity Date</th>
+                                        <th scope="col" class="d-none d-lg-table-cell w-15">Last Payment</th>
+                                        <th scope="col" class="d-none d-sm-table-cell w-15">Past Due</th>
+                                        <th scope="col" class="w-15">Next Payment</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small-text">
+                                    <tr>
+                                        <td>{{ getCurrentBalanceString(acc) }}</td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <div>
+                                                {{ getInterestRatePercentString(acc) }}
+                                            </div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getMortgageInterestRateDetail(acc) }}
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">{{ getMortgageMaturityDateString(acc) }}</td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <div>
+                                                {{ getLastPaymentAmountString(acc) }}
+                                            </div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getLastPaymentDateString(acc) }}
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-sm-table-cell">{{ getMortgagePastDueString(acc) }}</td>
+                                        <td>
+                                            <div>{{ getMortgageNextPaymentAmountString(acc) }}</div>
+                                            <div class="tiny-text text-muted">
+                                                {{ getNextPaymentDateString(acc) }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+}

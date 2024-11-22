@@ -10,6 +10,9 @@ import {
     fetchActiveItemsByUserId,
     fetchActiveItemsWithAccountsByUserId,
     fetchActiveItemsWithAccountsWithHoldingsByUserId,
+    fetchActiveItemsWithCreditCardAccounts,
+    fetchActiveItemsWithMortgageAccounts,
+    fetchActiveItemsWithStudentsLoansAccounts,
     modifyItemCursorByPlaidId,
     modifyItemInvestmentsLastRefreshedByPlaidId,
     modifyItemLastRefreshedByPlaidId,
@@ -94,6 +97,45 @@ export const getUserItemsWithAccountsWithHoldings = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithAccountsWithHoldingsByUserId(userId)
+    return res.json(items)
+}
+
+export const getUserItemsWithCreditCardAccounts = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('getting items with credit card accounts')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const items = await fetchActiveItemsWithCreditCardAccounts(userId)
+    return res.json(items)
+}
+
+export const getUserItemsWithMortgageAccounts = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('getting items with mortgage accounts')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const items = await fetchActiveItemsWithMortgageAccounts(userId)
+    return res.json(items)
+}
+
+export const getUserItemsWithStudentLoanAccounts = async (
+    req: Request,
+    res: Response
+) => {
+    logger.debug('getting items with student loan accounts')
+
+    const userId = req.session.user?.id
+    if (userId === undefined) throw new HttpError('missing user id', 400)
+
+    const items = await fetchActiveItemsWithStudentsLoansAccounts(userId)
     return res.json(items)
 }
 

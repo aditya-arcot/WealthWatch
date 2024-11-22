@@ -1,3 +1,5 @@
+import { CategoryEnum } from './category.js'
+
 export interface Transaction {
     id: number
     accountId: number
@@ -7,8 +9,8 @@ export interface Transaction {
     amount: number
     primaryCategory: string | null
     detailedCategory: string | null
-    categoryId: number
-    customCategoryId: number | null
+    categoryId: CategoryEnum
+    customCategoryId: CategoryEnum | null
     paymentChannel: PaymentChannelEnum
     merchantId: string | null
     merchant: string | null

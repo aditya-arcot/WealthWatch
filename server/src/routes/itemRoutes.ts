@@ -4,6 +4,9 @@ import {
     getUserItems,
     getUserItemsWithAccounts,
     getUserItemsWithAccountsWithHoldings,
+    getUserItemsWithCreditCardAccounts,
+    getUserItemsWithMortgageAccounts,
+    getUserItemsWithStudentLoanAccounts,
     refreshItem,
 } from '../controllers/itemController.js'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -81,6 +84,72 @@ router
 router
     .route('/with-accounts/with-holdings')
     .get(authenticate, catchAsync(getUserItemsWithAccountsWithHoldings))
+
+/**
+ * @swagger
+ * /items/with-credit-card-accounts:
+ *   get:
+ *     summary: Retrieve the logged in user's items with credit card accounts
+ *     tags: [Items]
+ *     responses:
+ *       200:
+ *         description: Retrieved the logged in user's items with credit card accounts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ItemWithCreditCardAccounts'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/with-credit-card-accounts')
+    .get(authenticate, catchAsync(getUserItemsWithCreditCardAccounts))
+
+/**
+ * @swagger
+ * /items/with-mortgage-accounts:
+ *   get:
+ *     summary: Retrieve the logged in user's items with mortgage accounts
+ *     tags: [Items]
+ *     responses:
+ *       200:
+ *         description: Retrieved the logged in user's items with mortgage accounts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ItemWithMortgageAccounts'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/with-mortgage-accounts')
+    .get(authenticate, catchAsync(getUserItemsWithMortgageAccounts))
+
+/**
+ * @swagger
+ * /items/with-student-loan-accounts:
+ *   get:
+ *     summary: Retrieve the logged in user's items with student loan accounts
+ *     tags: [Items]
+ *     responses:
+ *       200:
+ *         description: Retrieved the logged in user's items with student loan accounts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ItemWithStudentLoanAccounts'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router
+    .route('/with-student-loan-accounts')
+    .get(authenticate, catchAsync(getUserItemsWithStudentLoanAccounts))
 
 /**
  * @swagger

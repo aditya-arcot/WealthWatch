@@ -7,12 +7,12 @@ import { Secrets } from '../models/secrets'
     providedIn: 'root',
 })
 export class SecretsService {
-    readonly url = `${env.apiUrl}/secrets`
+    readonly baseUrl = `${env.apiUrl}/secrets`
     secrets: Secrets | undefined
 
     constructor(private http: HttpClient) {}
 
     getSecrets() {
-        return this.http.get<Secrets>(this.url)
+        return this.http.get<Secrets>(this.baseUrl)
     }
 }

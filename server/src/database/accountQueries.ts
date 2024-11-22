@@ -1,4 +1,14 @@
-import { Account, AccountWithHoldings } from '../models/account.js'
+import {
+    Account,
+    AccountWithHoldings,
+    CreditCardAccount,
+    MortgageAccount,
+    StudentLoanAccount,
+} from '../models/account.js'
+import {
+    StudentLoanRepaymentPlanTypeEnum,
+    StudentLoanStatusTypeEnum,
+} from '../models/liability.js'
 import {
     DbHoldingWithSecurity,
     mapDbHoldingWithSecurity,
@@ -142,4 +152,129 @@ export const mapDbAccountWithHoldings = (
 ): AccountWithHoldings => ({
     ...mapDbAccount(acc),
     holdings: acc.holdings.map(mapDbHoldingWithSecurity),
+})
+
+export interface DbCreditCardAccount extends DbAccount {
+    aprs: object
+    overdue: boolean | null
+    last_payment_date: Date | null
+    last_payment_amount: number | null
+    last_statement_date: Date | null
+    last_statement_balance: number | null
+    next_payment_due_date: Date | null
+    minimum_payment_amount: number | null
+}
+
+export const mapCreditCardAccount = (
+    acc: DbCreditCardAccount
+): CreditCardAccount => ({
+    ...mapDbAccount(acc),
+    aprs: acc.aprs,
+    overdue: acc.overdue,
+    lastPaymentDate: acc.last_payment_date,
+    lastPaymentAmount: acc.last_payment_amount,
+    lastStatementDate: acc.last_statement_date,
+    lastStatementBalance: acc.last_statement_balance,
+    nextPaymentDueDate: acc.next_payment_due_date,
+    minimumPaymentAmount: acc.minimum_payment_amount,
+})
+
+export interface DbMortgageAccount extends DbAccount {
+    mortgage_type: string | null
+    interest_rate_type: string | null
+    interest_rate_percent: number
+    term: string | null
+    address: string | null
+    origination_date: Date | null
+    origination_principal: number | null
+    maturity_date: Date | null
+    late_fee: number | null
+    escrow_balance: number | null
+    prepayment_penalty: boolean | null
+    private_insurance: boolean | null
+    past_due_amount: number | null
+    last_payment_date: Date | null
+    last_payment_amount: number | null
+    next_payment_due_date: Date | null
+    next_payment_amount: number | null
+    ytd_interest_paid: number | null
+    ytd_principal_paid: number | null
+}
+
+export const mapMortgageAccount = (
+    acc: DbMortgageAccount
+): MortgageAccount => ({
+    ...mapDbAccount(acc),
+    mortgageType: acc.mortgage_type,
+    interestRateType: acc.interest_rate_type,
+    interestRatePercent: acc.interest_rate_percent,
+    term: acc.term,
+    address: acc.address,
+    originationDate: acc.origination_date,
+    originationPrincipal: acc.origination_principal,
+    maturityDate: acc.maturity_date,
+    lateFee: acc.late_fee,
+    escrowBalance: acc.escrow_balance,
+    prepaymentPenalty: acc.prepayment_penalty,
+    privateInsurance: acc.private_insurance,
+    pastDueAmount: acc.past_due_amount,
+    lastPaymentDate: acc.last_payment_date,
+    lastPaymentAmount: acc.last_payment_amount,
+    nextPaymentDueDate: acc.next_payment_due_date,
+    nextPaymentAmount: acc.next_payment_amount,
+    ytdInterestPaid: acc.ytd_interest_paid,
+    ytdPrincipalPaid: acc.ytd_principal_paid,
+})
+
+export interface DbStudentLoanAccount extends DbAccount {
+    student_loan_name: string | null
+    interest_rate_percent: number
+    status_type_id: StudentLoanStatusTypeEnum | null
+    status_end_date: Date | null
+    overdue: boolean | null
+    origination_date: Date | null
+    origination_principal: number | null
+    disbursement_dates: string | null
+    outstanding_interest: number | null
+    expected_payoff_date: Date | null
+    guarantor: string | null
+    servicer_address: string | null
+    repayment_plan_type_id: StudentLoanRepaymentPlanTypeEnum | null
+    repayment_plan_description: string | null
+    last_payment_date: Date | null
+    last_payment_amount: number | null
+    last_statement_date: Date | null
+    last_statement_balance: number | null
+    next_payment_due_date: Date | null
+    minimum_payment_amount: number | null
+    ytd_interest_paid: number | null
+    ytd_principal_paid: number | null
+}
+
+export const mapStudentLoanAccount = (
+    acc: DbStudentLoanAccount
+): StudentLoanAccount => ({
+    ...mapDbAccount(acc),
+    studentLoanName: acc.student_loan_name,
+    interestRatePercent: acc.interest_rate_percent,
+    statusTypeId: acc.status_type_id,
+    statusEndDate: acc.status_end_date,
+    overdue: acc.overdue,
+    originationDate: acc.origination_date,
+    originationPrincipal: acc.origination_principal,
+    disbursementDates: acc.disbursement_dates,
+    outstandingInterest: acc.outstanding_interest,
+    expectedPayoffDate: acc.expected_payoff_date,
+    guarantor: acc.guarantor,
+    servicerAddress: acc.servicer_address,
+    repaymentPlanTypeId: acc.repayment_plan_type_id,
+    repaymentPlanDescription: acc.repayment_plan_description,
+    lastPaymentDate: acc.last_payment_date,
+    lastPaymentAmount: acc.last_payment_amount,
+    lastStatementDate: acc.last_statement_date,
+    lastStatementBalance: acc.last_statement_balance,
+    nextPaymentDueDate: acc.next_payment_due_date,
+    minimumPaymentAmount: acc.minimum_payment_amount,
+    ytdInterestPaid: acc.ytd_interest_paid,
+    ytdPrincipalPaid: acc.ytd_principal_paid,
 })
