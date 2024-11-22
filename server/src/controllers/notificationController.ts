@@ -11,6 +11,7 @@ import {
     createNotification,
     NotificationTypeEnum,
 } from '../models/notification.js'
+import { parseNumberOrUndefinedFromParam } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 
 export const getUserNotifications = async (req: Request, res: Response) => {
@@ -46,9 +47,11 @@ export const updateUserNotificationToInactive = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const notificationId = req.body.notificationId
-    if (typeof notificationId !== 'number')
-        throw new HttpError('invalid notification id', 400)
+    const notificationId = parseNumberOrUndefinedFromParam(
+        req.params['notificationId']
+    )
+    if (notificationId === undefined)
+        throw new HttpError('missing or invalid notification id', 400)
 
     await modifyNotificationToInactiveByUserIdAndId(userId, notificationId)
 
