@@ -1,0 +1,11 @@
+.credit-card-div:not(:last-child) {
+    margin-bottom: 12px;
+}
+
+.student-loan-div:not(:last-child) {
+    margin-bottom: 12px;
+}
+
+.mortgage-div:not(:last-child) {
+    margin-bottom: 12px;
+}

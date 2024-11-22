@@ -111,8 +111,10 @@
                                             {{ getAvailableBalanceString(account) }}
                                         </td>
                                         <td class="text-center d-none d-lg-table-cell">
-                                            &middot;&middot;&middot;&middot;
-                                            {{ account.mask }}
+                                            @if (account.mask) {
+                                                &middot;&middot;&middot;&middot;
+                                                {{ account.mask }}
+                                            }
                                         </td>
                                     </tr>
                                 }
