@@ -52,7 +52,7 @@
                             @if (item.lastRefreshed) {
                                 <h6 class="card-subtitle text-muted small-text">
                                     Last refreshed:
-                                    {{ getDateString(item.lastRefreshed) }}
+                                    {{ getLastRefreshedString(item) }}
                                 </h6>
                             }
 
@@ -111,8 +111,10 @@
                                             {{ getAvailableBalanceString(account) }}
                                         </td>
                                         <td class="text-center d-none d-lg-table-cell">
-                                            &middot;&middot;&middot;&middot;
-                                            {{ account.mask }}
+                                            @if (account.mask) {
+                                                &middot;&middot;&middot;&middot;
+                                                {{ account.mask }}
+                                            }
                                         </td>
                                     </tr>
                                 }

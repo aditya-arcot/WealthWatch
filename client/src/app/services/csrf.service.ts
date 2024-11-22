@@ -20,7 +20,6 @@ export class CSRFService {
     }
 
     getCsrfToken() {
-        const url = `${this.baseUrl}`
-        return this.http.get<{ csrfToken: string }>(url)
+        return this.http.get<{ csrfToken: string }>(this.baseUrl)
     }
 }

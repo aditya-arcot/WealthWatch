@@ -14,3 +14,17 @@ export const checkDatesEqual = (
     zeroMsDate2.setMilliseconds(0)
     return zeroMsDate1.getTime() === zeroMsDate2.getTime()
 }
+
+export const formatDate = (date: Date | null, includeTime = true): string => {
+    if (date === null) return '-'
+    const options: Intl.DateTimeFormatOptions = {
+        month: 'numeric',
+        day: 'numeric',
+        year: '2-digit',
+    }
+    if (includeTime) {
+        options.hour = 'numeric'
+        options.minute = 'numeric'
+    }
+    return new Date(date).toLocaleString(undefined, options)
+}

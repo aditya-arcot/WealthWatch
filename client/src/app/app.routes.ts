@@ -4,6 +4,7 @@ import { AccountsComponent } from './pages/accounts/accounts.component'
 import { AdminComponent } from './pages/admin/admin.component'
 import { HomeComponent } from './pages/home/home.component'
 import { InvestmentsComponent } from './pages/investments/investments.component'
+import { LiabilitiesComponent } from './pages/liabilities/liabilities.component'
 import { LoginComponent } from './pages/login/login.component'
 import { LogoutComponent } from './pages/logout/logout.component'
 import { RegisterComponent } from './pages/register/register.component'
@@ -23,6 +24,7 @@ export const routes: Routes = [
     { path: 'transactions', component: TransactionsComponent },
     { path: 'spending', component: SpendingComponent },
     { path: 'investments', component: InvestmentsComponent },
+    { path: 'liabilities', component: LiabilitiesComponent },
     // { path: 'net-worth', component: NetWorthComponent },
     // { path: 'paychecks', component: PaychecksComponent },
     {

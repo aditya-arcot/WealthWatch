@@ -260,6 +260,235 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    ItemWithCreditCardAccounts: {
+                        type: 'object',
+                        allOf: [
+                            {
+                                $ref: '#/components/schemas/Item',
+                            },
+                        ],
+                        properties: {
+                            accounts: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    allOf: [
+                                        {
+                                            $ref: '#/components/schemas/Account',
+                                        },
+                                    ],
+                                    properties: {
+                                        aprs: {
+                                            type: 'object',
+                                        },
+                                        overdue: {
+                                            type: 'boolean',
+                                        },
+                                        lastPaymentDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        lastPaymentAmount: {
+                                            type: 'number',
+                                        },
+                                        lastStatementDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        lastStatementBalance: {
+                                            type: 'number',
+                                        },
+                                        nextPaymentDueDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        minimumPaymentAmount: {
+                                            type: 'number',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ItemWithMortgageAccounts: {
+                        type: 'object',
+                        allOf: [
+                            {
+                                $ref: '#/components/schemas/Item',
+                            },
+                        ],
+                        properties: {
+                            accounts: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    allOf: [
+                                        {
+                                            $ref: '#/components/schemas/Account',
+                                        },
+                                    ],
+                                    properties: {
+                                        mortgageType: {
+                                            type: 'string',
+                                        },
+                                        interestRateType: {
+                                            type: 'string',
+                                        },
+                                        interestRatePercent: {
+                                            type: 'number',
+                                        },
+                                        term: {
+                                            type: 'string',
+                                        },
+                                        address: {
+                                            type: 'string',
+                                        },
+                                        originationDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        originationPrincipal: {
+                                            type: 'number',
+                                        },
+                                        maturityDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        lateFee: {
+                                            type: 'number',
+                                        },
+                                        escrowBalance: {
+                                            type: 'number',
+                                        },
+                                        prepaymentPenalty: {
+                                            type: 'boolean',
+                                        },
+                                        privateInsurance: {
+                                            type: 'boolean',
+                                        },
+                                        pastDueAmount: {
+                                            type: 'number',
+                                        },
+                                        lastPaymentDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        lastPaymentAmount: {
+                                            type: 'number',
+                                        },
+                                        nextPaymentDueDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        nextPaymentAmount: {
+                                            type: 'number',
+                                        },
+                                        ytdInterestPaid: {
+                                            type: 'number',
+                                        },
+                                        ytdPrincipalPaid: {
+                                            type: 'number',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ItemWithStudentLoanAccounts: {
+                        type: 'object',
+                        allOf: [
+                            {
+                                $ref: '#/components/schemas/Item',
+                            },
+                        ],
+                        properties: {
+                            accounts: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    allOf: [
+                                        {
+                                            $ref: '#/components/schemas/Account',
+                                        },
+                                    ],
+                                    properties: {
+                                        studentLoanName: {
+                                            type: 'string',
+                                        },
+                                        interestRatePercent: {
+                                            type: 'number',
+                                        },
+                                        statusTypeId: {
+                                            type: 'number',
+                                        },
+                                        statusEndDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        overdue: {
+                                            type: 'boolean',
+                                        },
+                                        originationDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        originationPrincipal: {
+                                            type: 'number',
+                                        },
+                                        disbursementDates: {
+                                            type: 'string',
+                                        },
+                                        outstandingInterest: {
+                                            type: 'number',
+                                        },
+                                        expectedPayoffDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        guarantor: {
+                                            type: 'string',
+                                        },
+                                        servicerAddress: {
+                                            type: 'string',
+                                        },
+                                        repaymentPlanTypeId: {
+                                            type: 'number',
+                                        },
+                                        repaymentPlanDescription: {
+                                            type: 'string',
+                                        },
+                                        lastPaymentDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        lastPaymentAmount: {
+                                            type: 'number',
+                                        },
+                                        lastStatementDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        lastStatementBalance: {
+                                            type: 'number',
+                                        },
+                                        nextPaymentDueDate: {
+                                            type: 'string',
+                                            format: 'date-time',
+                                        },
+                                        minimumPaymentAmount: {
+                                            type: 'number',
+                                        },
+                                        ytdInterestPaid: {
+                                            type: 'number',
+                                        },
+                                        ytdPrincipalPaid: {
+                                            type: 'number',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
                     Notification: {
                         type: 'object',
                         properties: {

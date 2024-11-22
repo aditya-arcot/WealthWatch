@@ -26,6 +26,7 @@ import { ItemService } from '../../services/item.service'
 import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
+import { formatDate } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-accounts',
@@ -340,14 +341,8 @@ export class AccountsComponent implements OnInit {
             })
     }
 
-    getDateString(date: Date): string {
-        return new Date(date).toLocaleString(undefined, {
-            month: 'numeric',
-            day: 'numeric',
-            year: '2-digit',
-            hour: 'numeric',
-            minute: 'numeric',
-        })
+    getLastRefreshedString(item: Item): string {
+        return formatDate(item.lastRefreshed)
     }
 
     getCurrentBalanceString(acc: Account): string {
