@@ -50,12 +50,6 @@ export class AccountsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        const institution = sessionStorage.getItem('deactivatedInstitution')
-        if (institution !== null) {
-            this.alertSvc.addSuccessAlert(`Deleted ${institution} data`)
-            sessionStorage.removeItem('deactivatedInstitution')
-        }
-
         this.route.queryParams.subscribe((params) => {
             const itemId: string | undefined = params['itemId']
             if (itemId === undefined) return
@@ -325,19 +319,17 @@ export class AccountsComponent implements OnInit {
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
-                        `Failed to delete ${item.institutionName}`
+                        `Failed to remove ${item.institutionName} accounts`
                     )
                     this.loading = false
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.loading = false
-                sessionStorage.setItem(
-                    'deactivatedInstitution',
-                    item.institutionName
+                this.alertSvc.addSuccessAlert(
+                    `Removed ${item.institutionName} accounts`
                 )
-                window.location.reload()
+                this.loadAccounts()
             })
     }
 
