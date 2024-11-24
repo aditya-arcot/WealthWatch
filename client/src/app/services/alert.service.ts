@@ -52,7 +52,7 @@ export class AlertService {
             () => {
                 this.removeAlert(alert.id)
             },
-            alert.type === AlertType.Success ? 3000 : 10000
+            alert.type === AlertType.Success ? 5000 : 15000
         )
     }
 

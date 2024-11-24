@@ -54,20 +54,17 @@ router
 
 /**
  * @swagger
- * /notifications/inactive:
+ * /notifications/{notificationId}/inactive:
  *   patch:
  *     summary: Update the logged in user's notification to inactive
  *     tags: [Notifications]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               notificationId:
- *                 type: number
- *                 required: true
+ *     parameters:
+ *       - in: path
+ *         name: notificationId
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The notification id
  *     responses:
  *       204:
  *         description: Updated the logged in user's notification to inactive
@@ -75,7 +72,7 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/inactive')
+    .route('/:notificationId/inactive')
     .patch(authenticate, catchAsync(updateUserNotificationToInactive))
 
 export default router

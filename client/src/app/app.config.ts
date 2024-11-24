@@ -11,7 +11,7 @@ import {
     provideZoneChangeDetection,
 } from '@angular/core'
 import { Title } from '@angular/platform-browser'
-import { provideRouter } from '@angular/router'
+import { provideRouter, TitleStrategy } from '@angular/router'
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
 import { env } from '../environments/env'
@@ -20,6 +20,7 @@ import { AuthInterceptor } from './interceptors/auth-interceptor'
 import { CSRFInterceptor } from './interceptors/csrf-interceptor'
 import { ErrorInterceptor } from './interceptors/error-interceptor'
 import { StartupService } from './services/startup.service'
+import { TitleService } from './services/title.service'
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -27,6 +28,7 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes),
         provideHttpClient(withInterceptorsFromDi()),
         provideAppInitializer(() => inject(StartupService).startup()),
+        { provide: TitleStrategy, useClass: TitleService },
         importProvidersFrom(
             LoggerModule.forRoot({
                 level:
