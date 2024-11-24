@@ -80,7 +80,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
 
     await syncItemData(newItem)
 
-    return res.status(204).send()
+    return res.status(202).send()
 }
 
 export const forceRefreshItemTransactions = async (

@@ -36,9 +36,7 @@ export class NotificationService {
     }
 
     updateNotificationToInactive(notificationId: number) {
-        const url = `${this.baseUrl}/inactive`
-        return this.http.patch<void>(url, {
-            notificationId,
-        })
+        const url = `${this.baseUrl}/${notificationId}/inactive`
+        return this.http.patch<void>(url, {})
     }
 }
