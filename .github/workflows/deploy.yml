@@ -132,24 +132,24 @@ jobs:
                   cd server/
                   mkdir stage
                   cp -r .env Dockerfile package.json package-lock.json dist stage/
+                  find stage -type f
 
             - name: copy client files
               run: |
                   cd client/
                   mkdir stage
                   cp -r Dockerfile nginx.conf dist stage/
+                  find stage -type f
 
             - name: build, push server docker image
               run: |
                   cd server/stage/
-                  ls -R
                   docker build -t $SERVER_IMAGE .
                   docker push $SERVER_IMAGE
 
             - name: build, push client docker image
               run: |
                   cd client/stage/
-                  ls -R
                   docker build -t $CLIENT_IMAGE .
                   docker push $CLIENT_IMAGE
 
