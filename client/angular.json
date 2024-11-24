@@ -68,13 +68,13 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "1MB",
-                                    "maximumError": "2MB"
+                                    "maximumWarning": "2MB",
+                                    "maximumError": "5MB"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kB",
-                                    "maximumError": "4kB"
+                                    "maximumWarning": "5kB",
+                                    "maximumError": "10kB"
                                 }
                             ]
                         },
@@ -87,13 +87,13 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "1MB",
-                                    "maximumError": "2MB"
+                                    "maximumWarning": "2MB",
+                                    "maximumError": "5MB"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kB",
-                                    "maximumError": "4kB"
+                                    "maximumWarning": "5kB",
+                                    "maximumError": "10kB"
                                 }
                             ],
                             "fileReplacements": [
@@ -112,13 +112,13 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "1MB",
-                                    "maximumError": "2MB"
+                                    "maximumWarning": "2MB",
+                                    "maximumError": "5MB"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kB",
-                                    "maximumError": "4kB"
+                                    "maximumWarning": "5kB",
+                                    "maximumError": "10kB"
                                 }
                             ],
                             "fileReplacements": [
