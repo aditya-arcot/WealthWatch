@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "tsc-watch --onSuccess 'npm run start'",
-        "build": "rm -rf dist/ && tsc",
+        "build": "rm -rf dist/ && tsc --sourceMap false",
         "start": "dotenvx run -f ../.env.dev -- node --inspect dist/index.js",
         "start:deploy": "dotenvx run -- node dist/index.js",
         "lint": "eslint --fix src/"
