@@ -142,12 +142,14 @@ jobs:
             - name: build, push server docker image
               run: |
                   cd server/stage/
+                  ls -R
                   docker build -t $SERVER_IMAGE .
                   docker push $SERVER_IMAGE
 
             - name: build, push client docker image
               run: |
                   cd client/stage/
+                  ls -R
                   docker build -t $CLIENT_IMAGE .
                   docker push $CLIENT_IMAGE
 
