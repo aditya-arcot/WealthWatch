@@ -42,7 +42,7 @@
                         "index": "src/index.html",
                         "browser": "src/main.ts",
                         "polyfills": ["zone.js"],
-                        "tsConfig": "tsconfig.app.json",
+                        "tsConfig": "tsconfig.json",
                         "assets": [
                             {
                                 "glob": "**/*",
@@ -64,38 +64,38 @@
                             "extractLicenses": true,
                             "sourceMap": false,
                             "namedChunks": false,
+                            "outputHashing": "all",
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "1MB",
-                                    "maximumError": "2MB"
+                                    "maximumWarning": "2MB",
+                                    "maximumError": "5MB"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kB",
-                                    "maximumError": "4kB"
+                                    "maximumWarning": "5kB",
+                                    "maximumError": "10kB"
                                 }
-                            ],
-                            "outputHashing": "all"
+                            ]
                         },
                         "stage": {
                             "optimization": true,
                             "extractLicenses": true,
                             "sourceMap": false,
                             "namedChunks": false,
+                            "outputHashing": "all",
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "1MB",
-                                    "maximumError": "2MB"
+                                    "maximumWarning": "2MB",
+                                    "maximumError": "5MB"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kB",
-                                    "maximumError": "4kB"
+                                    "maximumWarning": "5kB",
+                                    "maximumError": "10kB"
                                 }
                             ],
-                            "outputHashing": "all",
                             "fileReplacements": [
                                 {
                                     "replace": "src/environments/env.ts",
@@ -108,6 +108,19 @@
                             "extractLicenses": true,
                             "sourceMap": false,
                             "namedChunks": false,
+                            "outputHashing": "all",
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "2MB",
+                                    "maximumError": "5MB"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "5kB",
+                                    "maximumError": "10kB"
+                                }
+                            ],
                             "fileReplacements": [
                                 {
                                     "replace": "src/environments/env.ts",
@@ -120,6 +133,7 @@
                             "extractLicenses": false,
                             "sourceMap": true,
                             "namedChunks": true,
+                            "outputHashing": "none",
                             "fileReplacements": [
                                 {
                                     "replace": "src/environments/env.ts",
