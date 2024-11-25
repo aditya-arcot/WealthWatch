@@ -61,6 +61,10 @@ jobs:
                   node-version: 'lts/*'
                   check-latest: true
                   cache: 'npm'
+                  cache-dependency-path: |
+                      package-lock.json
+                      client/package-lock.json
+                      server/package-lock.json
 
             - name: create server .env
               run: |
@@ -128,12 +132,14 @@ jobs:
                   cd server/
                   mkdir stage
                   cp -r .env Dockerfile package.json package-lock.json dist stage/
+                  find stage -type f
 
             - name: copy client files
               run: |
                   cd client/
                   mkdir stage
                   cp -r Dockerfile nginx.conf dist stage/
+                  find stage -type f
 
             - name: build, push server docker image
               run: |
