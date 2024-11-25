@@ -252,9 +252,11 @@
                                         (blur)="showShortenedName($event.target, t)"
                                         (change)="updateName($event.target, t)"
                                     />
-                                    <button class="btn btn-outline-dark" type="button" (click)="resetName(t)" title="Reset Name">
-                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                    </button>
+                                    @if (t.customName !== null) {
+                                        <button class="btn btn-outline-dark" type="button" (click)="resetName(t)" title="Reset Name">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                             <td>
@@ -280,9 +282,11 @@
                                             </option>
                                         }
                                     </select>
-                                    <button class="btn btn-outline-dark" type="button" (click)="resetCategory(t)" title="Reset Category">
-                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                    </button>
+                                    @if (t.customCategoryId !== null) {
+                                        <button class="btn btn-outline-dark" type="button" (click)="resetCategory(t)" title="Reset Category">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                             <td class="d-none d-md-table-cell">
