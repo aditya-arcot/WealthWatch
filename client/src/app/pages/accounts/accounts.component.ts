@@ -26,6 +26,7 @@ import { ItemService } from '../../services/item.service'
 import { LinkService } from '../../services/link.service'
 import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
+import { parseBoolean } from '../../utilities/boolean.utility'
 import { formatDate } from '../../utilities/date.utility'
 
 @Component({
@@ -50,6 +51,7 @@ export class AccountsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        this.loadAccounts()
         this.route.queryParams.subscribe((params) => {
             const itemId: string | undefined = params['itemId']
             if (itemId === undefined) return
@@ -58,11 +60,10 @@ export class AccountsComponent implements OnInit {
 
             const withAccounts: string | undefined = params['withAccounts']
             if (withAccounts === undefined) throw Error('missing with accounts')
+            const withAccountsBool = parseBoolean(withAccounts)
 
-            this.linkInstitution(itemIdNum, withAccounts === 'true')
+            this.linkInstitution(itemIdNum, withAccountsBool)
         })
-
-        this.loadAccounts()
     }
 
     loadAccounts(): void {
