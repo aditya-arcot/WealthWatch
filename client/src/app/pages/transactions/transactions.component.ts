@@ -78,16 +78,12 @@ export class TransactionsComponent implements OnInit {
 
     dateFilterType = DateFilterEnum
     selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
-    previousStartDate: Date | null = null
     startDate: Date | null = null
-    previousEndDate: Date | null = null
     endDate: Date | null = null
 
     amountFilterType = AmountFilterEnum
     selectedAmountFilter: AmountFilterEnum = AmountFilterEnum.ALL
-    previousMinAmount: number | null = null
     minAmount: number | null = null
-    previousMaxAmount: number | null = null
     maxAmount: number | null = null
 
     selectedCategoryIds: Set<number> = new Set<number>()
@@ -491,13 +487,11 @@ export class TransactionsComponent implements OnInit {
     ): void {
         this.selectedDateFilter = filter
         let reload = false
-        if (!checkDatesEqual(start, this.previousStartDate)) {
-            this.previousStartDate = start ? new Date(start) : null
+        if (!checkDatesEqual(start, this.startDate)) {
             this.startDate = start ? new Date(start) : null
             reload = true
         }
-        if (!checkDatesEqual(end, this.previousEndDate)) {
-            this.previousEndDate = end ? new Date(end) : null
+        if (!checkDatesEqual(end, this.endDate)) {
             this.endDate = end ? new Date(end) : null
             reload = true
         }
@@ -515,13 +509,11 @@ export class TransactionsComponent implements OnInit {
     ): void {
         this.selectedAmountFilter = filter
         let reload = false
-        if (min !== this.previousMinAmount) {
-            this.previousMinAmount = min
+        if (min !== this.minAmount) {
             this.minAmount = min
             reload = true
         }
-        if (max !== this.previousMaxAmount) {
-            this.previousMaxAmount = max
+        if (max !== this.maxAmount) {
             this.maxAmount = max
             reload = true
         }
@@ -579,17 +571,11 @@ export class TransactionsComponent implements OnInit {
         this.searchText = ''
 
         this.selectedDateFilter = DateFilterEnum.ALL
-        this.previousStartDate = this.startDate
-            ? new Date(this.startDate)
-            : null
         this.startDate = null
-        this.previousEndDate = this.endDate ? new Date(this.endDate) : null
         this.endDate = null
 
         this.selectedAmountFilter = AmountFilterEnum.ALL
-        this.previousMinAmount = this.minAmount
         this.minAmount = null
-        this.previousMaxAmount = this.maxAmount
         this.maxAmount = null
 
         this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
