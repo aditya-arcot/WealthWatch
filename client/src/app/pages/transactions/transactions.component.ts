@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { ActivatedRoute, Params, Router } from '@angular/router'
 import {
     catchError,
     debounceTime,
@@ -35,7 +36,11 @@ import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
-import { checkDatesEqual } from '../../utilities/date.utility'
+import {
+    checkDatesEqual,
+    checkDateStringValid,
+} from '../../utilities/date.utility'
+import { parseNumberArrayOrUndefinedFromParam } from '../../utilities/number.utility'
 
 @Component({
     selector: 'app-transactions',
@@ -64,8 +69,8 @@ export class TransactionsComponent implements OnInit {
     items: Item[] = []
 
     pageSizes = [10, 25, 50, 100]
-    pageSizeIndex = 0
-    currentPage = 1
+    pageSizeIdx = 0
+    page = 1
 
     searchSubject = new Subject<string>()
     searchText = ''
@@ -100,40 +105,37 @@ export class TransactionsComponent implements OnInit {
         private itemSvc: ItemService,
         private logger: LoggerService,
         private alertSvc: AlertService,
-        private currencySvc: CurrencyService
+        private currencySvc: CurrencyService,
+        private route: ActivatedRoute,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
-        this.searchSubject
-            .pipe(debounceTime(300))
-            .subscribe(() => this.reloadTransactions())
-        this.loadData()
+        this.loadData().subscribe(() => {
+            this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
+            this.selectedAccountIds = new Set(this.accounts.map((a) => a.id))
+            this.loading = false
+            this.route.queryParams.subscribe((params) =>
+                this.processParams(params)
+            )
+        })
+        this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
+            this.redirectWithParams({ page: 1, query: this.searchText })
+        })
     }
 
-    loadData(): void {
-        this.loading = true
-        this.loadCategories()
-            .pipe(
-                switchMap(() => this.loadAccounts()),
-                switchMap(() => this.loadItems()),
-                switchMap(() => this.loadTransactions()),
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to load data', [
-                        err.message,
-                    ])
-                    this.loading = false
-                    return throwError(() => err)
-                })
-            )
-            .subscribe(() => {
-                this.selectedCategoryIds = new Set(
-                    this.categories.map((c) => c.id)
-                )
-                this.selectedAccountIds = new Set(
-                    this.accounts.map((a) => a.id)
-                )
+    loadData(): Observable<void> {
+        return this.loadCategories().pipe(
+            switchMap(() => this.loadAccounts()),
+            switchMap(() => this.loadItems()),
+            catchError((err: HttpErrorResponse) => {
+                this.alertSvc.addErrorAlert('Failed to load data', [
+                    err.message,
+                ])
                 this.loading = false
+                return throwError(() => err)
             })
+        )
     }
 
     loadCategories(): Observable<void> {
@@ -179,8 +181,8 @@ export class TransactionsComponent implements OnInit {
     }
 
     loadTransactions(): Observable<void> {
-        const limit = this.pageSizes[this.pageSizeIndex]
-        const offset = (this.currentPage - 1) * limit
+        const limit = this.pageSizes[this.pageSizeIdx]
+        const offset = (this.page - 1) * limit
         const req: TransactionsRequestParams = {
             searchQuery: this.searchText,
             startDate: this.startDate,
@@ -200,6 +202,14 @@ export class TransactionsComponent implements OnInit {
                     this.transactions = t.transactions
                     this.filteredCount = t.filteredCount
                     this.totalCount = t.totalCount
+
+                    const totalPages = this.getTotalPages()
+                    if (totalPages === 0) {
+                        this.page = 1
+                    } else if (this.page > totalPages) {
+                        this.redirectWithParams({ page: totalPages })
+                    }
+
                     return of(undefined)
                 }),
                 catchError((err: HttpErrorResponse) => {
@@ -244,35 +254,162 @@ export class TransactionsComponent implements OnInit {
             })
     }
 
-    updateCustomName(t: Transaction): void {
+    processParams(params: Params): void {
+        this.loading = true
+
+        const page: string | undefined = params['page']
+        if (page !== undefined) {
+            const pageNum = parseInt(page)
+            if (isNaN(pageNum) || pageNum < 1) {
+                this.page = 1
+            } else {
+                this.page = pageNum
+            }
+        }
+
+        const pageSizeIdx: string | undefined = params['pageSize']
+        if (pageSizeIdx !== undefined) {
+            const pageSizeIdxNum = parseInt(pageSizeIdx)
+            if (isNaN(pageSizeIdxNum) || pageSizeIdxNum < 0) {
+                this.pageSizeIdx = 0
+            } else if (pageSizeIdxNum >= this.pageSizes.length) {
+                this.pageSizeIdx = this.pageSizes.length - 1
+            } else {
+                this.pageSizeIdx = pageSizeIdxNum
+            }
+        }
+
+        const query: string | undefined = params['query']
+        if (query !== undefined) {
+            this.searchText = query
+        }
+
+        const startDate: string | undefined = params['startDate']
+        if (startDate !== undefined && checkDateStringValid(startDate)) {
+            this.startDate = new Date(`${startDate}T00:00:00`)
+            this.selectedDateFilter = DateFilterEnum.CUSTOM
+        }
+
+        const endDate: string | undefined = params['endDate']
+        if (endDate !== undefined && checkDateStringValid(endDate)) {
+            this.endDate = new Date(`${endDate}T00:00:00`)
+            this.selectedDateFilter = DateFilterEnum.CUSTOM
+        }
+
+        const minAmount: string | undefined = params['min']
+        let minAmountFloat: number | undefined
+        if (minAmount !== undefined) {
+            minAmountFloat = parseFloat(minAmount)
+        }
+
+        const maxAmount: string | undefined = params['max']
+        let maxAmountFloat: number | undefined
+        if (maxAmount !== undefined) {
+            maxAmountFloat = parseFloat(maxAmount)
+        }
+
+        if (minAmountFloat !== undefined && maxAmountFloat !== undefined) {
+            if (minAmountFloat === maxAmountFloat) {
+                this.selectedAmountFilter = AmountFilterEnum.EXACTLY
+                this.minAmount = minAmountFloat
+                this.maxAmount = maxAmountFloat
+            } else if (minAmountFloat <= maxAmountFloat) {
+                this.selectedAmountFilter = AmountFilterEnum.BETWEEN
+                this.minAmount = minAmountFloat
+                this.maxAmount = maxAmountFloat
+            } else {
+                this.selectedAmountFilter = AmountFilterEnum.GREATER_THAN
+                this.minAmount = minAmountFloat
+            }
+        } else if (minAmountFloat !== undefined) {
+            this.selectedAmountFilter = AmountFilterEnum.GREATER_THAN
+            this.minAmount = minAmountFloat
+        } else if (maxAmountFloat !== undefined) {
+            this.selectedAmountFilter = AmountFilterEnum.LESS_THAN
+            this.maxAmount = maxAmountFloat
+        }
+
+        const categoryIds = params['categoryId']
+        if (categoryIds !== undefined) {
+            const categoryIdNums =
+                parseNumberArrayOrUndefinedFromParam(categoryIds)
+            if (categoryIdNums !== undefined && categoryIdNums.length > 0) {
+                const filteredIds = categoryIdNums.filter(
+                    (id) =>
+                        this.categories.find((c) => c.id === id) !== undefined
+                )
+                if (filteredIds.length > 0) {
+                    this.selectedCategoryIds = new Set(filteredIds)
+                }
+            }
+        }
+
+        const accountIds = params['accountId']
+        if (accountIds !== undefined) {
+            const accountIdNums =
+                parseNumberArrayOrUndefinedFromParam(accountIds)
+            if (accountIdNums !== undefined && accountIdNums.length > 0) {
+                const filteredIds = accountIdNums.filter(
+                    (id) => this.accounts.find((a) => a.id === id) !== undefined
+                )
+                if (filteredIds.length > 0) {
+                    this.selectedAccountIds = new Set(filteredIds)
+                }
+            }
+        }
+
+        this.reloadTransactions()
+    }
+
+    redirectWithParams(params: Params, merge = true): void {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: params,
+            queryParamsHandling: merge ? 'merge' : 'replace',
+        })
+    }
+
+    updateCustomName(t: Transaction, reset = false): void {
         this.transactionSvc
             .updateTransactionCustomName(t)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
-                        'Failed to update transaction name'
+                        reset
+                            ? 'Failed to reset transaction name'
+                            : 'Failed to update transaction name'
                     )
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Updated transaction name')
+                this.alertSvc.addSuccessAlert(
+                    reset
+                        ? 'Reset transaction name'
+                        : 'Updated transaction name'
+                )
             })
     }
 
-    updateCustomCategoryId(t: Transaction): void {
+    updateCustomCategoryId(t: Transaction, reset = false): void {
         this.transactionSvc
             .updateTransactionCustomCategoryId(t)
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
-                        'Failed to update transaction category'
+                        reset
+                            ? 'Failed to reset transaction category'
+                            : 'Failed to update transaction category'
                     )
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Updated transaction category')
+                this.alertSvc.addSuccessAlert(
+                    reset
+                        ? 'Reset transaction category'
+                        : 'Updated transaction category'
+                )
             })
     }
 
@@ -293,71 +430,59 @@ export class TransactionsComponent implements OnInit {
     }
 
     getPageSize(): number {
-        return this.pageSizes[this.pageSizeIndex]
+        return this.pageSizes[this.pageSizeIdx]
     }
 
     updatePageSize(target: EventTarget | null): void {
         if (!target) return
         const element = target as HTMLSelectElement
-        this.pageSizeIndex = element.selectedIndex
-        this.currentPage = 1
-        this.reloadTransactions()
+        this.redirectWithParams({ page: 1, pageSize: element.selectedIndex })
     }
 
     getTotalPages(): number {
-        if (this.resultsFiltered()) {
-            return Math.ceil(this.filteredCount! / this.getPageSize())
-        }
-        return Math.ceil(this.totalCount / this.getPageSize())
+        return Math.ceil(
+            (this.filteredCount ?? this.totalCount) / this.getPageSize()
+        )
     }
 
     getStartTransactionNumber(): number {
-        return this.getPageSize() * (this.currentPage - 1) + 1
+        return this.getPageSize() * (this.page - 1) + 1
     }
 
     getEndTransactionNumber(): number {
-        if (this.currentPage === this.getTotalPages()) {
-            if (this.resultsFiltered()) {
-                return this.filteredCount!
-            }
-            return this.totalCount
+        if (this.page === this.getTotalPages()) {
+            return this.filteredCount ?? this.totalCount
         }
-        return this.getPageSize() * this.currentPage
+        return this.getPageSize() * this.page
     }
 
     navigateToFirstPage(): void {
-        if (this.currentPage === 1) return
-        this.currentPage = 1
-        this.reloadTransactions()
+        if (this.page === 1) return
+        this.redirectWithParams({ page: 1 })
     }
 
     navigateToPreviousPage(): void {
-        if (this.currentPage === 1) return
-        this.currentPage--
-        if (this.currentPage < 1) this.currentPage = 1
-        this.reloadTransactions()
+        if (this.page === 1) return
+        const page = this.page - 1
+        this.redirectWithParams({ page })
     }
 
     navigateToNextPage(): void {
-        if (this.currentPage === this.getTotalPages()) return
-        this.currentPage++
-        if (this.currentPage > this.getTotalPages())
-            this.currentPage = this.getTotalPages()
-        this.reloadTransactions()
+        if (this.page === this.getTotalPages()) return
+        const page = this.page + 1
+        this.redirectWithParams({ page })
     }
 
     navigateToLastPage(): void {
-        if (this.currentPage === this.getTotalPages()) return
-        this.currentPage = this.getTotalPages()
-        this.reloadTransactions()
+        const totalPages = this.getTotalPages()
+        if (this.page === totalPages) return
+        this.redirectWithParams({ page: totalPages })
     }
 
     search(): void {
         const modifiedSearchText = this.searchText.trim().toLowerCase()
         if (modifiedSearchText === this.previousSearchText) return
         this.previousSearchText = modifiedSearchText
-
-        this.currentPage = 1
         this.searchSubject.next(modifiedSearchText)
     }
 
@@ -379,8 +504,9 @@ export class TransactionsComponent implements OnInit {
             reload = true
         }
         if (reload) {
-            this.currentPage = 1
-            this.reloadTransactions()
+            const startDate = this.startDate?.toISOString().slice(0, 10)
+            const endDate = this.endDate?.toISOString().slice(0, 10)
+            this.redirectWithParams({ page: 1, startDate, endDate })
         }
     }
 
@@ -402,8 +528,11 @@ export class TransactionsComponent implements OnInit {
             reload = true
         }
         if (reload) {
-            this.currentPage = 1
-            this.reloadTransactions()
+            this.redirectWithParams({
+                page: 1,
+                min: this.minAmount,
+                max: this.maxAmount,
+            })
         }
     }
 
@@ -416,8 +545,7 @@ export class TransactionsComponent implements OnInit {
                 ids = new Set(this.categories.map((c) => c.id))
             }
             this.selectedCategoryIds = new Set(ids)
-            this.currentPage = 1
-            this.reloadTransactions()
+            this.redirectWithParams({ page: 1, categoryId: [...ids] })
         }
     }
 
@@ -430,8 +558,7 @@ export class TransactionsComponent implements OnInit {
                 ids = new Set(this.accounts.map((a) => a.id))
             }
             this.selectedAccountIds = new Set(ids)
-            this.currentPage = 1
-            this.reloadTransactions()
+            this.redirectWithParams({ page: 1, accountId: [...ids] })
         }
     }
 
@@ -470,8 +597,7 @@ export class TransactionsComponent implements OnInit {
         this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
         this.selectedAccountIds = new Set(this.accounts.map((a) => a.id))
 
-        this.currentPage = 1
-        this.reloadTransactions()
+        this.redirectWithParams({ page: 1, pageSize: this.pageSizeIdx }, false)
     }
 
     getDateString(t: Transaction): string {
@@ -517,7 +643,7 @@ export class TransactionsComponent implements OnInit {
     resetName(t: Transaction): void {
         if (t.customName === null) return
         t.customName = null
-        this.updateCustomName(t)
+        this.updateCustomName(t, true)
     }
 
     getAmountString(t: Transaction): string {
@@ -551,7 +677,7 @@ export class TransactionsComponent implements OnInit {
     resetCategory(t: Transaction): void {
         if (t.customCategoryId === null) return
         t.customCategoryId = null
-        this.updateCustomCategoryId(t)
+        this.updateCustomCategoryId(t, true)
     }
 
     getCategoryClass(t: Transaction): string {

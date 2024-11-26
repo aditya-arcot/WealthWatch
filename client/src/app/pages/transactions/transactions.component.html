@@ -109,7 +109,7 @@
                                     <ul class="pagination pagination-sm mb-0">
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === 1"
+                                            [class.disabled]="page === 1"
                                             (click)="navigateToFirstPage()"
                                             (keydown.enter)="navigateToFirstPage()"
                                             (keydown.space)="navigateToFirstPage()"
@@ -122,7 +122,7 @@
 
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === 1"
+                                            [class.disabled]="page === 1"
                                             (click)="navigateToPreviousPage()"
                                             (keydown.enter)="navigateToPreviousPage()"
                                             (keydown.space)="navigateToPreviousPage()"
@@ -135,14 +135,14 @@
 
                                         <li class="page-item">
                                             <a class="page-link current-page">
-                                                Page {{ currentPage }} of
+                                                Page {{ page }} of
                                                 {{ getTotalPages() }}
                                             </a>
                                         </li>
 
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === getTotalPages()"
+                                            [class.disabled]="page === getTotalPages()"
                                             (click)="navigateToNextPage()"
                                             (keydown.enter)="navigateToNextPage()"
                                             (keydown.space)="navigateToNextPage()"
@@ -155,7 +155,7 @@
 
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === getTotalPages()"
+                                            [class.disabled]="page === getTotalPages()"
                                             (click)="navigateToLastPage()"
                                             (keydown.enter)="navigateToLastPage()"
                                             (keydown.space)="navigateToLastPage()"
@@ -252,9 +252,11 @@
                                         (blur)="showShortenedName($event.target, t)"
                                         (change)="updateName($event.target, t)"
                                     />
-                                    <button class="btn btn-outline-dark" type="button" (click)="resetName(t)" title="Reset Name">
-                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                    </button>
+                                    @if (t.customName !== null) {
+                                        <button class="btn btn-outline-dark" type="button" (click)="resetName(t)" title="Reset Name">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                             <td>
@@ -280,9 +282,11 @@
                                             </option>
                                         }
                                     </select>
-                                    <button class="btn btn-outline-dark" type="button" (click)="resetCategory(t)" title="Reset Category">
-                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                    </button>
+                                    @if (t.customCategoryId !== null) {
+                                        <button class="btn btn-outline-dark" type="button" (click)="resetCategory(t)" title="Reset Category">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                             <td class="d-none d-md-table-cell">

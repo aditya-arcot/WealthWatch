@@ -22,3 +22,25 @@ const _formatPercent = (num: number, precision: number): string => {
     })
     return formatter.format(num)
 }
+
+export const parseNumberArrayOrUndefinedFromParam = (
+    param: unknown
+): number[] | undefined => {
+    if (param === undefined) return
+    if (typeof param === 'string') {
+        const num = Number(param)
+        if (isNaN(num)) return
+        return [num]
+    }
+    if (Array.isArray(param)) {
+        const nums: number[] = []
+        param.forEach((p) => {
+            if (typeof p !== 'string') return
+            const num = Number(p)
+            if (isNaN(num)) return
+            nums.push(num)
+        })
+        return nums
+    }
+    return
+}
