@@ -29,7 +29,7 @@ export const parseNumberOrUndefinedFromParam = (
     param: string | string[] | ParsedQs | ParsedQs[] | undefined,
     nonNegative = false
 ): number | undefined => {
-    if (param === undefined) return undefined
+    if (param === undefined) return
     if (typeof param !== 'string') throw new HttpError('invalid param')
     const num = Number(param)
     if (isNaN(num)) throw new HttpError('invalid param')
@@ -40,7 +40,7 @@ export const parseNumberOrUndefinedFromParam = (
 export const parseNumberArrayOrUndefinedFromParam = (
     param: string | string[] | ParsedQs | ParsedQs[] | undefined
 ): number[] | undefined => {
-    if (param === undefined) return undefined
+    if (param === undefined) return
     const nums: number[] = []
     if (typeof param === 'string') {
         const num = Number(param)
