@@ -109,7 +109,7 @@
                                     <ul class="pagination pagination-sm mb-0">
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === 1"
+                                            [class.disabled]="page === 1"
                                             (click)="navigateToFirstPage()"
                                             (keydown.enter)="navigateToFirstPage()"
                                             (keydown.space)="navigateToFirstPage()"
@@ -122,7 +122,7 @@
 
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === 1"
+                                            [class.disabled]="page === 1"
                                             (click)="navigateToPreviousPage()"
                                             (keydown.enter)="navigateToPreviousPage()"
                                             (keydown.space)="navigateToPreviousPage()"
@@ -135,14 +135,14 @@
 
                                         <li class="page-item">
                                             <a class="page-link current-page">
-                                                Page {{ currentPage }} of
+                                                Page {{ page }} of
                                                 {{ getTotalPages() }}
                                             </a>
                                         </li>
 
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === getTotalPages()"
+                                            [class.disabled]="page === getTotalPages()"
                                             (click)="navigateToNextPage()"
                                             (keydown.enter)="navigateToNextPage()"
                                             (keydown.space)="navigateToNextPage()"
@@ -155,7 +155,7 @@
 
                                         <li
                                             class="page-item"
-                                            [class.disabled]="currentPage === getTotalPages()"
+                                            [class.disabled]="page === getTotalPages()"
                                             (click)="navigateToLastPage()"
                                             (keydown.enter)="navigateToLastPage()"
                                             (keydown.space)="navigateToLastPage()"
