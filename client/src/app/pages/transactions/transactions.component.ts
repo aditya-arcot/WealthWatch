@@ -114,10 +114,12 @@ export class TransactionsComponent implements OnInit {
         this.loadData().subscribe(() => {
             this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
             this.selectedAccountIds = new Set(this.accounts.map((a) => a.id))
-            this.loading = false
-            this.route.queryParams.subscribe((params) =>
-                this.processParams(params)
-            )
+            this.route.queryParams.subscribe((params) => {
+                if (Object.keys(params).length > 0) {
+                    this.processParams(params)
+                }
+                this.reloadTransactions()
+            })
         })
         this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
             this.redirectWithParams({ page: 1, query: this.searchText })
@@ -125,6 +127,7 @@ export class TransactionsComponent implements OnInit {
     }
 
     loadData(): Observable<void> {
+        this.loading = true
         return this.loadCategories().pipe(
             switchMap(() => this.loadAccounts()),
             switchMap(() => this.loadItems()),
@@ -242,21 +245,18 @@ export class TransactionsComponent implements OnInit {
                     this.alertSvc.addErrorAlert(
                         'Failed to refresh transactions'
                     )
-                    this.loading = false
                     return throwError(() => err)
-                })
+                }),
+                finalize(() => (this.loading = false))
             )
             .subscribe(() => {
                 this.alertSvc.addSuccessAlert('Refreshing transactions', [
                     'Please check back later',
                 ])
-                this.loading = false
             })
     }
 
     processParams(params: Params): void {
-        this.loading = true
-
         const page: string | undefined = params['page']
         if (page !== undefined) {
             const pageNum = parseInt(page)
@@ -357,8 +357,6 @@ export class TransactionsComponent implements OnInit {
                 }
             }
         }
-
-        this.reloadTransactions()
     }
 
     redirectWithParams(params: Params, merge = true): void {
