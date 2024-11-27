@@ -67,12 +67,7 @@ router.route('/item').post(catchAsync(createSandboxItem))
  *     summary: Refresh an item's transactions (ignore cooldown)
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       204:
  *         description: Refreshed the item's transactions
@@ -88,12 +83,7 @@ router
  *     summary: Refresh an item's investments (ignore cooldown)
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       204:
  *         description: Refreshed the item's investments
@@ -109,12 +99,7 @@ router
  *     summary: Sync an item
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       202:
  *         description: Queued item syncs
@@ -128,12 +113,7 @@ router.route('/item/sync').post(catchAsync(syncItem))
  *     summary: Sync an item's transactions
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       202:
  *         description: Queued sync transactions
@@ -147,12 +127,7 @@ router.route('/item/sync-transactions').post(catchAsync(syncItemTransactions))
  *     summary: Sync an item's investments
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       202:
  *         description: Queued sync investments
@@ -166,12 +141,7 @@ router.route('/item/sync-investments').post(catchAsync(syncItemInvestments))
  *     summary: Sync an item's liabilities
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       202:
  *         description: Queued sync liabilities
@@ -185,12 +155,7 @@ router.route('/item/sync-liabilities').post(catchAsync(syncItemLiabilities))
  *     summary: Sync an item's balances
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       202:
  *         description: Queued sync balances
@@ -204,12 +169,7 @@ router.route('/item/sync-balances').post(catchAsync(syncItemBalances))
  *     summary: Reset an item login
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
  *     responses:
  *       204:
  *         description: Reset the item login
@@ -222,18 +182,8 @@ router.route('/item/reset-login').post(catchAsync(resetSandboxItemLogin))
  *     summary: Fire a webhook
  *     tags: [Dev]
  *     parameters:
- *       - in: query
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
- *       - in: query
- *         name: code
- *         schema:
- *           type: string
- *         required: true
- *         description: The webhook code
+ *       - $ref: '#/components/parameters/PlaidItemIdQuery'
+ *       - $ref: '#/components/parameters/WebhookCode'
  *     responses:
  *       204:
  *         description: Fired the webhook

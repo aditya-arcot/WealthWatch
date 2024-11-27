@@ -29,17 +29,7 @@ const router = express.Router()
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *                 required: true
- *               lastName:
- *                 type: string
- *                 required: true
- *               email:
- *                 type: string
- *                 required: true
+ *             $ref: '#/components/schemas/FirstNameLastNameEmail'
  *     responses:
  *       204:
  *         description: Requested access
@@ -57,23 +47,14 @@ router.route('/access-request').post(catchAsync(requestAccess))
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               accessCode:
- *                 type: string
- *                 required: true
+ *             $ref: '#/components/schemas/AccessCode'
  *     responses:
  *       200:
  *         description: Validated access code
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 name:
- *                   type: string
- *                 email:
- *                   type: string
+ *               $ref: '#/components/schemas/NameEmail'
  */
 router.route('/access-code').post(catchAsync(validateAccessCode))
 
@@ -88,17 +69,7 @@ router.route('/access-code').post(catchAsync(validateAccessCode))
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               accessCode:
- *                 type: string
- *                 required: true
- *               username:
- *                 type: string
- *                 required: true
- *               password:
- *                 type: string
- *                 required: true
+ *             $ref: '#/components/schemas/AccessCodeUserNamePassword'
  *     responses:
  *       201:
  *         description: Registered the user
@@ -120,14 +91,7 @@ router.route('/register').post(catchAsync(register))
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 required: true
- *               password:
- *                 type: string
- *                 required: true
+ *             $ref: '#/components/schemas/UsernamePassword'
  *     responses:
  *       200:
  *         description: Logged in the user

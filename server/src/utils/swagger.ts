@@ -28,11 +28,33 @@ export const createSwaggerSpec = () => {
             },
             components: {
                 schemas: {
+                    AccessCode: {
+                        type: 'object',
+                        properties: {
+                            accessCode: {
+                                type: 'string',
+                            },
+                        },
+                    },
+                    AccessCodeUserNamePassword: {
+                        type: 'object',
+                        properties: {
+                            accessCode: {
+                                type: 'string',
+                            },
+                            username: {
+                                type: 'string',
+                            },
+                            password: {
+                                type: 'string',
+                            },
+                        },
+                    },
                     AccessRequest: {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             email: {
                                 type: 'string',
@@ -44,7 +66,7 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                             },
                             statusId: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             accessCode: {
                                 type: 'string',
@@ -58,10 +80,10 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             itemId: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             accountId: {
                                 type: 'string',
@@ -102,7 +124,7 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             name: {
                                 type: 'string',
@@ -113,13 +135,43 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             categoryId: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             total: {
                                 type: 'number',
                             },
                             count: {
-                                type: 'number',
+                                type: 'integer',
+                            },
+                        },
+                    },
+                    CustomCategoryId: {
+                        type: 'object',
+                        properties: {
+                            customCategoryId: {
+                                type: 'integer',
+                            },
+                        },
+                    },
+                    CustomName: {
+                        type: 'object',
+                        properties: {
+                            customName: {
+                                type: 'string',
+                            },
+                        },
+                    },
+                    FirstNameLastNameEmail: {
+                        type: 'object',
+                        properties: {
+                            firstName: {
+                                type: 'string',
+                            },
+                            lastName: {
+                                type: 'string',
+                            },
+                            email: {
+                                type: 'string',
                             },
                         },
                     },
@@ -127,10 +179,10 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             userId: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             itemId: {
                                 type: 'string',
@@ -160,6 +212,28 @@ export const createSwaggerSpec = () => {
                             transactionsLastRefreshed: {
                                 type: 'string',
                                 format: 'date-time',
+                            },
+                        },
+                    },
+                    ItemIdNotificationTypeId: {
+                        type: 'object',
+                        properties: {
+                            itemId: {
+                                type: 'integer',
+                            },
+                            notificationTypeId: {
+                                type: 'integer',
+                            },
+                        },
+                    },
+                    ItemIdUpdateAccounts: {
+                        type: 'object',
+                        properties: {
+                            itemId: {
+                                type: 'integer',
+                            },
+                            updateAccounts: {
+                                type: 'boolean',
                             },
                         },
                     },
@@ -203,16 +277,16 @@ export const createSwaggerSpec = () => {
                                                 type: 'object',
                                                 properties: {
                                                     id: {
-                                                        type: 'number',
+                                                        type: 'integer',
                                                     },
                                                     accountId: {
-                                                        type: 'number',
+                                                        type: 'integer',
                                                     },
                                                     name: {
                                                         type: 'string',
                                                     },
                                                     typeId: {
-                                                        type: 'number',
+                                                        type: 'integer',
                                                     },
                                                     cashEquivalent: {
                                                         type: 'boolean',
@@ -419,7 +493,7 @@ export const createSwaggerSpec = () => {
                                             type: 'number',
                                         },
                                         statusTypeId: {
-                                            type: 'number',
+                                            type: 'integer',
                                         },
                                         statusEndDate: {
                                             type: 'string',
@@ -452,7 +526,7 @@ export const createSwaggerSpec = () => {
                                             type: 'string',
                                         },
                                         repaymentPlanTypeId: {
-                                            type: 'number',
+                                            type: 'integer',
                                         },
                                         repaymentPlanDescription: {
                                             type: 'string',
@@ -489,17 +563,52 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    LinkEvent: {
+                        type: 'object',
+                        properties: {
+                            event: {
+                                type: 'object',
+                            },
+                        },
+                    },
+                    LinkToken: {
+                        type: 'object',
+                        properties: {
+                            linkToken: {
+                                type: 'string',
+                            },
+                        },
+                    },
+                    NameEmail: {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                            },
+                            email: {
+                                type: 'string',
+                            },
+                        },
+                    },
+                    Note: {
+                        type: 'object',
+                        properties: {
+                            note: {
+                                type: 'string',
+                            },
+                        },
+                    },
                     Notification: {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             userId: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             typeId: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             message: {
                                 type: 'string',
@@ -512,11 +621,30 @@ export const createSwaggerSpec = () => {
                             },
                         },
                     },
+                    PublicTokenMetadata: {
+                        type: 'object',
+                        properties: {
+                            publicToken: {
+                                type: 'string',
+                            },
+                            metadata: {
+                                type: 'object',
+                            },
+                        },
+                    },
                     Secrets: {
                         type: 'object',
                         properties: {
                             logtailToken: {
                                 type: 'string',
+                            },
+                        },
+                    },
+                    StatusId: {
+                        type: 'object',
+                        properties: {
+                            statusId: {
+                                type: 'integer',
                             },
                         },
                     },
@@ -536,7 +664,7 @@ export const createSwaggerSpec = () => {
                                     type: 'object',
                                     properties: {
                                         categoryId: {
-                                            type: 'number',
+                                            type: 'integer',
                                         },
                                         totalByDate: {
                                             type: 'array',
@@ -567,10 +695,10 @@ export const createSwaggerSpec = () => {
                                     type: 'object',
                                     properties: {
                                         id: {
-                                            type: 'number',
+                                            type: 'integer',
                                         },
                                         accountId: {
-                                            type: 'number',
+                                            type: 'integer',
                                         },
                                         transactionId: {
                                             type: 'string',
@@ -597,10 +725,10 @@ export const createSwaggerSpec = () => {
                                             type: 'string',
                                         },
                                         categoryId: {
-                                            type: 'number',
+                                            type: 'integer',
                                         },
                                         customCategoryId: {
-                                            type: 'number',
+                                            type: 'integer',
                                         },
                                         paymentChannel: {
                                             type: 'string',
@@ -624,11 +752,11 @@ export const createSwaggerSpec = () => {
                                     },
                                 },
                             },
-                            filteredCounts: {
-                                type: 'number',
+                            filteredCount: {
+                                type: 'integer',
                             },
                             totalCount: {
-                                type: 'number',
+                                type: 'integer',
                             },
                         },
                     },
@@ -636,7 +764,7 @@ export const createSwaggerSpec = () => {
                         type: 'object',
                         properties: {
                             id: {
-                                type: 'number',
+                                type: 'integer',
                             },
                             username: {
                                 type: 'string',
@@ -654,6 +782,153 @@ export const createSwaggerSpec = () => {
                                 type: 'string',
                             },
                         },
+                    },
+                    UsernamePassword: {
+                        type: 'object',
+                        properties: {
+                            username: {
+                                type: 'string',
+                            },
+                            password: {
+                                type: 'string',
+                            },
+                        },
+                    },
+                },
+                parameters: {
+                    AccessRequestId: {
+                        in: 'path',
+                        name: 'requestId',
+                        schema: {
+                            type: 'integer',
+                        },
+                        required: true,
+                        description: 'The access request id',
+                    },
+                    AccountIds: {
+                        in: 'query',
+                        name: 'accountId',
+                        schema: {
+                            type: 'array',
+                            items: {
+                                type: 'integer',
+                            },
+                        },
+                        description: 'The account id(s)',
+                    },
+                    CategoryIds: {
+                        in: 'query',
+                        name: 'categoryId',
+                        schema: {
+                            type: 'array',
+                            items: {
+                                type: 'integer',
+                            },
+                        },
+                        description: 'The category id(s)',
+                    },
+                    EndDate: {
+                        in: 'query',
+                        name: 'endDate',
+                        schema: {
+                            type: 'string',
+                            format: 'date-time',
+                        },
+                        description: 'The end date',
+                    },
+                    Limit: {
+                        in: 'query',
+                        name: 'limit',
+                        schema: {
+                            type: 'integer',
+                        },
+                        description: 'The number of transactions to retrieve',
+                    },
+                    MaxAmount: {
+                        in: 'query',
+                        name: 'maxAmount',
+                        schema: {
+                            type: 'number',
+                        },
+                        description: 'The maximum amount',
+                    },
+                    MinAmount: {
+                        in: 'query',
+                        name: 'minAmount',
+                        schema: {
+                            type: 'number',
+                        },
+                        description: 'The minimum amount',
+                    },
+                    NotificationId: {
+                        in: 'path',
+                        name: 'notificationId',
+                        schema: {
+                            type: 'integer',
+                        },
+                        required: true,
+                        description: 'The notification id',
+                    },
+                    Offset: {
+                        in: 'query',
+                        name: 'offset',
+                        schema: {
+                            type: 'integer',
+                        },
+                        description: 'The number of transactions to skip',
+                    },
+                    PlaidItemIdQuery: {
+                        in: 'query',
+                        name: 'plaidItemId',
+                        schema: {
+                            type: 'string',
+                        },
+                        required: true,
+                        description: 'The Plaid item id',
+                    },
+                    PlaidItemIdPath: {
+                        in: 'path',
+                        name: 'plaidItemId',
+                        schema: {
+                            type: 'string',
+                        },
+                        required: true,
+                        description: 'The Plaid item id',
+                    },
+                    PlaidTransactionId: {
+                        in: 'path',
+                        name: 'plaidTransactionId',
+                        schema: {
+                            type: 'string',
+                        },
+                        required: true,
+                        description: 'The Plaid transaction id',
+                    },
+                    SearchQuery: {
+                        in: 'query',
+                        name: 'searchQuery',
+                        schema: {
+                            type: 'string',
+                        },
+                        description: 'The search query',
+                    },
+                    StartDate: {
+                        in: 'query',
+                        name: 'startDate',
+                        schema: {
+                            type: 'string',
+                            format: 'date-time',
+                        },
+                        description: 'The start date',
+                    },
+                    WebhookCode: {
+                        in: 'query',
+                        name: 'webhookCode',
+                        schema: {
+                            type: 'string',
+                        },
+                        required: true,
+                        description: 'The webhook code',
                     },
                 },
                 responses: {

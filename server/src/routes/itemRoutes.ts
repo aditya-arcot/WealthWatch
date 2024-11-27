@@ -158,12 +158,7 @@ router
  *     summary: Refresh an item (refresh transactions, refresh investments, queue sync balances)
  *     tags: [Items]
  *     parameters:
- *       - in: path
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdPath'
  *     responses:
  *       202:
  *         description: Refreshed the item
@@ -181,12 +176,7 @@ router
  *     summary: Deactivate an item
  *     tags: [Items]
  *     parameters:
- *       - in: path
- *         name: plaidItemId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid item id
+ *       - $ref: '#/components/parameters/PlaidItemIdPath'
  *     responses:
  *       204:
  *         description: Deactivated the item

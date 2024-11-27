@@ -39,27 +39,18 @@ router
 
 /**
  * @swagger
- * /admin/access-requests/:requestId:
+ * /admin/access-requests/{requestId}:
  *   patch:
  *     summary: Review access request
  *     tags: [Admin]
  *     parameters:
- *       - in: path
- *         name: requestId
- *         required: true
- *         description: The access request id
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/AccessRequestId'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               statusId:
- *                 type: number
- *                 required: true
+ *             $ref: '#/components/schemas/StatusId'
  *     responses:
  *       204:
  *         description: Reviewed access request
