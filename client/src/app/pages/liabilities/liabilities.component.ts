@@ -253,6 +253,6 @@ export class LiabilitiesComponent implements OnInit {
     }
 
     getDateString(date: Date | null): string {
-        return formatDate(date, false)
+        return formatDate(date, true, false)
     }
 }

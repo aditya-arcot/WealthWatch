@@ -275,10 +275,13 @@ export class AccountsComponent implements OnInit {
                 : null
             const nextRefresh = new Date(
                 (lastRefreshed?.getTime() ?? 0) + refreshCooldown
-            ).toLocaleTimeString(undefined, { timeStyle: 'short' })
+            )
+            const nextRefreshString = formatDate(nextRefresh, false, true)
             this.alertSvc.addErrorAlert(
                 `${item.institutionName} data was recently refreshed`,
-                [`Please wait until ${nextRefresh} before refreshing again`]
+                [
+                    `Please wait until ${nextRefreshString} before refreshing again`,
+                ]
             )
             return
         }
@@ -335,7 +338,7 @@ export class AccountsComponent implements OnInit {
     }
 
     getLastRefreshedString(item: Item): string {
-        return formatDate(item.lastRefreshed)
+        return formatDate(item.lastRefreshed, true, true)
     }
 
     getCurrentBalanceString(acc: Account): string {

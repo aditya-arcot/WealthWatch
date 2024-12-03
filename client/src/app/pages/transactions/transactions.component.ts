@@ -39,6 +39,7 @@ import { TransactionService } from '../../services/transaction.service'
 import {
     checkDatesEqual,
     checkDateStringValid,
+    formatDate,
 } from '../../utilities/date.utility'
 import { parseNumberArrayOrUndefinedFromParam } from '../../utilities/number.utility'
 import { redirectWithParams } from '../../utilities/redirect.utility'
@@ -601,11 +602,7 @@ export class TransactionsComponent implements OnInit {
     }
 
     getDateString(t: Transaction): string {
-        return new Date(t.date).toLocaleDateString(undefined, {
-            month: 'numeric',
-            day: 'numeric',
-            year: '2-digit',
-        })
+        return formatDate(t.date, true, false)
     }
 
     getShortenedName(t: Transaction): string {

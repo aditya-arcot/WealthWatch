@@ -15,12 +15,17 @@ export const checkDatesEqual = (
     return zeroMsDate1.getTime() === zeroMsDate2.getTime()
 }
 
-export const formatDate = (date: Date | null, includeTime = true): string => {
+export const formatDate = (
+    date: Date | null,
+    includeDate: boolean,
+    includeTime: boolean
+): string => {
     if (date === null) return '-'
-    const options: Intl.DateTimeFormatOptions = {
-        month: 'numeric',
-        day: 'numeric',
-        year: '2-digit',
+    const options: Intl.DateTimeFormatOptions = {}
+    if (includeDate) {
+        options.month = 'numeric'
+        options.day = 'numeric'
+        options.year = '2-digit'
     }
     if (includeTime) {
         options.hour = 'numeric'

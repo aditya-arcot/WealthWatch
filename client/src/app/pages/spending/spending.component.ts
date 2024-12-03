@@ -23,6 +23,7 @@ import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 import {
     checkDatesEqual,
     checkDateStringValid,
+    formatDate,
 } from '../../utilities/date.utility'
 import { formatDecimalToPercent } from '../../utilities/number.utility'
 import { redirectWithParams } from '../../utilities/redirect.utility'
@@ -465,11 +466,7 @@ export class SpendingComponent implements OnInit {
     }
 
     getDateString(date: Date): string {
-        return new Date(date).toLocaleDateString(undefined, {
-            month: 'numeric',
-            day: 'numeric',
-            year: '2-digit',
-        })
+        return formatDate(date, true, false)
     }
 
     getIncomeTotalString(): string | undefined {
