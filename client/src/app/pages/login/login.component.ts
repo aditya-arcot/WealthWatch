@@ -82,11 +82,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
         })
     }
 
-    login() {
+    login(demo = false) {
         this.logger.info('logging in')
         this.loading = true
-        const username = this.loginFormGroup.value.username
-        const password = this.loginFormGroup.value.password
+        const username = demo
+            ? this.userSvc.demoUser
+            : this.loginFormGroup.value.username
+        const password = demo
+            ? this.userSvc.demoPassword
+            : this.loginFormGroup.value.password
         this.authSvc
             .login(username, password)
             .pipe(
@@ -107,5 +111,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addSuccessAlert('Success logging in')
             })
+    }
+
+    loginWithDemo() {
+        this.login(true)
     }
 }

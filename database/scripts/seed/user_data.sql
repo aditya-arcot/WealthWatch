@@ -25,6 +25,14 @@ VALUES
         'Arcot',
         :'admin_password_hash',
         true
+    ),
+    (
+        'demo_user',
+        'demo@user',
+        'Demo',
+        'User',
+        '$2a$10$Sg24QcAjUDufmcwYzd13jOsCeXrB/BPrnGQTtdNuIOGfFOn4dXBma',
+        false
     );
 
 COMMIT;
