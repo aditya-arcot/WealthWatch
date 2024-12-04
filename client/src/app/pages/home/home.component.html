@@ -4,8 +4,25 @@
     <div class="col-10 col-sm-8 col-md-6 col-xl-4">
         <div class="card mb-2">
             <div class="card-body">
-                <h4 class="text-center mb-0">Welcome to WealthWatch!</h4>
+                <h4 class="card-title text-center mb-0">
+                    @if (!demoUserLoggedIn) {
+                        Welcome to WealthWatch, {{ firstName }}!
+                    } @else {
+                        Welcome to WealthWatch!
+                    }
+                </h4>
             </div>
         </div>
+        @if (demoUserLoggedIn) {
+            <div class="card bg-warning mb-2">
+                <div class="card-body">
+                    <p class="card-text text-center mb-0">
+                        You are logged in using a <strong>demo account</strong>.<br />
+                        Plaid sandbox data is used for this demo.<br />
+                        Get started now by linking an institution.
+                    </p>
+                </div>
+            </div>
+        }
     </div>
 </div>

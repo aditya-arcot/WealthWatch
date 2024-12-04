@@ -35,18 +35,18 @@ BEFORE UPDATE ON holdings
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
-CREATE TRIGGER trigger_credit_card_liabilities_update_timestamp
-BEFORE UPDATE ON credit_card_liabilities
+CREATE TRIGGER trigger_credit_cards_update_timestamp
+BEFORE UPDATE ON credit_cards
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
-CREATE TRIGGER trigger_mortgage_liabilities_update_timestamp
-BEFORE UPDATE ON mortgage_liabilities
+CREATE TRIGGER trigger_mortgages_update_timestamp
+BEFORE UPDATE ON mortgages
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
-CREATE TRIGGER trigger_student_loan_liabilities_update_timestamp
-BEFORE UPDATE ON student_loan_liabilities
+CREATE TRIGGER trigger_student_loans_update_timestamp
+BEFORE UPDATE ON student_loans
 FOR EACH ROW
 EXECUTE PROCEDURE set_update_timestamp();
 
@@ -92,18 +92,18 @@ AFTER INSERT OR UPDATE OR DELETE ON holdings
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
-CREATE TRIGGER trigger_credit_card_liabilities_insert_audit
-AFTER INSERT OR UPDATE OR DELETE ON credit_card_liabilities
+CREATE TRIGGER trigger_credit_cards_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON credit_cards
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
-CREATE TRIGGER trigger_mortgage_liabilities_insert_audit
-AFTER INSERT OR UPDATE OR DELETE ON mortgage_liabilities
+CREATE TRIGGER trigger_mortgages_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON mortgages
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 
-CREATE TRIGGER trigger_student_loan_liabilities_insert_audit
-AFTER INSERT OR UPDATE OR DELETE ON student_loan_liabilities
+CREATE TRIGGER trigger_student_loans_insert_audit
+AFTER INSERT OR UPDATE OR DELETE ON student_loans
 FOR EACH ROW
 EXECUTE FUNCTION insert_audit_record();
 

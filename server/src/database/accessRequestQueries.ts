@@ -36,7 +36,7 @@ export const fetchAccessRequests = async (): Promise<AccessRequest[]> => {
     const query = `
         SELECT *
         FROM access_requests
-        ORDER BY status_id, email, id
+        ORDER BY update_timestamp DESC, id
     `
     const rows = (await runQuery<DbAccessRequest>(query)).rows
     return rows.map(mapDbAccessRequest)
@@ -105,6 +105,8 @@ interface DbAccessRequest {
     status_id: AccessRequestStatusEnum
     access_code: string | null
     reviewer: string | null
+    create_timestamp: Date
+    update_timestamp: Date
 }
 
 const mapDbAccessRequest = (req: DbAccessRequest): AccessRequest => ({
@@ -115,4 +117,6 @@ const mapDbAccessRequest = (req: DbAccessRequest): AccessRequest => ({
     statusId: req.status_id,
     accessCode: req.access_code,
     reviewer: req.reviewer,
+    createTimestamp: req.create_timestamp,
+    updateTimestamp: req.update_timestamp,
 })

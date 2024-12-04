@@ -11,6 +11,7 @@ show_help() {
 }
 
 ENV_FILE="../.env.dev"
+ADMIN_PASSWORD_REQUIRED=true
 
 while [[ "$1" != "" ]]; do
     case $1 in
@@ -107,5 +108,5 @@ PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed/lookup_data.sq
 echo
 
 echo "seeding user data..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed/user_data.sql -v ON_ERROR_STOP=1
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed/user_data.sql -v ON_ERROR_STOP=1 -v admin_password_hash=$ADMIN_PASSWORD_HASH
 echo

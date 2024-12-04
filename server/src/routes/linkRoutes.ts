@@ -27,22 +27,14 @@ const router = express.Router()
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               itemId:
- *                 type: integer
- *               updateAccounts:
- *                 type: boolean
+ *             $ref: '#/components/schemas/ItemIdUpdateAccounts'
  *     responses:
  *       200:
  *         description: Created a link token
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 linkToken:
- *                   type: string
+ *               $ref: '#/components/schemas/LinkToken'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -59,11 +51,7 @@ router.route('/link-token').post(authenticate, catchAsync(createLinkToken))
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               event:
- *                 type: object
- *                 required: true
+ *             $ref: '#/components/schemas/LinkEvent'
  *     responses:
  *       202:
  *         description: Handled the link event
@@ -83,14 +71,7 @@ router.route('/link-event').post(authenticate, catchAsync(handleLinkEvent))
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               publicToken:
- *                 type: string
- *                 required: true
- *               metadata:
- *                 type: object
- *                 required: true
+ *             $ref: '#/components/schemas/PublicTokenMetadata'
  *     responses:
  *       202:
  *         description: Exchanged the public token, queued item syncs
@@ -112,14 +93,7 @@ router
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               itemId:
- *                 type: number
- *                 required: true
- *               notificationTypeId:
- *                 type: number
- *                 required: true
+ *             $ref: '#/components/schemas/ItemIdNotificationTypeId'
  *     responses:
  *       202:
  *         description: Handled the link update completion

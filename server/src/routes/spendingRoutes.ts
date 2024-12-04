@@ -22,16 +22,8 @@ const router = express.Router()
  *     summary: Retrieve the logged in user's category summaries
  *     tags: [Spending]
  *     parameters:
- *       - in: query
- *         name: startDate
- *         schema:
- *           type: string
- *         description: The start date
- *       - in: query
- *         name: endDate
- *         schema:
- *           type: string
- *         description: The end date
+ *       - $ref: '#/components/parameters/StartDate'
+ *       - $ref: '#/components/parameters/EndDate'
  *     responses:
  *       200:
  *         description: Retrieved a list of the logged in user's category summaries
@@ -55,16 +47,8 @@ router
  *     summary: Retrieve the logged in user's spending category totals by date
  *     tags: [Spending]
  *     parameters:
- *       - in: query
- *         name: startDate
- *         schema:
- *           type: string
- *         description: The start date
- *       - in: query
- *         name: endDate
- *         schema:
- *           type: string
- *         description: The end date
+ *       - $ref: '#/components/parameters/StartDate'
+ *       - $ref: '#/components/parameters/EndDate'
  *     responses:
  *       200:
  *         description: Retrieved a list of the logged in user's spending category totals by date

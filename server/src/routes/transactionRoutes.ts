@@ -25,55 +25,15 @@ const router = express.Router()
  *     summary: Retrieve the logged in user's transactions and counts
  *     tags: [Transactions]
  *     parameters:
- *       - in: query
- *         name: searchQuery
- *         schema:
- *           type: string
- *         description: The search query
- *       - in: query
- *         name: startDate
- *         schema:
- *           type: string
- *         description: The start date
- *       - in: query
- *         name: endDate
- *         schema:
- *           type: string
- *         description: The end date
- *       - in: query
- *         name: minAmount
- *         schema:
- *           type: integer
- *         description: The minimum amount
- *       - in: query
- *         name: maxAmount
- *         schema:
- *           type: integer
- *         description: The maximum amount
- *       - in: query
- *         name: categoryId
- *         schema:
- *           type: array
- *           items:
- *             type: integer
- *         description: The category id(s)
- *       - in: query
- *         name: accountId
- *         schema:
- *           type: array
- *           items:
- *             type: integer
- *         description: The account id(s)
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: The number of transactions to retrieve
- *       - in: query
- *         name: offset
- *         schema:
- *           type: integer
- *         description: The number of transactions to skip
+ *       - $ref: '#/components/parameters/SearchQuery'
+ *       - $ref: '#/components/parameters/StartDate'
+ *       - $ref: '#/components/parameters/EndDate'
+ *       - $ref: '#/components/parameters/MinAmount'
+ *       - $ref: '#/components/parameters/MaxAmount'
+ *       - $ref: '#/components/parameters/CategoryIds'
+ *       - $ref: '#/components/parameters/AccountIds'
+ *       - $ref: '#/components/parameters/Limit'
+ *       - $ref: '#/components/parameters/Offset'
  *     responses:
  *       200:
  *         description: Retrieved a list of the logged in user's transactions and counts
@@ -93,22 +53,13 @@ router.route('/').get(authenticate, catchAsync(getUserTransactionsAndCounts))
  *     summary: Update a transaction's custom name
  *     tags: [Transactions]
  *     parameters:
- *       - in: path
- *         name: plaidTransactionId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid transaction id
+ *       - $ref: '#/components/parameters/PlaidTransactionId'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               customName:
- *                 type: string
- *                 required: true
+ *             $ref: '#/components/schemas/CustomName'
  *     responses:
  *       204:
  *         description: Updated the transaction's custom name
@@ -126,22 +77,13 @@ router
  *     summary: Update a transaction's custom category id
  *     tags: [Transactions]
  *     parameters:
- *       - in: path
- *         name: plaidTransactionId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid transaction id
+ *       - $ref: '#/components/parameters/PlaidTransactionId'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               customCategoryId:
- *                 type: integer
- *                 required: true
+ *             $ref: '#/components/schemas/CustomCategoryId'
  *     responses:
  *       204:
  *         description: Updated the transaction's custom category id
@@ -159,22 +101,13 @@ router
  *     summary: Update a transaction's note
  *     tags: [Transactions]
  *     parameters:
- *       - in: path
- *         name: plaidTransactionId
- *         schema:
- *           type: string
- *         required: true
- *         description: The Plaid transaction id
+ *       - $ref: '#/components/parameters/PlaidTransactionId'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               note:
- *                 type: string
- *                 required: true
+ *             $ref: '#/components/schemas/Note'
  *     responses:
  *       204:
  *         description: Updated the transaction's note

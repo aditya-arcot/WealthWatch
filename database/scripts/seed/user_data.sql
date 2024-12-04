@@ -1,3 +1,11 @@
+\if :{?admin_password_hash}
+    \echo admin_password_hash: :admin_password_hash
+\else
+   \echo 'error - admin password hash is not set. exiting...'
+   SELECT 1 / 0;
+   \quit
+\endif
+
 BEGIN;
 
 INSERT INTO
@@ -15,8 +23,16 @@ VALUES
         'arcot.aditya@utexas.edu',
         'Aditya',
         'Arcot',
-        '$2a$10$y/oUd5B8qaopFIjiUCdxVuh8Zt0KLDPc5HOsRz.hncUMAL9UKnJfS',
+        :'admin_password_hash',
         true
+    ),
+    (
+        'demo_user',
+        'demo@user',
+        'Demo',
+        'User',
+        '$2a$10$Sg24QcAjUDufmcwYzd13jOsCeXrB/BPrnGQTtdNuIOGfFOn4dXBma',
+        false
     );
 
 COMMIT;
