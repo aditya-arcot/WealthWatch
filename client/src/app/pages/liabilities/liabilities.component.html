@@ -13,6 +13,70 @@
         </div>
     </div>
 } @else {
+    <div class="row">
+        <div class="col col-sm-8 col-md-6 col-lg-4 mx-auto">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <div class="dropdown input-group input-group-sm mb-2">
+                            <button
+                                type="button"
+                                class="form-select form-select-sm"
+                                title="Select Accounts"
+                                data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside"
+                            >
+                                {{ getSelectAccountsString() }}
+                            </button>
+                            <ul class="dropdown-menu p-0 pb-1">
+                                @for (item of items; track $index) {
+                                    <li class="dropdown-header medium-text py-0 px-2 mt-1">
+                                        {{ item.institutionName }}
+                                    </li>
+                                    @for (acc of item.accounts; track $index) {
+                                        <li>
+                                            <div class="dropdown-item form-check form-switch py-0 ps-2 pe-4 m-0">
+                                                <input
+                                                    id="account-{{ acc.id }}"
+                                                    class="form-check-input ms-0"
+                                                    type="checkbox"
+                                                    [value]="acc.id"
+                                                    [checked]="accountSelected(acc.id)"
+                                                    (click)="handleAccountSelect($event, acc.id)"
+                                                    (keydown)="handleAccountSelect($event, acc.id)"
+                                                    tabindex="0"
+                                                />
+                                                <label class="form-check-label small-text w-100 ms-2" for="account-{{ acc.id }}">{{ acc.name }}</label>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                            <button type="button" class="btn btn-sm btn-success" title="Invert Selection" (click)="invertAccountsSelection()">
+                                <i class="bi bi-arrow-repeat"></i>
+                                Invert
+                            </button>
+                        </div>
+                    </div>
+                    @if (pieChartDataset.length === 0) {
+                        <div class="text-center">No data</div>
+                    } @else {
+                        <div class="d-flex justify-content-center">
+                            <div class="pie-chart-div">
+                                <canvas
+                                    baseChart
+                                    type="pie"
+                                    [datasets]="[{ data: pieChartDataset }]"
+                                    [labels]="pieChartLabels"
+                                    [options]="pieChartOptions"
+                                ></canvas>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
     @if (creditCardItems.length) {
         <div class="card mb-2">
             <div class="card-body">
