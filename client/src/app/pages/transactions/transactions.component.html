@@ -92,10 +92,9 @@
                     @if (getTotalPages()) {
                         <div class="col-lg-auto">
                             <div class="row float-lg-end align-items-center justify-content-center">
-                                <div class="col-auto pe-1">
+                                <div class="col-auto ps-1 pe-1">
                                     <label for="pageSize" class="col-form-label p-0">Page size:</label>
                                 </div>
-
                                 <div class="col-auto ps-0 pe-1">
                                     <select id="pageSize" class="form-select form-select-sm" (change)="updatePageSize($event.target)">
                                         @for (size of pageSizes; track $index) {
@@ -105,7 +104,8 @@
                                         }
                                     </select>
                                 </div>
-                                <div class="col-auto ps-0 ps-md-1">
+                                <div class="w-100 d-sm-none"></div>
+                                <div class="col-auto ps-1 pe-1 mt-2 mt-sm-0">
                                     <ul class="pagination pagination-sm mb-0">
                                         <li
                                             class="page-item"

@@ -59,12 +59,7 @@ router
  *     summary: Update the logged in user's notification to inactive
  *     tags: [Notifications]
  *     parameters:
- *       - in: path
- *         name: notificationId
- *         schema:
- *           type: number
- *         required: true
- *         description: The notification id
+ *       - $ref: '#/components/parameters/NotificationId'
  *     responses:
  *       204:
  *         description: Updated the logged in user's notification to inactive

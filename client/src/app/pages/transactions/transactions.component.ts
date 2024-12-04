@@ -39,8 +39,10 @@ import { TransactionService } from '../../services/transaction.service'
 import {
     checkDatesEqual,
     checkDateStringValid,
+    formatDate,
 } from '../../utilities/date.utility'
 import { parseNumberArrayOrUndefinedFromParam } from '../../utilities/number.utility'
+import { redirectWithParams } from '../../utilities/redirect.utility'
 
 @Component({
     selector: 'app-transactions',
@@ -78,16 +80,12 @@ export class TransactionsComponent implements OnInit {
 
     dateFilterType = DateFilterEnum
     selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
-    previousStartDate: Date | null = null
     startDate: Date | null = null
-    previousEndDate: Date | null = null
     endDate: Date | null = null
 
     amountFilterType = AmountFilterEnum
     selectedAmountFilter: AmountFilterEnum = AmountFilterEnum.ALL
-    previousMinAmount: number | null = null
     minAmount: number | null = null
-    previousMaxAmount: number | null = null
     maxAmount: number | null = null
 
     selectedCategoryIds: Set<number> = new Set<number>()
@@ -122,7 +120,10 @@ export class TransactionsComponent implements OnInit {
             })
         })
         this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
-            this.redirectWithParams({ page: 1, query: this.searchText })
+            redirectWithParams(this.router, this.route, {
+                page: 1,
+                query: this.searchText,
+            })
         })
     }
 
@@ -210,7 +211,9 @@ export class TransactionsComponent implements OnInit {
                     if (totalPages === 0) {
                         this.page = 1
                     } else if (this.page > totalPages) {
-                        this.redirectWithParams({ page: totalPages })
+                        redirectWithParams(this.router, this.route, {
+                            page: totalPages,
+                        })
                     }
 
                     return of(undefined)
@@ -359,14 +362,6 @@ export class TransactionsComponent implements OnInit {
         }
     }
 
-    redirectWithParams(params: Params, merge = true): void {
-        this.router.navigate([], {
-            relativeTo: this.route,
-            queryParams: params,
-            queryParamsHandling: merge ? 'merge' : 'replace',
-        })
-    }
-
     updateCustomName(t: Transaction, reset = false): void {
         this.transactionSvc
             .updateTransactionCustomName(t)
@@ -434,7 +429,10 @@ export class TransactionsComponent implements OnInit {
     updatePageSize(target: EventTarget | null): void {
         if (!target) return
         const element = target as HTMLSelectElement
-        this.redirectWithParams({ page: 1, pageSize: element.selectedIndex })
+        redirectWithParams(this.router, this.route, {
+            page: 1,
+            pageSize: element.selectedIndex,
+        })
     }
 
     getTotalPages(): number {
@@ -456,25 +454,25 @@ export class TransactionsComponent implements OnInit {
 
     navigateToFirstPage(): void {
         if (this.page === 1) return
-        this.redirectWithParams({ page: 1 })
+        redirectWithParams(this.router, this.route, { page: 1 })
     }
 
     navigateToPreviousPage(): void {
         if (this.page === 1) return
         const page = this.page - 1
-        this.redirectWithParams({ page })
+        redirectWithParams(this.router, this.route, { page })
     }
 
     navigateToNextPage(): void {
         if (this.page === this.getTotalPages()) return
         const page = this.page + 1
-        this.redirectWithParams({ page })
+        redirectWithParams(this.router, this.route, { page })
     }
 
     navigateToLastPage(): void {
         const totalPages = this.getTotalPages()
         if (this.page === totalPages) return
-        this.redirectWithParams({ page: totalPages })
+        redirectWithParams(this.router, this.route, { page: totalPages })
     }
 
     search(): void {
@@ -491,20 +489,22 @@ export class TransactionsComponent implements OnInit {
     ): void {
         this.selectedDateFilter = filter
         let reload = false
-        if (!checkDatesEqual(start, this.previousStartDate)) {
-            this.previousStartDate = start ? new Date(start) : null
+        if (!checkDatesEqual(start, this.startDate)) {
             this.startDate = start ? new Date(start) : null
             reload = true
         }
-        if (!checkDatesEqual(end, this.previousEndDate)) {
-            this.previousEndDate = end ? new Date(end) : null
+        if (!checkDatesEqual(end, this.endDate)) {
             this.endDate = end ? new Date(end) : null
             reload = true
         }
         if (reload) {
             const startDate = this.startDate?.toISOString().slice(0, 10)
             const endDate = this.endDate?.toISOString().slice(0, 10)
-            this.redirectWithParams({ page: 1, startDate, endDate })
+            redirectWithParams(this.router, this.route, {
+                page: 1,
+                startDate,
+                endDate,
+            })
         }
     }
 
@@ -515,18 +515,16 @@ export class TransactionsComponent implements OnInit {
     ): void {
         this.selectedAmountFilter = filter
         let reload = false
-        if (min !== this.previousMinAmount) {
-            this.previousMinAmount = min
+        if (min !== this.minAmount) {
             this.minAmount = min
             reload = true
         }
-        if (max !== this.previousMaxAmount) {
-            this.previousMaxAmount = max
+        if (max !== this.maxAmount) {
             this.maxAmount = max
             reload = true
         }
         if (reload) {
-            this.redirectWithParams({
+            redirectWithParams(this.router, this.route, {
                 page: 1,
                 min: this.minAmount,
                 max: this.maxAmount,
@@ -543,7 +541,10 @@ export class TransactionsComponent implements OnInit {
                 ids = new Set(this.categories.map((c) => c.id))
             }
             this.selectedCategoryIds = new Set(ids)
-            this.redirectWithParams({ page: 1, categoryId: [...ids] })
+            redirectWithParams(this.router, this.route, {
+                page: 1,
+                categoryId: [...ids],
+            })
         }
     }
 
@@ -556,7 +557,10 @@ export class TransactionsComponent implements OnInit {
                 ids = new Set(this.accounts.map((a) => a.id))
             }
             this.selectedAccountIds = new Set(ids)
-            this.redirectWithParams({ page: 1, accountId: [...ids] })
+            redirectWithParams(this.router, this.route, {
+                page: 1,
+                accountId: [...ids],
+            })
         }
     }
 
@@ -579,31 +583,26 @@ export class TransactionsComponent implements OnInit {
         this.searchText = ''
 
         this.selectedDateFilter = DateFilterEnum.ALL
-        this.previousStartDate = this.startDate
-            ? new Date(this.startDate)
-            : null
         this.startDate = null
-        this.previousEndDate = this.endDate ? new Date(this.endDate) : null
         this.endDate = null
 
         this.selectedAmountFilter = AmountFilterEnum.ALL
-        this.previousMinAmount = this.minAmount
         this.minAmount = null
-        this.previousMaxAmount = this.maxAmount
         this.maxAmount = null
 
         this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
         this.selectedAccountIds = new Set(this.accounts.map((a) => a.id))
 
-        this.redirectWithParams({ page: 1, pageSize: this.pageSizeIdx }, false)
+        redirectWithParams(
+            this.router,
+            this.route,
+            { page: 1, pageSize: this.pageSizeIdx },
+            false
+        )
     }
 
     getDateString(t: Transaction): string {
-        return new Date(t.date).toLocaleDateString(undefined, {
-            month: 'numeric',
-            day: 'numeric',
-            year: '2-digit',
-        })
+        return formatDate(t.date, true, false)
     }
 
     getShortenedName(t: Transaction): string {

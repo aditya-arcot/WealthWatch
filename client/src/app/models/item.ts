@@ -36,6 +36,10 @@ export interface ItemWithAccountsWithHoldings extends Item {
     accounts: AccountWithHoldings[]
 }
 
+export interface ItemWithAccountsWithLiabilities extends Item {
+    accounts: (CreditCardAccount | StudentLoanAccount | MortgageAccount)[]
+}
+
 export interface ItemWithCreditCardAccounts extends Item {
     accounts: CreditCardAccount[]
 }

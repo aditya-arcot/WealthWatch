@@ -80,6 +80,8 @@ export const requestAccess = async (req: Request, res: Response) => {
         statusId: AccessRequestStatusEnum.Pending,
         accessCode: null,
         reviewer: null,
+        createTimestamp: new Date(),
+        updateTimestamp: new Date(),
     }
     await insertAccessRequest(accessReq)
     return res.status(204).send()

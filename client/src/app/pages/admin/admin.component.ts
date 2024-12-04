@@ -9,6 +9,7 @@ import {
 import { AdminService } from '../../services/admin.service'
 import { AlertService } from '../../services/alert.service'
 import { LoggerService } from '../../services/logger.service'
+import { formatDate } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-admin',
@@ -88,6 +89,10 @@ export class AdminComponent implements OnInit {
 
     getFullName = (req: AccessRequest) => {
         return `${req.firstName} ${req.lastName}`
+    }
+
+    getDateString(date: Date): string {
+        return formatDate(date, true, true)
     }
 
     reviewRequest = (req: AccessRequest, statusId: AccessRequestStatusEnum) => {

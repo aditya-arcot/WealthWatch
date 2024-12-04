@@ -1,5 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { ChartOptions } from 'chart.js'
+import { BaseChartDirective } from 'ng2-charts'
 import {
     catchError,
     finalize,
@@ -16,6 +18,7 @@ import {
     StudentLoanAccount,
 } from '../../models/account'
 import {
+    ItemWithAccountsWithLiabilities,
     ItemWithCreditCardAccounts,
     ItemWithMortgageAccounts,
     ItemWithStudentLoanAccounts,
@@ -28,21 +31,57 @@ import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
 import { LoggerService } from '../../services/logger.service'
+import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 import { formatDate } from '../../utilities/date.utility'
 import { formatPercent } from '../../utilities/number.utility'
 import { capitalize } from '../../utilities/string.utility'
 
 @Component({
     standalone: true,
-    imports: [LoadingSpinnerComponent],
+    imports: [LoadingSpinnerComponent, BaseChartDirective],
     templateUrl: './liabilities.component.html',
     styleUrl: './liabilities.component.css',
 })
 export class LiabilitiesComponent implements OnInit {
+    @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
+
     loading = false
+
+    items: ItemWithAccountsWithLiabilities[] = []
     creditCardItems: ItemWithCreditCardAccounts[] = []
     mortgageItems: ItemWithMortgageAccounts[] = []
     studentLoanItems: ItemWithStudentLoanAccounts[] = []
+    selectedAccountIds: Set<number> = new Set<number>()
+
+    pieChartLabels: string[] = []
+    pieChartLabelAccountIds: number[] = []
+    pieChartDataset: number[] = []
+    pieChartOptions: ChartOptions<'pie'> = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: (tooltipItem) => {
+                        const val = tooltipItem.parsed
+                        return ' ' + this.currencySvc.format(val, 'USD')
+                    },
+                },
+            },
+            legend: {
+                display: false,
+            },
+            autocolors: {
+                mode: 'data',
+                customize: (context) => {
+                    return {
+                        background: context.colors.background,
+                        border: 'white',
+                    }
+                },
+            },
+        },
+    }
 
     constructor(
         private logger: LoggerService,
@@ -69,7 +108,7 @@ export class LiabilitiesComponent implements OnInit {
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe()
+            .subscribe(() => this.processData())
     }
 
     loadItemsWithCreditCardAccounts(): Observable<void> {
@@ -80,6 +119,7 @@ export class LiabilitiesComponent implements OnInit {
                     items
                 )
                 this.creditCardItems = items
+                this.mergeItems(items)
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -97,6 +137,7 @@ export class LiabilitiesComponent implements OnInit {
             switchMap((items) => {
                 this.logger.debug('loaded items with mortgage accounts', items)
                 this.mortgageItems = items
+                this.mergeItems(items)
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -117,6 +158,7 @@ export class LiabilitiesComponent implements OnInit {
                     items
                 )
                 this.studentLoanItems = items
+                this.mergeItems(items)
                 return of(undefined)
             }),
             catchError((err: HttpErrorResponse) => {
@@ -127,6 +169,115 @@ export class LiabilitiesComponent implements OnInit {
                 return throwError(() => err)
             })
         )
+    }
+
+    mergeItems(newItems: ItemWithAccountsWithLiabilities[]) {
+        newItems.forEach((i) => {
+            const item = this.items.find((item) => item.id === i.id)
+            if (item) {
+                item.accounts.push(...i.accounts)
+            } else {
+                this.items.push(structuredClone(i))
+            }
+        })
+    }
+
+    processData(): void {
+        this.selectedAccountIds = new Set<number>(
+            this.items
+                .map((i) => i.accounts)
+                .flat()
+                .map((a) => a.id)
+        )
+
+        this.pieChartLabels = []
+        this.pieChartLabelAccountIds = []
+        this.pieChartDataset = []
+
+        this.items.forEach((i) => {
+            i.accounts.forEach((a) => {
+                this.addAccountToPieChart(a.id)
+            })
+        })
+
+        this.updateCharts()
+        this.logger.debug('processed data for pie chart')
+    }
+
+    updateCharts(): void {
+        this.charts.forEach((chart) => chart.chart?.update())
+    }
+
+    addAccountToPieChart(accountId: number): void {
+        this.selectedAccountIds.add(accountId)
+        this.items.forEach((i) => {
+            i.accounts.forEach((a) => {
+                if (a.id === accountId) {
+                    this.pieChartLabels.push(a.name)
+                    this.pieChartLabelAccountIds.push(a.id)
+                    this.pieChartDataset.push(a.currentBalance ?? 0)
+                }
+            })
+        })
+    }
+
+    removeAccountFromPieChart(accountId: number): void {
+        this.selectedAccountIds.delete(accountId)
+
+        const newLabels: string[] = []
+        const newLabelsAccountIds: number[] = []
+        const newData: number[] = []
+
+        this.pieChartLabelAccountIds.forEach((id, idx) => {
+            if (id !== accountId) {
+                newLabels.push(this.pieChartLabels[idx])
+                newLabelsAccountIds.push(id)
+                newData.push(this.pieChartDataset[idx])
+            }
+        })
+
+        this.pieChartLabels = newLabels
+        this.pieChartLabelAccountIds = newLabelsAccountIds
+        this.pieChartDataset = newData
+    }
+
+    getSelectAccountsString(): string {
+        if (this.selectedAccountIds.size === 0) {
+            return 'Select Accounts'
+        }
+        const accounts = this.items.map((i) => i.accounts).flat().length
+        if (this.selectedAccountIds.size === accounts) {
+            return 'All Accounts Selected'
+        }
+        return `${this.selectedAccountIds.size} Selected`
+    }
+
+    accountSelected(id: number) {
+        return this.selectedAccountIds.has(id)
+    }
+
+    handleAccountSelect(event: MouseEvent | KeyboardEvent, accountId: number) {
+        if (!handleCheckboxSelect(event)) return
+        const checkbox = event.target as HTMLInputElement
+        if (checkbox.checked) {
+            this.addAccountToPieChart(accountId)
+        } else {
+            this.removeAccountFromPieChart(accountId)
+        }
+        this.updateCharts()
+    }
+
+    invertAccountsSelection() {
+        this.items
+            .map((i) => i.accounts)
+            .flat()
+            .forEach((a) => {
+                if (!this.selectedAccountIds.has(a.id)) {
+                    this.addAccountToPieChart(a.id)
+                } else {
+                    this.removeAccountFromPieChart(a.id)
+                }
+            })
     }
 
     getCurrentBalanceString(acc: Account): string {
@@ -253,6 +404,6 @@ export class LiabilitiesComponent implements OnInit {
     }
 
     getDateString(date: Date | null): string {
-        return formatDate(date, false)
+        return formatDate(date, true, false)
     }
 }

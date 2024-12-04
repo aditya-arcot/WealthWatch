@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { ActivatedRoute, Params, Router } from '@angular/router'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
@@ -19,8 +20,13 @@ import { CurrencyService } from '../../services/currency.service'
 import { LoggerService } from '../../services/logger.service'
 import { SpendingService } from '../../services/spending.service'
 import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
-import { checkDatesEqual } from '../../utilities/date.utility'
+import {
+    checkDatesEqual,
+    checkDateStringValid,
+    formatDate,
+} from '../../utilities/date.utility'
 import { formatDecimalToPercent } from '../../utilities/number.utility'
+import { redirectWithParams } from '../../utilities/redirect.utility'
 
 @Component({
     selector: 'app-spending',
@@ -38,7 +44,7 @@ export class SpendingComponent implements OnInit {
 
     loading = false
 
-    selectedDateFilter: DateFilterEnum = DateFilterEnum.CURRENT_MONTH
+    selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
     startDate: Date | null = null
     defaultStartDate: Date | null = null
     endDate: Date | null = null
@@ -160,38 +166,33 @@ export class SpendingComponent implements OnInit {
         private categorySvc: CategoryService,
         private currencySvc: CurrencyService,
         private alertSvc: AlertService,
-        private spendingSvc: SpendingService
+        private spendingSvc: SpendingService,
+        private route: ActivatedRoute,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
         this.defaultStartDate = new Date()
         this.defaultStartDate.setHours(0, 0, 0, 0)
         this.defaultStartDate.setDate(1)
-        this.startDate = new Date(this.defaultStartDate)
-        this.loadData()
-    }
 
-    loadData(): void {
-        this.loading = true
-        this.loadCategories()
-            .pipe(
-                switchMap(() => this.loadCategorySummaries()),
-                switchMap(() => this.loadTotalByCategoryAndDate()),
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to load data', [
-                        err.message,
-                    ])
-                    this.loading = false
-                    return throwError(() => err)
-                })
-            )
-            .subscribe(() => {
-                this.processData()
-                this.loading = false
+        this.loadCategories().subscribe(() => {
+            this.route.queryParams.subscribe((params) => {
+                if (
+                    Object.keys(params).length === 0 ||
+                    this.processParams(params)
+                ) {
+                    this.selectedDateFilter = DateFilterEnum.CURRENT_MONTH
+                    this.startDate = new Date(this.defaultStartDate!)
+                    this.endDate = null
+                }
+                this.loadSpendingData()
             })
+        })
     }
 
     loadCategories(): Observable<void> {
+        this.loading = true
         return this.categorySvc.getCategories().pipe(
             switchMap((c) => {
                 this.logger.debug('loaded categories', c)
@@ -200,9 +201,27 @@ export class SpendingComponent implements OnInit {
             }),
             catchError((err: HttpErrorResponse) => {
                 this.logger.error('failed to load categories', err)
+                this.loading = false
                 return throwError(() => err)
             })
         )
+    }
+
+    loadSpendingData(): void {
+        this.loading = true
+        this.loadCategorySummaries()
+            .pipe(
+                switchMap(() => this.loadTotalByCategoryAndDate()),
+                catchError((err: HttpErrorResponse) => {
+                    this.alertSvc.addErrorAlert('Failed to load spending data')
+                    this.loading = false
+                    return throwError(() => err)
+                })
+            )
+            .subscribe(() => {
+                this.processSpendingData()
+                this.loading = false
+            })
     }
 
     loadCategorySummaries(): Observable<void> {
@@ -241,7 +260,28 @@ export class SpendingComponent implements OnInit {
             )
     }
 
-    processData(): void {
+    processParams(params: Params): boolean {
+        let useDefault = true
+
+        const startDate: string | undefined = params['startDate']
+        if (startDate !== undefined && checkDateStringValid(startDate)) {
+            this.startDate = new Date(`${startDate}T00:00:00`)
+            useDefault = false
+        }
+
+        const endDate: string | undefined = params['endDate']
+        if (endDate !== undefined && checkDateStringValid(endDate)) {
+            this.endDate = new Date(`${endDate}T00:00:00`)
+            useDefault = false
+        }
+
+        if (!useDefault) {
+            this.selectedDateFilter = DateFilterEnum.CUSTOM
+        }
+        return useDefault
+    }
+
+    processSpendingData(): void {
         this.incomeTotal = undefined
         this.incomeCount = undefined
         this.billsTotal = undefined
@@ -372,16 +412,18 @@ export class SpendingComponent implements OnInit {
     ): void {
         this.selectedDateFilter = filter
         let reload = false
-        if (start !== this.startDate) {
+        if (!checkDatesEqual(start, this.startDate)) {
             this.startDate = start ? new Date(start) : null
             reload = true
         }
-        if (end !== this.endDate) {
+        if (!checkDatesEqual(end, this.endDate)) {
             this.endDate = end ? new Date(end) : null
             reload = true
         }
         if (reload) {
-            this.loadData()
+            const startDate = this.startDate?.toISOString().slice(0, 10)
+            const endDate = this.endDate?.toISOString().slice(0, 10)
+            redirectWithParams(this.router, this.route, { startDate, endDate })
         }
     }
 
@@ -401,7 +443,7 @@ export class SpendingComponent implements OnInit {
             reload = true
         }
         if (reload) {
-            this.loadData()
+            redirectWithParams(this.router, this.route, {}, false)
         }
     }
 
@@ -424,11 +466,7 @@ export class SpendingComponent implements OnInit {
     }
 
     getDateString(date: Date): string {
-        return new Date(date).toLocaleDateString(undefined, {
-            month: 'numeric',
-            day: 'numeric',
-            year: '2-digit',
-        })
+        return formatDate(date, true, false)
     }
 
     getIncomeTotalString(): string | undefined {

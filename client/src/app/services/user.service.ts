@@ -8,6 +8,8 @@ import { User } from '../models/user'
 })
 export class UserService {
     readonly baseUrl = `${env.apiUrl}/users`
+    readonly demoUser = 'demo_user'
+    readonly demoPassword = 'demo_pass'
 
     constructor(private http: HttpClient) {}
 
@@ -23,6 +25,10 @@ export class UserService {
 
     clearStoredCurrentUser(): void {
         sessionStorage.removeItem('user')
+    }
+
+    demoUserLoggedIn() {
+        return this.getStoredCurrentUser()?.username === this.demoUser
     }
 
     getCurrentUser() {

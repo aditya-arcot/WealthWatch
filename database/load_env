@@ -15,5 +15,12 @@ if [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ]; then
     exit 1
 fi
 
+if [ -n "$ADMIN_PASSWORD_REQUIRED" ]; then
+    if [ -z "$ADMIN_PASSWORD_HASH" ]; then
+        echo "ADMIN_PASSWORD_HASH not set. aborting..."
+        exit 1
+    fi
+fi
+
 echo "env vars loaded"
 echo

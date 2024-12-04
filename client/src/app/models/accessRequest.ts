@@ -6,6 +6,8 @@ export interface AccessRequest {
     statusId: AccessRequestStatusEnum
     accessCode: string | null
     reviewer: string | null
+    createTimestamp: Date
+    updateTimestamp: Date
 }
 
 export enum AccessRequestStatusEnum {

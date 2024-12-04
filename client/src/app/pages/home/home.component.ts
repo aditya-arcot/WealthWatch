@@ -38,4 +38,12 @@ export class HomeComponent implements OnInit {
                 this.userSvc.storeCurrentUser(user)
             })
     }
+
+    get firstName() {
+        return this.userSvc.getStoredCurrentUser()?.firstName
+    }
+
+    get demoUserLoggedIn() {
+        return this.userSvc.demoUserLoggedIn()
+    }
 }
