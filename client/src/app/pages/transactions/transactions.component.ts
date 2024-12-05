@@ -41,7 +41,11 @@ import {
     checkDateStringValid,
     formatDate,
 } from '../../utilities/date.utility'
-import { parseNumberArrayOrUndefinedFromParam } from '../../utilities/number.utility'
+import {
+    safeParseFloat,
+    safeParseInt,
+    safeParseIntArrayOrUndefinedFromParam,
+} from '../../utilities/number.utility'
 import { redirectWithParams } from '../../utilities/redirect.utility'
 
 @Component({
@@ -262,23 +266,23 @@ export class TransactionsComponent implements OnInit {
     processParams(params: Params): void {
         const page: string | undefined = params['page']
         if (page !== undefined) {
-            const pageNum = parseInt(page)
-            if (isNaN(pageNum) || pageNum < 1) {
+            const pageInt = safeParseInt(page)
+            if (pageInt === undefined || pageInt < 1) {
                 this.page = 1
             } else {
-                this.page = pageNum
+                this.page = pageInt
             }
         }
 
         const pageSizeIdx: string | undefined = params['pageSize']
         if (pageSizeIdx !== undefined) {
-            const pageSizeIdxNum = parseInt(pageSizeIdx)
-            if (isNaN(pageSizeIdxNum) || pageSizeIdxNum < 0) {
+            const pageSizeIdxInt = safeParseInt(pageSizeIdx)
+            if (pageSizeIdxInt === undefined || pageSizeIdxInt < 0) {
                 this.pageSizeIdx = 0
-            } else if (pageSizeIdxNum >= this.pageSizes.length) {
+            } else if (pageSizeIdxInt >= this.pageSizes.length) {
                 this.pageSizeIdx = this.pageSizes.length - 1
             } else {
-                this.pageSizeIdx = pageSizeIdxNum
+                this.pageSizeIdx = pageSizeIdxInt
             }
         }
 
@@ -302,13 +306,13 @@ export class TransactionsComponent implements OnInit {
         const minAmount: string | undefined = params['min']
         let minAmountFloat: number | undefined
         if (minAmount !== undefined) {
-            minAmountFloat = parseFloat(minAmount)
+            minAmountFloat = safeParseFloat(minAmount)
         }
 
         const maxAmount: string | undefined = params['max']
         let maxAmountFloat: number | undefined
         if (maxAmount !== undefined) {
-            maxAmountFloat = parseFloat(maxAmount)
+            maxAmountFloat = safeParseFloat(maxAmount)
         }
 
         if (minAmountFloat !== undefined && maxAmountFloat !== undefined) {
@@ -335,7 +339,7 @@ export class TransactionsComponent implements OnInit {
         const categoryIds = params['categoryId']
         if (categoryIds !== undefined) {
             const categoryIdNums =
-                parseNumberArrayOrUndefinedFromParam(categoryIds)
+                safeParseIntArrayOrUndefinedFromParam(categoryIds)
             if (categoryIdNums !== undefined && categoryIdNums.length > 0) {
                 const filteredIds = categoryIdNums.filter(
                     (id) =>
@@ -350,7 +354,7 @@ export class TransactionsComponent implements OnInit {
         const accountIds = params['accountId']
         if (accountIds !== undefined) {
             const accountIdNums =
-                parseNumberArrayOrUndefinedFromParam(accountIds)
+                safeParseIntArrayOrUndefinedFromParam(accountIds)
             if (accountIdNums !== undefined && accountIdNums.length > 0) {
                 const filteredIds = accountIdNums.filter(
                     (id) => this.accounts.find((a) => a.id === id) !== undefined
@@ -660,9 +664,9 @@ export class TransactionsComponent implements OnInit {
     updateCategory(target: EventTarget | null, t: Transaction): void {
         if (!target) return
         const element = target as HTMLInputElement
-        const newCategoryId = parseInt(element.value.trim())
+        const newCategoryId = safeParseInt(element.value.trim())
 
-        if (isNaN(newCategoryId) || t.categoryId === newCategoryId) {
+        if (newCategoryId === undefined || t.categoryId === newCategoryId) {
             t.customCategoryId = null
         } else {
             t.customCategoryId = newCategoryId

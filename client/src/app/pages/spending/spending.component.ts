@@ -25,7 +25,10 @@ import {
     checkDateStringValid,
     formatDate,
 } from '../../utilities/date.utility'
-import { formatDecimalToPercent } from '../../utilities/number.utility'
+import {
+    formatDecimalToPercent,
+    safeParseFloat,
+} from '../../utilities/number.utility'
 import { redirectWithParams } from '../../utilities/redirect.utility'
 
 @Component({
@@ -97,8 +100,8 @@ export class SpendingComponent implements OnInit {
                         if (typeof value === 'number') {
                             return this.currencySvc.format(value, 'USD')
                         }
-                        const parsed = parseFloat(value)
-                        return this.currencySvc.format(parsed, 'USD')
+                        const parsed = safeParseFloat(value)
+                        return this.currencySvc.format(parsed ?? null, 'USD')
                     },
                 },
             },
