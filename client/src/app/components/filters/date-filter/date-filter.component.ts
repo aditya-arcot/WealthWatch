@@ -9,9 +9,13 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { DateFilterEnum } from '../../../models/dateFilter'
+import {
+    dateFilterDescriptions,
+    DateFilterEnum,
+} from '../../../models/dateFilter'
 import { AlertService } from '../../../services/alert.service'
 import { checkDatesEqual } from '../../../utilities/date.utility'
+import { computeDatesBasedOnFilter } from '../../../utilities/filter.utility'
 
 // all dates are in client timezone
 
@@ -37,9 +41,12 @@ export class DateFilterComponent implements OnInit, OnChanges {
     @Output() resetRange = new EventEmitter<void>()
 
     dateFilterType = DateFilterEnum
-    dateFilterKeys = Object.keys(
-        DateFilterEnum
-    ) as (keyof typeof DateFilterEnum)[]
+    dateFilters = Object.entries(dateFilterDescriptions).map(
+        ([key, value]) => ({
+            key: Number(key),
+            description: value,
+        })
+    )
 
     selectorStartDate: string | null = null
     selectorEndDate: string | null = null
@@ -89,120 +96,23 @@ export class DateFilterComponent implements OnInit, OnChanges {
         this.endDate = new Date(value + 'T00:00:00')
     }
 
-    handleFilterChange() {
+    handleFilterChange(filter: string) {
+        this.selectedFilter = Number(filter) as DateFilterEnum
         this.computeStartEndDate()
     }
 
     private computeStartEndDate() {
-        switch (this.selectedFilter) {
-            case DateFilterEnum.ALL:
-                this.startDate = null
-                this.endDate = null
-                break
-
-            case DateFilterEnum.CURRENT_WEEK: {
-                const start = new Date()
-                start.setHours(0, 0, 0, 0)
-                const day = start.getDay() || 7
-                if (day !== 1) start.setHours(-24 * (day - 1))
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = null
-                break
-            }
-
-            case DateFilterEnum.CURRENT_MONTH: {
-                const start = new Date()
-                start.setHours(0, 0, 0, 0)
-                start.setDate(1)
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = null
-                break
-            }
-
-            case DateFilterEnum.CURRENT_YEAR: {
-                const start = new Date()
-                start.setHours(0, 0, 0, 0)
-                start.setMonth(0)
-                start.setDate(1)
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = null
-                break
-            }
-
-            case DateFilterEnum.PAST_WEEK: {
-                const start = new Date()
-                start.setHours(0, 0, 0, 0)
-                start.setHours(-24 * 6)
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = null
-                break
-            }
-
-            case DateFilterEnum.PAST_MONTH: {
-                const start = new Date()
-                start.setHours(0, 0, 0, 0)
-                start.setHours(-24 * 29)
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = null
-                break
-            }
-
-            case DateFilterEnum.LAST_WEEK: {
-                const end = new Date()
-                end.setHours(0, 0, 0, 0)
-                const day = end.getDay() || 7
-                if (day !== 1) end.setHours(-24 * day)
-
-                const start = new Date(end.getTime())
-                start.setHours(-24 * 6)
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = end ? new Date(end) : null
-                break
-            }
-
-            case DateFilterEnum.LAST_MONTH: {
-                const end = new Date()
-                end.setHours(0, 0, 0, 0)
-                end.setDate(1)
-                end.setHours(-24)
-
-                const start = new Date(end.getTime())
-                start.setDate(1)
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = end ? new Date(end) : null
-                break
-            }
-
-            case DateFilterEnum.LAST_YEAR: {
-                const end = new Date()
-                end.setHours(0, 0, 0, 0)
-                end.setMonth(0)
-                end.setDate(1)
-                end.setHours(-24)
-
-                const start = new Date(end.getTime())
-                start.setMonth(0)
-                start.setDate(1)
-
-                this.startDate = start ? new Date(start) : null
-                this.endDate = end ? new Date(end) : null
-                break
-            }
-
-            case DateFilterEnum.CUSTOM: {
-                this.selectorStartDate =
-                    this.startDate?.toISOString().split('T')[0] ?? null
-                this.selectorEndDate =
-                    this.endDate?.toISOString().split('T')[0] ?? null
-                break
-            }
+        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+            this.selectorStartDate =
+                this.startDate?.toISOString().split('T')[0] ?? null
+            this.selectorEndDate =
+                this.endDate?.toISOString().split('T')[0] ?? null
+        } else {
+            const { startDate, endDate } = computeDatesBasedOnFilter(
+                this.selectedFilter
+            )
+            this.startDate = startDate
+            this.endDate = endDate
         }
     }
 

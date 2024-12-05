@@ -12,7 +12,7 @@ import {
     CategoryEnum,
     CategoryGroupEnum,
 } from '../../models/category'
-import { DateFilterEnum } from '../../models/dateFilter'
+import { dateFilterDescriptions, DateFilterEnum } from '../../models/dateFilter'
 import { CategorySummary, CategoryTotalByDate } from '../../models/spending'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
@@ -25,9 +25,11 @@ import {
     checkDateStringValid,
     formatDate,
 } from '../../utilities/date.utility'
+import { computeDatesBasedOnFilter } from '../../utilities/filter.utility'
 import {
     formatDecimalToPercent,
     safeParseFloat,
+    safeParseInt,
 } from '../../utilities/number.utility'
 import { redirectWithParams } from '../../utilities/redirect.utility'
 
@@ -47,7 +49,7 @@ export class SpendingComponent implements OnInit {
 
     loading = false
 
-    selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
+    selectedDateFilter: DateFilterEnum = DateFilterEnum.CURRENT_MONTH
     startDate: Date | null = null
     defaultStartDate: Date | null = null
     endDate: Date | null = null
@@ -186,8 +188,12 @@ export class SpendingComponent implements OnInit {
                     this.processParams(params)
                 ) {
                     this.selectedDateFilter = DateFilterEnum.CURRENT_MONTH
-                    this.startDate = new Date(this.defaultStartDate!)
-                    this.endDate = null
+                    this.startDate = this.defaultStartDate
+                        ? new Date(this.defaultStartDate)
+                        : null
+                    this.endDate = this.defaultEndDate
+                        ? new Date(this.defaultEndDate)
+                        : null
                 }
                 this.loadSpendingData()
             })
@@ -264,24 +270,37 @@ export class SpendingComponent implements OnInit {
     }
 
     processParams(params: Params): boolean {
-        let useDefault = true
+        const dateFilter: string | undefined = params['dateFilter']
+        if (dateFilter === undefined) return true
 
-        const startDate: string | undefined = params['startDate']
-        if (startDate !== undefined && checkDateStringValid(startDate)) {
-            this.startDate = new Date(`${startDate}T00:00:00`)
-            useDefault = false
+        const dateFilterInt = safeParseInt(dateFilter)
+        if (dateFilterInt === undefined) return true
+
+        this.selectedDateFilter = dateFilterInt
+        if (this.selectedDateFilter === DateFilterEnum.CUSTOM) {
+            let useDefault = true
+
+            const startDate: string | undefined = params['startDate']
+            if (startDate !== undefined && checkDateStringValid(startDate)) {
+                this.startDate = new Date(`${startDate}T00:00:00`)
+                useDefault = false
+            }
+
+            const endDate: string | undefined = params['endDate']
+            if (endDate !== undefined && checkDateStringValid(endDate)) {
+                this.endDate = new Date(`${endDate}T00:00:00`)
+                useDefault = false
+            }
+
+            return useDefault
         }
 
-        const endDate: string | undefined = params['endDate']
-        if (endDate !== undefined && checkDateStringValid(endDate)) {
-            this.endDate = new Date(`${endDate}T00:00:00`)
-            useDefault = false
-        }
-
-        if (!useDefault) {
-            this.selectedDateFilter = DateFilterEnum.CUSTOM
-        }
-        return useDefault
+        const { startDate, endDate } = computeDatesBasedOnFilter(
+            this.selectedDateFilter
+        )
+        this.startDate = startDate
+        this.endDate = endDate
+        return false
     }
 
     processSpendingData(): void {
@@ -413,6 +432,12 @@ export class SpendingComponent implements OnInit {
         start: Date | null,
         end: Date | null
     ): void {
+        if (filter !== DateFilterEnum.CUSTOM) {
+            this.selectedDateFilter = filter
+            redirectWithParams(this.router, this.route, { dateFilter: filter })
+            return
+        }
+
         this.selectedDateFilter = filter
         let reload = false
         if (!checkDatesEqual(start, this.startDate)) {
@@ -426,28 +451,17 @@ export class SpendingComponent implements OnInit {
         if (reload) {
             const startDate = this.startDate?.toISOString().slice(0, 10)
             const endDate = this.endDate?.toISOString().slice(0, 10)
-            redirectWithParams(this.router, this.route, { startDate, endDate })
+            redirectWithParams(
+                this.router,
+                this.route,
+                { dateFilter: filter, startDate, endDate },
+                false
+            )
         }
     }
 
     resetDateFilter(): void {
-        this.selectedDateFilter = DateFilterEnum.CURRENT_MONTH
-        let reload = false
-        if (!checkDatesEqual(this.startDate, this.defaultStartDate)) {
-            this.startDate = this.defaultStartDate
-                ? new Date(this.defaultStartDate)
-                : null
-            reload = true
-        }
-        if (!checkDatesEqual(this.endDate, this.defaultEndDate)) {
-            this.endDate = this.defaultEndDate
-                ? new Date(this.defaultEndDate)
-                : null
-            reload = true
-        }
-        if (reload) {
-            redirectWithParams(this.router, this.route, {}, false)
-        }
+        redirectWithParams(this.router, this.route, {}, false)
     }
 
     getCategoryName(categoryId: number): string {
@@ -457,7 +471,7 @@ export class SpendingComponent implements OnInit {
 
     getSelectedDateRangeString(): string {
         if (this.selectedDateFilter !== DateFilterEnum.CUSTOM) {
-            return this.selectedDateFilter
+            return dateFilterDescriptions[this.selectedDateFilter]
         }
         if (!this.startDate) {
             return `On or Before ${this.getDateString(this.endDate!)}`

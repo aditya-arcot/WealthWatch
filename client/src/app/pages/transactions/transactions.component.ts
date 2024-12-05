@@ -41,6 +41,7 @@ import {
     checkDateStringValid,
     formatDate,
 } from '../../utilities/date.utility'
+import { computeDatesBasedOnFilter } from '../../utilities/filter.utility'
 import {
     safeParseFloat,
     safeParseInt,
@@ -291,16 +292,43 @@ export class TransactionsComponent implements OnInit {
             this.searchText = query
         }
 
-        const startDate: string | undefined = params['startDate']
-        if (startDate !== undefined && checkDateStringValid(startDate)) {
-            this.startDate = new Date(`${startDate}T00:00:00`)
-            this.selectedDateFilter = DateFilterEnum.CUSTOM
-        }
+        const dateFilter: string | undefined = params['dateFilter']
+        if (dateFilter !== undefined) {
+            const dateFilterInt = safeParseInt(dateFilter)
+            if (dateFilterInt !== undefined) {
+                this.selectedDateFilter = dateFilterInt
+                if (this.selectedDateFilter === DateFilterEnum.CUSTOM) {
+                    let dateSet = false
 
-        const endDate: string | undefined = params['endDate']
-        if (endDate !== undefined && checkDateStringValid(endDate)) {
-            this.endDate = new Date(`${endDate}T00:00:00`)
-            this.selectedDateFilter = DateFilterEnum.CUSTOM
+                    const startDate: string | undefined = params['startDate']
+                    if (
+                        startDate !== undefined &&
+                        checkDateStringValid(startDate)
+                    ) {
+                        this.startDate = new Date(`${startDate}T00:00:00`)
+                        dateSet = true
+                    }
+
+                    const endDate: string | undefined = params['endDate']
+                    if (
+                        endDate !== undefined &&
+                        checkDateStringValid(endDate)
+                    ) {
+                        this.endDate = new Date(`${endDate}T00:00:00`)
+                        dateSet = true
+                    }
+
+                    if (!dateSet) {
+                        this.selectedDateFilter = DateFilterEnum.ALL
+                    }
+                } else {
+                    const { startDate, endDate } = computeDatesBasedOnFilter(
+                        this.selectedDateFilter
+                    )
+                    this.startDate = startDate
+                    this.endDate = endDate
+                }
+            }
         }
 
         const minAmount: string | undefined = params['min']
@@ -491,6 +519,15 @@ export class TransactionsComponent implements OnInit {
         start: Date | null,
         end: Date | null
     ): void {
+        if (filter !== DateFilterEnum.CUSTOM) {
+            this.selectedDateFilter = filter
+            redirectWithParams(this.router, this.route, {
+                page: 1,
+                dateFilter: filter,
+            })
+            return
+        }
+
         this.selectedDateFilter = filter
         let reload = false
         if (!checkDatesEqual(start, this.startDate)) {
@@ -506,6 +543,7 @@ export class TransactionsComponent implements OnInit {
             const endDate = this.endDate?.toISOString().slice(0, 10)
             redirectWithParams(this.router, this.route, {
                 page: 1,
+                dateFilter: filter,
                 startDate,
                 endDate,
             })
