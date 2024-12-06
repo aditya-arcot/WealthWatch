@@ -9,10 +9,10 @@
                     <label for="dateRange">
                         <b>Date Range</b>
                     </label>
-                    <select id="dateRange" class="form-select form-select-sm" [(ngModel)]="selectedFilter" (change)="handleFilterChange()">
-                        @for (key of dateFilterKeys; track $index) {
-                            <option [value]="dateFilterType[key]">
-                                {{ dateFilterType[key] }}
+                    <select id="dateRange" class="form-select form-select-sm" [(ngModel)]="selectedFilter" (ngModelChange)="handleFilterChange($event)">
+                        @for (filter of dateFilters; track $index) {
+                            <option [value]="filter.key">
+                                {{ filter.description }}
                             </option>
                         }
                     </select>

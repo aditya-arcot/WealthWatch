@@ -28,6 +28,7 @@ import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
 import { parseBoolean } from '../../utilities/boolean.utility'
 import { formatDate } from '../../utilities/date.utility'
+import { safeParseInt } from '../../utilities/number.utility'
 
 @Component({
     selector: 'app-accounts',
@@ -55,8 +56,8 @@ export class AccountsComponent implements OnInit {
         this.route.queryParams.subscribe((params) => {
             const itemId: string | undefined = params['itemId']
             if (itemId === undefined) return
-            const itemIdNum = parseInt(itemId)
-            if (isNaN(itemIdNum)) throw Error('invalid item id')
+            const itemIdNum = safeParseInt(itemId)
+            if (itemIdNum === undefined) throw Error('invalid item id')
 
             const withAccounts: string | undefined = params['withAccounts']
             if (withAccounts === undefined) throw Error('missing with accounts')
