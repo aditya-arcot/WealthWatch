@@ -20,13 +20,13 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
-        "@dotenvx/dotenvx": "^1.25.0",
+        "@dotenvx/dotenvx": "^1.28.0",
         "@logtail/pino": "^0.5.2",
-        "@tsconfig/node-lts": "^22.0.0",
+        "@tsconfig/node-lts": "^22.0.1",
         "@tsconfig/strictest": "^2.0.5",
-        "axios": "^1.7.8",
+        "axios": "^1.7.9",
         "bcryptjs": "^2.4.3",
-        "bullmq": "^5.29.1",
+        "bullmq": "^5.31.1",
         "connect-pg-simple": "^10.0.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -49,23 +49,23 @@
         "swagger-ui-express": "^5.0.1"
     },
     "devDependencies": {
-        "@eslint/js": "^9.15.0",
+        "@eslint/js": "^9.16.0",
         "@types/bcryptjs": "^2.4.6",
         "@types/connect-pg-simple": "^7.0.3",
         "@types/cookie-parser": "^1.4.8",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
-        "@types/express-session": "^1.18.0",
-        "@types/method-override": "^0.0.35",
-        "@types/node": "^22.9.4",
+        "@types/express-session": "^1.18.1",
+        "@types/method-override": "^3.0.0",
+        "@types/node": "^22.10.1",
         "@types/pg": "^8.11.10",
         "@types/qs": "^6.9.17",
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.7",
-        "eslint": "^9.15.0",
-        "globals": "^15.12.0",
+        "eslint": "^9.16.0",
+        "globals": "^15.13.0",
         "tsc-watch": "^6.2.1",
         "typescript": "^5.7.2",
-        "typescript-eslint": "^8.16.0"
+        "typescript-eslint": "^8.17.0"
     }
 }
