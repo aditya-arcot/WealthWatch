@@ -8,7 +8,7 @@ on:
 
 jobs:
     setup:
-        runs-on: mbp-13
+        runs-on: ubuntu-latest
         outputs:
             runner: ${{ steps.set-runner.outputs.runner }}
         steps:
