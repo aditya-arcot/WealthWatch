@@ -49,7 +49,7 @@ export class SpendingComponent implements OnInit {
 
     loading = false
 
-    selectedDateFilter: DateFilterEnum = DateFilterEnum.CURRENT_MONTH
+    selectedDateFilter: DateFilterEnum = DateFilterEnum.CUSTOM
     startDate: Date | null = null
     defaultStartDate: Date | null = null
     endDate: Date | null = null
