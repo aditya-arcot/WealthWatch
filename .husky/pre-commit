@@ -1,3 +1,40 @@
 #!/bin/sh
+
+echo "Running pre-commit hook..."
+echo
+
+echo "Scanning for secrets in staged files..."
 ggshield secret scan pre-commit "$@"
+echo
+
+echo "Formatting and linting staged files..."
 npx lint-staged
+echo
+
+echo "Checking for dependency issues..."
+echo "Checking base project..."
+npx depcheck || exit 1
+echo
+
+echo "Checking client project..."
+npx depcheck client || exit 1
+echo
+
+echo "Checking server project..."
+npx depcheck server || exit 1
+echo
+
+echo "Checking for available updates..."
+echo "Checking base project..."
+npx ncu -e 2 || exit 1
+echo
+
+echo "Checking client project..."
+npx ncu --cwd client --configFilePath client/.ncurc.json -e 2 || exit 1
+echo
+
+echo "Checking server project..."
+npx ncu --cwd server --configFilePath server/.ncurc.json -e 2 || exit 1
+echo
+
+echo "Done running pre-commit hook"
