@@ -17,6 +17,7 @@ import {
 } from '../models/accessRequest.js'
 import { AccessRequestErrorCodeEnum, HttpError } from '../models/error.js'
 import { User } from '../models/user.js'
+import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 
 export const requestAccess = async (req: Request, res: Response) => {
@@ -179,6 +180,17 @@ export const login = async (req: Request, res: Response) => {
     }
     if (!bcrypt.compareSync(password, user.passwordHash)) {
         throw new HttpError('incorrect password', 400)
+    }
+    req.session.user = user
+    return res.json(user)
+}
+
+export const loginWithDemo = async (req: Request, res: Response) => {
+    logger.debug('logging in with demo account')
+
+    const user = await fetchUserByUsername(vars.demoUser)
+    if (!user) {
+        throw new HttpError('unexpected error')
     }
     req.session.user = user
     return res.json(user)

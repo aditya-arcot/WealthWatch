@@ -85,14 +85,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
     login(demo = false) {
         this.logger.info('logging in')
         this.loading = true
-        const username = demo
-            ? this.userSvc.demoUser
-            : this.loginFormGroup.value.username
-        const password = demo
-            ? this.userSvc.demoPassword
-            : this.loginFormGroup.value.password
-        this.authSvc
-            .login(username, password)
+
+        const loginObservable = demo
+            ? this.authSvc.loginWithDemo()
+            : this.authSvc.login(
+                  this.loginFormGroup.value.username,
+                  this.loginFormGroup.value.password
+              )
+
+        loginObservable
             .pipe(
                 catchError((err) => {
                     this.alertSvc.addErrorAlert('Login failed')

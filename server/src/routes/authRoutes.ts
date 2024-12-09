@@ -1,6 +1,7 @@
 import express from 'express'
 import {
     login,
+    loginWithDemo,
     logout,
     register,
     requestAccess,
@@ -101,6 +102,22 @@ router.route('/register').post(catchAsync(register))
  *               $ref: '#/components/schemas/User'
  */
 router.route('/login').post(catchAsync(login))
+
+/**
+ * @swagger
+ * /auth/login/demo:
+ *   post:
+ *     summary: Log in using the demo account
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Logged in the demo user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ */
+router.route('/login/demo').post(catchAsync(loginWithDemo))
 
 /**
  * @swagger

@@ -638,6 +638,9 @@ export const createSwaggerSpec = () => {
                             logtailToken: {
                                 type: 'string',
                             },
+                            demoUser: {
+                                type: 'string',
+                            },
                         },
                     },
                     StatusId: {

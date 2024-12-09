@@ -7,6 +7,7 @@ export const getSecrets = async (_req: Request, res: Response) => {
     logger.debug('getting secrets')
     const secrets: Secrets = {
         logtailToken: vars.clientLogtailToken,
+        demoUser: vars.demoUser,
     }
     return res.json(secrets)
 }

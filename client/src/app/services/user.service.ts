@@ -2,16 +2,18 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { env } from '../../environments/env'
 import { User } from '../models/user'
+import { SecretsService } from './secrets.service'
 
 @Injectable({
     providedIn: 'root',
 })
 export class UserService {
     readonly baseUrl = `${env.apiUrl}/users`
-    readonly demoUser = 'demo_user'
-    readonly demoPassword = 'demo_pass'
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private secretsSvc: SecretsService
+    ) {}
 
     storeCurrentUser(user: User) {
         sessionStorage.setItem('user', JSON.stringify(user))
@@ -27,8 +29,11 @@ export class UserService {
         sessionStorage.removeItem('user')
     }
 
-    demoUserLoggedIn() {
-        return this.getStoredCurrentUser()?.username === this.demoUser
+    inDemo() {
+        return (
+            this.getStoredCurrentUser()?.username ===
+            this.secretsSvc.secrets?.demoUser
+        )
     }
 
     getCurrentUser() {

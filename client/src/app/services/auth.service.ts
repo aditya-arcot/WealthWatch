@@ -41,6 +41,11 @@ export class AuthService {
         return this.http.post<User>(url, { username, password })
     }
 
+    loginWithDemo() {
+        const url = `${this.baseUrl}/login/demo`
+        return this.http.post<User>(url, {})
+    }
+
     logout() {
         const url = `${this.baseUrl}/logout`
         return this.http.post<void>(url, {})

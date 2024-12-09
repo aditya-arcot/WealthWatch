@@ -5,7 +5,7 @@
         <div class="card mb-2">
             <div class="card-body">
                 <h4 class="card-title text-center mb-0">
-                    @if (!demoUserLoggedIn) {
+                    @if (!inDemo) {
                         Welcome to WealthWatch, {{ firstName }}!
                     } @else {
                         Welcome to WealthWatch!
@@ -13,7 +13,7 @@
                 </h4>
             </div>
         </div>
-        @if (demoUserLoggedIn) {
+        @if (inDemo) {
             <div class="card bg-warning mb-2">
                 <div class="card-body">
                     <p class="card-text text-center">
