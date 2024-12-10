@@ -26,7 +26,6 @@ export class StartupService {
 
     startup(): Observable<void> {
         this.logger.debug('starting up')
-        this.userSvc.clearStoredCurrentUser()
         return this.getCsrfToken().pipe(
             switchMap(() => this.getCurrentUser()),
             switchMap(() => this.getSecrets()),

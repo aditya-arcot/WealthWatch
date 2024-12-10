@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { catchError, throwError } from 'rxjs'
+import { catchError, of } from 'rxjs'
 import { User } from '../../models/user'
 import { AlertService } from '../../services/alert.service'
 import { LoggerService } from '../../services/logger.service'
@@ -25,9 +25,8 @@ export class LogoutComponent implements OnInit {
             .getCurrentUser()
             .pipe(
                 catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearStoredCurrentUser()
-                    this.logger.error('error while getting current user')
-                    return throwError(() => err)
+                    this.logger.error(err)
+                    return of(undefined)
                 })
             )
             .subscribe((user?: User) => {
@@ -40,10 +39,8 @@ export class LogoutComponent implements OnInit {
                     }, 3000)
                     return
                 }
-                this.userSvc.storeCurrentUser(user)
+                this.logger.info('not logged out')
                 this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addErrorAlert('Cannot access this page')
             })
     }
 }

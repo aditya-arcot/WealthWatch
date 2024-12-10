@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { tap } from 'rxjs'
 import { env } from '../../environments/env'
 import { User } from '../models/user'
+import { UserService } from './user.service'
 
 @Injectable({
     providedIn: 'root',
@@ -9,7 +11,10 @@ import { User } from '../models/user'
 export class AuthService {
     readonly baseUrl = `${env.apiUrl}/auth`
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private userSvc: UserService
+    ) {}
 
     requestAccess(firstName: string, lastName: string, email: string) {
         const url = `${this.baseUrl}/access-request`
@@ -48,6 +53,8 @@ export class AuthService {
 
     logout() {
         const url = `${this.baseUrl}/logout`
-        return this.http.post<void>(url, {})
+        return this.http
+            .post<void>(url, {})
+            .pipe(tap(() => this.userSvc.clearStoredCurrentUser()))
     }
 }
