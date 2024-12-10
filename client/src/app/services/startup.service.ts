@@ -74,14 +74,9 @@ export class StartupService {
         )
     }
 
-    private getSecrets(): Observable<void> {
+    private getSecrets(): Observable<Secrets> {
         return this.secretsSvc.getSecrets().pipe(
-            switchMap((secrets) => {
-                this.logger.debug('received secrets')
-                this.secretsSvc.secrets = secrets
-                this.logger.configureLogtail(secrets.logtailToken)
-                return of(undefined)
-            }),
+            tap(() => this.logger.debug('received secrets')),
             catchError((err: HttpErrorResponse) => {
                 this.router.navigateByUrl('/startup-error')
                 this.alertSvc.addErrorAlert('Failed to get secrets')
