@@ -55,8 +55,8 @@ export class AuthService {
         const url = `${this.baseUrl}/logout`
         return this.http.post<void>(url, {}).pipe(
             tap(() => {
-                this.userSvc.clearStoredCurrentUser()
-                sessionStorage.setItem('loggedOut', 'true')
+                this.userSvc.user = null
+                this.userSvc.loggedOut = true
             })
         )
     }

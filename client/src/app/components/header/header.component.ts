@@ -41,7 +41,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this.router.events
             .pipe(filter((event) => event instanceof NavigationEnd))
             .forEach(() => {
-                if (this.userSvc.getStoredCurrentUser()) {
+                if (this.userSvc.user) {
                     this.notificationSvc.loadNotifications().subscribe()
                 }
             })
@@ -63,7 +63,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         }
     }
 
-    isAdmin = () => this.userSvc.getStoredCurrentUser()?.admin ?? false
+    isAdmin = () => this.userSvc.user?.admin ?? false
 
     updateNotificationsToRead(): Observable<undefined> {
         return this.notificationSvc.updateAllNotificationsToRead().pipe(

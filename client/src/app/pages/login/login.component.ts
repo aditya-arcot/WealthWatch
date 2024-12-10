@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        if (this.userSvc.getStoredCurrentUser()) {
+        if (this.userSvc.user) {
             this.router.navigateByUrl('/home')
             this.alertSvc.clearAlerts()
             this.alertSvc.addSuccessAlert('Already logged in')
@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 finalize(() => (this.loading = false))
             )
             .subscribe((user) => {
-                this.userSvc.storeCurrentUser(user)
+                this.userSvc.user = user
                 this.router.navigateByUrl('/home')
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addSuccessAlert('Success logging in')

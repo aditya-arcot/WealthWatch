@@ -48,7 +48,7 @@ export class AccessRequestComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        if (this.userSvc.getStoredCurrentUser()) {
+        if (this.userSvc.user) {
             this.router.navigateByUrl('/home')
             this.alertSvc.clearAlerts()
             this.alertSvc.addSuccessAlert('Already logged in')

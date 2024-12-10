@@ -12,7 +12,7 @@ export class HomeComponent {
     constructor(private userSvc: UserService) {}
 
     get firstName() {
-        return this.userSvc.getStoredCurrentUser()?.firstName
+        return this.userSvc.user?.firstName
     }
 
     get inDemo() {

@@ -2,8 +2,6 @@ import { HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable, catchError, of, switchMap, tap, throwError } from 'rxjs'
-import { Secrets } from '../models/secrets'
-import { User } from '../models/user'
 import { AlertService } from './alert.service'
 import { CSRFService } from './csrf.service'
 import { LoggerService } from './logger.service'
@@ -43,13 +41,9 @@ export class StartupService {
         )
     }
 
-    private getCsrfToken(): Observable<void> {
+    private getCsrfToken() {
         return this.csrfSvc.getCsrfToken().pipe(
-            switchMap((resp) => {
-                this.logger.debug('received csrf token')
-                this.csrfSvc.storeCsrfToken(resp.csrfToken)
-                return of(undefined)
-            }),
+            tap(() => this.logger.debug('received csrf token')),
             catchError((err: HttpErrorResponse) => {
                 this.router.navigateByUrl('/startup-error')
                 this.alertSvc.addErrorAlert('Failed to get CSRF token')
@@ -58,13 +52,13 @@ export class StartupService {
         )
     }
 
-    private getCurrentUser(): Observable<User> {
+    private getCurrentUser() {
         return this.userSvc
             .getCurrentUser()
             .pipe(tap(() => this.logger.debug('received current user')))
     }
 
-    private getSecrets(): Observable<Secrets> {
+    private getSecrets() {
         return this.secretsSvc.getSecrets().pipe(
             tap(() => this.logger.debug('received secrets')),
             catchError((err: HttpErrorResponse) => {

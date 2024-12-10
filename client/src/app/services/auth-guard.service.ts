@@ -15,7 +15,7 @@ export const AuthGuardService: CanActivateFn = (
     state: RouterStateSnapshot
 ): boolean => {
     const route = state.url.split('?')[0]
-    const user = inject(UserService).getStoredCurrentUser()
+    const user = inject(UserService).user
     if (!user) {
         inject(Router).navigateByUrl('/login')
         inject(AlertService).addErrorAlert('Not logged in')

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { of, switchMap } from 'rxjs'
 import { env } from '../../environments/env'
 
 @Injectable({
@@ -8,18 +9,16 @@ import { env } from '../../environments/env'
 export class CSRFService {
     readonly baseUrl = `${env.apiUrl}/csrf-token`
     readonly csrfTokenName = `csrfToken-${env.name}`
+    csrfToken: string | null = null
 
     constructor(private http: HttpClient) {}
 
-    storeCsrfToken(token: string) {
-        sessionStorage.setItem(this.csrfTokenName, token)
-    }
-
-    getStoredCsrfToken() {
-        return sessionStorage.getItem(this.csrfTokenName)
-    }
-
     getCsrfToken() {
-        return this.http.get<{ csrfToken: string }>(this.baseUrl)
+        return this.http.get<{ csrfToken: string }>(this.baseUrl).pipe(
+            switchMap((resp) => {
+                this.csrfToken = resp.csrfToken
+                return of(resp)
+            })
+        )
     }
 }

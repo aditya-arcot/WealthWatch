@@ -138,7 +138,7 @@ export class AccountsComponent implements OnInit {
         this.logger.debug(type, token, metadata)
         const event: PlaidLinkEvent = {
             id: -1,
-            userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            userId: this.userSvc.user?.id ?? -1,
             timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
@@ -225,7 +225,7 @@ export class AccountsComponent implements OnInit {
         this.logger.debug(type, error, metadata)
         const event: PlaidLinkEvent = {
             id: -1,
-            userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            userId: this.userSvc.user?.id ?? -1,
             timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,
@@ -245,7 +245,7 @@ export class AccountsComponent implements OnInit {
         this.logger.debug(type, metadata)
         const event: PlaidLinkEvent = {
             id: -1,
-            userId: this.userSvc.getStoredCurrentUser()?.id ?? -1,
+            userId: this.userSvc.user?.id ?? -1,
             timestamp: new Date(),
             type,
             sessionId: metadata.link_session_id,

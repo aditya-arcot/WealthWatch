@@ -21,15 +21,12 @@ export class LogoutComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        if (
-            this.userSvc.getStoredCurrentUser() ||
-            !sessionStorage.getItem('loggedOut')
-        ) {
+        if (this.userSvc.user || !this.userSvc.loggedOut) {
             this.logger.info('not logged out')
             this.router.navigateByUrl('/home')
             return
         }
-        sessionStorage.removeItem('loggedOut')
+        this.userSvc.loggedOut = false
 
         this.userSvc
             .getCurrentUser()

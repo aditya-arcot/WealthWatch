@@ -10,37 +10,23 @@ import { SecretsService } from './secrets.service'
 })
 export class UserService {
     readonly baseUrl = `${env.apiUrl}/users`
+    user: User | null = null
+    loggedOut = false
 
     constructor(
         private http: HttpClient,
         private secretsSvc: SecretsService
     ) {}
 
-    storeCurrentUser(user: User) {
-        sessionStorage.setItem('user', JSON.stringify(user))
-    }
-
-    getStoredCurrentUser(): User | null {
-        const userStr = sessionStorage.getItem('user')
-        if (userStr === null) return null
-        return JSON.parse(userStr) as User
-    }
-
-    clearStoredCurrentUser(): void {
-        sessionStorage.removeItem('user')
-    }
-
-    inDemo = () =>
-        this.getStoredCurrentUser()?.username ===
-        this.secretsSvc.secrets?.demoUser
+    inDemo = () => this.user?.username === this.secretsSvc.secrets?.demoUser
 
     getCurrentUser() {
         const url = `${this.baseUrl}/current`
         return this.http.get<User | undefined>(url).pipe(
             switchMap((user?: User) => {
-                this.clearStoredCurrentUser()
+                this.user = null
                 if (!user) return throwError(() => new Error('no current user'))
-                this.storeCurrentUser(user)
+                this.user = user
                 return of(user)
             })
         )

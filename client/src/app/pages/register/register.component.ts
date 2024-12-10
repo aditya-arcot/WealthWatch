@@ -54,7 +54,7 @@ export class RegisterComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (this.userSvc.getStoredCurrentUser()) {
+        if (this.userSvc.user) {
             this.router.navigateByUrl('/home')
             this.alertSvc.clearAlerts()
             this.alertSvc.addSuccessAlert('Already logged in')
@@ -161,7 +161,7 @@ export class RegisterComponent implements OnInit {
             .register(this.accessCode, username, password)
             .pipe(
                 switchMap((user) => {
-                    this.userSvc.storeCurrentUser(user)
+                    this.userSvc.user = user
                     this.router.navigateByUrl('/home')
                     this.alertSvc.clearAlerts()
                     this.alertSvc.addSuccessAlert('Success registering')

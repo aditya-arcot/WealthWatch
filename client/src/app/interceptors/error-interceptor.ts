@@ -37,7 +37,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                     } else {
                         errorSubtext.push(error.error.message)
                         if (error.status === 401) {
-                            this.userSvc.clearStoredCurrentUser()
+                            this.userSvc.user = null
                             this.router.navigateByUrl('/login')
                             this.alertSvc.clearAlerts()
                             this.alertSvc.addErrorAlert('Not logged in')
