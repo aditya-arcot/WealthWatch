@@ -12,6 +12,7 @@ import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
+import { SecretsService } from '../../services/secrets.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -38,7 +39,8 @@ export class RegisterComponent implements OnInit {
         private userSvc: UserService,
         private router: Router,
         private authSvc: AuthService,
-        private alertSvc: AlertService
+        private alertSvc: AlertService,
+        private secretsSvc: SecretsService
     ) {
         this.accessCodeFormGroup = this.formBuilder.group({
             accessCode: [],
@@ -160,13 +162,7 @@ export class RegisterComponent implements OnInit {
         this.authSvc
             .register(this.accessCode, username, password)
             .pipe(
-                switchMap((user) => {
-                    this.userSvc.user = user
-                    this.router.navigateByUrl('/home')
-                    this.alertSvc.clearAlerts()
-                    this.alertSvc.addSuccessAlert('Success registering')
-                    return of(undefined)
-                }),
+                switchMap(() => this.secretsSvc.getSecrets()),
                 catchError((err: HttpErrorResponse) => {
                     this.logger.error('error while registering')
                     if (err.status === 409) {
@@ -191,6 +187,10 @@ export class RegisterComponent implements OnInit {
                     this.loading = false
                 })
             )
-            .subscribe()
+            .subscribe(() => {
+                this.router.navigateByUrl('/home')
+                this.alertSvc.clearAlerts()
+                this.alertSvc.addSuccessAlert('Success registering')
+            })
     }
 }

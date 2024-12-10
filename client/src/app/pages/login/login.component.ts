@@ -13,10 +13,11 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-import { catchError, finalize, throwError } from 'rxjs'
+import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
+import { SecretsService } from '../../services/secrets.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -36,7 +37,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
         private userSvc: UserService,
         private authSvc: AuthService,
         private router: Router,
-        private alertSvc: AlertService
+        private alertSvc: AlertService,
+        private secretsSvc: SecretsService
     ) {
         this.loginFormGroup = this.formBuilder.group({
             username: ['', [Validators.required]],
@@ -79,6 +81,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
         loginObservable
             .pipe(
+                switchMap(() => this.secretsSvc.getSecrets()),
                 catchError((err) => {
                     this.alertSvc.addErrorAlert('Login failed')
                     if (err.status === 404) {
@@ -90,8 +93,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe((user) => {
-                this.userSvc.user = user
+            .subscribe(() => {
                 this.router.navigateByUrl('/home')
                 this.alertSvc.clearAlerts()
                 this.alertSvc.addSuccessAlert('Success logging in')

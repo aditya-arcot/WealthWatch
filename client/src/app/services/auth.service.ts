@@ -34,21 +34,35 @@ export class AuthService {
 
     register(accessCode: string, username: string, password: string) {
         const url = `${this.baseUrl}/register`
-        return this.http.post<User>(url, {
-            accessCode,
-            username,
-            password,
-        })
+        return this.http
+            .post<User>(url, {
+                accessCode,
+                username,
+                password,
+            })
+            .pipe(
+                tap((user) => {
+                    this.userSvc.user = user
+                })
+            )
     }
 
     login(username: string, password: string) {
         const url = `${this.baseUrl}/login`
-        return this.http.post<User>(url, { username, password })
+        return this.http.post<User>(url, { username, password }).pipe(
+            tap((user) => {
+                this.userSvc.user = user
+            })
+        )
     }
 
     loginWithDemo() {
         const url = `${this.baseUrl}/login/demo`
-        return this.http.post<User>(url, {})
+        return this.http.post<User>(url, {}).pipe(
+            tap((user) => {
+                this.userSvc.user = user
+            })
+        )
     }
 
     logout() {
