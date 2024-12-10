@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { of, switchMap, throwError } from 'rxjs'
 import { env } from '../../environments/env'
 import { User } from '../models/user'
 import { SecretsService } from './secrets.service'
@@ -29,15 +30,19 @@ export class UserService {
         sessionStorage.removeItem('user')
     }
 
-    inDemo() {
-        return (
-            this.getStoredCurrentUser()?.username ===
-            this.secretsSvc.secrets?.demoUser
-        )
-    }
+    inDemo = () =>
+        this.getStoredCurrentUser()?.username ===
+        this.secretsSvc.secrets?.demoUser
 
     getCurrentUser() {
         const url = `${this.baseUrl}/current`
-        return this.http.get<User | undefined>(url)
+        return this.http.get<User | undefined>(url).pipe(
+            switchMap((user?: User) => {
+                this.clearStoredCurrentUser()
+                if (!user) return throwError(() => new Error('no current user'))
+                this.storeCurrentUser(user)
+                return of(user)
+            })
+        )
     }
 }

@@ -15,7 +15,6 @@ import {
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
 import { AccessRequestErrorCodeEnum, ServerError } from '../../models/error'
-import { User } from '../../models/user'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
@@ -49,25 +48,11 @@ export class AccessRequestComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.userSvc
-            .getCurrentUser()
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearStoredCurrentUser()
-                    this.logger.error('error while getting current user')
-                    return throwError(() => err)
-                })
-            )
-            .subscribe((user?: User) => {
-                if (!user) {
-                    this.logger.info('not logged in')
-                    return
-                }
-                this.userSvc.storeCurrentUser(user)
-                this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Already logged in')
-            })
+        if (this.userSvc.getStoredCurrentUser()) {
+            this.router.navigateByUrl('/home')
+            this.alertSvc.clearAlerts()
+            this.alertSvc.addSuccessAlert('Already logged in')
+        }
     }
 
     ngAfterViewInit(): void {

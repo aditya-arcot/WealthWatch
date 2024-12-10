@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, catchError, of, switchMap, throwError } from 'rxjs'
+import { Observable, catchError, of, switchMap, tap, throwError } from 'rxjs'
+import { Secrets } from '../models/secrets'
 import { User } from '../models/user'
 import { AlertService } from './alert.service'
 import { CSRFService } from './csrf.service'
@@ -34,7 +35,9 @@ export class StartupService {
                 this.logger.debug('startup complete')
                 return of(undefined)
             }),
-            catchError(() => {
+            catchError((err: HttpErrorResponse) => {
+                this.logger.debug('error during startup')
+                this.logger.error(err)
                 return of(undefined)
             })
         )
@@ -55,23 +58,10 @@ export class StartupService {
         )
     }
 
-    private getCurrentUser(): Observable<void> {
-        return this.userSvc.getCurrentUser().pipe(
-            switchMap((user?: User) => {
-                if (!user) {
-                    return throwError(() => new Error('no current user'))
-                }
-                this.logger.debug('received current user')
-                this.userSvc.storeCurrentUser(user)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.userSvc.clearStoredCurrentUser()
-                this.router.navigateByUrl('/login')
-                this.alertSvc.addErrorAlert('Not logged in')
-                return throwError(() => err)
-            })
-        )
+    private getCurrentUser(): Observable<User> {
+        return this.userSvc
+            .getCurrentUser()
+            .pipe(tap(() => this.logger.debug('received current user')))
     }
 
     private getSecrets(): Observable<Secrets> {

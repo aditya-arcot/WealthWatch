@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
 import {
     AfterViewInit,
     Component,
@@ -15,7 +14,6 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, throwError } from 'rxjs'
-import { User } from '../../models/user'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { LoggerService } from '../../services/logger.service'
@@ -47,25 +45,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.userSvc
-            .getCurrentUser()
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearStoredCurrentUser()
-                    this.logger.error('error while getting current user')
-                    return throwError(() => err)
-                })
-            )
-            .subscribe((user?: User) => {
-                if (!user) {
-                    this.logger.info('not logged in')
-                    return
-                }
-                this.userSvc.storeCurrentUser(user)
-                this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Already logged in')
-            })
+        if (this.userSvc.getStoredCurrentUser()) {
+            this.router.navigateByUrl('/home')
+            this.alertSvc.clearAlerts()
+            this.alertSvc.addSuccessAlert('Already logged in')
+        }
     }
 
     ngAfterViewInit(): void {

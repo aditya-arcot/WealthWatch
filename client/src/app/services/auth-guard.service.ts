@@ -14,8 +14,14 @@ export const AuthGuardService: CanActivateFn = (
     _: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
 ): boolean => {
-    if (!adminRoutes.includes(state.url)) return true
+    const route = state.url.split('?')[0]
     const user = inject(UserService).getStoredCurrentUser()
+    if (!user) {
+        inject(Router).navigateByUrl('/login')
+        inject(AlertService).addErrorAlert('Not logged in')
+        return false
+    }
+    if (!adminRoutes.includes(route)) return true
     if (!user || !user.admin) {
         inject(Router).navigateByUrl('/home')
         inject(AlertService).addErrorAlert('You cannot access that page')
