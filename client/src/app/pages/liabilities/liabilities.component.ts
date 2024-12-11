@@ -37,7 +37,6 @@ import { formatPercent } from '../../utilities/number.utility'
 import { capitalize } from '../../utilities/string.utility'
 
 @Component({
-    standalone: true,
     imports: [LoadingSpinnerComponent, BaseChartDirective],
     templateUrl: './liabilities.component.html',
     styleUrl: './liabilities.component.css',

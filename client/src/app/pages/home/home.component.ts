@@ -4,7 +4,6 @@ import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-home',
-    standalone: true,
     imports: [RouterLink],
     templateUrl: './home.component.html',
 })

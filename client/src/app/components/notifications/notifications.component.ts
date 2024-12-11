@@ -6,7 +6,6 @@ import { NotificationService } from '../../services/notification.service'
 
 @Component({
     selector: 'app-notifications',
-    standalone: true,
     templateUrl: './notifications.component.html',
     styleUrl: './notifications.component.css',
 })
