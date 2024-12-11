@@ -27,15 +27,15 @@ export const getUserTransactionsAndCounts = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const searchQuery = req.query['searchQuery']
-    if (typeof searchQuery !== 'undefined' && typeof searchQuery !== 'string')
+    if (searchQuery !== undefined && typeof searchQuery !== 'string')
         throw new HttpError('invalid search query', 400)
 
     const startDate = req.query['startDate']
-    if (typeof startDate !== 'undefined' && typeof startDate !== 'string')
+    if (startDate !== undefined && typeof startDate !== 'string')
         throw new HttpError('invalid start date', 400)
 
     const endDate = req.query['endDate']
-    if (typeof endDate !== 'undefined' && typeof endDate !== 'string')
+    if (endDate !== undefined && typeof endDate !== 'string')
         throw new HttpError('invalid end date', 400)
 
     const minAmount = parseNumberOrUndefinedFromParam(
