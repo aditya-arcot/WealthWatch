@@ -57,7 +57,7 @@
         "@types/express": "^5.0.0",
         "@types/express-session": "^1.18.1",
         "@types/method-override": "^3.0.0",
-        "@types/node": "^22.10.1",
+        "@types/node": "^22.10.2",
         "@types/pg": "^8.11.10",
         "@types/qs": "^6.9.17",
         "@types/swagger-jsdoc": "^6.0.4",
