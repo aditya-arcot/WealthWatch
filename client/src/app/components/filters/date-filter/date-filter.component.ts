@@ -172,14 +172,6 @@ export class DateFilterComponent implements OnInit, OnChanges {
             }
         }
 
-        if (!this.startDateValid() || !this.endDateValid()) {
-            this.alertSvc.addErrorAlert('Invalid date range', [
-                'Update inputs and try again',
-            ])
-            this.cancel()
-            return
-        }
-
         this.filterInputsChanged.emit({
             selectedFilter: this.selectedFilter,
             startDate: this.startDate,
