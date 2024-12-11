@@ -15,13 +15,9 @@ export class TransactionService {
 
     constructor(private http: HttpClient) {}
 
-    getTransactions(
-        req: TransactionsRequestParams,
-        numCategories: number,
-        numAccounts: number
-    ) {
+    getTransactions(req: TransactionsRequestParams) {
         let params = new HttpParams()
-        if (req.searchQuery !== undefined && req.searchQuery !== '') {
+        if (req.searchQuery.length > 0) {
             params = params.set('searchQuery', req.searchQuery)
         }
         if (req.startDate) {
@@ -30,38 +26,24 @@ export class TransactionService {
         if (req.endDate) {
             params = params.set('endDate', req.endDate.toISOString())
         }
-        if (req.minAmount !== null && req.minAmount !== undefined) {
+        if (req.minAmount !== null) {
             params = params.set('minAmount', req.minAmount)
         }
-        if (req.maxAmount !== null && req.maxAmount !== undefined) {
+        if (req.maxAmount !== null) {
             params = params.set('maxAmount', req.maxAmount)
         }
-        if (
-            req.categoryIds !== null &&
-            req.categoryIds !== undefined &&
-            req.categoryIds.size > 0 &&
-            req.categoryIds.size !== numCategories
-        ) {
+        if (req.categoryIds !== undefined && req.categoryIds.size > 0) {
             req.categoryIds.forEach(
                 (id) => (params = params.append('categoryId', id))
             )
         }
-        if (
-            req.accountIds !== null &&
-            req.accountIds !== undefined &&
-            req.accountIds.size > 0 &&
-            req.accountIds.size !== numAccounts
-        ) {
+        if (req.accountIds !== undefined && req.accountIds.size > 0) {
             req.accountIds.forEach(
                 (id) => (params = params.append('accountId', id))
             )
         }
-        if (req.limit !== undefined) {
-            params = params.set('limit', req.limit)
-        }
-        if (req.offset !== undefined) {
-            params = params.set('offset', req.offset)
-        }
+        params = params.set('limit', req.limit)
+        params = params.set('offset', req.offset)
         return this.http.get<TransactionsAndCounts>(this.baseUrl, { params })
     }
 

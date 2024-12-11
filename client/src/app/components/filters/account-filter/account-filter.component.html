@@ -14,7 +14,7 @@
                             <li class="dropdown-header medium-text py-0 px-2 mt-1">
                                 {{ i.institutionName }}
                             </li>
-                            @for (a of getItemAccounts(i.id); track $index) {
+                            @for (a of i.accounts; track $index) {
                                 <li>
                                     <div class="dropdown-item form-check form-switch py-0 ps-2 pe-4 m-0">
                                         <input
