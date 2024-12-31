@@ -20,7 +20,7 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
-        "@dotenvx/dotenvx": "^1.28.0",
+        "@dotenvx/dotenvx": "^1.29.0",
         "@logtail/pino": "^0.5.2",
         "@tsconfig/node-lts": "^22.0.1",
         "@tsconfig/strictest": "^2.0.5",
