@@ -217,7 +217,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                     this.loading = false
                     return throwError(() => err)
                 }),
-                finalize(() => this.router.navigateByUrl('/accounts'))
+                finalize(() => void this.router.navigateByUrl('/accounts'))
             )
             .subscribe(() => {
                 // don't disable loading flag
@@ -237,7 +237,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
     ): void {
         this.logger.info('handling link exit', { error, metadata, itemId })
         if (itemId !== undefined) {
-            this.router.navigateByUrl('/accounts')
+            void this.router.navigateByUrl('/accounts')
         }
         const event: PlaidLinkEvent = {
             id: -1,
@@ -277,7 +277,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
 
     addAccounts(item: Item): void {
         this.logger.info('adding accounts', { item })
-        this.router.navigate(['/accounts'], {
+        void this.router.navigate(['/accounts'], {
             queryParams: {
                 itemId: item.id,
                 withAccounts: true,

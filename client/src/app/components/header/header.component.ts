@@ -43,7 +43,7 @@ export class HeaderComponent
     }
 
     ngOnInit(): void {
-        this.router.events
+        void this.router.events
             .pipe(filter((event) => event instanceof NavigationEnd))
             .forEach(() => {
                 if (this.userSvc.user) {
@@ -93,7 +93,7 @@ export class HeaderComponent
                 })
             )
             .subscribe(() => {
-                this.router.navigateByUrl('/logout')
+                void this.router.navigateByUrl('/logout')
             })
     }
 }

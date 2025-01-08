@@ -53,7 +53,7 @@ export class LoginComponent
 
     ngOnInit(): void {
         if (this.userSvc.user) {
-            this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl('/home')
             this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
         }
     }
@@ -102,7 +102,7 @@ export class LoginComponent
             .subscribe(() => {
                 this.logger.info('getting secrets')
                 this.secretsSvc.getSecrets().subscribe()
-                this.router.navigateByUrl('/home')
+                void this.router.navigateByUrl('/home')
                 this.alertSvc.addSuccessAlert(this.logger, 'Success logging in')
             })
     }

@@ -14,7 +14,7 @@ export class StartupErrorComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.startupSvc.success) {
-            this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl('/home')
             return
         }
     }

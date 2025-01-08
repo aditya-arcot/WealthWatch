@@ -59,7 +59,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                         }
                         if (err.status === 401) {
                             this.userSvc.user = undefined
-                            this.router.navigateByUrl('/login')
+                            void this.router.navigateByUrl('/login')
                             this.alertSvc.addErrorAlert(
                                 this.logger,
                                 'Not logged in'

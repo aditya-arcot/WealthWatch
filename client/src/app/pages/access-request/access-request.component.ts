@@ -53,7 +53,7 @@ export class AccessRequestComponent
 
     ngOnInit(): void {
         if (this.userSvc.user) {
-            this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl('/home')
             this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
         }
     }
@@ -84,7 +84,7 @@ export class AccessRequestComponent
             .requestAccess(firstName, lastName, email)
             .pipe(
                 switchMap(() => {
-                    this.router.navigateByUrl('/login')
+                    void this.router.navigateByUrl('/login')
                     this.alertSvc.addSuccessAlert(
                         this.logger,
                         'Success requesting access',
@@ -114,7 +114,7 @@ export class AccessRequestComponent
                         `An account with that email already exists`,
                         'Please log in'
                     )
-                    this.router.navigateByUrl('/login')
+                    void this.router.navigateByUrl('/login')
                     return true
                 case AccessRequestErrorCodeEnum.RequestPending:
                     this.alertSvc.addErrorAlert(
@@ -129,7 +129,7 @@ export class AccessRequestComponent
                         'A previous request with that email has been approved',
                         'Please check your email for your access code'
                     )
-                    this.router.navigateByUrl('/register')
+                    void this.router.navigateByUrl('/register')
                     return true
                 case AccessRequestErrorCodeEnum.RequestRejected:
                     this.alertSvc.addErrorAlert(

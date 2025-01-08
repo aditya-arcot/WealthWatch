@@ -31,7 +31,7 @@ export class NotificationsComponent extends LoggerComponent {
     }
 
     launchLinkUpdate = (n: Notification): void => {
-        this.router.navigate(['/accounts'], {
+        void this.router.navigate(['/accounts'], {
             queryParams: {
                 itemId: n.itemId,
                 withAccounts:

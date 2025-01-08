@@ -29,20 +29,23 @@ export class LoggerService {
 
     debug(message: string, data?: object): void {
         this.logger.debug(this.createLogWithData(message, data))
-        this.logtailSvc.logtail?.debug(message, { data })
-        this.logtailSvc.logtail?.flush()
+        void this.logtailSvc.logtail
+            ?.debug(message, { data })
+            .then(() => this.logtailSvc.logtail?.flush())
     }
 
     info(message: string, data?: object): void {
         this.logger.info(this.createLogWithData(message, data))
-        this.logtailSvc.logtail?.info(message, { data })
-        this.logtailSvc.logtail?.flush()
+        void this.logtailSvc.logtail
+            ?.info(message, { data })
+            .then(() => this.logtailSvc.logtail?.flush())
     }
 
     warn(message: string, data?: object): void {
         this.logger.warn(this.createLogWithData(message, data))
-        this.logtailSvc.logtail?.warn(message, { data })
-        this.logtailSvc.logtail?.flush()
+        void this.logtailSvc.logtail
+            ?.warn(message, { data })
+            .then(() => this.logtailSvc.logtail?.flush())
     }
 
     private createLogWithData(message: string, data?: unknown) {
@@ -61,8 +64,9 @@ export class LoggerService {
             error,
         }
         this.logger.error(log)
-        this.logtailSvc.logtail?.error(message, { error })
-        this.logtailSvc.logtail?.flush()
+        void this.logtailSvc.logtail
+            ?.error(message, { error })
+            .then(() => this.logtailSvc.logtail?.flush())
     }
 }
 

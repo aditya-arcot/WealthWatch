@@ -22,7 +22,7 @@ export class LogoutComponent extends LoggerComponent implements OnInit {
     ngOnInit(): void {
         if (this.userSvc.user || !this.userSvc.loggedOut) {
             this.logger.info('not logged out')
-            this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl('/home')
             return
         }
         this.userSvc.loggedOut = false
@@ -41,7 +41,7 @@ export class LogoutComponent extends LoggerComponent implements OnInit {
                 if (!user) {
                     this.logger.info('logged out')
                     setTimeout(() => {
-                        this.router.navigateByUrl('/login')
+                        void this.router.navigateByUrl('/login')
                         this.alertSvc.addSuccessAlert(
                             this.logger,
                             'Success logging out'
@@ -50,7 +50,7 @@ export class LogoutComponent extends LoggerComponent implements OnInit {
                     return
                 }
                 this.logger.info('not logged out')
-                this.router.navigateByUrl('/home')
+                void this.router.navigateByUrl('/home')
             })
     }
 }

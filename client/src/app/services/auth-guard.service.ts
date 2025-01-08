@@ -33,7 +33,7 @@ export const AuthGuardService: CanActivateFn = (
 }
 
 const navigateByUrl = (url: string) => {
-    inject(Router).navigateByUrl(url)
+    void inject(Router).navigateByUrl(url)
 }
 
 const addErrorAlert = (message: string) => {

@@ -63,7 +63,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.userSvc.user) {
-            this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl('/home')
             this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
         }
     }
@@ -181,7 +181,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
             .register(this.accessCode, username, password)
             .pipe(
                 switchMap(() => {
-                    this.router.navigateByUrl('/home')
+                    void this.router.navigateByUrl('/home')
                     this.alertSvc.addSuccessAlert(
                         this.logger,
                         'Success registering'

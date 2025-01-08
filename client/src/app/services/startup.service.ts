@@ -61,7 +61,7 @@ export class StartupService {
         this.logger.info('getting csrf token')
         return this.csrfSvc.getCsrfToken().pipe(
             catchError((err) => {
-                this.router.navigateByUrl('/startup-error')
+                void this.router.navigateByUrl('/startup-error')
                 this.alertSvc.addErrorAlert(
                     this.logger,
                     'Failed to get CSRF token'
@@ -86,7 +86,7 @@ export class StartupService {
         this.logger.info('getting secrets')
         return this.secretsSvc.getSecrets().pipe(
             catchError((err) => {
-                this.router.navigateByUrl('/startup-error')
+                void this.router.navigateByUrl('/startup-error')
                 this.alertSvc.addErrorAlert(
                     this.logger,
                     'Failed to get secrets'
