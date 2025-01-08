@@ -14,7 +14,7 @@ import { LoggerComponent } from '../../components/logger.component'
 import { AccountWithHoldings } from '../../models/account'
 import { HoldingWithSecurity } from '../../models/holding'
 import { ItemWithAccountsWithHoldings } from '../../models/item'
-import { SecurityTypeEnum } from '../../models/security'
+import { securityTypeNames } from '../../models/security'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { InvestmentService } from '../../services/investment.service'
@@ -271,7 +271,7 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
     }
 
     getTypeString(holding: HoldingWithSecurity): string {
-        return SecurityTypeEnum[holding.typeId]
+        return securityTypeNames[holding.typeId]
     }
 
     getPriceString(holding: HoldingWithSecurity): string {

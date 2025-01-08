@@ -23,8 +23,8 @@ import {
     ItemWithStudentLoanAccounts,
 } from '../../models/item'
 import {
-    studentLoanRepaymentPlanNames,
-    studentLoanStatusNames,
+    studentLoanRepaymentPlanTypeNames,
+    studentLoanStatusTypeNames,
 } from '../../models/liability'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
@@ -321,14 +321,14 @@ export class LiabilitiesComponent extends LoggerComponent implements OnInit {
         if (!acc.statusTypeId) {
             return ''
         }
-        return studentLoanStatusNames[acc.statusTypeId]
+        return studentLoanStatusTypeNames[acc.statusTypeId]
     }
 
     getStudentLoanRepaymentPlanName(acc: StudentLoanAccount): string {
         if (!acc.repaymentPlanTypeId) {
             return ''
         }
-        return studentLoanRepaymentPlanNames[acc.repaymentPlanTypeId]
+        return studentLoanRepaymentPlanTypeNames[acc.repaymentPlanTypeId]
     }
 
     getStudentLoanStatusEndDate(acc: StudentLoanAccount): string {
