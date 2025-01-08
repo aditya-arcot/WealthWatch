@@ -10,7 +10,7 @@
                         {{ getSelectedAccountsString() }}
                     </button>
                     <ul class="dropdown-menu p-0 pb-1">
-                        @for (i of items; track $index) {
+                        @for (i of itemsWithAccounts; track $index) {
                             <li class="dropdown-header medium-text py-0 px-2 mt-1">
                                 {{ i.institutionName }}
                             </li>
