@@ -1,19 +1,23 @@
-import { Component } from '@angular/core'
+import { Component, Injector } from '@angular/core'
 import { Router } from '@angular/router'
-import { switchMap } from 'rxjs'
+import { catchError, of, switchMap } from 'rxjs'
 import { Notification, NotificationTypeEnum } from '../../models/notification'
 import { NotificationService } from '../../services/notification.service'
+import { LoggerComponent } from '../logger.component'
 
 @Component({
     selector: 'app-notifications',
     templateUrl: './notifications.component.html',
     styleUrl: './notifications.component.css',
 })
-export class NotificationsComponent {
+export class NotificationsComponent extends LoggerComponent {
     constructor(
         private router: Router,
-        private notificationSvc: NotificationService
-    ) {}
+        private notificationSvc: NotificationService,
+        injector: Injector
+    ) {
+        super(injector, 'NotificationsComponent')
+    }
 
     get notifications(): Notification[] {
         return this.notificationSvc.notifications
@@ -36,10 +40,15 @@ export class NotificationsComponent {
         })
     }
 
-    removeNotification = (n: Notification): void => {
+    removeNotification = (notification: Notification): void => {
+        this.logger.info('removing notification', { notification })
         this.notificationSvc
-            .updateNotificationToInactive(n.id)
-            .pipe(switchMap(() => this.notificationSvc.loadNotifications()))
+            .updateNotificationToInactive(notification.id)
+            .pipe(
+                switchMap(() => this.notificationSvc.loadNotifications()),
+                // silence errors
+                catchError(() => of(undefined))
+            )
             .subscribe()
     }
 }

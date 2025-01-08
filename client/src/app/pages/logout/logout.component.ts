@@ -1,23 +1,23 @@
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
+import { Component, Injector, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of } from 'rxjs'
-import { User } from '../../models/user'
+import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
-import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-logout',
     templateUrl: './logout.component.html',
 })
-export class LogoutComponent implements OnInit {
+export class LogoutComponent extends LoggerComponent implements OnInit {
     constructor(
         private router: Router,
         private alertSvc: AlertService,
         private userSvc: UserService,
-        private logger: LoggerService
-    ) {}
+        injector: Injector
+    ) {
+        super(injector, 'LogoutComponent')
+    }
 
     ngOnInit(): void {
         if (this.userSvc.user || !this.userSvc.loggedOut) {
@@ -26,23 +26,27 @@ export class LogoutComponent implements OnInit {
             return
         }
         this.userSvc.loggedOut = false
+        this.checkLoggedOut()
+    }
 
+    checkLoggedOut() {
+        this.logger.info('checking logged out')
         this.userSvc
             .getCurrentUser()
             .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.logger.error(err)
-                    return of(undefined)
-                })
+                // silence errors
+                catchError(() => of(undefined))
             )
-            .subscribe((user?: User) => {
+            .subscribe((user) => {
                 if (!user) {
                     this.logger.info('logged out')
                     setTimeout(() => {
                         this.router.navigateByUrl('/login')
-                        this.alertSvc.clearAlerts()
-                        this.alertSvc.addSuccessAlert('Success logging out')
-                    }, 3000)
+                        this.alertSvc.addSuccessAlert(
+                            this.logger,
+                            'Success logging out'
+                        )
+                    }, 2000)
                     return
                 }
                 this.logger.info('not logged out')

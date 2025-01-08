@@ -1,16 +1,15 @@
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
+import {
+    Component,
+    Injector,
+    OnInit,
+    QueryList,
+    ViewChildren,
+} from '@angular/core'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
-import {
-    catchError,
-    finalize,
-    Observable,
-    of,
-    switchMap,
-    throwError,
-} from 'rxjs'
+import { catchError, finalize, switchMap, tap, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../../components/logger.component'
 import {
     Account,
     CreditCardAccount,
@@ -30,7 +29,6 @@ import {
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
-import { LoggerService } from '../../services/logger.service'
 import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 import { formatDate } from '../../utilities/date.utility'
 import { formatPercent } from '../../utilities/number.utility'
@@ -41,7 +39,7 @@ import { capitalize } from '../../utilities/string.utility'
     templateUrl: './liabilities.component.html',
     styleUrl: './liabilities.component.css',
 })
-export class LiabilitiesComponent implements OnInit {
+export class LiabilitiesComponent extends LoggerComponent implements OnInit {
     @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
 
     loading = false
@@ -83,26 +81,30 @@ export class LiabilitiesComponent implements OnInit {
     }
 
     constructor(
-        private logger: LoggerService,
         private alertSvc: AlertService,
         private itemSvc: ItemService,
-        private currencySvc: CurrencyService
-    ) {}
-
-    ngOnInit(): void {
-        this.loadData()
+        private currencySvc: CurrencyService,
+        injector: Injector
+    ) {
+        super(injector, 'LiabilitiesComponent')
     }
 
-    loadData(): void {
+    ngOnInit(): void {
+        this.loadLiabilities()
+    }
+
+    loadLiabilities(): void {
+        this.logger.info('loading liabilities')
         this.loading = true
         this.loadItemsWithCreditCardAccounts()
             .pipe(
                 switchMap(() => this.loadItemsWithMortgageAccounts()),
                 switchMap(() => this.loadItemsWithStudentLoanAccounts()),
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to load data', [
-                        err.message,
-                    ])
+                catchError((err) => {
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to load liabilities. Please try again'
+                    )
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
@@ -110,67 +112,38 @@ export class LiabilitiesComponent implements OnInit {
             .subscribe(() => this.processData())
     }
 
-    loadItemsWithCreditCardAccounts(): Observable<void> {
+    loadItemsWithCreditCardAccounts() {
+        this.logger.info('loading credit cards')
         return this.itemSvc.getItemsWithCreditCardAccounts().pipe(
-            switchMap((items) => {
-                this.logger.debug(
-                    'loaded items with credit card accounts',
-                    items
-                )
+            tap((items) => {
                 this.creditCardItems = items
                 this.mergeItems(items)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error(
-                    'failed to load items with credit card accounts',
-                    err
-                )
-                return throwError(() => err)
             })
         )
     }
 
-    loadItemsWithMortgageAccounts(): Observable<void> {
+    loadItemsWithMortgageAccounts() {
+        this.logger.info('loading mortgages')
         return this.itemSvc.getItemsWithMortgageAccounts().pipe(
-            switchMap((items) => {
-                this.logger.debug('loaded items with mortgage accounts', items)
+            tap((items) => {
                 this.mortgageItems = items
                 this.mergeItems(items)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error(
-                    'failed to load items with mortgage accounts',
-                    err
-                )
-                return throwError(() => err)
             })
         )
     }
 
-    loadItemsWithStudentLoanAccounts(): Observable<void> {
+    loadItemsWithStudentLoanAccounts() {
+        this.logger.info('loading student loans')
         return this.itemSvc.getItemsWithStudentLoanAccounts().pipe(
-            switchMap((items) => {
-                this.logger.debug(
-                    'loaded items with student loan accounts',
-                    items
-                )
+            tap((items) => {
                 this.studentLoanItems = items
                 this.mergeItems(items)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error(
-                    'failed to load items with student loan accounts',
-                    err
-                )
-                return throwError(() => err)
             })
         )
     }
 
     mergeItems(newItems: ItemWithAccountsWithLiabilities[]) {
+        this.logger.info('merging items', { newItems })
         newItems.forEach((i) => {
             const item = this.items.find((item) => item.id === i.id)
             if (item) {
@@ -182,6 +155,7 @@ export class LiabilitiesComponent implements OnInit {
     }
 
     processData(): void {
+        this.logger.info('processing data')
         this.selectedAccountIds = new Set<number>(
             this.items
                 .map((i) => i.accounts)
@@ -200,7 +174,6 @@ export class LiabilitiesComponent implements OnInit {
         })
 
         this.updateCharts()
-        this.logger.debug('processed data for pie chart')
     }
 
     updateCharts(): void {

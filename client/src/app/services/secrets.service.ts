@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import { tap } from 'rxjs'
 import { env } from '../../environments/env'
 import { Secrets } from '../models/secrets'
-import { LoggerService } from './logger.service'
+import { LogtailService } from './logger.service'
 
 @Injectable({
     providedIn: 'root',
@@ -14,14 +14,14 @@ export class SecretsService {
 
     constructor(
         private http: HttpClient,
-        private logger: LoggerService
+        private logtailSvc: LogtailService
     ) {}
 
     getSecrets() {
         return this.http.get<Secrets>(this.baseUrl).pipe(
             tap((secrets) => {
                 this.secrets = secrets
-                this.logger.configureLogtail(secrets.logtailToken)
+                this.logtailSvc.configure(secrets.logtailToken)
             })
         )
     }

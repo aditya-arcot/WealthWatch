@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { of, switchMap, throwError } from 'rxjs'
+import { tap } from 'rxjs'
 import { env } from '../../environments/env'
 import { User } from '../models/user'
 import { SecretsService } from './secrets.service'
@@ -10,7 +10,7 @@ import { SecretsService } from './secrets.service'
 })
 export class UserService {
     readonly baseUrl = `${env.apiUrl}/users`
-    user: User | null = null
+    user?: User
     loggedOut = false
 
     constructor(
@@ -23,11 +23,8 @@ export class UserService {
     getCurrentUser() {
         const url = `${this.baseUrl}/current`
         return this.http.get<User | undefined>(url).pipe(
-            switchMap((user?: User) => {
-                this.user = null
-                if (!user) return throwError(() => new Error('no current user'))
+            tap((user) => {
                 this.user = user
-                return of(user)
             })
         )
     }

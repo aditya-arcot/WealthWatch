@@ -1,47 +1,75 @@
-import { Injectable } from '@angular/core'
+import { Inject, Injectable } from '@angular/core'
 import { Logtail } from '@logtail/browser'
 import { NGXLogger } from 'ngx-logger'
 
 @Injectable({
     providedIn: 'root',
 })
-export class LoggerService {
-    private logtail: Logtail | undefined
+export class LogtailService {
+    logtail: Logtail | undefined
 
-    constructor(private logger: NGXLogger) {}
-
-    configureLogtail(token: string): void {
+    configure(token: string): void {
         this.logtail = new Logtail(token)
     }
+}
 
-    debug(message: unknown, ...args: unknown[]): void {
-        this.logger.debug(message, ...args)
-        this.logtail?.debug(this.formatMessage(message), { ...args })
-        this.logtail?.flush()
+interface Log {
+    message: string
+    data?: unknown
+    context?: string
+}
+
+@Injectable()
+export class LoggerService {
+    constructor(
+        private logger: NGXLogger,
+        private logtailSvc: LogtailService,
+        @Inject(String) private context: string
+    ) {}
+
+    debug(message: string, data?: object): void {
+        this.logger.debug(this.createLogWithData(message, data))
+        this.logtailSvc.logtail?.debug(message, { data })
+        this.logtailSvc.logtail?.flush()
     }
 
-    info(message: unknown, ...args: unknown[]): void {
-        this.logger.info(message, ...args)
-        this.logtail?.info(this.formatMessage(message), { ...args })
-        this.logtail?.flush()
+    info(message: string, data?: object): void {
+        this.logger.info(this.createLogWithData(message, data))
+        this.logtailSvc.logtail?.info(message, { data })
+        this.logtailSvc.logtail?.flush()
     }
 
-    warn(message: unknown, ...args: unknown[]): void {
-        this.logger.warn(message, ...args)
-        this.logtail?.warn(this.formatMessage(message), { ...args })
-        this.logtail?.flush()
+    warn(message: string, data?: object): void {
+        this.logger.warn(this.createLogWithData(message, data))
+        this.logtailSvc.logtail?.warn(message, { data })
+        this.logtailSvc.logtail?.flush()
     }
 
-    error(message: unknown, ...args: unknown[]): void {
-        this.logger.error(message, ...args)
-        this.logtail?.error(this.formatMessage(message), { ...args })
-        this.logtail?.flush()
-    }
-
-    formatMessage = (message: unknown): string => {
-        if (typeof message === 'object') {
-            return JSON.stringify(message)
+    private createLogWithData(message: string, data?: unknown) {
+        const log: Log = {
+            context: this.context,
+            message,
         }
-        return String(message)
+        if (data) log.data = data
+        return log
     }
+
+    error(message: string, error?: object): void {
+        const log = {
+            context: this.context,
+            message,
+            error,
+        }
+        this.logger.error(log)
+        this.logtailSvc.logtail?.error(message, { error })
+        this.logtailSvc.logtail?.flush()
+    }
+}
+
+export function createLoggerWithContext(
+    logger: NGXLogger,
+    logtail: LogtailService,
+    context: string
+): LoggerService {
+    return new LoggerService(logger, logtail, context)
 }

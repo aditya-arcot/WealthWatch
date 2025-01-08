@@ -1,14 +1,11 @@
 import { CommonModule } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, Injector, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Params, Router } from '@angular/router'
 import {
     catchError,
     debounceTime,
     finalize,
-    Observable,
-    of,
     Subject,
     Subscription,
     switchMap,
@@ -19,6 +16,7 @@ import { AmountFilterComponent } from '../../components/filters/amount-filter/am
 import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../../components/logger.component'
 import { NoteComponent } from '../../components/note/note.component'
 import { Account } from '../../models/account'
 import { AmountFilterEnum } from '../../models/amountFilter'
@@ -33,7 +31,6 @@ import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
-import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
 import {
     checkDatesEqual,
@@ -63,7 +60,7 @@ import { redirectWithParams } from '../../utilities/redirect.utility'
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
 })
-export class TransactionsComponent implements OnInit {
+export class TransactionsComponent extends LoggerComponent implements OnInit {
     @ViewChild(NoteComponent) noteComponent!: NoteComponent
     noteUpdateSubscription: Subscription | null = null
 
@@ -101,18 +98,22 @@ export class TransactionsComponent implements OnInit {
     maxNameLength = 30
 
     constructor(
-        private transactionSvc: TransactionService,
-        private categorySvc: CategoryService,
-        private itemSvc: ItemService,
-        private logger: LoggerService,
-        private alertSvc: AlertService,
-        private currencySvc: CurrencyService,
         private route: ActivatedRoute,
-        private router: Router
-    ) {}
+        private router: Router,
+        private alertSvc: AlertService,
+        private categorySvc: CategoryService,
+        private currencySvc: CurrencyService,
+        private itemSvc: ItemService,
+        private transactionSvc: TransactionService,
+        injector: Injector
+    ) {
+        super(injector, 'TransactionsComponent')
+    }
 
     ngOnInit(): void {
-        this.loadData().subscribe(() => {
+        this.loadData().subscribe((items) => {
+            this.itemsWithAccounts = items
+            this.accounts = items.flatMap((item) => item.accounts)
             this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
             this.selectedAccountIds = new Set(this.accounts.map((a) => a.id))
             this.route.queryParams.subscribe((params) => {
@@ -130,50 +131,29 @@ export class TransactionsComponent implements OnInit {
         })
     }
 
-    loadData(): Observable<void> {
+    loadData() {
+        this.logger.info('loading data')
         this.loading = true
-        return this.loadCategories().pipe(
-            switchMap(() => this.loadItemsWithAccounts()),
-            catchError((err: HttpErrorResponse) => {
-                this.alertSvc.addErrorAlert('Failed to load data', [
-                    err.message,
-                ])
-                this.loading = false
-                return throwError(() => err)
-            })
-        )
-    }
-
-    loadCategories(): Observable<void> {
         return this.categorySvc.getCategories().pipe(
             switchMap((categories) => {
-                this.logger.debug('loaded categories', categories)
                 this.categories = categories
-                return of(undefined)
+                return this.itemSvc.getItemsWithAccounts()
             }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load categories', err)
+            catchError((err) => {
+                this.alertSvc.addErrorAlert(
+                    this.logger,
+                    'Failed to load data. Please try again'
+                )
                 return throwError(() => err)
-            })
+            }),
+            finalize(() => (this.loading = false))
         )
     }
 
-    loadItemsWithAccounts(): Observable<void> {
-        return this.itemSvc.getItemsWithAccounts().pipe(
-            switchMap((items) => {
-                this.logger.debug('loaded items with accounts', items)
-                this.itemsWithAccounts = items
-                this.accounts = items.flatMap((item) => item.accounts)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load items with accounts', err)
-                return throwError(() => err)
-            })
-        )
-    }
+    reloadTransactions(): void {
+        this.logger.info('reloading transactions')
+        this.loading = true
 
-    loadTransactions(): Observable<void> {
         const limit = this.pageSizes[this.pageSizeIdx]
         const offset = (this.page - 1) * limit
         const req: TransactionsRequestParams = {
@@ -191,12 +171,24 @@ export class TransactionsComponent implements OnInit {
         if (this.accounts.length !== this.selectedAccountIds.size) {
             req.accountIds = this.selectedAccountIds
         }
-        return this.transactionSvc.getTransactions(req).pipe(
-            switchMap((t) => {
-                this.logger.debug('loaded transactions', t)
-                this.transactions = t.transactions
-                this.filteredCount = t.filteredCount
-                this.totalCount = t.totalCount
+
+        this.transactionSvc
+            .getTransactions(req)
+            .pipe(
+                catchError((err) => {
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to reload transactions. Please try again'
+                    )
+                    this.clearFilters()
+                    return throwError(() => err)
+                }),
+                finalize(() => (this.loading = false))
+            )
+            .subscribe((resp) => {
+                this.transactions = resp.transactions
+                this.filteredCount = resp.filteredCount
+                this.totalCount = resp.totalCount
 
                 const totalPages = this.getTotalPages()
                 if (totalPages === 0) {
@@ -206,51 +198,36 @@ export class TransactionsComponent implements OnInit {
                         page: totalPages,
                     })
                 }
-
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load transactions', err)
-                return throwError(() => err)
             })
-        )
-    }
-
-    reloadTransactions(): void {
-        this.loading = true
-        this.loadTransactions()
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to reload transactions')
-                    this.clearFilters()
-                    return throwError(() => err)
-                }),
-                finalize(() => (this.loading = false))
-            )
-            .subscribe()
     }
 
     refreshTransactions(): void {
+        this.logger.info('refreshing transactions')
         this.loading = true
         this.transactionSvc
             .refreshTransactions()
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
-                        'Failed to refresh transactions'
+                        this.logger,
+                        'Failed to refresh transactions. Please try again'
                     )
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Refreshing transactions', [
-                    'Please check back later',
-                ])
+                this.alertSvc.addSuccessAlert(
+                    this.logger,
+                    'Refreshing transactions',
+                    'Please check back later'
+                )
             })
     }
 
     processParams(params: Params): void {
+        this.logger.info('processing params', { params })
+
         const page: string | undefined = params['page']
         if (page !== undefined) {
             const pageInt = safeParseInt(page)
@@ -380,21 +357,24 @@ export class TransactionsComponent implements OnInit {
         }
     }
 
-    updateCustomName(t: Transaction, reset = false): void {
+    updateCustomName(transaction: Transaction, reset = false): void {
+        this.logger.info('updating custom name', { transaction, reset })
         this.transactionSvc
-            .updateTransactionCustomName(t)
+            .updateTransactionCustomName(transaction)
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
+                        this.logger,
                         reset
-                            ? 'Failed to reset transaction name'
-                            : 'Failed to update transaction name'
+                            ? 'Failed to reset transaction name. Please try again'
+                            : 'Failed to update transaction name. Please try again'
                     )
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
                 this.alertSvc.addSuccessAlert(
+                    this.logger,
                     reset
                         ? 'Reset transaction name'
                         : 'Updated transaction name'
@@ -402,21 +382,24 @@ export class TransactionsComponent implements OnInit {
             })
     }
 
-    updateCustomCategoryId(t: Transaction, reset = false): void {
+    updateCustomCategoryId(transaction: Transaction, reset = false): void {
+        this.logger.info('updating custom category id', { transaction, reset })
         this.transactionSvc
-            .updateTransactionCustomCategoryId(t)
+            .updateTransactionCustomCategoryId(transaction)
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
+                        this.logger,
                         reset
-                            ? 'Failed to reset transaction category'
-                            : 'Failed to update transaction category'
+                            ? 'Failed to reset transaction category. Please try again'
+                            : 'Failed to update transaction category. Please try again'
                     )
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
                 this.alertSvc.addSuccessAlert(
+                    this.logger,
                     reset
                         ? 'Reset transaction category'
                         : 'Updated transaction category'
@@ -424,19 +407,24 @@ export class TransactionsComponent implements OnInit {
             })
     }
 
-    updateNote(t: Transaction): void {
+    updateNote(transaction: Transaction): void {
+        this.logger.info('updating note', { transaction })
         this.transactionSvc
-            .updateTransactionNote(t)
+            .updateTransactionNote(transaction)
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
-                        'Failed to update transaction note'
+                        this.logger,
+                        'Failed to update transaction note. Please try again'
                     )
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Updated transaction note')
+                this.alertSvc.addSuccessAlert(
+                    this.logger,
+                    'Updated transaction note'
+                )
             })
     }
 

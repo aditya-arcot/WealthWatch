@@ -69,7 +69,7 @@ export class AuthService {
         const url = `${this.baseUrl}/logout`
         return this.http.post<void>(url, {}).pipe(
             tap(() => {
-                this.userSvc.user = null
+                this.userSvc.user = undefined
                 this.userSvc.loggedOut = true
             })
         )

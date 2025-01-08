@@ -1,10 +1,14 @@
-import { HttpErrorResponse } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, Injector } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, catchError, of, switchMap, tap, throwError } from 'rxjs'
+import { NGXLogger } from 'ngx-logger'
+import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { AlertService } from './alert.service'
 import { CSRFService } from './csrf.service'
-import { LoggerService } from './logger.service'
+import {
+    createLoggerWithContext,
+    LoggerService,
+    LogtailService,
+} from './logger.service'
 import { SecretsService } from './secrets.service'
 import { UserService } from './user.service'
 
@@ -12,58 +16,81 @@ import { UserService } from './user.service'
     providedIn: 'root',
 })
 export class StartupService {
+    private logger: LoggerService
     success = false
 
     constructor(
-        private logger: LoggerService,
         private csrfSvc: CSRFService,
         private userSvc: UserService,
         private secretsSvc: SecretsService,
         private router: Router,
-        private alertSvc: AlertService
-    ) {}
+        private alertSvc: AlertService,
+        injector: Injector
+    ) {
+        const ngxLogger = injector.get(NGXLogger)
+        const logtail = injector.get(LogtailService)
+        this.logger = createLoggerWithContext(
+            ngxLogger,
+            logtail,
+            'StartupService'
+        )
+    }
 
     startup(): Observable<void> {
-        this.logger.debug('starting up')
+        this.logger.info('starting up')
         return this.getCsrfToken().pipe(
             switchMap(() => this.getCurrentUser()),
-            switchMap(() => this.getSecrets()),
-            switchMap(() => {
-                this.success = true
-                this.logger.debug('startup complete')
+            switchMap((userReceived) => {
+                if (userReceived) return this.getSecrets()
+                this.logger.info('skipping secrets')
                 return of(undefined)
             }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.debug('error during startup')
-                this.logger.error(err)
+            switchMap(() => {
+                this.success = true
+                this.logger.info('startup success')
+                return of(undefined)
+            }),
+            catchError((err) => {
+                this.logger.error('startup error', { err })
                 return of(undefined)
             })
         )
     }
 
     private getCsrfToken() {
+        this.logger.info('getting csrf token')
         return this.csrfSvc.getCsrfToken().pipe(
-            tap(() => this.logger.debug('received csrf token')),
-            catchError((err: HttpErrorResponse) => {
+            catchError((err) => {
                 this.router.navigateByUrl('/startup-error')
-                this.alertSvc.addErrorAlert('Failed to get CSRF token')
+                this.alertSvc.addErrorAlert(
+                    this.logger,
+                    'Failed to get CSRF token'
+                )
                 return throwError(() => err)
             })
         )
     }
 
     private getCurrentUser() {
-        return this.userSvc
-            .getCurrentUser()
-            .pipe(tap(() => this.logger.debug('received current user')))
+        this.logger.info('getting current user')
+        return this.userSvc.getCurrentUser().pipe(
+            switchMap((user) => {
+                if (user) return of(true)
+                this.logger.info('no current user')
+                return of(false)
+            })
+        )
     }
 
     private getSecrets() {
+        this.logger.info('getting secrets')
         return this.secretsSvc.getSecrets().pipe(
-            tap(() => this.logger.debug('received secrets')),
-            catchError((err: HttpErrorResponse) => {
+            catchError((err) => {
                 this.router.navigateByUrl('/startup-error')
-                this.alertSvc.addErrorAlert('Failed to get secrets')
+                this.alertSvc.addErrorAlert(
+                    this.logger,
+                    'Failed to get secrets'
+                )
                 return throwError(() => err)
             })
         )

@@ -3,6 +3,7 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
+    Injector,
     OnInit,
     ViewChild,
 } from '@angular/core'
@@ -13,10 +14,10 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-import { catchError, finalize, switchMap, throwError } from 'rxjs'
+import { catchError, finalize, throwError } from 'rxjs'
+import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
-import { LoggerService } from '../../services/logger.service'
 import { SecretsService } from '../../services/secrets.service'
 import { UserService } from '../../services/user.service'
 
@@ -26,20 +27,24 @@ import { UserService } from '../../services/user.service'
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent
+    extends LoggerComponent
+    implements OnInit, AfterViewInit
+{
     @ViewChild('loginForm') loginForm!: ElementRef<HTMLFormElement>
     loginFormGroup: FormGroup
     loading = false
 
     constructor(
         private formBuilder: FormBuilder,
-        private logger: LoggerService,
         private userSvc: UserService,
         private authSvc: AuthService,
         private router: Router,
         private alertSvc: AlertService,
-        private secretsSvc: SecretsService
+        private secretsSvc: SecretsService,
+        injector: Injector
     ) {
+        super(injector, 'LoginComponent')
         this.loginFormGroup = this.formBuilder.group({
             username: ['', [Validators.required]],
             password: ['', [Validators.required, Validators.minLength(8)]],
@@ -49,8 +54,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     ngOnInit(): void {
         if (this.userSvc.user) {
             this.router.navigateByUrl('/home')
-            this.alertSvc.clearAlerts()
-            this.alertSvc.addSuccessAlert('Already logged in')
+            this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
         }
     }
 
@@ -58,7 +62,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
         const form = this.loginForm?.nativeElement
         form.addEventListener('submit', (submitEvent: SubmitEvent) => {
             if (!this.loginFormGroup.valid || !form.checkValidity()) {
-                this.logger.error('validation error')
+                this.logger.info('validation failed')
                 submitEvent.preventDefault()
                 submitEvent.stopPropagation()
             } else {
@@ -69,7 +73,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
 
     login(demo = false) {
-        this.logger.info('logging in')
+        this.logger.info('logging in', { demo })
         this.loading = true
 
         const loginObservable = demo
@@ -81,9 +85,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
         loginObservable
             .pipe(
-                switchMap(() => this.secretsSvc.getSecrets()),
                 catchError((err) => {
-                    this.alertSvc.addErrorAlert('Login failed')
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to log in. Please try again'
+                    )
                     if (err.status === 404) {
                         this.loginFormGroup.reset()
                         return throwError(() => err)
@@ -94,9 +100,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
+                this.logger.info('getting secrets')
+                this.secretsSvc.getSecrets().subscribe()
                 this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Success logging in')
+                this.alertSvc.addSuccessAlert(this.logger, 'Success logging in')
             })
     }
 

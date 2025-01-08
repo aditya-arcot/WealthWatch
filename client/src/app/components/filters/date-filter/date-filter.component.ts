@@ -13,7 +13,6 @@ import {
     dateFilterDescriptions,
     DateFilterEnum,
 } from '../../../models/dateFilter'
-import { AlertService } from '../../../services/alert.service'
 import { checkDatesEqual } from '../../../utilities/date.utility'
 import { computeDatesBasedOnFilter } from '../../../utilities/filter.utility'
 
@@ -56,8 +55,6 @@ export class DateFilterComponent implements OnInit, OnChanges {
     originalEndDate: Date | null = this.endDate
 
     cancelOnExit = true
-
-    constructor(private alertSvc: AlertService) {}
 
     ngOnInit(): void {
         const modalElement = this.dateFilterModal.nativeElement

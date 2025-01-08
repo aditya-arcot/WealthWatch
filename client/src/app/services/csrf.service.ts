@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { of, switchMap } from 'rxjs'
+import { tap } from 'rxjs'
 import { env } from '../../environments/env'
 
 @Injectable({
@@ -15,9 +15,8 @@ export class CSRFService {
 
     getCsrfToken() {
         return this.http.get<{ csrfToken: string }>(this.baseUrl).pipe(
-            switchMap((resp) => {
+            tap((resp) => {
                 this.csrfToken = resp.csrfToken
-                return of(resp)
             })
         )
     }
