@@ -1,7 +1,6 @@
 import express from 'express'
 import {
     deactivateItem,
-    getUserItems,
     getUserItemsWithAccounts,
     getUserItemsWithAccountsWithHoldings,
     getUserItemsWithCreditCardAccounts,
@@ -23,33 +22,13 @@ const router = express.Router()
 
 /**
  * @swagger
- * /items:
- *   get:
- *     summary: Retrieve the logged in user's items
- *     tags: [Items]
- *     responses:
- *       200:
- *         description: Retrieved the logged in user's items
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Item'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.route('/').get(authenticate, catchAsync(getUserItems))
-
-/**
- * @swagger
  * /items/with-accounts:
  *   get:
- *     summary: Retrieve the logged in user's items with accounts
+ *     summary: Retrieve the logged-in user's items with accounts
  *     tags: [Items]
  *     responses:
  *       200:
- *         description: Retrieved the logged in user's items with accounts
+ *         description: Retrieved the logged-in user's items with accounts
  *         content:
  *           application/json:
  *             schema:
@@ -67,11 +46,11 @@ router
  * @swagger
  * /items/with-accounts/with-holdings:
  *   get:
- *     summary: Retrieve the logged in user's items with accounts with holdings
+ *     summary: Retrieve the logged-in user's items with accounts with holdings
  *     tags: [Items]
  *     responses:
  *       200:
- *         description: Retrieved the logged in user's items with accounts with holdings
+ *         description: Retrieved the logged-in user's items with accounts with holdings
  *         content:
  *           application/json:
  *             schema:
@@ -89,11 +68,11 @@ router
  * @swagger
  * /items/with-credit-card-accounts:
  *   get:
- *     summary: Retrieve the logged in user's items with credit card accounts
+ *     summary: Retrieve the logged-in user's items with credit card accounts
  *     tags: [Items]
  *     responses:
  *       200:
- *         description: Retrieved the logged in user's items with credit card accounts
+ *         description: Retrieved the logged-in user's items with credit card accounts
  *         content:
  *           application/json:
  *             schema:
@@ -111,11 +90,11 @@ router
  * @swagger
  * /items/with-mortgage-accounts:
  *   get:
- *     summary: Retrieve the logged in user's items with mortgage accounts
+ *     summary: Retrieve the logged-in user's items with mortgage accounts
  *     tags: [Items]
  *     responses:
  *       200:
- *         description: Retrieved the logged in user's items with mortgage accounts
+ *         description: Retrieved the logged-in user's items with mortgage accounts
  *         content:
  *           application/json:
  *             schema:
@@ -133,11 +112,11 @@ router
  * @swagger
  * /items/with-student-loan-accounts:
  *   get:
- *     summary: Retrieve the logged in user's items with student loan accounts
+ *     summary: Retrieve the logged-in user's items with student loan accounts
  *     tags: [Items]
  *     responses:
  *       200:
- *         description: Retrieved the logged in user's items with student loan accounts
+ *         description: Retrieved the logged-in user's items with student loan accounts
  *         content:
  *           application/json:
  *             schema:

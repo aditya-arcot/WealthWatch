@@ -18,7 +18,7 @@ import { UserService } from '../services/user.service'
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-    private logger: LoggerService
+    private readonly logger: LoggerService
 
     constructor(
         private alertSvc: AlertService,

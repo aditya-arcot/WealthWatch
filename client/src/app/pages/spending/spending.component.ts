@@ -488,10 +488,6 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         return this.getAmountString(this.spendingTotal)
     }
 
-    getNonSpendingTotalString(): string {
-        return this.getAmountString(this.nonSpendingTotal)
-    }
-
     getAmountString(total: number): string {
         const negative = total < 0
         const formatted = this.currencySvc.format(Math.abs(total), 'USD')

@@ -8,7 +8,6 @@ import { env } from '../../environments/env'
 })
 export class CSRFService {
     readonly baseUrl = `${env.apiUrl}/csrf-token`
-    readonly csrfTokenName = `csrfToken-${env.name}`
     csrfToken: string | null = null
 
     constructor(private http: HttpClient) {}

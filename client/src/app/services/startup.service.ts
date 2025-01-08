@@ -16,7 +16,7 @@ import { UserService } from './user.service'
     providedIn: 'root',
 })
 export class StartupService {
-    private logger: LoggerService
+    private readonly logger: LoggerService
     success = false
 
     constructor(

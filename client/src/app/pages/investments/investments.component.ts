@@ -253,19 +253,14 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
     }
 
     getTotalGainLoss(account: AccountWithHoldings): number {
-        const total = account.holdings.reduce(
+        return account.holdings.reduce(
             (acc, h) => acc + (this.getGainLoss(h) ?? 0),
             0
         )
-        return total
     }
 
     getTotalCostBasis(account: AccountWithHoldings): number {
-        const total = account.holdings.reduce(
-            (acc, h) => acc + (h.costBasis ?? 0),
-            0
-        )
-        return total
+        return account.holdings.reduce((acc, h) => acc + (h.costBasis ?? 0), 0)
     }
 
     getNameString(holding: HoldingWithSecurity): string {

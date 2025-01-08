@@ -91,16 +91,13 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
     }
 
     categoryIdsChanged(): boolean {
-        if (
+        return (
             this.originalSelectedCategoryIds.size !==
                 this.selectedCategoryIds.size ||
             ![...this.originalSelectedCategoryIds].every((value) =>
                 this.selectedCategoryIds!.has(value)
             )
-        ) {
-            return true
-        }
-        return false
+        )
     }
 
     filterApplied(): boolean {

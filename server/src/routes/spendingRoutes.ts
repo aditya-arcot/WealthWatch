@@ -19,14 +19,14 @@ const router = express.Router()
  * @swagger
  * /spending/category-summaries:
  *   get:
- *     summary: Retrieve the logged in user's category summaries
+ *     summary: Retrieve the logged-in user's category summaries
  *     tags: [Spending]
  *     parameters:
  *       - $ref: '#/components/parameters/StartDate'
  *       - $ref: '#/components/parameters/EndDate'
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's category summaries
+ *         description: Retrieved a list of the logged-in user's category summaries
  *         content:
  *           application/json:
  *             schema:
@@ -44,14 +44,14 @@ router
  * @swagger
  * /spending/category-totals:
  *   get:
- *     summary: Retrieve the logged in user's spending category totals by date
+ *     summary: Retrieve the logged-in user's spending category totals by date
  *     tags: [Spending]
  *     parameters:
  *       - $ref: '#/components/parameters/StartDate'
  *       - $ref: '#/components/parameters/EndDate'
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's spending category totals by date
+ *         description: Retrieved a list of the logged-in user's spending category totals by date
  *         content:
  *           application/json:
  *             schema:

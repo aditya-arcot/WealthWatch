@@ -78,16 +78,13 @@ export class AccountFilterComponent implements OnInit, OnChanges {
     }
 
     accountIdsChanged(): boolean {
-        if (
+        return (
             this.originalSelectedAccountIds.size !==
                 this.selectedAccountIds.size ||
             ![...this.originalSelectedAccountIds].every((value) =>
                 this.selectedAccountIds!.has(value)
             )
-        ) {
-            return true
-        }
-        return false
+        )
     }
 
     filterApplied(): boolean {

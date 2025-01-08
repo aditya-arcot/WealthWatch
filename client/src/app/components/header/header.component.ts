@@ -23,7 +23,6 @@ import { NotificationsComponent } from '../notifications/notifications.component
         LoadingSpinnerComponent,
     ],
     templateUrl: './header.component.html',
-    styleUrl: './header.component.css',
 })
 export class HeaderComponent
     extends LoggerComponent

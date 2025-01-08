@@ -22,7 +22,7 @@ const router = express.Router()
  * @swagger
  * /transactions:
  *   get:
- *     summary: Retrieve the logged in user's transactions and counts
+ *     summary: Retrieve the logged-in user's transactions and counts
  *     tags: [Transactions]
  *     parameters:
  *       - $ref: '#/components/parameters/SearchQuery'
@@ -36,7 +36,7 @@ const router = express.Router()
  *       - $ref: '#/components/parameters/Offset'
  *     responses:
  *       200:
- *         description: Retrieved a list of the logged in user's transactions and counts
+ *         description: Retrieved a list of the logged-in user's transactions and counts
  *         content:
  *           application/json:
  *             schema:
@@ -122,11 +122,11 @@ router
  * @swagger
  * /transactions/refresh:
  *   post:
- *     summary: Refresh the logged in user's transactions
+ *     summary: Refresh the logged-in user's transactions
  *     tags: [Transactions]
  *     responses:
  *       204:
- *         description: Refreshed the logged in user's transactions
+ *         description: Refreshed the logged-in user's transactions
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
