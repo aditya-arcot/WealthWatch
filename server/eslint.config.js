@@ -1,8 +1,12 @@
-import pluginJs from '@eslint/js'
+// @ts-check
+import eslint from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-export default [
+export default tseslint.config(
+    eslint.configs.recommended,
+    tseslint.configs.strict,
+    tseslint.configs.stylistic,
     {
         ignores: ['eslint.config.js', 'dist/**/*'],
         languageOptions: {
@@ -21,7 +25,5 @@ export default [
             '@typescript-eslint/no-misused-promises': 'error',
             '@typescript-eslint/no-floating-promises': 'error',
         },
-    },
-    pluginJs.configs.recommended,
-    ...tseslint.configs.recommended,
-]
+    }
+)

@@ -14,7 +14,7 @@ import { executePlaidMethod, getPlaidClient } from './index.js'
 export const plaidLinkTokenCreate = async (
     userId: number,
     item?: Item,
-    updateAccounts: boolean = false
+    updateAccounts = false
 ) => {
     logger.debug(
         { itemId: item?.id, userId, updateAccounts },

@@ -551,7 +551,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
     applyCategoryFilter(ids: Set<number>): void {
         if (
             ids.size !== this.selectedCategoryIds.size ||
-            ![...ids].every((value) => this.selectedCategoryIds!.has(value))
+            ![...ids].every((value) => this.selectedCategoryIds.has(value))
         ) {
             if (ids.size === 0) {
                 ids = new Set(this.categories.map((c) => c.id))
@@ -567,7 +567,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
     applyAccountFilter(ids: Set<number>): void {
         if (
             ids.size !== this.selectedAccountIds.size ||
-            ![...ids].every((value) => this.selectedAccountIds!.has(value))
+            ![...ids].every((value) => this.selectedAccountIds.has(value))
         ) {
             if (ids.size === 0) {
                 ids = new Set(this.accounts.map((a) => a.id))

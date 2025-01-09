@@ -18,6 +18,7 @@ export class AuthService {
 
     requestAccess(firstName: string, lastName: string, email: string) {
         const url = `${this.baseUrl}/access-request`
+        /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.post<void>(url, {
             firstName,
             lastName,
@@ -67,6 +68,7 @@ export class AuthService {
 
     logout() {
         const url = `${this.baseUrl}/logout`
+        /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.post<void>(url, {}).pipe(
             tap(() => {
                 this.userSvc.user = undefined

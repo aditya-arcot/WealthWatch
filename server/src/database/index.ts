@@ -72,7 +72,7 @@ export const rollbackTransaction = async (
 export const constructInsertQueryParamsPlaceholder = (
     rowCount: number,
     paramCount: number,
-    counter: number = 1
+    counter = 1
 ): string => {
     if (rowCount < 1 || paramCount < 1)
         throw new DatabaseError('cannot construct parameters placeholder')
@@ -92,7 +92,7 @@ export const runQuery = async <T extends QueryResultRow>(
     query: string,
     params: unknown[] = [],
     client: PoolClient | null = null,
-    skipSuccessLog: boolean = false
+    skipSuccessLog = false
 ): Promise<QueryResult<T>> => {
     const start = Date.now()
 

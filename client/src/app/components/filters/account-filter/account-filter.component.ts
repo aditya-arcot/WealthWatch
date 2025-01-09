@@ -82,7 +82,7 @@ export class AccountFilterComponent implements OnInit, OnChanges {
             this.originalSelectedAccountIds.size !==
                 this.selectedAccountIds.size ||
             ![...this.originalSelectedAccountIds].every((value) =>
-                this.selectedAccountIds!.has(value)
+                this.selectedAccountIds.has(value)
             )
         )
     }

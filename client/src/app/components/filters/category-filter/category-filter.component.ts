@@ -95,7 +95,7 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
             this.originalSelectedCategoryIds.size !==
                 this.selectedCategoryIds.size ||
             ![...this.originalSelectedCategoryIds].every((value) =>
-                this.selectedCategoryIds!.has(value)
+                this.selectedCategoryIds.has(value)
             )
         )
     }

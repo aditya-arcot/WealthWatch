@@ -463,13 +463,16 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         if (this.selectedDateFilter !== DateFilterEnum.CUSTOM) {
             return dateFilterDescriptions[this.selectedDateFilter]
         }
-        if (!this.startDate) {
-            return `On or Before ${this.getDateString(this.endDate!)}`
+        if (this.startDate && !this.endDate) {
+            return `On or After ${this.getDateString(this.startDate)}`
         }
-        if (!this.endDate) {
-            return `On or After ${this.getDateString(this.startDate!)}`
+        if (this.endDate && !this.startDate) {
+            return `On or Before ${this.getDateString(this.endDate)}`
         }
-        return `${this.getDateString(this.startDate)} - ${this.getDateString(this.endDate)}`
+        if (this.startDate && this.endDate) {
+            return `${this.getDateString(this.startDate)} - ${this.getDateString(this.endDate)}`
+        }
+        throw Error('unexpected missing dates for custom date range')
     }
 
     getDateString(date: Date): string {

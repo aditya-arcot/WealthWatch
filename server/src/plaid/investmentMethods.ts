@@ -39,7 +39,7 @@ export const plaidInvestmentsRefresh = async (item: Item) => {
     }
 }
 
-type InvestmentsHoldingsResponse = {
+interface InvestmentsHoldingsResponse {
     holdings: PlaidHolding[]
     securities: PlaidSecurity[]
 }
@@ -139,9 +139,7 @@ enum PlaidSecurityTypeEnum {
     Other = 'other',
 }
 
-const securityTypeMap: {
-    [key in PlaidSecurityTypeEnum]: SecurityTypeEnum
-} = {
+const securityTypeMap: Record<PlaidSecurityTypeEnum, SecurityTypeEnum> = {
     cash: SecurityTypeEnum.Cash,
     cryptocurrency: SecurityTypeEnum.Cryptocurrency,
     derivative: SecurityTypeEnum.Derivative,

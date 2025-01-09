@@ -45,7 +45,7 @@ export const plaidTransactionsRefresh = async (item: Item) => {
     }
 }
 
-type PlaidTransactionsSyncResponse = {
+interface PlaidTransactionsSyncResponse {
     added: PlaidTransaction[]
     modified: PlaidTransaction[]
     removed: PlaidRemovedTransaction[]
@@ -200,9 +200,7 @@ enum PlaidDetailedCategoryEnum {
     GovernmentAndNonProfitTaxes = 'GOVERNMENT_AND_NON_PROFIT_TAX_PAYMENT',
 }
 
-const detailedCategoryMap: {
-    [key in PlaidDetailedCategoryEnum]: CategoryEnum
-} = {
+const detailedCategoryMap: Record<PlaidDetailedCategoryEnum, CategoryEnum> = {
     [PlaidDetailedCategoryEnum.TransferInDeposit]: CategoryEnum.CashAndChecks,
     [PlaidDetailedCategoryEnum.TransferInInvestment]: CategoryEnum.Investment,
     [PlaidDetailedCategoryEnum.TransferInSavings]: CategoryEnum.Savings,
@@ -237,9 +235,7 @@ enum PlaidPrimaryCategoryEnum {
     RentAndUtilities = 'RENT_AND_UTILITIES',
 }
 
-const primaryCategoryMap: {
-    [key in PlaidPrimaryCategoryEnum]: CategoryEnum
-} = {
+const primaryCategoryMap: Record<PlaidPrimaryCategoryEnum, CategoryEnum> = {
     [PlaidPrimaryCategoryEnum.Income]: CategoryEnum.Income,
     [PlaidPrimaryCategoryEnum.TransferIn]: CategoryEnum.Transfer,
     [PlaidPrimaryCategoryEnum.TransferOut]: CategoryEnum.Transfer,

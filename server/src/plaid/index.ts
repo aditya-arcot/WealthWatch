@@ -20,8 +20,10 @@ let plaidClient: PlaidApi | undefined
 
 export const createPlaidClient = () => {
     logger.debug('configuring plaid client')
+    const basePath = PlaidEnvironments[vars.plaidEnv]
+    if (basePath === undefined) throw new HttpError('invalid plaid env')
     const config = new Configuration({
-        basePath: PlaidEnvironments[vars.plaidEnv]!,
+        basePath,
         baseOptions: {
             headers: {
                 'PLAID-CLIENT-ID': vars.plaidClientId,
