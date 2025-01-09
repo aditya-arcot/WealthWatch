@@ -1,8 +1,8 @@
 {
-    "name": "server",
+    "name": "wealthwatch-server",
     "version": "1.0.0",
-    "main": "index.ts",
     "type": "module",
+    "private": true,
     "scripts": {
         "dev": "tsc-watch --onSuccess 'npm run start'",
         "build": "rm -rf dist/ && tsc --sourceMap false",
@@ -16,10 +16,8 @@
             "prettier --write --ignore-unknown"
         ]
     },
-    "author": "",
-    "license": "ISC",
-    "description": "",
     "dependencies": {
+        "wealthwatch-shared": "file:../shared/dist/",
         "@dotenvx/dotenvx": "^1.32.1",
         "@logtail/pino": "^0.5.2",
         "@tsconfig/node-lts": "^22.0.1",

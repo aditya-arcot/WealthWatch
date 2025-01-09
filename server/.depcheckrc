@@ -2,5 +2,6 @@ ignores: [
     "@logtail/pino",
     "@tsconfig/strictest",
     "pino-pretty",
-    "lint-staged"
+    "lint-staged",
+    "wealthwatch-shared"
 ]

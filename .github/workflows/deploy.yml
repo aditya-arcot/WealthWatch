@@ -109,6 +109,12 @@ jobs:
                       env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
+            - name: install, build shared
+              run: |
+                  cd shared/
+                  npm ci
+                  npm run build
+
             - name: install, build server
               run: |
                   cd server/

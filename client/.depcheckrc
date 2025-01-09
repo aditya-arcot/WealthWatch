@@ -6,5 +6,6 @@ ignores: [
     "@angular/build",
     "@angular/compiler-cli",
     "@types/node",
-    "lint-staged"
+    "lint-staged",
+    "wealthwatch-shared"
 ]

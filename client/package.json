@@ -1,13 +1,14 @@
 {
-    "name": "client",
-    "version": "0.0.0",
+    "name": "wealthwatch-client",
+    "version": "1.0.0",
+    "private": true,
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
         "build:stage": "ng build --configuration stage",
         "build:test": "ng build --configuration test",
-        "watch": "ng build --watch --configuration dev",
+        "build:dev": "ng build --watch --configuration dev",
         "lint": "ng lint"
     },
     "lint-staged": {
@@ -16,8 +17,8 @@
             "prettier --write --ignore-unknown"
         ]
     },
-    "private": true,
     "dependencies": {
+        "wealthwatch-shared": "file:../shared/dist/",
         "@angular/animations": "^19.0.6",
         "@angular/common": "^19.0.6",
         "@angular/compiler": "^19.0.6",

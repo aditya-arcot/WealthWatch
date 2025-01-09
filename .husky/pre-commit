@@ -16,6 +16,10 @@ echo "Checking base project..."
 npx depcheck || exit 1
 echo
 
+echo "Checking shared project..."
+npx depcheck shared || exit 1
+echo
+
 echo "Checking client project..."
 npx depcheck client || exit 1
 echo
@@ -27,6 +31,10 @@ echo
 echo "Checking for available updates..."
 echo "Checking base project..."
 npx ncu -e 2 || exit 1
+echo
+
+echo "Checking shared project..."
+npx ncu --cwd shared --configFilePath shared/.ncurc.json -e 2 || exit 1
 echo
 
 echo "Checking client project..."
