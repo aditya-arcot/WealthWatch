@@ -161,7 +161,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
                     }
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to validate access code. Please try again'
+                        'Failed to validate access code'
                     )
                     return throwError(() => err)
                 }),
@@ -203,7 +203,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
                     }
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Registration failed. Please try again'
+                        'Registration failed'
                     )
                     this.registerFormGroup.patchValue({ confirmPassword: '' })
                     return throwError(() => err)

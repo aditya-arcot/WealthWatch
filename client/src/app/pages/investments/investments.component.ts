@@ -88,7 +88,7 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to load holdings. Please try again'
+                        'Failed to load holdings'
                     )
                     return throwError(() => err)
                 }),
@@ -133,7 +133,7 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to refresh investments. Please try again'
+                        'Failed to refresh investments'
                     )
                     return throwError(() => err)
                 }),

@@ -140,10 +140,7 @@ export class AccessRequestComponent
                     return true
             }
         }
-        this.alertSvc.addErrorAlert(
-            this.logger,
-            'Failed to request access. Please try again'
-        )
+        this.alertSvc.addErrorAlert(this.logger, 'Failed to request access')
         return false
     }
 }

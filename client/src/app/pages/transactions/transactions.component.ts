@@ -140,10 +140,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                 return this.itemSvc.getItemsWithAccounts()
             }),
             catchError((err) => {
-                this.alertSvc.addErrorAlert(
-                    this.logger,
-                    'Failed to load data. Please try again'
-                )
+                this.alertSvc.addErrorAlert(this.logger, 'Failed to load data')
                 return throwError(() => err)
             }),
             finalize(() => (this.loading = false))
@@ -178,7 +175,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to reload transactions. Please try again'
+                        'Failed to reload transactions'
                     )
                     this.clearFilters()
                     return throwError(() => err)
@@ -210,7 +207,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to refresh transactions. Please try again'
+                        'Failed to refresh transactions'
                     )
                     return throwError(() => err)
                 }),
@@ -366,8 +363,8 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         reset
-                            ? 'Failed to reset transaction name. Please try again'
-                            : 'Failed to update transaction name. Please try again'
+                            ? 'Failed to reset transaction name'
+                            : 'Failed to update transaction name'
                     )
                     return throwError(() => err)
                 })
@@ -391,8 +388,8 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         reset
-                            ? 'Failed to reset transaction category. Please try again'
-                            : 'Failed to update transaction category. Please try again'
+                            ? 'Failed to reset transaction category'
+                            : 'Failed to update transaction category'
                     )
                     return throwError(() => err)
                 })
@@ -415,7 +412,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to update transaction note. Please try again'
+                        'Failed to update transaction note'
                     )
                     return throwError(() => err)
                 })

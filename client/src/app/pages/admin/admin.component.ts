@@ -41,7 +41,7 @@ export class AdminComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to load access requests. Please try again'
+                        'Failed to load access requests'
                     )
                     return throwError(() => err)
                 }),
@@ -104,7 +104,7 @@ export class AdminComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to review access request. Please try again'
+                        'Failed to review access request'
                     )
                     return throwError(() => err)
                 }),

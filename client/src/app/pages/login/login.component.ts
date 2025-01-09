@@ -86,10 +86,7 @@ export class LoginComponent
         loginObservable
             .pipe(
                 catchError((err) => {
-                    this.alertSvc.addErrorAlert(
-                        this.logger,
-                        'Failed to log in. Please try again'
-                    )
+                    this.alertSvc.addErrorAlert(this.logger, 'Failed to log in')
                     if (err.status === 404) {
                         this.loginFormGroup.reset()
                         return throwError(() => err)

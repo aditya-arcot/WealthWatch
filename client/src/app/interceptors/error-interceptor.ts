@@ -8,6 +8,7 @@ import { Injectable, Injector } from '@angular/core'
 import { Router } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
 import { catchError, Observable, throwError } from 'rxjs'
+import { ServerError } from '../models/error'
 import { AlertService } from '../services/alert.service'
 import {
     createLoggerWithContext,
@@ -53,7 +54,8 @@ export class ErrorInterceptor implements HttpInterceptor {
                         errorSubtext.push('No server response')
                     } else {
                         if (err.error) {
-                            errorSubtext.push(err.error.message)
+                            const error = err.error as ServerError
+                            errorSubtext.push(error.message)
                         } else if (err.statusText) {
                             errorSubtext.push(err.statusText)
                         }

@@ -86,7 +86,7 @@ export class HeaderComponent
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to log out. Please try again'
+                        'Failed to log out'
                     )
                     return throwError(() => err)
                 })

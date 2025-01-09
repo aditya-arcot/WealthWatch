@@ -6,9 +6,15 @@ import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
-import { DatabaseError, HttpError, PlaidApiError } from '../models/error.js'
+import {
+    DatabaseError,
+    HttpError,
+    PlaidApiError,
+    ServerError,
+} from '../models/error.js'
 import { queueLogAppRequest } from '../queues/logQueue.js'
 import { production, stage, vars } from './env.js'
+import { capitalizeFirstLetter } from './format.js'
 import { logger } from './logger.js'
 
 const origins = [
@@ -142,13 +148,41 @@ export const handleError = (
     _next: NextFunction
 ) => {
     logger.error({ err }, 'handling error')
+    let status = err instanceof HttpError ? err.status : 500
+    // error status codes are 4xx and 5xx
+    if (status < 400 || status >= 600) status = 500
+    const error = createErrorObject(err)
+    logger.error({ status, error }, 'sending error response')
+    res.status(status).json(error)
+}
+
+const createErrorObject = (err: Error): ServerError => {
     if (err instanceof HttpError) {
-        res.status(err.status).json({ message: err.message, code: err.code })
-    } else if (err instanceof DatabaseError) {
-        res.status(500).json({ message: 'Database error' })
-    } else if (err instanceof PlaidApiError) {
-        res.status(500).json({ message: 'Plaid API error' })
-    } else {
-        res.status(500).json({ message: 'Unexpected error' })
+        const error: ServerError = {
+            message: err.message,
+        }
+        if (err.code) error.code = err.code
+        return error
     }
+    if (err instanceof DatabaseError) {
+        return { message: formatErrorMessage('Database Error', err.message) }
+    }
+    if (err instanceof PlaidApiError) {
+        return {
+            message: formatErrorMessage(
+                'Plaid Error',
+                err.message,
+                err.code,
+                err.detail
+            ),
+        }
+    }
+    return {
+        message: formatErrorMessage('Unexpected Error', err.message),
+    }
+}
+
+const formatErrorMessage = (category: string, ...messages: string[]) => {
+    if (production) return category
+    return `${category} - ${messages.map((m) => capitalizeFirstLetter(m)).join(' - ')}`
 }

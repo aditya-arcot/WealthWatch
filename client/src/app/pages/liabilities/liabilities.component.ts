@@ -103,7 +103,7 @@ export class LiabilitiesComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to load liabilities. Please try again'
+                        'Failed to load liabilities'
                     )
                     return throwError(() => err)
                 }),

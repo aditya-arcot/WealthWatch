@@ -77,7 +77,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to load accounts. Please try again'
+                        'Failed to load accounts'
                     )
                     return throwError(() => err)
                 }),
@@ -102,7 +102,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to create link token. Please try again'
+                        'Failed to create link token'
                     )
                     return throwError(() => err)
                 }),
@@ -182,7 +182,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                     } else {
                         this.alertSvc.addErrorAlert(
                             this.logger,
-                            'Failed to exchange public token. Please try again'
+                            'Failed to exchange public token'
                         )
                     }
                     this.loading = false
@@ -212,7 +212,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to complete link update. Please try again'
+                        'Failed to complete link update'
                     )
                     this.loading = false
                     return throwError(() => err)
@@ -313,7 +313,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                     }
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        `Failed to refresh ${item.institutionName} data. Please try again`
+                        `Failed to refresh ${item.institutionName} data`
                     )
                     return throwError(() => err)
                 }),
@@ -343,7 +343,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        `Failed to remove ${item.institutionName} accounts. Please try again`
+                        `Failed to remove ${item.institutionName} accounts`
                     )
                     return throwError(() => err)
                 }),

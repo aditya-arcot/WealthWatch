@@ -215,7 +215,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
             catchError((err) => {
                 this.alertSvc.addErrorAlert(
                     this.logger,
-                    'Failed to load categories. Please try again'
+                    'Failed to load categories'
                 )
                 this.loading = false
                 return throwError(() => err)
@@ -240,7 +240,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
-                        'Failed to load spending data. Please try again'
+                        'Failed to load spending data'
                     )
                     return throwError(() => err)
                 }),
