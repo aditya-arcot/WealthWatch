@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { env } from '../../environments/env'
 import {
     ItemWithAccounts,
     ItemWithAccountsWithHoldings,
     ItemWithCreditCardAccounts,
     ItemWithMortgageAccounts,
     ItemWithStudentLoanAccounts,
-} from '../models/item'
+} from 'wealthwatch-shared/models/item'
+import { env } from '../../environments/env'
 
 @Injectable({
     providedIn: 'root',

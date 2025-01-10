@@ -10,16 +10,16 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
-import { Account } from '../../models/account'
+import { Account } from 'wealthwatch-shared/models/account'
 import {
     inCooldown,
     Item,
     ItemWithAccounts,
     refreshCooldown,
-} from '../../models/item'
-import { PlaidLinkEvent } from '../../models/plaidLinkEvent'
+} from 'wealthwatch-shared/models/item'
+import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'

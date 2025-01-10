@@ -4,14 +4,10 @@ import { randomInt } from 'crypto'
 import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
+import { ServerError } from 'wealthwatch-shared/models/error.js'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
-import {
-    DatabaseError,
-    HttpError,
-    PlaidApiError,
-    ServerError,
-} from '../models/error.js'
+import { DatabaseError, HttpError, PlaidApiError } from '../models/error.js'
 import { queueLogAppRequest } from '../queues/logQueue.js'
 import { production, stage, vars } from './env.js'
 import { capitalizeFirstLetter } from './format.js'

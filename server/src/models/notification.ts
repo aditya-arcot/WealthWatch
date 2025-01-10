@@ -1,21 +1,5 @@
-import { Item } from './item.js'
-
-export interface Notification {
-    id: number
-    typeId: NotificationTypeEnum
-    userId: number
-    itemId: number | null
-    message: string
-    persistent: boolean
-    read: boolean
-    active: boolean
-}
-
-export enum NotificationTypeEnum {
-    Info = 1,
-    LinkUpdate,
-    LinkUpdateWithAccounts,
-}
+import { Item } from 'wealthwatch-shared/models/item.js'
+import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification.js'
 
 export const createNotification = (
     type: NotificationTypeEnum,

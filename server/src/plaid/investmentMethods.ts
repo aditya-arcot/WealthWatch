@@ -3,11 +3,14 @@ import {
     Holding as PlaidHolding,
     Security as PlaidSecurity,
 } from 'plaid'
+import { Holding } from 'wealthwatch-shared/models/holding.js'
+import { Item } from 'wealthwatch-shared/models/item.js'
+import {
+    Security,
+    SecurityTypeEnum,
+} from 'wealthwatch-shared/models/security.js'
 import { PlaidApiError } from '../models/error.js'
-import { Holding } from '../models/holding.js'
-import { Item } from '../models/item.js'
 import { PlaidGeneralErrorCodeEnum } from '../models/plaidApiRequest.js'
-import { Security, SecurityTypeEnum } from '../models/security.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 

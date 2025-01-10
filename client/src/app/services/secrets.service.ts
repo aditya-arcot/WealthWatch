@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { tap } from 'rxjs'
+import { Secrets } from 'wealthwatch-shared/models/secrets'
 import { env } from '../../environments/env'
-import { Secrets } from '../models/secrets'
 import { LogtailService } from './logger.service'
 
 @Injectable({

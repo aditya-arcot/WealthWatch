@@ -6,14 +6,17 @@ import {
     TransactionsRefreshRequest,
     TransactionsSyncRequest,
 } from 'plaid'
-import { CategoryEnum } from '../models/category.js'
+import { CategoryEnum } from 'wealthwatch-shared/models/category.js'
+import { Item } from 'wealthwatch-shared/models/item.js'
+import {
+    PaymentChannelEnum,
+    Transaction,
+} from 'wealthwatch-shared/models/transaction.js'
 import { PlaidApiError } from '../models/error.js'
-import { Item } from '../models/item.js'
 import {
     PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,
 } from '../models/plaidApiRequest.js'
-import { PaymentChannelEnum, Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 

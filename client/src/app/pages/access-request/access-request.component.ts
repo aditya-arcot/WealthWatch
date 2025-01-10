@@ -14,8 +14,11 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
+import {
+    AccessRequestErrorCodeEnum,
+    ServerError,
+} from 'wealthwatch-shared/models/error'
 import { LoggerComponent } from '../../components/logger.component'
-import { AccessRequestErrorCodeEnum, ServerError } from '../../models/error'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { UserService } from '../../services/user.service'

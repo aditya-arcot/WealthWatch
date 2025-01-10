@@ -1,4 +1,4 @@
-import { Security } from '../models/security.js'
+import { Security } from 'wealthwatch-shared/models/security.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertSecurities = async (

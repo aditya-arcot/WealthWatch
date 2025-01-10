@@ -11,6 +11,10 @@ import {
     switchMap,
     throwError,
 } from 'rxjs'
+import { Account } from 'wealthwatch-shared/models/account'
+import { Category, CategoryEnum } from 'wealthwatch-shared/models/category'
+import { ItemWithAccounts } from 'wealthwatch-shared/models/item'
+import { Transaction } from 'wealthwatch-shared/models/transaction'
 import { AccountFilterComponent } from '../../components/filters/account-filter/account-filter.component'
 import { AmountFilterComponent } from '../../components/filters/amount-filter/amount-filter.component'
 import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'
@@ -18,15 +22,10 @@ import { DateFilterComponent } from '../../components/filters/date-filter/date-f
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { NoteComponent } from '../../components/note/note.component'
-import { Account } from '../../models/account'
 import { AmountFilterEnum } from '../../models/amountFilter'
-import { Category, CategoryEnum, categoryIcons } from '../../models/category'
+import { categoryIcons } from '../../models/category'
 import { DateFilterEnum } from '../../models/dateFilter'
-import { ItemWithAccounts } from '../../models/item'
-import {
-    Transaction,
-    TransactionsRequestParams,
-} from '../../models/transaction'
+import { TransactionsRequestParams } from '../../models/transaction'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'

@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification'
+import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent'
 import { env } from '../../environments/env'
-import { NotificationTypeEnum } from '../models/notification'
-import { PlaidLinkEvent } from '../models/plaidLinkEvent'
 
 @Injectable({
     providedIn: 'root',

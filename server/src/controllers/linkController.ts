@@ -1,5 +1,8 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
+import { Item } from 'wealthwatch-shared/models/item.js'
+import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification.js'
+import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent.js'
 import {
     fetchActiveItemByUserIdAndId,
     fetchActiveItemByUserIdAndInstitutionId,
@@ -8,9 +11,6 @@ import {
 } from '../database/itemQueries.js'
 import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
-import { Item } from '../models/item.js'
-import { NotificationTypeEnum } from '../models/notification.js'
-import { PlaidLinkEvent } from '../models/plaidLinkEvent.js'
 import {
     plaidLinkTokenCreate,
     plaidPublicTokenExchange,

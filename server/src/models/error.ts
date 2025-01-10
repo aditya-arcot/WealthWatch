@@ -1,8 +1,3 @@
-export interface ServerError {
-    message: string
-    code?: string
-}
-
 export class HttpError extends Error {
     status: number
     code?: string
@@ -25,11 +20,4 @@ export class PlaidApiError extends Error {
         this.code = code
         this.detail = detail
     }
-}
-
-export enum AccessRequestErrorCodeEnum {
-    UserExists = 'USER_EXISTS',
-    RequestPending = 'REQUEST_PENDING',
-    RequestApproved = 'REQUEST_APPROVED',
-    RequestRejected = 'REQUEST_REJECTED',
 }

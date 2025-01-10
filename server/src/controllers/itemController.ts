@@ -1,4 +1,6 @@
 import { Request, Response } from 'express'
+import { Account } from 'wealthwatch-shared/models/account.js'
+import { inCooldown, Item } from 'wealthwatch-shared/models/item.js'
 import {
     fetchActiveAccountsByUserId,
     insertAccounts,
@@ -33,9 +35,7 @@ import {
     insertTransactions,
     removeTransactionsByPlaidIds,
 } from '../database/transactionQueries.js'
-import { Account } from '../models/account.js'
 import { HttpError } from '../models/error.js'
-import { inCooldown, Item } from '../models/item.js'
 import {
     plaidAccountsBalanceGet,
     plaidAccountsGet,

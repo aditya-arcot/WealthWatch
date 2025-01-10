@@ -10,16 +10,19 @@ import { ActivatedRoute, Params, Router } from '@angular/router'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
-import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
 import {
     Category,
     CategoryEnum,
     CategoryGroupEnum,
-} from '../../models/category'
+} from 'wealthwatch-shared/models/category'
+import {
+    CategorySummary,
+    CategoryTotalByDate,
+} from 'wealthwatch-shared/models/spending'
+import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../../components/logger.component'
 import { dateFilterDescriptions, DateFilterEnum } from '../../models/dateFilter'
-import { CategorySummary, CategoryTotalByDate } from '../../models/spending'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'

@@ -1,4 +1,4 @@
-import { Category } from '../models/category.js'
+import { Category } from 'wealthwatch-shared/models/category.js'
 import { runQuery } from './index.js'
 
 export const fetchCategories = async (): Promise<Category[]> => {

@@ -5,8 +5,8 @@ import {
     Products as PlaidProducts,
     SandboxPublicTokenCreateRequest,
 } from 'plaid'
-import { Item } from '../models/item.js'
-import { User } from '../models/user.js'
+import { Item } from 'wealthwatch-shared/models/item.js'
+import { User } from 'wealthwatch-shared/models/user.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'

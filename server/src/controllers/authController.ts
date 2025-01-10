@@ -1,6 +1,12 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import {
+    AccessRequest,
+    AccessRequestStatusEnum,
+} from 'wealthwatch-shared/models/accessRequest.js'
+import { AccessRequestErrorCodeEnum } from 'wealthwatch-shared/models/error.js'
+import { User } from 'wealthwatch-shared/models/user.js'
+import {
     fetchAccessRequestByAccessCode,
     fetchAccessRequestByEmail,
     insertAccessRequest,
@@ -11,12 +17,7 @@ import {
     fetchUserByUsername,
     insertUser,
 } from '../database/userQueries.js'
-import {
-    AccessRequest,
-    AccessRequestStatusEnum,
-} from '../models/accessRequest.js'
-import { AccessRequestErrorCodeEnum, HttpError } from '../models/error.js'
-import { User } from '../models/user.js'
+import { HttpError } from '../models/error.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 

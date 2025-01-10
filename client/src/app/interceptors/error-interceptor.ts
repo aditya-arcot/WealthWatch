@@ -8,7 +8,7 @@ import { Injectable, Injector } from '@angular/core'
 import { Router } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
 import { catchError, Observable, throwError } from 'rxjs'
-import { ServerError } from '../models/error'
+import { ServerError } from 'wealthwatch-shared/models/error'
 import { AlertService } from '../services/alert.service'
 import {
     createLoggerWithContext,
