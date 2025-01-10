@@ -4,11 +4,11 @@ import {
     CreditCardAccount,
     MortgageAccount,
     StudentLoanAccount,
-} from '../models/account.js'
+} from 'wealthwatch-shared/models/account.js'
 import {
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
-} from '../models/liability.js'
+} from 'wealthwatch-shared/models/liability.js'
 import {
     DbHoldingWithSecurity,
     mapDbHoldingWithSecurity,

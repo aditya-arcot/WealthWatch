@@ -1,9 +1,8 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { catchError, tap, throwError } from 'rxjs'
+import { tap } from 'rxjs'
+import { Notification } from 'wealthwatch-shared/models/notification'
 import { env } from '../../environments/env'
-import { Notification } from '../models/notification'
-import { LoggerService } from './logger.service'
 
 @Injectable({
     providedIn: 'root',
@@ -12,31 +11,25 @@ export class NotificationService {
     notifications: Notification[] = []
     readonly baseUrl = `${env.apiUrl}/notifications`
 
-    constructor(
-        private http: HttpClient,
-        private logger: LoggerService
-    ) {}
+    constructor(private http: HttpClient) {}
 
     loadNotifications() {
-        this.logger.debug('loading notifications')
         return this.http.get<Notification[]>(this.baseUrl).pipe(
             tap((notifications) => {
                 this.notifications = notifications
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load notifications', err)
-                return throwError(() => err)
             })
         )
     }
 
     updateAllNotificationsToRead() {
         const url = `${this.baseUrl}/read`
+        /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.patch<void>(url, {})
     }
 
     updateNotificationToInactive(notificationId: number) {
         const url = `${this.baseUrl}/${notificationId}/inactive`
+        /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.patch<void>(url, {})
     }
 }

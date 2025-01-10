@@ -4,9 +4,9 @@ import {
     AccountsBalanceGetRequest,
     AccountsGetRequest,
 } from 'plaid'
-import { Account } from '../models/account.js'
+import { Account } from 'wealthwatch-shared/models/account.js'
+import { Item } from 'wealthwatch-shared/models/item.js'
 import { PlaidApiError } from '../models/error.js'
-import { Item } from '../models/item.js'
 import { PlaidAccountErrorCodeEnum } from '../models/plaidApiRequest.js'
 import { toTitleCase } from '../utils/format.js'
 import { logger } from '../utils/logger.js'

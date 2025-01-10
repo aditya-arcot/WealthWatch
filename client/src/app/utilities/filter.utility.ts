@@ -1,4 +1,4 @@
-import { DateFilterEnum } from '../models/dateFilter'
+import { DateFilterEnum } from '../models/filter'
 
 export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
     let startDate: Date | null = null

@@ -10,7 +10,8 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { Category, CategoryEnum, categoryIcons } from '../../../models/category'
+import { Category, CategoryEnum } from 'wealthwatch-shared/models/category'
+import { categoryIcons } from '../../../models/category'
 
 @Component({
     selector: 'app-category-filter',
@@ -91,16 +92,13 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
     }
 
     categoryIdsChanged(): boolean {
-        if (
+        return (
             this.originalSelectedCategoryIds.size !==
                 this.selectedCategoryIds.size ||
             ![...this.originalSelectedCategoryIds].every((value) =>
-                this.selectedCategoryIds!.has(value)
+                this.selectedCategoryIds.has(value)
             )
-        ) {
-            return true
-        }
-        return false
+        )
     }
 
     filterApplied(): boolean {

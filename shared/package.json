@@ -1,0 +1,32 @@
+{
+    "name": "wealthwatch-shared",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "main": "index.js",
+    "types": "index.d.ts",
+    "scripts": {
+        "dev": "tsc-watch",
+        "build": "rm -rf dist/ && tsc",
+        "postbuild": "cp package.json dist/",
+        "lint": "eslint src/"
+    },
+    "lint-staged": {
+        "*": [
+            "eslint --max-warnings=0 --no-warn-ignored",
+            "prettier --write --ignore-unknown"
+        ]
+    },
+    "dependencies": {
+        "@tsconfig/node-lts": "^22.0.1",
+        "@tsconfig/strictest": "^2.0.5"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.17.0",
+        "eslint": "^9.17.0",
+        "globals": "^15.14.0",
+        "tsc-watch": "^6.2.1",
+        "typescript": "^5.7.3",
+        "typescript-eslint": "^8.19.1"
+    }
+}

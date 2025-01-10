@@ -1,23 +1,31 @@
 import { CommonModule } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
+import {
+    Component,
+    Injector,
+    OnInit,
+    QueryList,
+    ViewChildren,
+} from '@angular/core'
 import { ActivatedRoute, Params, Router } from '@angular/router'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
-import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import {
     Category,
     CategoryEnum,
     CategoryGroupEnum,
-} from '../../models/category'
-import { dateFilterDescriptions, DateFilterEnum } from '../../models/dateFilter'
-import { CategorySummary, CategoryTotalByDate } from '../../models/spending'
+} from 'wealthwatch-shared/models/category'
+import {
+    CategorySummary,
+    CategoryTotalByDate,
+} from 'wealthwatch-shared/models/spending'
+import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../../components/logger.component'
+import { dateFilterDescriptions, DateFilterEnum } from '../../models/filter'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
-import { LoggerService } from '../../services/logger.service'
 import { SpendingService } from '../../services/spending.service'
 import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 import {
@@ -44,7 +52,7 @@ import { redirectWithParams } from '../../utilities/redirect.utility'
     templateUrl: './spending.component.html',
     styleUrl: './spending.component.css',
 })
-export class SpendingComponent implements OnInit {
+export class SpendingComponent extends LoggerComponent implements OnInit {
     @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
 
     loading = false
@@ -167,21 +175,24 @@ export class SpendingComponent implements OnInit {
     }
 
     constructor(
-        private logger: LoggerService,
         private categorySvc: CategoryService,
         private currencySvc: CurrencyService,
         private alertSvc: AlertService,
         private spendingSvc: SpendingService,
         private route: ActivatedRoute,
-        private router: Router
-    ) {}
+        private router: Router,
+        injector: Injector
+    ) {
+        super(injector, 'SpendingComponent')
+    }
 
     ngOnInit(): void {
         this.defaultStartDate = new Date()
         this.defaultStartDate.setHours(0, 0, 0, 0)
         this.defaultStartDate.setDate(1)
 
-        this.loadCategories().subscribe(() => {
+        this.loadCategories().subscribe((categories) => {
+            this.categories = categories
             this.route.queryParams.subscribe((params) => {
                 if (
                     Object.keys(params).length === 0 ||
@@ -200,76 +211,54 @@ export class SpendingComponent implements OnInit {
         })
     }
 
-    loadCategories(): Observable<void> {
+    loadCategories() {
+        this.logger.info('loading categories')
         this.loading = true
         return this.categorySvc.getCategories().pipe(
-            switchMap((c) => {
-                this.logger.debug('loaded categories', c)
-                this.categories = c
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load categories', err)
+            catchError((err) => {
+                this.alertSvc.addErrorAlert(
+                    this.logger,
+                    'Failed to load categories'
+                )
                 this.loading = false
                 return throwError(() => err)
-            })
+            }),
+            finalize(() => (this.loading = false))
         )
     }
 
     loadSpendingData(): void {
+        this.logger.info('loading spending data')
         this.loading = true
-        this.loadCategorySummaries()
+        this.spendingSvc
+            .getCategorySummaries(this.startDate, this.endDate)
             .pipe(
-                switchMap(() => this.loadTotalByCategoryAndDate()),
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to load spending data')
-                    this.loading = false
+                switchMap((summaries) => {
+                    this.categorySummaries = summaries
+                    return this.spendingSvc.getSpendingCategoryTotalsByDate(
+                        this.startDate,
+                        this.endDate
+                    )
+                }),
+                catchError((err) => {
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to load spending data'
+                    )
                     return throwError(() => err)
-                })
+                }),
+                finalize(() => (this.loading = false))
             )
-            .subscribe(() => {
+            .subscribe((resp) => {
+                this.dates = resp.dates
+                this.spendingCategoryTotalsByDate = resp.totals
                 this.processSpendingData()
-                this.loading = false
             })
     }
 
-    loadCategorySummaries(): Observable<void> {
-        return this.spendingSvc
-            .getCategorySummaries(this.startDate, this.endDate)
-            .pipe(
-                switchMap((s) => {
-                    this.logger.debug('loaded category summaries', s)
-                    this.categorySummaries = s
-                    return of(undefined)
-                }),
-                catchError((err: HttpErrorResponse) => {
-                    this.logger.error('failed to load category summaries', err)
-                    return throwError(() => err)
-                })
-            )
-    }
-
-    loadTotalByCategoryAndDate(): Observable<void> {
-        return this.spendingSvc
-            .getSpendingCategoryTotalsByDate(this.startDate, this.endDate)
-            .pipe(
-                switchMap((t) => {
-                    this.logger.debug('loaded spending category totals', t)
-                    this.dates = t.dates
-                    this.spendingCategoryTotalsByDate = t.totals
-                    return of(undefined)
-                }),
-                catchError((err: HttpErrorResponse) => {
-                    this.logger.error(
-                        'failed to load spending category totals',
-                        err
-                    )
-                    return throwError(() => err)
-                })
-            )
-    }
-
     processParams(params: Params): boolean {
+        this.logger.info('processing params', { params })
+
         const dateFilter: string | undefined = params['dateFilter']
         if (dateFilter === undefined) return true
 
@@ -304,6 +293,8 @@ export class SpendingComponent implements OnInit {
     }
 
     processSpendingData(): void {
+        this.logger.info('processing spending data')
+
         this.incomeTotal = undefined
         this.incomeCount = undefined
         this.billsTotal = undefined
@@ -371,6 +362,8 @@ export class SpendingComponent implements OnInit {
     }
 
     toggleIncludeBills(event: MouseEvent | KeyboardEvent): void {
+        this.logger.info('toggling include bills', { event })
+
         if (!handleCheckboxSelect(event)) return
         this.loading = true
         const billsCategory = this.categories.find(
@@ -473,13 +466,16 @@ export class SpendingComponent implements OnInit {
         if (this.selectedDateFilter !== DateFilterEnum.CUSTOM) {
             return dateFilterDescriptions[this.selectedDateFilter]
         }
-        if (!this.startDate) {
-            return `On or Before ${this.getDateString(this.endDate!)}`
+        if (this.startDate && !this.endDate) {
+            return `On or After ${this.getDateString(this.startDate)}`
         }
-        if (!this.endDate) {
-            return `On or After ${this.getDateString(this.startDate!)}`
+        if (this.endDate && !this.startDate) {
+            return `On or Before ${this.getDateString(this.endDate)}`
         }
-        return `${this.getDateString(this.startDate)} - ${this.getDateString(this.endDate)}`
+        if (this.startDate && this.endDate) {
+            return `${this.getDateString(this.startDate)} - ${this.getDateString(this.endDate)}`
+        }
+        throw Error('unexpected missing dates for custom date range')
     }
 
     getDateString(date: Date): string {
@@ -496,10 +492,6 @@ export class SpendingComponent implements OnInit {
 
     getSpendingTotalString(): string {
         return this.getAmountString(this.spendingTotal)
-    }
-
-    getNonSpendingTotalString(): string {
-        return this.getAmountString(this.nonSpendingTotal)
     }
 
     getAmountString(total: number): string {

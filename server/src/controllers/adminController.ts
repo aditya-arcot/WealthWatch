@@ -1,10 +1,10 @@
 import * as crypto from 'crypto'
 import { Request, Response } from 'express'
+import { AccessRequestStatusEnum } from 'wealthwatch-shared/models/accessRequest.js'
 import {
     fetchAccessRequests,
     modifyAccessRequestStatusAccessCodeAndReviewerById,
 } from '../database/accessRequestQueries.js'
-import { AccessRequestStatusEnum } from '../models/accessRequest.js'
 import { HttpError } from '../models/error.js'
 import { parseNumberOrUndefinedFromParam } from '../utils/format.js'
 import { logger } from '../utils/logger.js'

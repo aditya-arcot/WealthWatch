@@ -7,7 +7,8 @@ import {
 } from './account.js'
 
 // 3 hours
-const refreshCooldown = 1000 * 60 * 60 * 3
+export const refreshCooldown = 1000 * 60 * 60 * 3
+
 export const inCooldown = (timestamp: Date | null) => {
     if (!timestamp) return false
     return Date.now() - new Date(timestamp).getTime() < refreshCooldown
@@ -34,6 +35,10 @@ export interface ItemWithAccounts extends Item {
 
 export interface ItemWithAccountsWithHoldings extends Item {
     accounts: AccountWithHoldings[]
+}
+
+export interface ItemWithAccountsWithLiabilities extends Item {
+    accounts: (CreditCardAccount | StudentLoanAccount | MortgageAccount)[]
 }
 
 export interface ItemWithCreditCardAccounts extends Item {

@@ -1,3 +1,11 @@
+export enum AmountFilterEnum {
+    ALL = 'all',
+    EXACTLY = 'exactly',
+    GREATER_THAN = 'greaterThan',
+    LESS_THAN = 'lessThan',
+    BETWEEN = 'between',
+}
+
 export enum DateFilterEnum {
     ALL,
     CURRENT_WEEK,

@@ -5,7 +5,7 @@ import path from 'path'
 import { pino } from 'pino'
 import { dev, vars } from './env.js'
 
-type pinoTarget = {
+interface pinoTarget {
     target: string
     level: string
     options: object

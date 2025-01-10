@@ -31,7 +31,7 @@ VALUES
         'demo@user',
         'Demo',
         'User',
-        '$2a$10$Sg24QcAjUDufmcwYzd13jOsCeXrB/BPrnGQTtdNuIOGfFOn4dXBma',
+        '',
         false
     );
 

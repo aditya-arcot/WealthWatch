@@ -1,7 +1,5 @@
 ignores: [
-    "@dotenvx/dotenvx",
     "@logtail/pino",
-    "@tsconfig/node-lts",
     "@tsconfig/strictest",
     "pino-pretty",
     "lint-staged"

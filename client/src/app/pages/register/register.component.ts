@@ -1,6 +1,11 @@
 import { CommonModule } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import {
+    Component,
+    ElementRef,
+    Injector,
+    OnInit,
+    ViewChild,
+} from '@angular/core'
 import {
     AbstractControl,
     FormBuilder,
@@ -9,10 +14,10 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
-import { User } from '../../models/user'
+import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
-import { LoggerService } from '../../services/logger.service'
+import { SecretsService } from '../../services/secrets.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -21,7 +26,7 @@ import { UserService } from '../../services/user.service'
     templateUrl: './register.component.html',
     styleUrl: './register.component.css',
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent extends LoggerComponent implements OnInit {
     @ViewChild('accessCodeForm') accessCodeForm!: ElementRef<HTMLFormElement>
     @ViewChild('registerForm') registerForm!: ElementRef<HTMLFormElement>
 
@@ -35,12 +40,14 @@ export class RegisterComponent implements OnInit {
 
     constructor(
         private formBuilder: FormBuilder,
-        private logger: LoggerService,
         private userSvc: UserService,
         private router: Router,
         private authSvc: AuthService,
-        private alertSvc: AlertService
+        private alertSvc: AlertService,
+        private secretsSvc: SecretsService,
+        injector: Injector
     ) {
+        super(injector, 'RegisterComponent')
         this.accessCodeFormGroup = this.formBuilder.group({
             accessCode: [],
         })
@@ -55,25 +62,10 @@ export class RegisterComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.userSvc
-            .getCurrentUser()
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearStoredCurrentUser()
-                    this.logger.error('error while getting current user')
-                    return throwError(() => err)
-                })
-            )
-            .subscribe((user?: User) => {
-                if (!user) {
-                    this.logger.info('not logged in')
-                    return
-                }
-                this.userSvc.storeCurrentUser(user)
-                this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Already logged in')
-            })
+        if (this.userSvc.user) {
+            void this.router.navigateByUrl('/home')
+            this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
+        }
     }
 
     handleAccessCodeFormKeypress = (event: KeyboardEvent) => {
@@ -94,7 +86,7 @@ export class RegisterComponent implements OnInit {
             !this.accessCodeFormGroup.valid ||
             !accessCodeForm.checkValidity()
         ) {
-            this.logger.error('validation error')
+            this.logger.info('validation failed')
         } else {
             this.validateAccessCode()
         }
@@ -104,7 +96,7 @@ export class RegisterComponent implements OnInit {
     validateRegisterForm() {
         const registerForm = this.registerForm?.nativeElement
         if (!this.registerFormGroup.valid || !registerForm.checkValidity()) {
-            this.logger.error('validation error')
+            this.logger.info('validation failed')
         } else {
             this.register()
         }
@@ -148,19 +140,32 @@ export class RegisterComponent implements OnInit {
             .validateAccessCode(this.accessCode)
             .pipe(
                 switchMap((resp) => {
+                    this.alertSvc.addSuccessAlert(
+                        this.logger,
+                        'Success validating access code',
+                        'Please continue with registration'
+                    )
                     this.name = resp.name
                     this.email = resp.email
                     this.accessCodeValidated = true
                     return of(undefined)
                 }),
-                catchError((err: HttpErrorResponse) => {
-                    this.logger.error('error while validating access code')
-                    this.accessCodeFormGroup.patchValue({ accessCode: '' })
+                catchError((err) => {
+                    if (err.status === 400) {
+                        this.alertSvc.addErrorAlert(
+                            this.logger,
+                            'Invalid access code'
+                        )
+                        this.accessCodeFormGroup.patchValue({ accessCode: '' })
+                        return of(undefined)
+                    }
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to validate access code'
+                    )
                     return throwError(() => err)
                 }),
-                finalize(() => {
-                    this.loading = false
-                })
+                finalize(() => (this.loading = false))
             )
             .subscribe()
     }
@@ -175,20 +180,20 @@ export class RegisterComponent implements OnInit {
         this.authSvc
             .register(this.accessCode, username, password)
             .pipe(
-                switchMap((user) => {
-                    this.userSvc.storeCurrentUser(user)
-                    this.router.navigateByUrl('/home')
-                    this.alertSvc.clearAlerts()
-                    this.alertSvc.addSuccessAlert('Success registering')
+                switchMap(() => {
+                    void this.router.navigateByUrl('/home')
+                    this.alertSvc.addSuccessAlert(
+                        this.logger,
+                        'Success registering'
+                    )
                     return of(undefined)
                 }),
-                catchError((err: HttpErrorResponse) => {
-                    this.logger.error('error while registering')
+                catchError((err) => {
                     if (err.status === 409) {
-                        this.alertSvc.clearAlerts()
                         this.alertSvc.addErrorAlert(
-                            'An account with that username already exists',
-                            ['Please choose another username or log in']
+                            this.logger,
+                            'That username is not available',
+                            'Please choose another username or log in'
                         )
                         this.registerFormGroup.patchValue({
                             username: '',
@@ -197,15 +202,17 @@ export class RegisterComponent implements OnInit {
                         return of(undefined)
                     }
                     this.alertSvc.addErrorAlert(
-                        'Registration failed. Please try again'
+                        this.logger,
+                        'Registration failed'
                     )
                     this.registerFormGroup.patchValue({ confirmPassword: '' })
                     return throwError(() => err)
                 }),
-                finalize(() => {
-                    this.loading = false
-                })
+                finalize(() => (this.loading = false))
             )
-            .subscribe()
+            .subscribe(() => {
+                this.logger.info('getting secrets')
+                this.secretsSvc.getSecrets().subscribe()
+            })
     }
 }

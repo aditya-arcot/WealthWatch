@@ -4,7 +4,6 @@ import { StartupService } from '../../services/startup.service'
 
 @Component({
     selector: 'app-startup-error',
-    standalone: true,
     templateUrl: './startup-error.component.html',
 })
 export class StartupErrorComponent implements OnInit {
@@ -15,7 +14,7 @@ export class StartupErrorComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.startupSvc.success) {
-            this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl('/home')
             return
         }
     }

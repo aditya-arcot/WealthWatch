@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
+import { Item } from 'wealthwatch-shared/models/item.js'
 import {
     fetchActiveItemByPlaidId,
     fetchActiveItemByUserIdAndInstitutionId,
@@ -8,7 +9,6 @@ import {
 } from '../database/itemQueries.js'
 import { fetchUsers, removeUserById } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
-import { Item } from '../models/item.js'
 import { plaidSandboxResetLogin } from '../plaid/itemMethods.js'
 import {
     plaidPublicTokenExchange,

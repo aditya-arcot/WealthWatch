@@ -3,13 +3,13 @@ import { importJWK, jwtVerify } from 'jose'
 import { sha256 } from 'js-sha256'
 import { jwtDecode } from 'jwt-decode'
 import { JWKPublicKey } from 'plaid'
+import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification.js'
 import {
     fetchActiveItemByPlaidId,
     modifyItemHealthyById,
 } from '../database/itemQueries.js'
 import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
-import { NotificationTypeEnum } from '../models/notification.js'
 import {
     HoldingsWebhookCodeEnum,
     ItemWebhookCodeEnum,

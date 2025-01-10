@@ -1,6 +1,12 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import {
+    AccessRequest,
+    AccessRequestStatusEnum,
+} from 'wealthwatch-shared/models/accessRequest.js'
+import { AccessRequestErrorCodeEnum } from 'wealthwatch-shared/models/error.js'
+import { User } from 'wealthwatch-shared/models/user.js'
+import {
     fetchAccessRequestByAccessCode,
     fetchAccessRequestByEmail,
     insertAccessRequest,
@@ -11,12 +17,8 @@ import {
     fetchUserByUsername,
     insertUser,
 } from '../database/userQueries.js'
-import {
-    AccessRequest,
-    AccessRequestStatusEnum,
-} from '../models/accessRequest.js'
-import { AccessRequestErrorCodeEnum, HttpError } from '../models/error.js'
-import { User } from '../models/user.js'
+import { HttpError } from '../models/error.js'
+import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 
 export const requestAccess = async (req: Request, res: Response) => {
@@ -179,6 +181,17 @@ export const login = async (req: Request, res: Response) => {
     }
     if (!bcrypt.compareSync(password, user.passwordHash)) {
         throw new HttpError('incorrect password', 400)
+    }
+    req.session.user = user
+    return res.json(user)
+}
+
+export const loginWithDemo = async (req: Request, res: Response) => {
+    logger.debug('logging in with demo account')
+
+    const user = await fetchUserByUsername(vars.demoUser)
+    if (!user) {
+        throw new HttpError('unexpected error')
     }
     req.session.user = user
     return res.json(user)

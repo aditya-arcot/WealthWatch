@@ -5,7 +5,6 @@ import autocolors from 'chartjs-plugin-autocolors'
 import { AlertComponent } from './components/alert/alert.component'
 import { HeaderComponent } from './components/header/header.component'
 import { CustomBarElement } from './models/chart.js'
-import { AuthService } from './services/auth.service'
 
 @Component({
     selector: 'app-root',
@@ -22,10 +21,7 @@ export class AppComponent implements OnInit {
         '/register',
     ]
 
-    constructor(
-        public authSvc: AuthService,
-        public router: Router
-    ) {}
+    constructor(public router: Router) {}
 
     ngOnInit(): void {
         // vertically-centered tooltip for stacked bar graph

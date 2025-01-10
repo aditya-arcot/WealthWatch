@@ -1,4 +1,6 @@
 import { Request, Response } from 'express'
+import { Item } from 'wealthwatch-shared/models/item.js'
+import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification.js'
 import {
     fetchActiveNotificationsByUserId,
     insertNotification,
@@ -6,11 +8,7 @@ import {
     modifyNotificationToInactiveByUserIdAndId,
 } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
-import { Item } from '../models/item.js'
-import {
-    createNotification,
-    NotificationTypeEnum,
-} from '../models/notification.js'
+import { createNotification } from '../models/notification.js'
 import { parseNumberOrUndefinedFromParam } from '../utils/format.js'
 import { logger } from '../utils/logger.js'
 

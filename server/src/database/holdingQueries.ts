@@ -1,4 +1,7 @@
-import { Holding, HoldingWithSecurity } from '../models/holding.js'
+import {
+    Holding,
+    HoldingWithSecurity,
+} from 'wealthwatch-shared/models/holding.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertHoldings = async (holdings: Holding[]): Promise<void> => {

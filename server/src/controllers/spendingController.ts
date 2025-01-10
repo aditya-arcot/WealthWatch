@@ -14,11 +14,11 @@ export const getUserCategorySummaries = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const startDate = req.query['startDate']
-    if (typeof startDate !== 'undefined' && typeof startDate !== 'string')
+    if (startDate !== undefined && typeof startDate !== 'string')
         throw new HttpError('invalid start date', 400)
 
     const endDate = req.query['endDate']
-    if (typeof endDate !== 'undefined' && typeof endDate !== 'string')
+    if (endDate !== undefined && typeof endDate !== 'string')
         throw new HttpError('invalid end date', 400)
 
     const resp = await fetchCategorySummariesByUserIdAndDateRange(
@@ -39,11 +39,11 @@ export const getUserSpendingCategoryTotals = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const startDate = req.query['startDate']
-    if (typeof startDate !== 'undefined' && typeof startDate !== 'string')
+    if (startDate !== undefined && typeof startDate !== 'string')
         throw new HttpError('invalid start date', 400)
 
     const endDate = req.query['endDate']
-    if (typeof endDate !== 'undefined' && typeof endDate !== 'string')
+    if (endDate !== undefined && typeof endDate !== 'string')
         throw new HttpError('invalid end date', 400)
 
     const dates = await fetchActiveTransactionsDateSeriesByUserIdAndDateRange(

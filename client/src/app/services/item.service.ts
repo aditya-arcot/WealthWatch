@@ -1,14 +1,13 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { env } from '../../environments/env'
 import {
-    Item,
     ItemWithAccounts,
     ItemWithAccountsWithHoldings,
     ItemWithCreditCardAccounts,
     ItemWithMortgageAccounts,
     ItemWithStudentLoanAccounts,
-} from '../models/item'
+} from 'wealthwatch-shared/models/item'
+import { env } from '../../environments/env'
 
 @Injectable({
     providedIn: 'root',
@@ -17,10 +16,6 @@ export class ItemService {
     readonly baseUrl = `${env.apiUrl}/items`
 
     constructor(private http: HttpClient) {}
-
-    getItems() {
-        return this.http.get<Item[]>(this.baseUrl)
-    }
 
     getItemsWithAccounts() {
         const url = `${this.baseUrl}/with-accounts`

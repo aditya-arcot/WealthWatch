@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
 import {
     AfterViewInit,
     Component,
     ElementRef,
+    Injector,
     OnInit,
     ViewChild,
 } from '@angular/core'
@@ -15,10 +15,10 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, throwError } from 'rxjs'
-import { User } from '../../models/user'
+import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
-import { LoggerService } from '../../services/logger.service'
+import { SecretsService } from '../../services/secrets.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -27,19 +27,24 @@ import { UserService } from '../../services/user.service'
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent
+    extends LoggerComponent
+    implements OnInit, AfterViewInit
+{
     @ViewChild('loginForm') loginForm!: ElementRef<HTMLFormElement>
     loginFormGroup: FormGroup
     loading = false
 
     constructor(
         private formBuilder: FormBuilder,
-        private logger: LoggerService,
         private userSvc: UserService,
         private authSvc: AuthService,
         private router: Router,
-        private alertSvc: AlertService
+        private alertSvc: AlertService,
+        private secretsSvc: SecretsService,
+        injector: Injector
     ) {
+        super(injector, 'LoginComponent')
         this.loginFormGroup = this.formBuilder.group({
             username: ['', [Validators.required]],
             password: ['', [Validators.required, Validators.minLength(8)]],
@@ -47,32 +52,17 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.userSvc
-            .getCurrentUser()
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearStoredCurrentUser()
-                    this.logger.error('error while getting current user')
-                    return throwError(() => err)
-                })
-            )
-            .subscribe((user?: User) => {
-                if (!user) {
-                    this.logger.info('not logged in')
-                    return
-                }
-                this.userSvc.storeCurrentUser(user)
-                this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Already logged in')
-            })
+        if (this.userSvc.user) {
+            void this.router.navigateByUrl('/home')
+            this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
+        }
     }
 
     ngAfterViewInit(): void {
         const form = this.loginForm?.nativeElement
         form.addEventListener('submit', (submitEvent: SubmitEvent) => {
             if (!this.loginFormGroup.valid || !form.checkValidity()) {
-                this.logger.error('validation error')
+                this.logger.info('validation failed')
                 submitEvent.preventDefault()
                 submitEvent.stopPropagation()
             } else {
@@ -83,19 +73,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
 
     login(demo = false) {
-        this.logger.info('logging in')
+        this.logger.info('logging in', { demo })
         this.loading = true
-        const username = demo
-            ? this.userSvc.demoUser
-            : this.loginFormGroup.value.username
-        const password = demo
-            ? this.userSvc.demoPassword
-            : this.loginFormGroup.value.password
-        this.authSvc
-            .login(username, password)
+
+        const loginObservable = demo
+            ? this.authSvc.loginWithDemo()
+            : this.authSvc.login(
+                  this.loginFormGroup.value.username,
+                  this.loginFormGroup.value.password
+              )
+
+        loginObservable
             .pipe(
                 catchError((err) => {
-                    this.alertSvc.addErrorAlert('Login failed')
+                    this.alertSvc.addErrorAlert(this.logger, 'Failed to log in')
                     if (err.status === 404) {
                         this.loginFormGroup.reset()
                         return throwError(() => err)
@@ -105,11 +96,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe((user) => {
-                this.userSvc.storeCurrentUser(user)
-                this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Success logging in')
+            .subscribe(() => {
+                this.logger.info('getting secrets')
+                this.secretsSvc.getSecrets().subscribe()
+                void this.router.navigateByUrl('/home')
+                this.alertSvc.addSuccessAlert(this.logger, 'Success logging in')
             })
     }
 
