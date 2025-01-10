@@ -109,15 +109,22 @@ jobs:
                       env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
-            - name: install, build shared
+            - name: install, build, package shared
               run: |
                   cd shared/
                   npm ci
                   npm run build
+                  mkdir pack
+                  cp -r dist/* pack
+                  cd pack
+                  npm pack
+                  mv wealthwatch-shared-*.tgz ../wealthwatch-shared.tgz
 
             - name: install, build server
               run: |
                   cd server/
+                  cp ../shared/wealthwatch-shared.tgz .
+                  npm i wealthwatch-shared.tgz
                   npm ci
                   npm run build
 
@@ -139,7 +146,7 @@ jobs:
               run: |
                   cd server/
                   mkdir stage
-                  cp -r .env Dockerfile package.json package-lock.json dist stage/
+                  cp -r .env Dockerfile package.json package-lock.json wealthwatch-shared.tgz dist stage/
                   find stage -type f
 
             - name: copy client files
