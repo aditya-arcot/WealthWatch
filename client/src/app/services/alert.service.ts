@@ -11,34 +11,36 @@ export class AlertService {
     private alerts: Alert[] = []
     private alertSubject = new BehaviorSubject<Alert[]>([])
 
-    constructor(private logger: LoggerService) {}
-
     getAlerts(): Observable<Alert[]> {
         return this.alertSubject.asObservable()
     }
 
-    addSuccessAlert(message: string, subtext?: string[]): void {
+    addSuccessAlert(
+        logger: LoggerService,
+        message: string,
+        ...subtext: string[]
+    ): void {
+        this.clearAlerts()
         this.addAlert(AlertType.Success, message, subtext)
-        if (subtext) {
-            this.logger.info(message, subtext)
-        } else {
-            this.logger.info(message)
-        }
+        if (subtext.length) logger.info(message, { subtext })
+        else logger.info(message)
     }
 
-    addErrorAlert(message: string, subtext?: string[]): void {
+    addErrorAlert(
+        logger: LoggerService,
+        message: string,
+        ...subtext: string[]
+    ): void {
+        this.clearAlerts()
         this.addAlert(AlertType.Error, message, subtext)
-        if (subtext) {
-            this.logger.error(message, subtext)
-        } else {
-            this.logger.error(message)
-        }
+        if (subtext.length) logger.error(message, { subtext })
+        else logger.error(message)
     }
 
     private addAlert(
         type: AlertType,
         message: string,
-        subtext?: string[]
+        subtext: string[]
     ): void {
         const alert: Alert = {
             id: uuid(),
@@ -61,7 +63,7 @@ export class AlertService {
         this.alertSubject.next([...this.alerts])
     }
 
-    clearAlerts(): void {
+    private clearAlerts(): void {
         this.alerts = []
         this.alertSubject.next([...this.alerts])
     }

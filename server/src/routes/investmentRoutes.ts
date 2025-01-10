@@ -16,11 +16,11 @@ const router = express.Router()
  * @swagger
  * /investments/refresh:
  *   post:
- *     summary: Refresh the logged in user's investments
+ *     summary: Refresh the logged-in user's investments
  *     tags: [Investments]
  *     responses:
  *       204:
- *         description: Refreshed the logged in user's investments
+ *         description: Refreshed the logged-in user's investments
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

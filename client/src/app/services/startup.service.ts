@@ -1,11 +1,14 @@
-import { HttpErrorResponse } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, Injector } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, catchError, of, switchMap, throwError } from 'rxjs'
-import { User } from '../models/user'
+import { NGXLogger } from 'ngx-logger'
+import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { AlertService } from './alert.service'
 import { CSRFService } from './csrf.service'
-import { LoggerService } from './logger.service'
+import {
+    createLoggerWithContext,
+    LoggerService,
+    LogtailService,
+} from './logger.service'
 import { SecretsService } from './secrets.service'
 import { UserService } from './user.service'
 
@@ -13,79 +16,81 @@ import { UserService } from './user.service'
     providedIn: 'root',
 })
 export class StartupService {
+    private readonly logger: LoggerService
     success = false
 
     constructor(
-        private logger: LoggerService,
         private csrfSvc: CSRFService,
         private userSvc: UserService,
         private secretsSvc: SecretsService,
         private router: Router,
-        private alertSvc: AlertService
-    ) {}
+        private alertSvc: AlertService,
+        injector: Injector
+    ) {
+        const ngxLogger = injector.get(NGXLogger)
+        const logtail = injector.get(LogtailService)
+        this.logger = createLoggerWithContext(
+            ngxLogger,
+            logtail,
+            'StartupService'
+        )
+    }
 
     startup(): Observable<void> {
-        this.logger.debug('starting up')
-        this.userSvc.clearStoredCurrentUser()
+        this.logger.info('starting up')
         return this.getCsrfToken().pipe(
             switchMap(() => this.getCurrentUser()),
-            switchMap(() => this.getSecrets()),
+            switchMap((userReceived) => {
+                if (userReceived) return this.getSecrets()
+                this.logger.info('skipping secrets')
+                return of(undefined)
+            }),
             switchMap(() => {
                 this.success = true
-                this.logger.debug('startup complete')
+                this.logger.info('startup success')
                 return of(undefined)
             }),
-            catchError(() => {
+            catchError((err) => {
+                this.logger.error('startup error', { err })
                 return of(undefined)
             })
         )
     }
 
-    private getCsrfToken(): Observable<void> {
+    private getCsrfToken() {
+        this.logger.info('getting csrf token')
         return this.csrfSvc.getCsrfToken().pipe(
-            switchMap((resp) => {
-                this.logger.debug('received csrf token')
-                this.csrfSvc.storeCsrfToken(resp.csrfToken)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.router.navigateByUrl('/startup-error')
-                this.alertSvc.addErrorAlert('Failed to get CSRF token')
+            catchError((err) => {
+                void this.router.navigateByUrl('/startup-error')
+                this.alertSvc.addErrorAlert(
+                    this.logger,
+                    'Failed to get CSRF token'
+                )
                 return throwError(() => err)
             })
         )
     }
 
-    private getCurrentUser(): Observable<void> {
+    private getCurrentUser() {
+        this.logger.info('getting current user')
         return this.userSvc.getCurrentUser().pipe(
-            switchMap((user?: User) => {
-                if (!user) {
-                    return throwError(() => new Error('no current user'))
-                }
-                this.logger.debug('received current user')
-                this.userSvc.storeCurrentUser(user)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.userSvc.clearStoredCurrentUser()
-                this.router.navigateByUrl('/login')
-                this.alertSvc.addErrorAlert('Not logged in')
-                return throwError(() => err)
+            switchMap((user) => {
+                if (user) return of(true)
+                this.logger.info('no current user')
+                return of(false)
             })
         )
     }
 
-    private getSecrets(): Observable<void> {
+    private getSecrets() {
+        this.logger.info('getting secrets')
         return this.secretsSvc.getSecrets().pipe(
-            switchMap((secrets) => {
-                this.logger.debug('received secrets')
-                this.secretsSvc.secrets = secrets
-                this.logger.configureLogtail(secrets.logtailToken)
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.router.navigateByUrl('/startup-error')
-                this.alertSvc.addErrorAlert('Failed to get secrets')
+            catchError((err) => {
+                void this.router.navigateByUrl('/startup-error')
+                this.alertSvc.addErrorAlert(
+                    this.logger,
+                    'Failed to get secrets'
+                )
                 return throwError(() => err)
             })
         )

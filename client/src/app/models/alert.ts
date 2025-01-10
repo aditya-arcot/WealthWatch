@@ -2,7 +2,7 @@ export interface Alert {
     id: string
     type: AlertType
     message: string
-    subtext?: string[]
+    subtext: string[]
 }
 
 export enum AlertType {

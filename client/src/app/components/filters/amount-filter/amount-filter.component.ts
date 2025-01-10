@@ -9,8 +9,7 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { AmountFilterEnum } from '../../../models/amountFilter'
-import { AlertService } from '../../../services/alert.service'
+import { AmountFilterEnum } from '../../../models/filter'
 
 @Component({
     selector: 'app-amount-filter',
@@ -39,8 +38,6 @@ export class AmountFilterComponent implements OnInit, OnChanges {
     originalMaxAmount: number | null = this.maxAmount
 
     cancelOnExit = true
-
-    constructor(private alertSvc: AlertService) {}
 
     ngOnInit(): void {
         const modalElement = this.amountFilterModal.nativeElement
@@ -162,14 +159,6 @@ export class AmountFilterComponent implements OnInit, OnChanges {
             if (this.minAmount === null || this.maxAmount === null) {
                 this.selectedFilter = AmountFilterEnum.ALL
             }
-        }
-
-        if (!this.minAmountValid() || !this.maxAmountValid()) {
-            this.alertSvc.addErrorAlert('Invalid amount(s)', [
-                'Update inputs and try again',
-            ])
-            this.cancel()
-            return
         }
 
         this.filterInputsChanged.emit({

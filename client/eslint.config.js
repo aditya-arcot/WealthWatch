@@ -6,9 +6,14 @@ const angular = require('angular-eslint')
 module.exports = tseslint.config(
     {
         files: ['**/*.ts'],
+        languageOptions: {
+            parserOptions: {
+                project: 'tsconfig.json',
+            },
+        },
         extends: [
             eslint.configs.recommended,
-            ...tseslint.configs.recommended,
+            ...tseslint.configs.strict,
             ...tseslint.configs.stylistic,
             ...angular.configs.tsRecommended,
         ],
@@ -30,6 +35,14 @@ module.exports = tseslint.config(
                     style: 'kebab-case',
                 },
             ],
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                {
+                    argsIgnorePattern: '^_',
+                },
+            ],
+            '@typescript-eslint/no-misused-promises': 'error',
+            '@typescript-eslint/no-floating-promises': 'error',
         },
     },
     {
@@ -38,6 +51,5 @@ module.exports = tseslint.config(
             ...angular.configs.templateRecommended,
             ...angular.configs.templateAccessibility,
         ],
-        rules: {},
     }
 )

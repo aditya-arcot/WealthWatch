@@ -20,6 +20,7 @@ export const vars = {
     plaidClientId: getEnvVar('PLAID_CLIENT_ID'),
     plaidSecret: getEnvVar('PLAID_SECRET'),
     plaidWebhookUrl: getEnvVar('PLAID_WEBHOOK_URL'),
+    demoUser: getEnvVar('DEMO_USER'),
     logLevel: getEnvVar('LOG_LEVEL'),
     nodeEnv: getEnvVar('NODE_ENV'),
     plaidEnv: getEnvVar('PLAID_ENV'),

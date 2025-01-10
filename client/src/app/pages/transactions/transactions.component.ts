@@ -1,40 +1,34 @@
 import { CommonModule } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, Injector, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Params, Router } from '@angular/router'
 import {
     catchError,
     debounceTime,
     finalize,
-    Observable,
-    of,
     Subject,
     Subscription,
     switchMap,
     throwError,
 } from 'rxjs'
+import { Account } from 'wealthwatch-shared/models/account'
+import { Category, CategoryEnum } from 'wealthwatch-shared/models/category'
+import { ItemWithAccounts } from 'wealthwatch-shared/models/item'
+import { Transaction } from 'wealthwatch-shared/models/transaction'
 import { AccountFilterComponent } from '../../components/filters/account-filter/account-filter.component'
 import { AmountFilterComponent } from '../../components/filters/amount-filter/amount-filter.component'
 import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../../components/logger.component'
 import { NoteComponent } from '../../components/note/note.component'
-import { Account } from '../../models/account'
-import { AmountFilterEnum } from '../../models/amountFilter'
-import { Category, CategoryEnum, categoryIcons } from '../../models/category'
-import { DateFilterEnum } from '../../models/dateFilter'
-import { Item } from '../../models/item'
-import {
-    Transaction,
-    TransactionsRequestParams,
-} from '../../models/transaction'
-import { AccountService } from '../../services/account.service'
+import { categoryIcons } from '../../models/category'
+import { AmountFilterEnum, DateFilterEnum } from '../../models/filter'
+import { TransactionsRequestParams } from '../../models/transaction'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
-import { LoggerService } from '../../services/logger.service'
 import { TransactionService } from '../../services/transaction.service'
 import {
     checkDatesEqual,
@@ -64,7 +58,7 @@ import { redirectWithParams } from '../../utilities/redirect.utility'
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.css',
 })
-export class TransactionsComponent implements OnInit {
+export class TransactionsComponent extends LoggerComponent implements OnInit {
     @ViewChild(NoteComponent) noteComponent!: NoteComponent
     noteUpdateSubscription: Subscription | null = null
 
@@ -72,8 +66,8 @@ export class TransactionsComponent implements OnInit {
 
     transactions: Transaction[] = []
     categories: Category[] = []
+    itemsWithAccounts: ItemWithAccounts[] = []
     accounts: Account[] = []
-    items: Item[] = []
 
     pageSizes = [10, 25, 50, 100]
     pageSizeIdx = 0
@@ -102,19 +96,22 @@ export class TransactionsComponent implements OnInit {
     maxNameLength = 30
 
     constructor(
-        private transactionSvc: TransactionService,
-        private categorySvc: CategoryService,
-        private accountSvc: AccountService,
-        private itemSvc: ItemService,
-        private logger: LoggerService,
-        private alertSvc: AlertService,
-        private currencySvc: CurrencyService,
         private route: ActivatedRoute,
-        private router: Router
-    ) {}
+        private router: Router,
+        private alertSvc: AlertService,
+        private categorySvc: CategoryService,
+        private currencySvc: CurrencyService,
+        private itemSvc: ItemService,
+        private transactionSvc: TransactionService,
+        injector: Injector
+    ) {
+        super(injector, 'TransactionsComponent')
+    }
 
     ngOnInit(): void {
-        this.loadData().subscribe(() => {
+        this.loadData().subscribe((items) => {
+            this.itemsWithAccounts = items
+            this.accounts = items.flatMap((item) => item.accounts)
             this.selectedCategoryIds = new Set(this.categories.map((c) => c.id))
             this.selectedAccountIds = new Set(this.accounts.map((a) => a.id))
             this.route.queryParams.subscribe((params) => {
@@ -132,64 +129,26 @@ export class TransactionsComponent implements OnInit {
         })
     }
 
-    loadData(): Observable<void> {
+    loadData() {
+        this.logger.info('loading data')
         this.loading = true
-        return this.loadCategories().pipe(
-            switchMap(() => this.loadAccounts()),
-            switchMap(() => this.loadItems()),
-            catchError((err: HttpErrorResponse) => {
-                this.alertSvc.addErrorAlert('Failed to load data', [
-                    err.message,
-                ])
-                this.loading = false
-                return throwError(() => err)
-            })
-        )
-    }
-
-    loadCategories(): Observable<void> {
         return this.categorySvc.getCategories().pipe(
             switchMap((categories) => {
-                this.logger.debug('loaded categories', categories)
                 this.categories = categories
-                return of(undefined)
+                return this.itemSvc.getItemsWithAccounts()
             }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load categories', err)
+            catchError((err) => {
+                this.alertSvc.addErrorAlert(this.logger, 'Failed to load data')
                 return throwError(() => err)
-            })
+            }),
+            finalize(() => (this.loading = false))
         )
     }
 
-    loadAccounts(): Observable<void> {
-        return this.accountSvc.getAccounts().pipe(
-            switchMap((accounts) => {
-                this.logger.debug('loaded accounts', accounts)
-                this.accounts = accounts
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load accounts', err)
-                return throwError(() => err)
-            })
-        )
-    }
+    reloadTransactions(): void {
+        this.logger.info('reloading transactions')
+        this.loading = true
 
-    loadItems(): Observable<void> {
-        return this.itemSvc.getItems().pipe(
-            switchMap((items) => {
-                this.logger.debug('loaded items', items)
-                this.items = items
-                return of(undefined)
-            }),
-            catchError((err: HttpErrorResponse) => {
-                this.logger.error('failed to load items', err)
-                return throwError(() => err)
-            })
-        )
-    }
-
-    loadTransactions(): Observable<void> {
         const limit = this.pageSizes[this.pageSizeIdx]
         const offset = (this.page - 1) * limit
         const req: TransactionsRequestParams = {
@@ -198,59 +157,54 @@ export class TransactionsComponent implements OnInit {
             endDate: this.endDate,
             minAmount: this.minAmount,
             maxAmount: this.maxAmount,
-            categoryIds: this.selectedCategoryIds,
-            accountIds: this.selectedAccountIds,
             limit,
             offset,
         }
-        return this.transactionSvc
-            .getTransactions(req, this.categories.length, this.accounts.length)
+        if (this.categories.length !== this.selectedCategoryIds.size) {
+            req.categoryIds = this.selectedCategoryIds
+        }
+        if (this.accounts.length !== this.selectedAccountIds.size) {
+            req.accountIds = this.selectedAccountIds
+        }
+
+        this.transactionSvc
+            .getTransactions(req)
             .pipe(
-                switchMap((t) => {
-                    this.logger.debug('loaded transactions', t)
-                    this.transactions = t.transactions
-                    this.filteredCount = t.filteredCount
-                    this.totalCount = t.totalCount
-
-                    const totalPages = this.getTotalPages()
-                    if (totalPages === 0) {
-                        this.page = 1
-                    } else if (this.page > totalPages) {
-                        redirectWithParams(this.router, this.route, {
-                            page: totalPages,
-                        })
-                    }
-
-                    return of(undefined)
-                }),
-                catchError((err: HttpErrorResponse) => {
-                    this.logger.error('failed to load transactions', err)
-                    return throwError(() => err)
-                })
-            )
-    }
-
-    reloadTransactions(): void {
-        this.loading = true
-        this.loadTransactions()
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to reload transactions')
+                catchError((err) => {
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to reload transactions'
+                    )
                     this.clearFilters()
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe()
+            .subscribe((resp) => {
+                this.transactions = resp.transactions
+                this.filteredCount = resp.filteredCount
+                this.totalCount = resp.totalCount
+
+                const totalPages = this.getTotalPages()
+                if (totalPages === 0) {
+                    this.page = 1
+                } else if (this.page > totalPages) {
+                    redirectWithParams(this.router, this.route, {
+                        page: totalPages,
+                    })
+                }
+            })
     }
 
     refreshTransactions(): void {
+        this.logger.info('refreshing transactions')
         this.loading = true
         this.transactionSvc
             .refreshTransactions()
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
+                        this.logger,
                         'Failed to refresh transactions'
                     )
                     return throwError(() => err)
@@ -258,13 +212,17 @@ export class TransactionsComponent implements OnInit {
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Refreshing transactions', [
-                    'Please check back later',
-                ])
+                this.alertSvc.addSuccessAlert(
+                    this.logger,
+                    'Refreshing transactions',
+                    'Please check back later'
+                )
             })
     }
 
     processParams(params: Params): void {
+        this.logger.info('processing params', { params })
+
         const page: string | undefined = params['page']
         if (page !== undefined) {
             const pageInt = safeParseInt(page)
@@ -394,12 +352,14 @@ export class TransactionsComponent implements OnInit {
         }
     }
 
-    updateCustomName(t: Transaction, reset = false): void {
+    updateCustomName(transaction: Transaction, reset = false): void {
+        this.logger.info('updating custom name', { transaction, reset })
         this.transactionSvc
-            .updateTransactionCustomName(t)
+            .updateTransactionCustomName(transaction)
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
+                        this.logger,
                         reset
                             ? 'Failed to reset transaction name'
                             : 'Failed to update transaction name'
@@ -409,6 +369,7 @@ export class TransactionsComponent implements OnInit {
             )
             .subscribe(() => {
                 this.alertSvc.addSuccessAlert(
+                    this.logger,
                     reset
                         ? 'Reset transaction name'
                         : 'Updated transaction name'
@@ -416,12 +377,14 @@ export class TransactionsComponent implements OnInit {
             })
     }
 
-    updateCustomCategoryId(t: Transaction, reset = false): void {
+    updateCustomCategoryId(transaction: Transaction, reset = false): void {
+        this.logger.info('updating custom category id', { transaction, reset })
         this.transactionSvc
-            .updateTransactionCustomCategoryId(t)
+            .updateTransactionCustomCategoryId(transaction)
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
+                        this.logger,
                         reset
                             ? 'Failed to reset transaction category'
                             : 'Failed to update transaction category'
@@ -431,6 +394,7 @@ export class TransactionsComponent implements OnInit {
             )
             .subscribe(() => {
                 this.alertSvc.addSuccessAlert(
+                    this.logger,
                     reset
                         ? 'Reset transaction category'
                         : 'Updated transaction category'
@@ -438,19 +402,24 @@ export class TransactionsComponent implements OnInit {
             })
     }
 
-    updateNote(t: Transaction): void {
+    updateNote(transaction: Transaction): void {
+        this.logger.info('updating note', { transaction })
         this.transactionSvc
-            .updateTransactionNote(t)
+            .updateTransactionNote(transaction)
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
+                        this.logger,
                         'Failed to update transaction note'
                     )
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Updated transaction note')
+                this.alertSvc.addSuccessAlert(
+                    this.logger,
+                    'Updated transaction note'
+                )
             })
     }
 
@@ -577,7 +546,7 @@ export class TransactionsComponent implements OnInit {
     applyCategoryFilter(ids: Set<number>): void {
         if (
             ids.size !== this.selectedCategoryIds.size ||
-            ![...ids].every((value) => this.selectedCategoryIds!.has(value))
+            ![...ids].every((value) => this.selectedCategoryIds.has(value))
         ) {
             if (ids.size === 0) {
                 ids = new Set(this.categories.map((c) => c.id))
@@ -593,7 +562,7 @@ export class TransactionsComponent implements OnInit {
     applyAccountFilter(ids: Set<number>): void {
         if (
             ids.size !== this.selectedAccountIds.size ||
-            ![...ids].every((value) => this.selectedAccountIds!.has(value))
+            ![...ids].every((value) => this.selectedAccountIds.has(value))
         ) {
             if (ids.size === 0) {
                 ids = new Set(this.accounts.map((a) => a.id))
@@ -745,26 +714,15 @@ export class TransactionsComponent implements OnInit {
 
     getAccountName(t: Transaction): string {
         const account = this.accounts.find((a) => a.id === t.accountId)
-        if (!account) {
-            this.logger.error('unrecognized account id', t.accountId)
-            return ''
-        }
-        return account.name
+        return account?.name ?? ''
     }
 
     getInstitutionName(t: Transaction): string {
-        const account = this.accounts.find((a) => a.id === t.accountId)
-        if (!account) {
-            this.logger.error('unrecognized account id', t.accountId)
-            return ''
+        for (const item of this.itemsWithAccounts) {
+            if (item.accounts.some((a) => a.id === t.accountId)) {
+                return item.institutionName
+            }
         }
-
-        const item = this.items.find((i) => i.id === account.itemId)
-        if (!item) {
-            this.logger.error('unrecognized item id', account.itemId)
-            return ''
-        }
-
-        return item.institutionName
+        return ''
     }
 }

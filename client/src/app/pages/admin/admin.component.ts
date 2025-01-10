@@ -1,14 +1,13 @@
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
-import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { Component, Injector, OnInit } from '@angular/core'
+import { catchError, finalize, throwError } from 'rxjs'
 import {
     AccessRequest,
     AccessRequestStatusEnum,
-} from '../../models/accessRequest'
+} from 'wealthwatch-shared/models/accessRequest'
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../../components/logger.component'
 import { AdminService } from '../../services/admin.service'
 import { AlertService } from '../../services/alert.service'
-import { LoggerService } from '../../services/logger.service'
 import { formatDate } from '../../utilities/date.utility'
 
 @Component({
@@ -16,38 +15,39 @@ import { formatDate } from '../../utilities/date.utility'
     imports: [LoadingSpinnerComponent],
     templateUrl: './admin.component.html',
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent extends LoggerComponent implements OnInit {
     accessRequestStatusEnum = AccessRequestStatusEnum
     loading = false
     accessReqs: AccessRequest[] = []
 
     constructor(
         private adminSvc: AdminService,
-        private logger: LoggerService,
-        private alertSvc: AlertService
-    ) {}
+        private alertSvc: AlertService,
+        injector: Injector
+    ) {
+        super(injector, 'AdminComponent')
+    }
 
     ngOnInit(): void {
         this.loadRequests()
     }
 
     loadRequests = () => {
+        this.logger.info('loading access requests')
         this.loading = true
         this.adminSvc
             .getAccessRequests()
             .pipe(
-                switchMap((reqs) => {
-                    this.logger.debug('loaded access requests', reqs)
-                    this.accessReqs = reqs
-                    return of(undefined)
-                }),
-                catchError((err: HttpErrorResponse) => {
-                    this.logger.error('failed to load access requests', err)
+                catchError((err) => {
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to load access requests'
+                    )
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe()
+            .subscribe((reqs) => (this.accessReqs = reqs))
     }
 
     getPendingRequests = () => {
@@ -96,13 +96,15 @@ export class AdminComponent implements OnInit {
     }
 
     reviewRequest = (req: AccessRequest, statusId: AccessRequestStatusEnum) => {
+        this.logger.info('reviewing access request', { req, statusId })
         this.loading = true
         this.adminSvc
             .reviewAccessRequest(req.id, statusId)
             .pipe(
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     this.alertSvc.addErrorAlert(
-                        'Failed to review access request. Try again'
+                        this.logger,
+                        'Failed to review access request'
                     )
                     return throwError(() => err)
                 }),

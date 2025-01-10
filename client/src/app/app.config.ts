@@ -33,7 +33,7 @@ export const appConfig: ApplicationConfig = {
             LoggerModule.forRoot({
                 level:
                     env.name === 'prod'
-                        ? NgxLoggerLevel.INFO
+                        ? NgxLoggerLevel.WARN
                         : NgxLoggerLevel.DEBUG,
             })
         ),

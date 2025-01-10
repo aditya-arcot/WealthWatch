@@ -9,8 +9,8 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { Account } from '../../../models/account'
-import { Item } from '../../../models/item'
+import { Account } from 'wealthwatch-shared/models/account'
+import { ItemWithAccounts } from 'wealthwatch-shared/models/item'
 import { handleCheckboxSelect } from '../../../utilities/checkbox.utility'
 
 @Component({
@@ -23,7 +23,7 @@ export class AccountFilterComponent implements OnInit, OnChanges {
     @ViewChild('accountFilterModal', { static: true })
     accountFilterModal!: ElementRef
     @Input({ required: true }) accounts: Account[] = []
-    @Input({ required: true }) items: Item[] = []
+    @Input({ required: true }) itemsWithAccounts: ItemWithAccounts[] = []
     @Input({ required: true }) originalSelectedAccountIds: Set<number> =
         new Set<number>()
     @Output() selectedAccountsChanged = new EventEmitter<{
@@ -63,10 +63,6 @@ export class AccountFilterComponent implements OnInit, OnChanges {
         return `${this.selectedAccountIds.size} Selected`
     }
 
-    getItemAccounts(itemId: number): Account[] {
-        return this.accounts.filter((a) => a.itemId === itemId)
-    }
-
     inputChecked(id: number): boolean {
         return this.selectedAccountIds.has(id)
     }
@@ -82,16 +78,13 @@ export class AccountFilterComponent implements OnInit, OnChanges {
     }
 
     accountIdsChanged(): boolean {
-        if (
+        return (
             this.originalSelectedAccountIds.size !==
                 this.selectedAccountIds.size ||
             ![...this.originalSelectedAccountIds].every((value) =>
-                this.selectedAccountIds!.has(value)
+                this.selectedAccountIds.has(value)
             )
-        ) {
-            return true
-        }
-        return false
+        )
     }
 
     filterApplied(): boolean {

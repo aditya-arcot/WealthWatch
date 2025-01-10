@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification'
+import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent'
 import { env } from '../../environments/env'
-import { NotificationTypeEnum } from '../models/notification'
-import { PlaidLinkEvent } from '../models/plaidLinkEvent'
 
 @Injectable({
     providedIn: 'root',
@@ -22,11 +22,13 @@ export class LinkService {
 
     handleLinkEvent(event: PlaidLinkEvent) {
         const url = `${this.baseUrl}/link-event`
+        /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.post<void>(url, { event })
     }
 
     exchangePublicToken(publicToken: string, metadata: object) {
         const url = `${this.baseUrl}/public-token`
+        /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.post<void>(url, { publicToken, metadata })
     }
 
@@ -35,6 +37,7 @@ export class LinkService {
             ? NotificationTypeEnum.LinkUpdateWithAccounts
             : NotificationTypeEnum.LinkUpdate
         const url = `${this.baseUrl}/link-update`
+        /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.post<void>(url, { itemId, notificationTypeId })
     }
 }

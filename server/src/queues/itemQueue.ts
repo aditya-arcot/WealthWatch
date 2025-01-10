@@ -1,4 +1,5 @@
 import { Queue, Worker } from 'bullmq'
+import { Item } from 'wealthwatch-shared/models/item.js'
 import {
     syncItemAccounts,
     syncItemBalances,
@@ -7,7 +8,6 @@ import {
     syncItemTransactions,
 } from '../controllers/itemController.js'
 import { HttpError } from '../models/error.js'
-import { Item } from '../models/item.js'
 import { vars } from '../utils/env.js'
 import { logger } from '../utils/logger.js'
 import { getRedis } from '../utils/redis.js'

@@ -1,8 +1,8 @@
-import { HttpErrorResponse } from '@angular/common/http'
 import {
     AfterViewInit,
     Component,
     ElementRef,
+    Injector,
     OnInit,
     ViewChild,
 } from '@angular/core'
@@ -14,11 +14,13 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
-import { AccessRequestErrorCodeEnum, ServerError } from '../../models/error'
-import { User } from '../../models/user'
+import {
+    AccessRequestErrorCodeEnum,
+    ServerError,
+} from 'wealthwatch-shared/models/error'
+import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
-import { LoggerService } from '../../services/logger.service'
 import { UserService } from '../../services/user.service'
 
 @Component({
@@ -27,7 +29,10 @@ import { UserService } from '../../services/user.service'
     templateUrl: './access-request.component.html',
     styleUrl: './access-request.component.css',
 })
-export class AccessRequestComponent implements OnInit, AfterViewInit {
+export class AccessRequestComponent
+    extends LoggerComponent
+    implements OnInit, AfterViewInit
+{
     @ViewChild('accessRequestForm')
     accessRequestForm!: ElementRef<HTMLFormElement>
     accessRequestFormGroup: FormGroup
@@ -35,12 +40,13 @@ export class AccessRequestComponent implements OnInit, AfterViewInit {
 
     constructor(
         private formBuilder: FormBuilder,
-        private logger: LoggerService,
         private userSvc: UserService,
         private router: Router,
         private authSvc: AuthService,
-        private alertSvc: AlertService
+        private alertSvc: AlertService,
+        injector: Injector
     ) {
+        super(injector, 'AccessRequestComponent')
         this.accessRequestFormGroup = this.formBuilder.group({
             firstName: ['', [Validators.required]],
             lastName: ['', [Validators.required]],
@@ -49,33 +55,17 @@ export class AccessRequestComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.userSvc
-            .getCurrentUser()
-            .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.userSvc.clearStoredCurrentUser()
-                    this.logger.error('error while getting current user')
-                    return throwError(() => err)
-                })
-            )
-            .subscribe((user?: User) => {
-                if (!user) {
-                    this.logger.info('not logged in')
-                    return
-                }
-                this.userSvc.storeCurrentUser(user)
-                this.router.navigateByUrl('/home')
-                this.alertSvc.clearAlerts()
-                this.alertSvc.addSuccessAlert('Already logged in')
-            })
+        if (this.userSvc.user) {
+            void this.router.navigateByUrl('/home')
+            this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
+        }
     }
 
     ngAfterViewInit(): void {
-        this.logger.info('adding event listener')
         const form = this.accessRequestForm?.nativeElement
         form.addEventListener('submit', (submitEvent: SubmitEvent) => {
             if (!this.accessRequestFormGroup.valid || !form.checkValidity()) {
-                this.logger.error('validation error')
+                this.logger.info('validation failed')
                 submitEvent.preventDefault()
                 submitEvent.stopPropagation()
             } else {
@@ -97,60 +87,63 @@ export class AccessRequestComponent implements OnInit, AfterViewInit {
             .requestAccess(firstName, lastName, email)
             .pipe(
                 switchMap(() => {
-                    this.router.navigateByUrl('/login')
-                    this.alertSvc.clearAlerts()
-                    this.alertSvc.addSuccessAlert('Success requesting access', [
-                        'Please wait for approval',
-                    ])
+                    void this.router.navigateByUrl('/login')
+                    this.alertSvc.addSuccessAlert(
+                        this.logger,
+                        'Success requesting access',
+                        'Please wait for approval'
+                    )
                     return of(undefined)
                 }),
-                catchError((err: HttpErrorResponse) => {
+                catchError((err) => {
                     const code = (err.error as ServerError).code
-                    if (code !== 'undefined') {
-                        switch (code) {
-                            case AccessRequestErrorCodeEnum.UserExists:
-                                this.alertSvc.clearAlerts()
-                                this.alertSvc.addErrorAlert(
-                                    `An account with that email already exists`,
-                                    ['Please log in']
-                                )
-                                this.router.navigateByUrl('/login')
-                                break
-                            case AccessRequestErrorCodeEnum.RequestPending:
-                                this.alertSvc.clearAlerts()
-                                this.alertSvc.addErrorAlert(
-                                    'A previous request with that email is pending',
-                                    ['Please wait for approval']
-                                )
-                                break
-                            case AccessRequestErrorCodeEnum.RequestApproved:
-                                this.alertSvc.clearAlerts()
-                                this.alertSvc.addErrorAlert(
-                                    'A previous request with that email has been approved',
-                                    [
-                                        'Please check your email for your access code',
-                                    ]
-                                )
-                                this.router.navigateByUrl('/register')
-                                break
-                            case AccessRequestErrorCodeEnum.RequestRejected:
-                                this.alertSvc.clearAlerts()
-                                this.alertSvc.addErrorAlert(
-                                    'A previous request with that email has been rejected',
-                                    [
-                                        'Please contact an admin for further assistance',
-                                    ]
-                                )
-                        }
+                    if (this.handleRequestAccessError(code)) {
                         return of(undefined)
                     }
-                    this.alertSvc.addErrorAlert(
-                        'Access request failed. Please try again'
-                    )
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
             )
             .subscribe()
+    }
+
+    handleRequestAccessError(code?: string): boolean {
+        this.logger.info('handling request access error', { code })
+        if (code !== undefined) {
+            switch (code) {
+                case AccessRequestErrorCodeEnum.UserExists:
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        `An account with that email already exists`,
+                        'Please log in'
+                    )
+                    void this.router.navigateByUrl('/login')
+                    return true
+                case AccessRequestErrorCodeEnum.RequestPending:
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'A previous request with that email is pending',
+                        'Please wait for approval'
+                    )
+                    return true
+                case AccessRequestErrorCodeEnum.RequestApproved:
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'A previous request with that email has been approved',
+                        'Please check your email for your access code'
+                    )
+                    void this.router.navigateByUrl('/register')
+                    return true
+                case AccessRequestErrorCodeEnum.RequestRejected:
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'A previous request with that email has been rejected',
+                        'Please contact an admin for further assistance'
+                    )
+                    return true
+            }
+        }
+        this.alertSvc.addErrorAlert(this.logger, 'Failed to request access')
+        return false
     }
 }

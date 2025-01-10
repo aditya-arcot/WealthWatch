@@ -1,17 +1,17 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core'
+import { AfterViewInit, Component, Injector, OnInit } from '@angular/core'
 import {
     NavigationEnd,
     Router,
     RouterLink,
     RouterLinkActive,
 } from '@angular/router'
-import { catchError, filter, Observable, of, switchMap, throwError } from 'rxjs'
+import { catchError, filter, of, switchMap, throwError } from 'rxjs'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
-import { LoggerService } from '../../services/logger.service'
 import { NotificationService } from '../../services/notification.service'
 import { UserService } from '../../services/user.service'
 import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '../logger.component'
 import { NotificationsComponent } from '../notifications/notifications.component'
 
 @Component({
@@ -23,9 +23,11 @@ import { NotificationsComponent } from '../notifications/notifications.component
         LoadingSpinnerComponent,
     ],
     templateUrl: './header.component.html',
-    styleUrl: './header.component.css',
 })
-export class HeaderComponent implements OnInit, AfterViewInit {
+export class HeaderComponent
+    extends LoggerComponent
+    implements OnInit, AfterViewInit
+{
     loading = false
 
     constructor(
@@ -34,14 +36,16 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         private authSvc: AuthService,
         private router: Router,
         private notificationSvc: NotificationService,
-        private logger: LoggerService
-    ) {}
+        injector: Injector
+    ) {
+        super(injector, 'HeaderComponent')
+    }
 
     ngOnInit(): void {
-        this.router.events
+        void this.router.events
             .pipe(filter((event) => event instanceof NavigationEnd))
             .forEach(() => {
-                if (this.userSvc.getStoredCurrentUser()) {
+                if (this.userSvc.user) {
                     this.notificationSvc.loadNotifications().subscribe()
                 }
             })
@@ -51,11 +55,14 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         const notificationsModal = document.getElementById('notificationsModal')
         if (notificationsModal) {
             notificationsModal.addEventListener('hidden.bs.modal', () => {
-                this.updateNotificationsToRead()
+                this.logger.info('updating notifications to read')
+                this.notificationSvc
+                    .updateAllNotificationsToRead()
                     .pipe(
                         switchMap(() =>
                             this.notificationSvc.loadNotifications()
                         ),
+                        // silence errors
                         catchError(() => of(undefined))
                     )
                     .subscribe()
@@ -63,17 +70,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         }
     }
 
-    isAdmin = () => this.userSvc.getStoredCurrentUser()?.admin ?? false
-
-    updateNotificationsToRead(): Observable<undefined> {
-        return this.notificationSvc.updateAllNotificationsToRead().pipe(
-            switchMap(() => {
-                this.logger.debug('updated notifications to read')
-                return of(undefined)
-            }),
-            catchError(() => of(undefined))
-        )
-    }
+    isAdmin = () => this.userSvc.user?.admin ?? false
 
     unreadNotifications(): boolean {
         return this.notificationSvc.notifications.some(
@@ -82,19 +79,20 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 
     logout(): void {
+        this.logger.info('logging out')
         this.authSvc
             .logout()
             .pipe(
                 catchError((err) => {
                     this.alertSvc.addErrorAlert(
-                        'Logout failed. Please try again'
+                        this.logger,
+                        'Failed to log out'
                     )
                     return throwError(() => err)
                 })
             )
             .subscribe(() => {
-                this.userSvc.clearStoredCurrentUser()
-                this.router.navigateByUrl('/logout')
+                void this.router.navigateByUrl('/logout')
             })
     }
 }

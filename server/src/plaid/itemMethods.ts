@@ -1,5 +1,5 @@
 import { ItemRemoveRequest, SandboxItemResetLoginRequest } from 'plaid'
-import { Item } from '../models/item.js'
+import { Item } from 'wealthwatch-shared/models/item.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 

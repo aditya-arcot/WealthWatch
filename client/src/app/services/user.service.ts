@@ -1,38 +1,31 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { tap } from 'rxjs'
+import { User } from 'wealthwatch-shared/models/user'
 import { env } from '../../environments/env'
-import { User } from '../models/user'
+import { SecretsService } from './secrets.service'
 
 @Injectable({
     providedIn: 'root',
 })
 export class UserService {
     readonly baseUrl = `${env.apiUrl}/users`
-    readonly demoUser = 'demo_user'
-    readonly demoPassword = 'demo_pass'
+    user?: User
+    loggedOut = false
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private secretsSvc: SecretsService
+    ) {}
 
-    storeCurrentUser(user: User) {
-        sessionStorage.setItem('user', JSON.stringify(user))
-    }
-
-    getStoredCurrentUser(): User | null {
-        const userStr = sessionStorage.getItem('user')
-        if (userStr === null) return null
-        return JSON.parse(userStr) as User
-    }
-
-    clearStoredCurrentUser(): void {
-        sessionStorage.removeItem('user')
-    }
-
-    demoUserLoggedIn() {
-        return this.getStoredCurrentUser()?.username === this.demoUser
-    }
+    inDemo = () => this.user?.username === this.secretsSvc.secrets?.demoUser
 
     getCurrentUser() {
         const url = `${this.baseUrl}/current`
-        return this.http.get<User | undefined>(url)
+        return this.http.get<User | undefined>(url).pipe(
+            tap((user) => {
+                this.user = user
+            })
+        )
     }
 }

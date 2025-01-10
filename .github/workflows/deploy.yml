@@ -8,7 +8,7 @@ on:
 
 jobs:
     setup:
-        runs-on: mbp-13
+        runs-on: ubuntu-latest
         outputs:
             runner: ${{ steps.set-runner.outputs.runner }}
         steps:
@@ -87,6 +87,8 @@ jobs:
                   echo "PLAID_SECRET=${{ secrets.PLAID_SECRET }}" >> .env
                   echo "PLAID_WEBHOOK_URL=${{ secrets.PLAID_WEBHOOK_URL }}" >> .env
 
+                  echo "DEMO_USER=${{ secrets.DEMO_USER }}" >> .env
+
                   echo "DOCKER_REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> .env
                   echo "KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}" >> .env
 
@@ -107,9 +109,22 @@ jobs:
                       env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
+            - name: install, build, package shared
+              run: |
+                  cd shared/
+                  npm ci
+                  npm run build
+                  mkdir pack
+                  cp -r dist/* pack
+                  cd pack
+                  npm pack
+                  mv wealthwatch-shared-*.tgz ../wealthwatch-shared.tgz
+
             - name: install, build server
               run: |
                   cd server/
+                  cp ../shared/wealthwatch-shared.tgz .
+                  npm i wealthwatch-shared.tgz
                   npm ci
                   npm run build
 
@@ -131,7 +146,7 @@ jobs:
               run: |
                   cd server/
                   mkdir stage
-                  cp -r .env Dockerfile package.json package-lock.json dist stage/
+                  cp -r .env Dockerfile package.json package-lock.json wealthwatch-shared.tgz dist stage/
                   find stage -type f
 
             - name: copy client files

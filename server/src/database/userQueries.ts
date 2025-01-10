@@ -1,5 +1,5 @@
+import { User } from 'wealthwatch-shared/models/user.js'
 import { DatabaseError } from '../models/error.js'
-import { User } from '../models/user.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertUser = async (user: User): Promise<User> => {

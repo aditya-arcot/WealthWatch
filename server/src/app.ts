@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import methodOverride from 'method-override'
 import swaggerUi from 'swagger-ui-express'
 import { processWebhook } from './controllers/webhookController.js'
+import { HttpError } from './models/error.js'
 import router from './routes/index.js'
 import { catchAsync } from './utils/catchAsync.js'
 import { production } from './utils/env.js'
@@ -53,8 +54,10 @@ const startMainApp = () => {
         res.sendStatus(204)
     })
     app.get('/csrf-token', (req, res) => {
-        const token = req.csrfToken!()
-        res.json({ csrfToken: token })
+        if (typeof req.csrfToken !== 'function') {
+            throw new HttpError('csrfToken method is not defined')
+        }
+        res.json({ csrfToken: req.csrfToken() })
     })
     if (!production) {
         app.use(

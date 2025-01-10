@@ -6,7 +6,7 @@ export const redirectWithParams = (
     params: Params,
     merge = true
 ): void => {
-    router.navigate([], {
+    void router.navigate([], {
         relativeTo: route,
         queryParams: params,
         queryParamsHandling: merge ? 'merge' : 'replace',

@@ -1,7 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import {
+    CategorySummary,
+    CategoryTotalByDate,
+} from 'wealthwatch-shared/models/spending'
 import { env } from '../../environments/env'
-import { CategorySummary, CategoryTotalByDate } from '../models/spending'
 
 @Injectable({
     providedIn: 'root',

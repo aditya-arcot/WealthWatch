@@ -6,14 +6,17 @@ import {
     TransactionsRefreshRequest,
     TransactionsSyncRequest,
 } from 'plaid'
-import { CategoryEnum } from '../models/category.js'
+import { CategoryEnum } from 'wealthwatch-shared/models/category.js'
+import { Item } from 'wealthwatch-shared/models/item.js'
+import {
+    PaymentChannelEnum,
+    Transaction,
+} from 'wealthwatch-shared/models/transaction.js'
 import { PlaidApiError } from '../models/error.js'
-import { Item } from '../models/item.js'
 import {
     PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,
 } from '../models/plaidApiRequest.js'
-import { PaymentChannelEnum, Transaction } from '../models/transaction.js'
 import { logger } from '../utils/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
@@ -45,7 +48,7 @@ export const plaidTransactionsRefresh = async (item: Item) => {
     }
 }
 
-type PlaidTransactionsSyncResponse = {
+interface PlaidTransactionsSyncResponse {
     added: PlaidTransaction[]
     modified: PlaidTransaction[]
     removed: PlaidRemovedTransaction[]
@@ -200,9 +203,7 @@ enum PlaidDetailedCategoryEnum {
     GovernmentAndNonProfitTaxes = 'GOVERNMENT_AND_NON_PROFIT_TAX_PAYMENT',
 }
 
-const detailedCategoryMap: {
-    [key in PlaidDetailedCategoryEnum]: CategoryEnum
-} = {
+const detailedCategoryMap: Record<PlaidDetailedCategoryEnum, CategoryEnum> = {
     [PlaidDetailedCategoryEnum.TransferInDeposit]: CategoryEnum.CashAndChecks,
     [PlaidDetailedCategoryEnum.TransferInInvestment]: CategoryEnum.Investment,
     [PlaidDetailedCategoryEnum.TransferInSavings]: CategoryEnum.Savings,
@@ -237,9 +238,7 @@ enum PlaidPrimaryCategoryEnum {
     RentAndUtilities = 'RENT_AND_UTILITIES',
 }
 
-const primaryCategoryMap: {
-    [key in PlaidPrimaryCategoryEnum]: CategoryEnum
-} = {
+const primaryCategoryMap: Record<PlaidPrimaryCategoryEnum, CategoryEnum> = {
     [PlaidPrimaryCategoryEnum.Income]: CategoryEnum.Income,
     [PlaidPrimaryCategoryEnum.TransferIn]: CategoryEnum.Transfer,
     [PlaidPrimaryCategoryEnum.TransferOut]: CategoryEnum.Transfer,

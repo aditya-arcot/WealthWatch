@@ -1,19 +1,24 @@
 import { CommonModule } from '@angular/common'
-import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit, QueryList, ViewChildren } from '@angular/core'
+import {
+    Component,
+    Injector,
+    OnInit,
+    QueryList,
+    ViewChildren,
+} from '@angular/core'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, finalize, throwError } from 'rxjs'
+import { AccountWithHoldings } from 'wealthwatch-shared/models/account'
+import { HoldingWithSecurity } from 'wealthwatch-shared/models/holding'
+import { ItemWithAccountsWithHoldings } from 'wealthwatch-shared/models/item'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { AccountWithHoldings } from '../../models/account'
-import { HoldingWithSecurity } from '../../models/holding'
-import { ItemWithAccountsWithHoldings } from '../../models/item'
-import { SecurityTypeEnum } from '../../models/security'
+import { LoggerComponent } from '../../components/logger.component'
+import { securityTypeNames } from '../../models/security'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { InvestmentService } from '../../services/investment.service'
 import { ItemService } from '../../services/item.service'
-import { LoggerService } from '../../services/logger.service'
 import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
 import { formatDecimalToPercent } from '../../utilities/number.utility'
 
@@ -22,7 +27,7 @@ import { formatDecimalToPercent } from '../../utilities/number.utility'
     templateUrl: './investments.component.html',
     styleUrl: './investments.component.css',
 })
-export class InvestmentsComponent implements OnInit {
+export class InvestmentsComponent extends LoggerComponent implements OnInit {
     @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
 
     loading = false
@@ -61,26 +66,30 @@ export class InvestmentsComponent implements OnInit {
     }
 
     constructor(
-        private logger: LoggerService,
         private alertSvc: AlertService,
         private itemSvc: ItemService,
         private investmentSvc: InvestmentService,
-        private currencySvc: CurrencyService
-    ) {}
-
-    ngOnInit(): void {
-        this.loadData()
+        private currencySvc: CurrencyService,
+        injector: Injector
+    ) {
+        super(injector, 'InvestmentsComponent')
     }
 
-    loadData(): void {
+    ngOnInit(): void {
+        this.loadHoldings()
+    }
+
+    loadHoldings(): void {
+        this.logger.info('loading holdings')
         this.loading = true
         this.itemSvc
             .getItemsWithAccountsWithHoldings()
             .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to load holdings', [
-                        err.message,
-                    ])
+                catchError((err) => {
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to load holdings'
+                    )
                     return throwError(() => err)
                 }),
                 finalize(() => (this.loading = false))
@@ -92,6 +101,7 @@ export class InvestmentsComponent implements OnInit {
     }
 
     processData(): void {
+        this.logger.info('processing data')
         this.selectedAccountIds = new Set<number>(
             this.items
                 .map((i) => i.accounts)
@@ -112,25 +122,29 @@ export class InvestmentsComponent implements OnInit {
         })
 
         this.updateCharts()
-        this.logger.debug('processed data for pie chart')
     }
 
     refreshInvestments(): void {
+        this.logger.info('refreshing investments')
         this.loading = true
         this.investmentSvc
             .refreshInvestments()
             .pipe(
-                catchError((err: HttpErrorResponse) => {
-                    this.alertSvc.addErrorAlert('Failed to refresh investments')
-                    this.loading = false
+                catchError((err) => {
+                    this.alertSvc.addErrorAlert(
+                        this.logger,
+                        'Failed to refresh investments'
+                    )
                     return throwError(() => err)
-                })
+                }),
+                finalize(() => (this.loading = false))
             )
             .subscribe(() => {
-                this.alertSvc.addSuccessAlert('Refreshing investments', [
-                    'Please check back later',
-                ])
-                this.loading = false
+                this.alertSvc.addSuccessAlert(
+                    this.logger,
+                    'Refreshing investments',
+                    'Please check back later'
+                )
             })
     }
 
@@ -239,19 +253,14 @@ export class InvestmentsComponent implements OnInit {
     }
 
     getTotalGainLoss(account: AccountWithHoldings): number {
-        const total = account.holdings.reduce(
+        return account.holdings.reduce(
             (acc, h) => acc + (this.getGainLoss(h) ?? 0),
             0
         )
-        return total
     }
 
     getTotalCostBasis(account: AccountWithHoldings): number {
-        const total = account.holdings.reduce(
-            (acc, h) => acc + (h.costBasis ?? 0),
-            0
-        )
-        return total
+        return account.holdings.reduce((acc, h) => acc + (h.costBasis ?? 0), 0)
     }
 
     getNameString(holding: HoldingWithSecurity): string {
@@ -262,7 +271,7 @@ export class InvestmentsComponent implements OnInit {
     }
 
     getTypeString(holding: HoldingWithSecurity): string {
-        return SecurityTypeEnum[holding.typeId]
+        return securityTypeNames[holding.typeId]
     }
 
     getPriceString(holding: HoldingWithSecurity): string {

@@ -20,11 +20,11 @@ const router = express.Router()
  * @swagger
  * /notifications:
  *   get:
- *     summary: Retrieve the logged in user's notifications
+ *     summary: Retrieve the logged-in user's notifications
  *     tags: [Notifications]
  *     responses:
  *       200:
- *         description: Retrieved the logged in user's notifications
+ *         description: Retrieved the logged-in user's notifications
  *         content:
  *           application/json:
  *             schema:
@@ -40,11 +40,11 @@ router.route('/').get(authenticate, catchAsync(getUserNotifications))
  * @swagger
  * /notifications/read:
  *   patch:
- *     summary: Update the logged in user's notifications to read
+ *     summary: Update the logged-in user's notifications to read
  *     tags: [Notifications]
  *     responses:
  *       204:
- *         description: Updated the logged in user's notifications to read
+ *         description: Updated the logged-in user's notifications to read
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -56,13 +56,13 @@ router
  * @swagger
  * /notifications/{notificationId}/inactive:
  *   patch:
- *     summary: Update the logged in user's notification to inactive
+ *     summary: Update the logged-in user's notification to inactive
  *     tags: [Notifications]
  *     parameters:
  *       - $ref: '#/components/parameters/NotificationId'
  *     responses:
  *       204:
- *         description: Updated the logged in user's notification to inactive
+ *         description: Updated the logged-in user's notification to inactive
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

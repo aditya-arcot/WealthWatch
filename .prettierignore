@@ -1,3 +1,4 @@
 client/dist/
 client/.angular/
 server/dist/
+shared/dist/
