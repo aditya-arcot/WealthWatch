@@ -9,10 +9,7 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import {
-    dateFilterDescriptions,
-    DateFilterEnum,
-} from '../../../models/dateFilter'
+import { dateFilterDescriptions, DateFilterEnum } from '../../../models/filter'
 import { checkDatesEqual } from '../../../utilities/date.utility'
 import { computeDatesBasedOnFilter } from '../../../utilities/filter.utility'
 

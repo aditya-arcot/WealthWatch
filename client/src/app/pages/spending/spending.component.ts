@@ -22,7 +22,7 @@ import {
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
-import { dateFilterDescriptions, DateFilterEnum } from '../../models/dateFilter'
+import { dateFilterDescriptions, DateFilterEnum } from '../../models/filter'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
