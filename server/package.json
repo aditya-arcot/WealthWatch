@@ -24,7 +24,7 @@
         "@tsconfig/strictest": "^2.0.5",
         "axios": "^1.7.9",
         "bcryptjs": "^2.4.3",
-        "bullmq": "^5.34.8",
+        "bullmq": "^5.34.10",
         "connect-pg-simple": "^10.0.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
