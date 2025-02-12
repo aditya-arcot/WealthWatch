@@ -26,7 +26,7 @@ export const toTitleCase = (str: string): string =>
         .join(' ')
 
 export const parseNumberOrUndefinedFromParam = (
-    param: string | string[] | ParsedQs | ParsedQs[] | undefined,
+    param: string | ParsedQs | (string | ParsedQs)[] | undefined,
     nonNegative = false
 ): number | undefined => {
     if (param === undefined) return
@@ -38,7 +38,7 @@ export const parseNumberOrUndefinedFromParam = (
 }
 
 export const parseNumberArrayOrUndefinedFromParam = (
-    param: string | string[] | ParsedQs | ParsedQs[] | undefined
+    param: string | ParsedQs | (string | ParsedQs)[] | undefined
 ): number[] | undefined => {
     if (param === undefined) return
     const nums: number[] = []
