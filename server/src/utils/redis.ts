@@ -23,6 +23,10 @@ export const getRedis = (): Redis => {
 
 export const closeRedis = (): void => {
     logger.debug('closing redis client')
+    if (!redis) {
+        logger.warn('redis client not initialized')
+        return
+    }
     getRedis().disconnect()
     logger.debug('closed redis client')
 }
