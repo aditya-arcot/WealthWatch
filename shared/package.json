@@ -22,11 +22,11 @@
         "@tsconfig/strictest": "^2.0.5"
     },
     "devDependencies": {
-        "@eslint/js": "^9.20.0",
-        "eslint": "^9.20.1",
-        "globals": "^15.15.0",
+        "@eslint/js": "^9.22.0",
+        "eslint": "^9.22.0",
+        "globals": "^16.0.0",
         "tsc-watch": "^6.2.1",
-        "typescript": "^5.7.3",
-        "typescript-eslint": "^8.24.1"
+        "typescript": "^5.8.2",
+        "typescript-eslint": "^8.27.0"
     }
 }
