@@ -28,7 +28,7 @@ const targets: pinoTarget[] = [
 ]
 
 if (dev) {
-    const logDirectory = path.resolve(os.homedir(), 'Logs')
+    const logDirectory = path.resolve(os.homedir(), 'Projects', 'Logs')
     const formattedDate = formatDate(new Date(), 'yyyy_MM_dd')
     const fileName = `wealthwatch_server-${formattedDate}.log`
     const logPath = path.join(logDirectory, fileName)
