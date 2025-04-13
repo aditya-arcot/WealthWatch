@@ -7,13 +7,13 @@
         "build:dev": "ng build --watch --configuration dev",
         "build:stage": "ng build --configuration stage",
         "build:test": "ng build --configuration test",
-        "lint": "ng lint",
+        "lint": "eslint --fix --max-warnings=0 src/",
         "ng": "ng",
         "start": "ng serve"
     },
     "lint-staged": {
         "*": [
-            "eslint --max-warnings=0 --no-warn-ignored",
+            "eslint --fix --max-warnings=0 --no-warn-ignored",
             "prettier --write --ignore-unknown"
         ]
     },

@@ -6,13 +6,13 @@
     "scripts": {
         "build": "rm -rf dist/ && tsc --sourceMap false",
         "dev": "tsc-watch --onSuccess 'npm run start'",
-        "lint": "eslint src/",
+        "lint": "eslint --fix --max-warnings=0 src/",
         "start": "dotenvx run -f ../.env.dev -- node --inspect dist/index.js",
         "start:deploy": "dotenvx run -- node dist/index.js"
     },
     "lint-staged": {
         "*": [
-            "eslint --max-warnings=0 --no-warn-ignored",
+            "eslint --fix --max-warnings=0 --no-warn-ignored",
             "prettier --write --ignore-unknown"
         ]
     },
