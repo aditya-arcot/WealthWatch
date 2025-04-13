@@ -10,8 +10,8 @@
     "devDependencies": {
         "depcheck": "^1.4.7",
         "husky": "^9.1.7",
-        "lint-staged": "^15.5.0",
-        "npm-check-updates": "^17.1.16",
+        "lint-staged": "^15.5.1",
+        "npm-check-updates": "^17.1.18",
         "prettier": "^3.5.3",
         "prettier-plugin-organize-imports": "^4.1.0",
         "sort-package-json": "^3.0.0"
