@@ -3,13 +3,13 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "ng": "ng",
-        "start": "ng serve",
         "build": "ng build",
+        "build:dev": "ng build --watch --configuration dev",
         "build:stage": "ng build --configuration stage",
         "build:test": "ng build --configuration test",
-        "build:dev": "ng build --watch --configuration dev",
-        "lint": "ng lint"
+        "lint": "ng lint",
+        "ng": "ng",
+        "start": "ng serve"
     },
     "lint-staged": {
         "*": [
@@ -18,7 +18,6 @@
         ]
     },
     "dependencies": {
-        "wealthwatch-shared": "file:../shared/dist/",
         "@angular/animations": "^19.2.5",
         "@angular/common": "^19.2.5",
         "@angular/compiler": "^19.2.5",
@@ -37,6 +36,7 @@
         "ngx-plaid-link": "^14.0.0",
         "rxjs": "~7.8.2",
         "uuid": "^11.1.0",
+        "wealthwatch-shared": "file:../shared/dist/",
         "zone.js": "~0.15.0"
     },
     "devDependencies": {

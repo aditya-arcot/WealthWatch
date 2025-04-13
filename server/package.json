@@ -1,14 +1,14 @@
 {
     "name": "wealthwatch-server",
     "version": "1.0.0",
-    "type": "module",
     "private": true,
+    "type": "module",
     "scripts": {
-        "dev": "tsc-watch --onSuccess 'npm run start'",
         "build": "rm -rf dist/ && tsc --sourceMap false",
+        "dev": "tsc-watch --onSuccess 'npm run start'",
+        "lint": "eslint src/",
         "start": "dotenvx run -f ../.env.dev -- node --inspect dist/index.js",
-        "start:deploy": "dotenvx run -- node dist/index.js",
-        "lint": "eslint src/"
+        "start:deploy": "dotenvx run -- node dist/index.js"
     },
     "lint-staged": {
         "*": [
@@ -17,7 +17,6 @@
         ]
     },
     "dependencies": {
-        "wealthwatch-shared": "file:../shared/dist/",
         "@dotenvx/dotenvx": "^1.39.1",
         "@logtail/pino": "^0.5.2",
         "@tsconfig/node-lts": "^22.0.1",
@@ -44,7 +43,8 @@
         "plaid": "^31.1.0",
         "qs": "^6.14.0",
         "swagger-jsdoc": "^6.2.8",
-        "swagger-ui-express": "^5.0.1"
+        "swagger-ui-express": "^5.0.1",
+        "wealthwatch-shared": "file:../shared/dist/"
     },
     "devDependencies": {
         "@eslint/js": "^9.24.0",
