@@ -3,30 +3,29 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "ng": "ng",
-        "start": "ng serve",
         "build": "ng build",
+        "build:dev": "ng build --watch --configuration dev",
         "build:stage": "ng build --configuration stage",
         "build:test": "ng build --configuration test",
-        "build:dev": "ng build --watch --configuration dev",
-        "lint": "ng lint"
+        "lint": "eslint --fix --max-warnings=0 src/",
+        "ng": "ng",
+        "start": "ng serve"
     },
     "lint-staged": {
         "*": [
-            "eslint --max-warnings=0 --no-warn-ignored",
+            "eslint --fix --max-warnings=0 --no-warn-ignored",
             "prettier --write --ignore-unknown"
         ]
     },
     "dependencies": {
-        "wealthwatch-shared": "file:../shared/dist/",
-        "@angular/animations": "^19.2.5",
-        "@angular/common": "^19.2.5",
-        "@angular/compiler": "^19.2.5",
-        "@angular/core": "^19.2.5",
-        "@angular/forms": "^19.2.5",
-        "@angular/platform-browser": "^19.2.5",
-        "@angular/platform-browser-dynamic": "^19.2.5",
-        "@angular/router": "^19.2.5",
+        "@angular/animations": "^19.2.6",
+        "@angular/common": "^19.2.6",
+        "@angular/compiler": "^19.2.6",
+        "@angular/core": "^19.2.6",
+        "@angular/forms": "^19.2.6",
+        "@angular/platform-browser": "^19.2.6",
+        "@angular/platform-browser-dynamic": "^19.2.6",
+        "@angular/router": "^19.2.6",
         "@logtail/browser": "^0.5.2",
         "bootstrap": "^5.3.5",
         "bootstrap-icons": "^1.11.3",
@@ -37,14 +36,15 @@
         "ngx-plaid-link": "^14.0.0",
         "rxjs": "~7.8.2",
         "uuid": "^11.1.0",
+        "wealthwatch-shared": "file:../shared/dist/",
         "zone.js": "~0.15.0"
     },
     "devDependencies": {
-        "@angular/build": "^19.2.6",
-        "@angular/cli": "^19.2.6",
-        "@angular/compiler-cli": "^19.2.5",
+        "@angular/build": "^19.2.7",
+        "@angular/cli": "^19.2.7",
+        "@angular/compiler-cli": "^19.2.6",
         "@eslint/js": "^9.24.0",
-        "@types/node": "^22.14.0",
+        "@types/node": "^22.14.1",
         "angular-eslint": "19.3.0",
         "eslint": "^9.24.0",
         "typescript": "~5.8.3",

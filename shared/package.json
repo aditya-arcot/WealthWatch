@@ -1,19 +1,19 @@
 {
     "name": "wealthwatch-shared",
     "version": "1.0.0",
-    "type": "module",
     "private": true,
+    "type": "module",
     "main": "index.js",
     "types": "index.d.ts",
     "scripts": {
-        "dev": "tsc-watch",
         "build": "rm -rf dist/ && tsc",
         "postbuild": "cp package.json dist/",
-        "lint": "eslint src/"
+        "dev": "tsc-watch",
+        "lint": "eslint --fix --max-warnings=0 src/"
     },
     "lint-staged": {
         "*": [
-            "eslint --max-warnings=0 --no-warn-ignored",
+            "eslint --fix --max-warnings=0 --no-warn-ignored",
             "prettier --write --ignore-unknown"
         ]
     },
