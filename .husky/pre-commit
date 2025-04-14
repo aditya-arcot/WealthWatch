@@ -8,41 +8,41 @@ ggshield secret scan pre-commit "$@"
 echo
 
 echo "Formatting and linting staged files..."
-npx lint-staged
+lint-staged
 echo
 
 echo "Checking for dependency issues..."
 echo "Checking base project..."
-npx depcheck || exit 1
+depcheck || exit 1
 echo
 
 echo "Checking shared project..."
-npx depcheck shared || exit 1
+depcheck shared || exit 1
 echo
 
 echo "Checking client project..."
-npx depcheck client || exit 1
+depcheck client || exit 1
 echo
 
 echo "Checking server project..."
-npx depcheck server || exit 1
+depcheck server || exit 1
 echo
 
 echo "Checking for available updates..."
 echo "Checking base project..."
-npx ncu -e 2 || exit 1
+ncu -e 2 || exit 1
 echo
 
 echo "Checking shared project..."
-npx ncu --cwd shared --configFilePath shared/.ncurc.json -e 2 || exit 1
+ncu --cwd shared --configFilePath shared/.ncurc.json -e 2 || exit 1
 echo
 
 echo "Checking client project..."
-npx ncu --cwd client --configFilePath client/.ncurc.json -e 2 || exit 1
+ncu --cwd client --configFilePath client/.ncurc.json -e 2 || exit 1
 echo
 
 echo "Checking server project..."
-npx ncu --cwd server --configFilePath server/.ncurc.json -e 2 || exit 1
+ncu --cwd server --configFilePath server/.ncurc.json -e 2 || exit 1
 echo
 
 echo "Done running pre-commit hook"

@@ -24,6 +24,7 @@ export default tseslint.config(
             ],
             '@typescript-eslint/no-misused-promises': 'error',
             '@typescript-eslint/no-floating-promises': 'error',
+            'no-console': 'warn',
         },
     }
 )

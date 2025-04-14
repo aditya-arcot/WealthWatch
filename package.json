@@ -1,7 +1,8 @@
 {
     "scripts": {
-        "prettier": "npx prettier --write .",
-        "prepare": "husky"
+        "prepare": "husky && npm run sort-package-jsons",
+        "prettier": "prettier --write .",
+        "sort-package-jsons": "sort-package-json && sort-package-json shared/package.json && sort-package-json server/package.json && sort-package-json client/package.json"
     },
     "lint-staged": {
         "*": "prettier --write --ignore-unknown"
@@ -9,9 +10,10 @@
     "devDependencies": {
         "depcheck": "^1.4.7",
         "husky": "^9.1.7",
-        "lint-staged": "^15.5.0",
-        "npm-check-updates": "^17.1.16",
+        "lint-staged": "^15.5.1",
+        "npm-check-updates": "^17.1.18",
         "prettier": "^3.5.3",
-        "prettier-plugin-organize-imports": "^4.1.0"
+        "prettier-plugin-organize-imports": "^4.1.0",
+        "sort-package-json": "^3.0.0"
     }
 }
