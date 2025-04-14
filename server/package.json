@@ -17,7 +17,7 @@
         ]
     },
     "dependencies": {
-        "@dotenvx/dotenvx": "^1.39.1",
+        "@dotenvx/dotenvx": "^1.40.0",
         "@logtail/pino": "^0.5.2",
         "@tsconfig/node-lts": "^22.0.1",
         "@tsconfig/strictest": "^2.0.5",
