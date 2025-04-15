@@ -1,5 +1,5 @@
+import { NotificationTypeEnum } from 'wealthwatch-shared/enums/notification.js'
 import { Item } from 'wealthwatch-shared/models/item.js'
-import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification.js'
 
 export const createNotification = (
     type: NotificationTypeEnum,

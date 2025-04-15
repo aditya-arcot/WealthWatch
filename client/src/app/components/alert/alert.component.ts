@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy } from '@angular/core'
 import { Subscription } from 'rxjs'
-import { Alert, AlertType } from '../../models/alert'
+import { AlertTypeEnum } from '../../enums/alert'
+import { Alert } from '../../models/alert'
 import { AlertService } from '../../services/alert.service'
 
 @Component({
@@ -28,20 +29,20 @@ export class AlertComponent implements OnDestroy {
         this.alertSvc.removeAlert(id)
     }
 
-    getAlertClass(type: AlertType): string {
+    getAlertClass(type: AlertTypeEnum): string {
         switch (type) {
-            case AlertType.Success:
+            case AlertTypeEnum.Success:
                 return 'alert-success'
-            case AlertType.Error:
+            case AlertTypeEnum.Error:
                 return 'alert-danger'
         }
     }
 
-    getAlertIconClass(type: AlertType): string {
+    getAlertIconClass(type: AlertTypeEnum): string {
         switch (type) {
-            case AlertType.Success:
+            case AlertTypeEnum.Success:
                 return 'bi-check-circle-fill'
-            case AlertType.Error:
+            case AlertTypeEnum.Error:
                 return 'bi-exclamation-triangle-fill'
         }
     }

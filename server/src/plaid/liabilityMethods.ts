@@ -7,15 +7,17 @@ import {
     StudentRepaymentPlanTypeEnum as PlaidStudentLoanRepaymentTypeEnum,
     StudentLoanStatusTypeEnum as PlaidStudentLoanStatusTypeEnum,
 } from 'plaid'
+import {
+    StudentLoanRepaymentPlanTypeEnum,
+    StudentLoanStatusTypeEnum,
+} from 'wealthwatch-shared/enums/liability.js'
 import { Item } from 'wealthwatch-shared/models/item.js'
 import {
     CreditCard,
     Mortgage,
     StudentLoan,
-    StudentLoanRepaymentPlanTypeEnum,
-    StudentLoanStatusTypeEnum,
 } from 'wealthwatch-shared/models/liability.js'
-import { logger } from '../utils/logger.js'
+import { logger } from '../utilities/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidLiabilitiesGet = async (item: Item) => {

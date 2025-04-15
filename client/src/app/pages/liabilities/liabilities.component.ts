@@ -25,7 +25,7 @@ import { LoggerComponent } from '../../components/logger.component'
 import {
     studentLoanRepaymentPlanTypeNames,
     studentLoanStatusTypeNames,
-} from '../../models/liability'
+} from '../../records/liability'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'

@@ -11,10 +11,10 @@ import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import {
-    Category,
     CategoryEnum,
     CategoryGroupEnum,
-} from 'wealthwatch-shared/models/category'
+} from 'wealthwatch-shared/enums/category'
+import { Category } from 'wealthwatch-shared/models/category'
 import {
     CategorySummary,
     CategoryTotalByDate,
@@ -22,7 +22,8 @@ import {
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
-import { dateFilterDescriptions, DateFilterEnum } from '../../models/filter'
+import { DateFilterEnum } from '../../enums/filter'
+import { dateFilterDescriptions } from '../../records/filter'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'

@@ -1,5 +1,5 @@
 import express from 'express'
-import { production } from '../utils/env.js'
+import { production } from '../utilities/env.js'
 import adminRouter from './adminRoutes.js'
 import authRouter from './authRoutes.js'
 import categoryRouter from './categoryRoutes.js'

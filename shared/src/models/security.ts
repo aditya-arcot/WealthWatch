@@ -1,3 +1,5 @@
+import { SecurityTypeEnum } from '../enums/security.js'
+
 export interface Security {
     id: number
     plaidId: string
@@ -13,16 +15,4 @@ export interface Security {
     closePriceAsOf: Date | null
     isoCurrencyCode: string | null
     unofficialCurrencyCode: string | null
-}
-
-export enum SecurityTypeEnum {
-    Cash = 1,
-    Cryptocurrency,
-    Derivative,
-    Equity,
-    ETF,
-    FixedIncome,
-    Loan,
-    MutualFund,
-    Other,
 }

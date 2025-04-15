@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { NotificationTypeEnum } from 'wealthwatch-shared/models/notification'
+import { NotificationTypeEnum } from 'wealthwatch-shared/enums/notification'
 import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent'
 import { env } from '../../environments/env'
 

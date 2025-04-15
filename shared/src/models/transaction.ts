@@ -1,4 +1,5 @@
-import { CategoryEnum } from './category.js'
+import { CategoryEnum } from '../enums/category.js'
+import { PaymentChannelEnum } from '../enums/transaction.js'
 
 export interface Transaction {
     id: number
@@ -26,10 +27,4 @@ export interface TransactionsAndCounts {
     transactions: Transaction[]
     filteredCount: number | null
     totalCount: number
-}
-
-export enum PaymentChannelEnum {
-    Online = 'online',
-    InStore = 'in_store',
-    Other = 'other',
 }

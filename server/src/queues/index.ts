@@ -1,5 +1,5 @@
 import { insertJob } from '../database/jobQueries.js'
-import { logger } from '../utils/logger.js'
+import { logger } from '../utilities/logger.js'
 import {
     closeItemWorker,
     initializeItemQueue,

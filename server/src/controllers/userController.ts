@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { fetchActiveItemsByUserId } from '../database/itemQueries.js'
 import { removeUserById } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
-import { logger } from '../utils/logger.js'
+import { logger } from '../utilities/logger.js'
 import { logout } from './authController.js'
 import { removeDeactivateItem } from './itemController.js'
 

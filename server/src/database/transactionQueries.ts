@@ -1,5 +1,5 @@
+import { PaymentChannelEnum } from 'wealthwatch-shared/enums/transaction.js'
 import {
-    PaymentChannelEnum,
     Transaction,
     TransactionsAndCounts,
 } from 'wealthwatch-shared/models/transaction.js'

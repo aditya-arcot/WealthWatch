@@ -6,9 +6,9 @@ import swaggerUi from 'swagger-ui-express'
 import { processWebhook } from './controllers/webhookController.js'
 import { HttpError } from './models/error.js'
 import router from './routes/index.js'
-import { catchAsync } from './utils/catchAsync.js'
-import { production } from './utils/env.js'
-import { logger } from './utils/logger.js'
+import { catchAsync } from './utilities/catchAsync.js'
+import { production } from './utilities/env.js'
+import { logger } from './utilities/logger.js'
 import {
     corsMiddleware,
     createCsrfMiddleware,
@@ -16,8 +16,8 @@ import {
     handleError,
     handleUnmatchedRoute,
     logRequestResponse,
-} from './utils/middleware.js'
-import { createSwaggerSpec, swaggerOptions } from './utils/swagger.js'
+} from './utilities/middleware.js'
+import { createSwaggerSpec, swaggerOptions } from './utilities/swagger.js'
 
 export const startExpressApps = () => {
     logger.debug('starting express apps')

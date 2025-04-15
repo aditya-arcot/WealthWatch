@@ -9,7 +9,7 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { AmountFilterEnum } from '../../../models/filter'
+import { AmountFilterEnum } from '../../../enums/filter'
 
 @Component({
     selector: 'app-amount-filter',

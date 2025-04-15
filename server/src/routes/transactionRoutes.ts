@@ -6,8 +6,8 @@ import {
     updateTransactionCustomName,
     updateTransactionNote,
 } from '../controllers/transactionController.js'
-import { catchAsync } from '../utils/catchAsync.js'
-import { authenticate } from '../utils/middleware.js'
+import { catchAsync } from '../utilities/catchAsync.js'
+import { authenticate } from '../utilities/middleware.js'
 
 const router = express.Router()
 

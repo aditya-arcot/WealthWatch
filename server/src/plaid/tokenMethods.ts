@@ -7,8 +7,8 @@ import {
 } from 'plaid'
 import { Item } from 'wealthwatch-shared/models/item.js'
 import { User } from 'wealthwatch-shared/models/user.js'
-import { vars } from '../utils/env.js'
-import { logger } from '../utils/logger.js'
+import { vars } from '../utilities/env.js'
+import { logger } from '../utilities/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidLinkTokenCreate = async (

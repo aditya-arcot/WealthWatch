@@ -1,10 +1,8 @@
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
-import {
-    AccessRequest,
-    AccessRequestStatusEnum,
-} from 'wealthwatch-shared/models/accessRequest.js'
-import { AccessRequestErrorCodeEnum } from 'wealthwatch-shared/models/error.js'
+import { AccessRequestStatusEnum } from 'wealthwatch-shared/enums/accessRequest.js'
+import { AccessRequestErrorCodeEnum } from 'wealthwatch-shared/enums/error.js'
+import { AccessRequest } from 'wealthwatch-shared/models/accessRequest.js'
 import { User } from 'wealthwatch-shared/models/user.js'
 import {
     fetchAccessRequestByAccessCode,
@@ -18,8 +16,8 @@ import {
     insertUser,
 } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
-import { vars } from '../utils/env.js'
-import { logger } from '../utils/logger.js'
+import { vars } from '../utilities/env.js'
+import { logger } from '../utilities/logger.js'
 
 export const requestAccess = async (req: Request, res: Response) => {
     logger.debug('requesting access')

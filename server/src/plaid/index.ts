@@ -6,15 +6,13 @@ import {
     insertLinkUpdateWithAccountsNotification,
 } from '../controllers/notificationController.js'
 import { fetchActiveItemByUserIdAndId } from '../database/itemQueries.js'
+import { PlaidGeneralErrorCodeEnum } from '../enums/plaidApiError.js'
 import { HttpError, PlaidApiError } from '../models/error.js'
-import {
-    PlaidApiRequest,
-    PlaidGeneralErrorCodeEnum,
-} from '../models/plaidApiRequest.js'
+import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { queueLogPlaidApiRequest } from '../queues/logQueue.js'
-import { vars } from '../utils/env.js'
-import { safeStringify } from '../utils/format.js'
-import { logger } from '../utils/logger.js'
+import { vars } from '../utilities/env.js'
+import { safeStringify } from '../utilities/format.js'
+import { logger } from '../utilities/logger.js'
 
 let plaidClient: PlaidApi | undefined
 

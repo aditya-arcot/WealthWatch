@@ -2,9 +2,9 @@ import { Queue, Worker } from 'bullmq'
 import { handleWebhook } from '../controllers/webhookController.js'
 import { HttpError } from '../models/error.js'
 import { Webhook } from '../models/webhook.js'
-import { vars } from '../utils/env.js'
-import { logger } from '../utils/logger.js'
-import { getRedis } from '../utils/redis.js'
+import { vars } from '../utilities/env.js'
+import { logger } from '../utilities/logger.js'
+import { getRedis } from '../utilities/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 const webhookQueueName = `webhook-${vars.nodeEnv}`

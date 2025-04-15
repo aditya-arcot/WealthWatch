@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { v4 as uuid } from 'uuid'
-import { Alert, AlertType } from '../models/alert'
+import { AlertTypeEnum } from '../enums/alert'
+import { Alert } from '../models/alert'
 import { LoggerService } from './logger.service'
 
 @Injectable({
@@ -21,7 +22,7 @@ export class AlertService {
         ...subtext: string[]
     ): void {
         this.clearAlerts()
-        this.addAlert(AlertType.Success, message, subtext)
+        this.addAlert(AlertTypeEnum.Success, message, subtext)
         if (subtext.length) logger.info(message, { subtext })
         else logger.info(message)
     }
@@ -32,13 +33,13 @@ export class AlertService {
         ...subtext: string[]
     ): void {
         this.clearAlerts()
-        this.addAlert(AlertType.Error, message, subtext)
+        this.addAlert(AlertTypeEnum.Error, message, subtext)
         if (subtext.length) logger.error(message, { subtext })
         else logger.error(message)
     }
 
     private addAlert(
-        type: AlertType,
+        type: AlertTypeEnum,
         message: string,
         subtext: string[]
     ): void {
@@ -54,7 +55,7 @@ export class AlertService {
             () => {
                 this.removeAlert(alert.id)
             },
-            alert.type === AlertType.Success ? 5000 : 15000
+            alert.type === AlertTypeEnum.Success ? 5000 : 15000
         )
     }
 

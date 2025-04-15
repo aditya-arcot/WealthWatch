@@ -11,13 +11,12 @@ import {
 } from 'ngx-plaid-link'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import { Account } from 'wealthwatch-shared/models/account'
-import {
-    inCooldown,
-    Item,
-    ItemWithAccounts,
-    refreshCooldown,
-} from 'wealthwatch-shared/models/item'
+import { Item, ItemWithAccounts } from 'wealthwatch-shared/models/item'
 import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent'
+import {
+    itemInCooldown,
+    itemRefreshCooldown,
+} from 'wealthwatch-shared/utilities/item'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
@@ -287,12 +286,12 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
 
     refreshItem(item: Item): void {
         this.logger.info('refreshing item', { item })
-        if (inCooldown(item.lastRefreshed)) {
+        if (itemInCooldown(item.lastRefreshed)) {
             const lastRefreshed = item.lastRefreshed
                 ? new Date(item.lastRefreshed)
                 : null
             const nextRefresh = new Date(
-                (lastRefreshed?.getTime() ?? 0) + refreshCooldown
+                (lastRefreshed?.getTime() ?? 0) + itemRefreshCooldown
             )
             const nextRefreshString = formatDate(nextRefresh, false, true)
             this.alertSvc.addErrorAlert(

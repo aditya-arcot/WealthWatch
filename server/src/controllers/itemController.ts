@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { Account } from 'wealthwatch-shared/models/account.js'
-import { inCooldown, Item } from 'wealthwatch-shared/models/item.js'
+import { Item } from 'wealthwatch-shared/models/item.js'
+import { itemInCooldown } from 'wealthwatch-shared/utilities/item.js'
 import {
     fetchActiveAccountsByUserId,
     insertAccounts,
@@ -64,7 +65,7 @@ import {
     queueSyncItemLiabilities,
     queueSyncItemTransactions,
 } from '../queues/itemQueue.js'
-import { logger } from '../utils/logger.js'
+import { logger } from '../utilities/logger.js'
 
 export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
     logger.debug('getting items with accounts')
@@ -138,7 +139,7 @@ export const refreshItem = async (req: Request, res: Response) => {
     const item = await fetchActiveItemByPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    if (inCooldown(item.lastRefreshed)) {
+    if (itemInCooldown(item.lastRefreshed)) {
         logger.debug(
             { id: item.id, lastRefreshed: item.lastRefreshed },
             'item refresh cooldown'
@@ -184,7 +185,7 @@ export const refreshItemTransactions = (
     item: Item,
     checkCooldown = true
 ): Promise<boolean> => {
-    if (checkCooldown && inCooldown(item.transactionsLastRefreshed)) {
+    if (checkCooldown && itemInCooldown(item.transactionsLastRefreshed)) {
         logger.debug(
             {
                 id: item.id,
@@ -201,7 +202,7 @@ export const refreshItemInvestments = (
     item: Item,
     checkCooldown = true
 ): Promise<boolean> => {
-    if (checkCooldown && inCooldown(item.investmentsLastRefreshed)) {
+    if (checkCooldown && itemInCooldown(item.investmentsLastRefreshed)) {
         logger.debug(
             {
                 id: item.id,

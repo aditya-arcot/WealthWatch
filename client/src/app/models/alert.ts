@@ -1,11 +1,8 @@
+import { AlertTypeEnum } from '../enums/alert'
+
 export interface Alert {
     id: string
-    type: AlertType
+    type: AlertTypeEnum
     message: string
     subtext: string[]
-}
-
-export enum AlertType {
-    Success,
-    Error,
 }

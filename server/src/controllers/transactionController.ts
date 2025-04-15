@@ -13,8 +13,8 @@ import { HttpError } from '../models/error.js'
 import {
     parseNumberArrayOrUndefinedFromParam,
     parseNumberOrUndefinedFromParam,
-} from '../utils/format.js'
-import { logger } from '../utils/logger.js'
+} from '../utilities/format.js'
+import { logger } from '../utilities/logger.js'
 import { refreshItemTransactions } from './itemController.js'
 
 export const getUserTransactionsAndCounts = async (

@@ -4,7 +4,7 @@ import {
     modifyItemInvestmentsLastRefreshedByPlaidId,
 } from '../database/itemQueries.js'
 import { HttpError } from '../models/error.js'
-import { logger } from '../utils/logger.js'
+import { logger } from '../utilities/logger.js'
 import { refreshItemInvestments } from './itemController.js'
 
 export const refreshUserInvestments = async (req: Request, res: Response) => {

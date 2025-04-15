@@ -6,18 +6,16 @@ import {
     TransactionsRefreshRequest,
     TransactionsSyncRequest,
 } from 'plaid'
-import { CategoryEnum } from 'wealthwatch-shared/models/category.js'
+import { CategoryEnum } from 'wealthwatch-shared/enums/category.js'
+import { PaymentChannelEnum } from 'wealthwatch-shared/enums/transaction.js'
 import { Item } from 'wealthwatch-shared/models/item.js'
-import {
-    PaymentChannelEnum,
-    Transaction,
-} from 'wealthwatch-shared/models/transaction.js'
-import { PlaidApiError } from '../models/error.js'
+import { Transaction } from 'wealthwatch-shared/models/transaction.js'
 import {
     PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,
-} from '../models/plaidApiRequest.js'
-import { logger } from '../utils/logger.js'
+} from '../enums/plaidApiError.js'
+import { PlaidApiError } from '../models/error.js'
+import { logger } from '../utilities/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidTransactionsRefresh = async (item: Item) => {

@@ -1,3 +1,5 @@
+import { NotificationTypeEnum } from '../enums/notification.js'
+
 export interface Notification {
     id: number
     typeId: NotificationTypeEnum
@@ -7,10 +9,4 @@ export interface Notification {
     persistent: boolean
     read: boolean
     active: boolean
-}
-
-export enum NotificationTypeEnum {
-    Info = 1,
-    LinkUpdate,
-    LinkUpdateWithAccounts,
 }

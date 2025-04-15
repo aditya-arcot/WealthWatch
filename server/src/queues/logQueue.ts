@@ -6,9 +6,9 @@ import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
 import { AppRequest } from '../models/appRequest.js'
 import { HttpError } from '../models/error.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
-import { vars } from '../utils/env.js'
-import { logger } from '../utils/logger.js'
-import { getRedis } from '../utils/redis.js'
+import { vars } from '../utilities/env.js'
+import { logger } from '../utilities/logger.js'
+import { getRedis } from '../utilities/redis.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum LogJobType {

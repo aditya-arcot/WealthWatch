@@ -1,13 +1,13 @@
 import * as crypto from 'crypto'
 import { Request, Response } from 'express'
-import { AccessRequestStatusEnum } from 'wealthwatch-shared/models/accessRequest.js'
+import { AccessRequestStatusEnum } from 'wealthwatch-shared/enums/accessRequest.js'
 import {
     fetchAccessRequests,
     modifyAccessRequestStatusAccessCodeAndReviewerById,
 } from '../database/accessRequestQueries.js'
 import { HttpError } from '../models/error.js'
-import { parseNumberOrUndefinedFromParam } from '../utils/format.js'
-import { logger } from '../utils/logger.js'
+import { parseNumberOrUndefinedFromParam } from '../utilities/format.js'
+import { logger } from '../utilities/logger.js'
 
 export const getAccessRequests = async (_req: Request, res: Response) => {
     logger.debug('getting access requests')

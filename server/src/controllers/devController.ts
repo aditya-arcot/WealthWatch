@@ -21,7 +21,7 @@ import {
     queueSyncItemLiabilities,
     queueSyncItemTransactions,
 } from '../queues/itemQueue.js'
-import { logger } from '../utils/logger.js'
+import { logger } from '../utilities/logger.js'
 import {
     refreshItemInvestments,
     refreshItemTransactions,

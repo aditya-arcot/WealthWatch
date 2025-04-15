@@ -5,7 +5,7 @@ import {
 } from '../database/spendingQueries.js'
 import { fetchActiveTransactionsDateSeriesByUserIdAndDateRange } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
-import { logger } from '../utils/logger.js'
+import { logger } from '../utilities/logger.js'
 
 export const getUserCategorySummaries = async (req: Request, res: Response) => {
     logger.debug('getting category summaries')

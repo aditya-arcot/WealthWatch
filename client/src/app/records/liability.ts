@@ -1,7 +1,7 @@
 import {
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
-} from 'wealthwatch-shared/models/liability'
+} from 'wealthwatch-shared/enums/liability'
 
 export const studentLoanStatusTypeNames: Record<
     StudentLoanStatusTypeEnum,
