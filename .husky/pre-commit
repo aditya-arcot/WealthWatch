@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 echo "Running pre-commit hook..."
 echo
 
@@ -11,38 +13,42 @@ echo "Formatting and linting staged files..."
 lint-staged
 echo
 
+echo "Checking shared project version..."
+./scripts/check-shared-version
+echo
+
 echo "Checking for dependency issues..."
 echo "Checking base project..."
-depcheck || exit 1
+depcheck
 echo
 
 echo "Checking shared project..."
-depcheck shared || exit 1
+depcheck shared
 echo
 
 echo "Checking client project..."
-depcheck client || exit 1
+depcheck client
 echo
 
 echo "Checking server project..."
-depcheck server || exit 1
+depcheck server
 echo
 
 echo "Checking for available updates..."
 echo "Checking base project..."
-ncu -e 2 || exit 1
+ncu -e 2
 echo
 
 echo "Checking shared project..."
-ncu --cwd shared --configFilePath shared/.ncurc.json -e 2 || exit 1
+ncu --cwd shared --configFilePath shared/.ncurc.json -e 2
 echo
 
 echo "Checking client project..."
-ncu --cwd client --configFilePath client/.ncurc.json -e 2 || exit 1
+ncu --cwd client --configFilePath client/.ncurc.json -e 2
 echo
 
 echo "Checking server project..."
-ncu --cwd server --configFilePath server/.ncurc.json -e 2 || exit 1
+ncu --cwd server --configFilePath server/.ncurc.json -e 2
 echo
 
 echo "Done running pre-commit hook"

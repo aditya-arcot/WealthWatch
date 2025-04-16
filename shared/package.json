@@ -1,11 +1,22 @@
 {
-    "name": "wealthwatch-shared",
+    "name": "@aditya-arcot/wealthwatch-shared",
     "version": "1.0.0",
-    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/aditya-arcot/WealthWatch.git"
+    },
     "type": "module",
+    "exports": {
+        ".": {
+            "default": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "rm -rf dist/ && tsc",
-        "postbuild": "cp package.json dist/",
         "dev": "tsc-watch",
         "lint": "eslint --fix --max-warnings=0 src/"
     },
@@ -26,5 +37,8 @@
         "tsc-watch": "^6.2.1",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.29.1"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/"
     }
 }

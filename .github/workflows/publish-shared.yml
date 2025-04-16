@@ -1,0 +1,43 @@
+name: Publish Shared Package
+
+on:
+    push:
+        paths:
+            - 'shared/package.json'
+            - 'shared/tsconfig.json'
+            - 'shared/src/**'
+        branches:
+            - main
+
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+    publish:
+        runs-on: 'mbp-14'
+        steps:
+            - name: checkout
+              uses: actions/checkout@v4
+
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+                  cache: 'npm'
+                  cache-dependency-path: shared/package-lock.json
+
+            - name: build
+              run: |
+                  cd shared
+                  npm ci
+                  npm run build
+
+            - name: publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  cd shared
+                  npm whoami --registry=https://npm.pkg.github.com/
+                  npm publish --access public
