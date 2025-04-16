@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { tap } from 'rxjs'
-import { User } from 'wealthwatch-shared/models/user'
+import { User } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 import { UserService } from './user.service'
 

@@ -1,6 +1,8 @@
 ignores: [
+    "@aditya-arcot/wealthwatch-shared",
     "@logtail/pino",
     "@tsconfig/strictest",
     "pino-pretty",
-    "lint-staged"
+    "lint-staged",
+    "wealthwatch-shared"
 ]

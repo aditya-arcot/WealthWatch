@@ -11,15 +11,13 @@ import { catchError, finalize, switchMap, tap, throwError } from 'rxjs'
 import {
     Account,
     CreditCardAccount,
-    MortgageAccount,
-    StudentLoanAccount,
-} from 'wealthwatch-shared/models/account'
-import {
     ItemWithAccountsWithLiabilities,
     ItemWithCreditCardAccounts,
     ItemWithMortgageAccounts,
     ItemWithStudentLoanAccounts,
-} from 'wealthwatch-shared/models/item'
+    MortgageAccount,
+    StudentLoanAccount,
+} from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import {

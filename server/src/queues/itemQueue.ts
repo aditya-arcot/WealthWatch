@@ -1,5 +1,5 @@
 import { Queue, Worker } from 'bullmq'
-import { Item } from 'wealthwatch-shared/models/item.js'
+import { Item } from 'wealthwatch-shared'
 import {
     syncItemAccounts,
     syncItemBalances,

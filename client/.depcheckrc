@@ -1,4 +1,5 @@
 ignores: [
+    "@aditya-arcot/wealthwatch-shared",
     "@angular/compiler",
     "@angular/platform-browser-dynamic",
     "bootstrap",
@@ -6,5 +7,6 @@ ignores: [
     "@angular/build",
     "@angular/compiler-cli",
     "@types/node",
-    "lint-staged"
+    "lint-staged",
+    "wealthwatch-shared"
 ]

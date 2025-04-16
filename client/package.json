@@ -18,6 +18,7 @@
         ]
     },
     "dependencies": {
+        "@aditya-arcot/wealthwatch-shared": "^1.0.0",
         "@angular/animations": "^19.2.6",
         "@angular/common": "^19.2.6",
         "@angular/compiler": "^19.2.6",
@@ -36,7 +37,6 @@
         "ngx-plaid-link": "^14.0.0",
         "rxjs": "~7.8.2",
         "uuid": "^11.1.0",
-        "wealthwatch-shared": "file:../shared/dist/",
         "zone.js": "~0.15.0"
     },
     "devDependencies": {

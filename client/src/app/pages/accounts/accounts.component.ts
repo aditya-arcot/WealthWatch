@@ -10,13 +10,14 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
-import { Account } from 'wealthwatch-shared/models/account'
-import { Item, ItemWithAccounts } from 'wealthwatch-shared/models/item'
-import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent'
 import {
+    Account,
+    Item,
     itemInCooldown,
     itemRefreshCooldown,
-} from 'wealthwatch-shared/utilities/item'
+    ItemWithAccounts,
+    PlaidLinkEvent,
+} from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'

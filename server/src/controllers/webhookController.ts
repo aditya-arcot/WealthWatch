@@ -3,7 +3,7 @@ import { importJWK, jwtVerify } from 'jose'
 import { sha256 } from 'js-sha256'
 import { jwtDecode } from 'jwt-decode'
 import { JWKPublicKey } from 'plaid'
-import { NotificationTypeEnum } from 'wealthwatch-shared/enums/notification.js'
+import { NotificationTypeEnum } from 'wealthwatch-shared'
 import {
     fetchActiveItemByPlaidId,
     modifyItemHealthyById,

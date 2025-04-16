@@ -1,6 +1,6 @@
 import * as crypto from 'crypto'
 import { Request, Response } from 'express'
-import { AccessRequestStatusEnum } from 'wealthwatch-shared/enums/accessRequest.js'
+import { AccessRequestStatusEnum } from 'wealthwatch-shared'
 import {
     fetchAccessRequests,
     modifyAccessRequestStatusAccessCodeAndReviewerById,

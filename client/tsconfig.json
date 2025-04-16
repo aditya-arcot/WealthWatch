@@ -17,7 +17,13 @@
         "target": "ES2022",
         "module": "ES2022",
         "useDefineForClassFields": false,
-        "lib": ["ES2022", "dom"]
+        "lib": ["ES2022", "dom"],
+        "baseUrl": ".",
+        "paths": {
+            "wealthwatch-shared": [
+                "node_modules/@aditya-arcot/wealthwatch-shared/dist"
+            ]
+        }
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,

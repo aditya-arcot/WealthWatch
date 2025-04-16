@@ -5,7 +5,7 @@ import {
     ItemWithCreditCardAccounts,
     ItemWithMortgageAccounts,
     ItemWithStudentLoanAccounts,
-} from 'wealthwatch-shared/models/item.js'
+} from 'wealthwatch-shared'
 import { DatabaseError } from '../models/error.js'
 import {
     DbAccount,
