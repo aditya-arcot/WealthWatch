@@ -40,9 +40,10 @@ source ./load_env
 if psql -lqt | cut -d \| -f 1 | grep -qw $DB_NAME; then
     echo "database already exists"
     echo "checking for active items..."
-    VIEW_EXISTS=$(PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -tAc "SELECT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'active_items');")
+    VIEW_EXISTS=$(PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -qtAc "SELECT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'active_items');")
     if [ "$VIEW_EXISTS" = "t" ]; then
-        if PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -tAc "SELECT COUNT(*) FROM active_items;" | grep -q 0; then
+        ACTIVE_ITEMS_EXIST=$(PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -qtAc "SELECT EXISTS (SELECT 1 FROM active_items);")
+        if [ "$ACTIVE_ITEMS_EXIST" = "f" ]; then
             echo "database has no active items. dropping..."
             dropdb $DB_NAME
         else
@@ -67,7 +68,8 @@ psql $DB_NAME -f ../sql/schema/01_schemas.sql -v ON_ERROR_STOP=1 -v user=$USER
 psql $DB_NAME -c "ALTER DATABASE $DB_NAME SET search_path TO core, lookup, debug;"
 echo
 
-if psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER';" | grep -q 1; then
+USER_EXISTS=$(psql postgres -qtAc "SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='$DB_USER');")
+if [ "$USER_EXISTS" = "t" ]; then
     echo "user already exists. dropping..."
     psql postgres -c "DROP USER $DB_USER;"
 else
