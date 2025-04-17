@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 show_help() {
     echo "Usage: reset [options]"

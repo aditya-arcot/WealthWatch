@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
 
