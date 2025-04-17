@@ -37,5 +37,5 @@ echo
 source ./load_env
 
 echo "cleaning up debug tables..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f ../sql/cleanup/debug_tables.sql -v ON_ERROR_STOP=1
+PGPASSWORD="$DB_PASSWORD" psql "$DB_NAME" -U "$DB_USER" -f ../sql/cleanup/debug_tables.sql -v ON_ERROR_STOP=1
 echo
