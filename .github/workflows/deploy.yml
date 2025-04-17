@@ -24,6 +24,9 @@ on:
             - 'server/tsconfig.json'
             - 'config/infra/**'
 
+permissions:
+    contents: read
+
 jobs:
     runner:
         runs-on: ubuntu-latest
