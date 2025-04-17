@@ -8,6 +8,7 @@ on:
             - stage
             - main
         paths:
+            - '.github/workflows/deploy*.yml'
             - 'client/public/**'
             - 'client/src/**'
             - 'client/angular.json'

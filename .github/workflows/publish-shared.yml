@@ -4,6 +4,7 @@ on:
     workflow_dispatch:
     push:
         paths:
+            - '.github/workflows/publish-shared.yml'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
             - 'shared/src/**'
