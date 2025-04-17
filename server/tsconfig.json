@@ -6,12 +6,7 @@
     "compilerOptions": {
         "outDir": "dist",
         "sourceMap": true,
-        "baseUrl": ".",
-        "paths": {
-            "wealthwatch-shared": [
-                "node_modules/@aditya-arcot/wealthwatch-shared/dist/index.d.ts"
-            ]
-        }
+        "baseUrl": "."
     },
     "include": ["src"]
 }
