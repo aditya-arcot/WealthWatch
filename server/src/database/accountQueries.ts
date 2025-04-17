@@ -1,14 +1,12 @@
 import {
-    StudentLoanRepaymentPlanTypeEnum,
-    StudentLoanStatusTypeEnum,
-} from 'wealthwatch-shared/enums/liability.js'
-import {
     Account,
     AccountWithHoldings,
     CreditCardAccount,
     MortgageAccount,
     StudentLoanAccount,
-} from 'wealthwatch-shared/models/account.js'
+    StudentLoanRepaymentPlanTypeEnum,
+    StudentLoanStatusTypeEnum,
+} from 'wealthwatch-shared'
 import {
     DbHoldingWithSecurity,
     mapDbHoldingWithSecurity,

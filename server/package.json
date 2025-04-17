@@ -1,13 +1,12 @@
 {
     "name": "wealthwatch-server",
-    "version": "1.0.0",
     "private": true,
     "type": "module",
     "scripts": {
         "build": "rm -rf dist/ && tsc --sourceMap false",
         "dev": "tsc-watch --onSuccess 'npm run start'",
         "lint": "eslint --fix --max-warnings=0 src/",
-        "start": "dotenvx run -f ../.env.dev -- node --inspect dist/index.js",
+        "start": "dotenvx run -f ../config/env/.env.dev -- node --inspect dist/index.js",
         "start:deploy": "dotenvx run -- node dist/index.js"
     },
     "lint-staged": {
@@ -17,13 +16,13 @@
         ]
     },
     "dependencies": {
-        "@dotenvx/dotenvx": "^1.40.0",
-        "@logtail/pino": "^0.5.2",
+        "@dotenvx/dotenvx": "^1.40.1",
+        "@logtail/pino": "^0.5.4",
         "@tsconfig/node-lts": "^22.0.1",
         "@tsconfig/strictest": "^2.0.5",
         "axios": "^1.8.4",
         "bcryptjs": "^3.0.2",
-        "bullmq": "^5.48.1",
+        "bullmq": "^5.49.1",
         "connect-pg-simple": "^10.0.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -44,7 +43,7 @@
         "qs": "^6.14.0",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
-        "wealthwatch-shared": "file:../shared/dist/"
+        "wealthwatch-shared": "npm:@aditya-arcot/wealthwatch-shared@^1.0.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.24.0",
@@ -55,7 +54,7 @@
         "@types/express-session": "^1.18.1",
         "@types/method-override": "^3.0.0",
         "@types/node": "^22.14.1",
-        "@types/pg": "^8.11.12",
+        "@types/pg": "^8.11.13",
         "@types/qs": "^6.9.18",
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.8",
@@ -63,6 +62,6 @@
         "globals": "^16.0.0",
         "tsc-watch": "^6.2.1",
         "typescript": "^5.8.3",
-        "typescript-eslint": "^8.29.1"
+        "typescript-eslint": "^8.30.1"
     }
 }

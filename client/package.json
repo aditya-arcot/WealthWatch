@@ -1,6 +1,5 @@
 {
     "name": "wealthwatch-client",
-    "version": "1.0.0",
     "private": true,
     "scripts": {
         "build": "ng build",
@@ -18,36 +17,36 @@
         ]
     },
     "dependencies": {
-        "@angular/animations": "^19.2.6",
-        "@angular/common": "^19.2.6",
-        "@angular/compiler": "^19.2.6",
-        "@angular/core": "^19.2.6",
-        "@angular/forms": "^19.2.6",
-        "@angular/platform-browser": "^19.2.6",
-        "@angular/platform-browser-dynamic": "^19.2.6",
-        "@angular/router": "^19.2.6",
-        "@logtail/browser": "^0.5.2",
+        "@angular/animations": "^19.2.7",
+        "@angular/common": "^19.2.7",
+        "@angular/compiler": "^19.2.7",
+        "@angular/core": "^19.2.7",
+        "@angular/forms": "^19.2.7",
+        "@angular/platform-browser": "^19.2.7",
+        "@angular/platform-browser-dynamic": "^19.2.7",
+        "@angular/router": "^19.2.7",
+        "@logtail/browser": "^0.5.4",
         "bootstrap": "^5.3.5",
         "bootstrap-icons": "^1.11.3",
-        "chart.js": "^4.4.8",
+        "chart.js": "^4.4.9",
         "chartjs-plugin-autocolors": "^0.3.1",
         "ng2-charts": "^8.0.0",
         "ngx-logger": "^5.0.12",
         "ngx-plaid-link": "^14.0.0",
         "rxjs": "~7.8.2",
         "uuid": "^11.1.0",
-        "wealthwatch-shared": "file:../shared/dist/",
+        "wealthwatch-shared": "npm:@aditya-arcot/wealthwatch-shared@^1.0.0",
         "zone.js": "~0.15.0"
     },
     "devDependencies": {
-        "@angular/build": "^19.2.7",
-        "@angular/cli": "^19.2.7",
-        "@angular/compiler-cli": "^19.2.6",
+        "@angular/build": "^19.2.8",
+        "@angular/cli": "^19.2.8",
+        "@angular/compiler-cli": "^19.2.7",
         "@eslint/js": "^9.24.0",
         "@types/node": "^22.14.1",
         "angular-eslint": "19.3.0",
         "eslint": "^9.24.0",
         "typescript": "~5.8.3",
-        "typescript-eslint": "^8.29.1"
+        "typescript-eslint": "^8.30.1"
     }
 }

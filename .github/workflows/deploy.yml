@@ -1,19 +1,34 @@
-name: CI/CD Pipeline
+name: Deploy Client, Server, and Infrastructure
 
 on:
+    workflow_dispatch:
     push:
         branches:
             - test
             - stage
             - main
+        paths:
+            - '.github/workflows/deploy*.yml'
+            - 'client/public/**'
+            - 'client/src/**'
+            - 'client/angular.json'
+            - 'client/Dockerfile'
+            - 'client/nginx.conf'
+            - 'client/package-lock.json'
+            - 'client/package.json'
+            - 'client/tsconfig.json'
+            - 'server/src/**'
+            - 'server/Dockerfile'
+            - 'server/package-lock.json'
+            - 'server/package.json'
+            - 'server/tsconfig.json'
+            - 'config/infra/**'
 
 permissions:
     contents: read
 
 jobs:
-    setup:
-        # TODO remove
-        if: false
+    runner:
         runs-on: ubuntu-latest
         outputs:
             runner: ${{ steps.set-runner.outputs.runner }}
@@ -21,20 +36,23 @@ jobs:
             - name: set runner
               id: set-runner
               run: |
-                  if [ ${{ github.ref_name }} == 'test' ]; then
+                  if [ "${{ github.ref_name }}" = "test" ]; then
                       echo "runner=mbp-14" >> $GITHUB_OUTPUT
                   else
                       echo "runner=mbp-13" >> $GITHUB_OUTPUT
                   fi
 
-    deploy:
-        # TODO remove
-        if: false
-        needs: setup
-        runs-on: ${{ needs.setup.outputs.runner }}
+    setup:
+        runs-on: ubuntu-latest
         environment: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+        outputs:
+            repo: ${{ steps.outputs-vars.outputs.repo }}
+            client_image: ${{ steps.outputs-vars.outputs.client_image }}
+            client_container: ${{ steps.outputs-vars.outputs.client_container }}
+            server_image: ${{ steps.outputs-vars.outputs.server_image }}
+            server_container: ${{ steps.outputs-vars.outputs.server_container }}
         steps:
-            - name: general vars
+            - name: initial vars
               run: |
                   VERSION=${{ github.run_number }}-${{ github.run_attempt }}-${{ github.run_id }}
                   echo "REPO=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -43,151 +61,63 @@ jobs:
             - name: docker container names - non-prod
               if: github.ref_name != 'main'
               run: |
-                  echo "SERVER_CONTAINER=$REPO-${{ github.ref_name }}-server" >> $GITHUB_ENV
                   echo "CLIENT_CONTAINER=$REPO-${{ github.ref_name }}-client" >> $GITHUB_ENV
+                  echo "SERVER_CONTAINER=$REPO-${{ github.ref_name }}-server" >> $GITHUB_ENV
 
             - name: docker container names - prod
               if: github.ref_name == 'main'
               run: |
-                  echo "SERVER_CONTAINER=$REPO-server" >> $GITHUB_ENV
                   echo "CLIENT_CONTAINER=$REPO-client" >> $GITHUB_ENV
+                  echo "SERVER_CONTAINER=$REPO-server" >> $GITHUB_ENV
 
-            - name: docker image names
+            - name: output vars
+              id: outputs-vars
               run: |
-                  echo "SERVER_IMAGE=${{ secrets.DOCKER_REGISTRY }}/$SERVER_CONTAINER:$IMAGE_TAG" >> $GITHUB_ENV
-                  echo "CLIENT_IMAGE=${{ secrets.DOCKER_REGISTRY }}/$CLIENT_CONTAINER:$IMAGE_TAG" >> $GITHUB_ENV
+                  echo "repo=$REPO" >> $GITHUB_OUTPUT
+                  echo "client_image=$CLIENT_CONTAINER:$IMAGE_TAG" >> $GITHUB_OUTPUT
+                  echo "client_container=$CLIENT_CONTAINER" >> $GITHUB_OUTPUT
+                  echo "server_image=$SERVER_CONTAINER:$IMAGE_TAG" >> $GITHUB_OUTPUT
+                  echo "server_container=$SERVER_CONTAINER" >> $GITHUB_OUTPUT
 
-            - name: unlock keychain
-              run: security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} login.keychain
+    deploy-client:
+        needs: [runner, setup]
+        uses: ./.github/workflows/deploy-client.yml
+        with:
+            runner: ${{ needs.runner.outputs.runner }}
+            image: ${{ needs.setup.outputs.client_image }}
+        secrets: inherit
 
-            - name: checkout
-              uses: actions/checkout@v4
+    deploy-server:
+        needs: [runner, setup]
+        uses: ./.github/workflows/deploy-server.yml
+        with:
+            runner: ${{ needs.runner.outputs.runner }}
+            image: ${{ needs.setup.outputs.server_image }}
+        secrets: inherit
 
-            - name: setup node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 'lts/*'
-                  check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: |
-                      package-lock.json
-                      shared/package-lock.json
-                      client/package-lock.json
-                      server/package-lock.json
-
-            - name: create server .env
-              run: |
-                  cd server/
-
-                  echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
-                  echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
-
-                  echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-
-                  echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-                  echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
-                  echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-                  echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-
-                  echo "CSRF_SECRET=${{ secrets.CSRF_SECRET }}" >> .env
-                  echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
-
-                  echo "PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }}" >> .env
-                  echo "PLAID_SECRET=${{ secrets.PLAID_SECRET }}" >> .env
-                  echo "PLAID_WEBHOOK_URL=${{ secrets.PLAID_WEBHOOK_URL }}" >> .env
-
-                  echo "DEMO_USER=${{ secrets.DEMO_USER }}" >> .env
-
-                  echo "DOCKER_REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> .env
-                  echo "KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}" >> .env
-
-                  echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
-
-                  echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
-                  echo "PLAID_ENV=${{ vars.PLAID_ENV }}" >> .env
-
-                  echo "CLIENT_PORT=${{ vars.CLIENT_PORT }}" >> .env
-                  echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
-                  echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
-
-            - name: modify client env.test.ts
-              if: github.ref_name == 'test'
-              run: |
-                  cd client/src/environments/
-                  sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT}}/g" \
-                      env.test.ts > env.test.ts.tmp
-                  mv env.test.ts.tmp env.test.ts
-
-            - name: install, build, package shared
-              run: |
-                  cd shared/
-                  npm ci
-                  npm run build
-                  mkdir pack
-                  cp -r dist/* pack
-                  cd pack
-                  npm pack
-                  mv wealthwatch-shared-*.tgz ../wealthwatch-shared.tgz
-
-            - name: install, build server
-              run: |
-                  cd server/
-                  cp ../shared/wealthwatch-shared.tgz .
-                  npm i wealthwatch-shared.tgz
-                  npm ci
-                  npm run build
-
-            - name: install, build client - non-prod
-              if: github.ref_name != 'main'
-              run: |
-                  cd client/
-                  npm ci
-                  npm run build:${{ github.ref_name }}
-
-            - name: install, build client - prod
-              if: github.ref_name == 'main'
-              run: |
-                  cd client/
-                  npm ci
-                  npm run build
-
-            - name: copy server files
-              run: |
-                  cd server/
-                  mkdir stage
-                  cp -r .env Dockerfile package.json package-lock.json wealthwatch-shared.tgz dist stage/
-                  find stage -type f
-
-            - name: copy client files
-              run: |
-                  cd client/
-                  mkdir stage
-                  cp -r Dockerfile nginx.conf dist stage/
-                  find stage -type f
-
-            - name: build, push server docker image
-              run: |
-                  cd server/stage/
-                  docker build -t $SERVER_IMAGE .
-                  docker push $SERVER_IMAGE
-
-            - name: build, push client docker image
-              run: |
-                  cd client/stage/
-                  docker build -t $CLIENT_IMAGE .
-                  docker push $CLIENT_IMAGE
-
+    deploy-infra:
+        needs: [runner, setup, deploy-client, deploy-server]
+        runs-on: ${{ needs.runner.outputs.runner }}
+        environment: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+        steps:
             - name: start docker
+              env:
+                  REPO: ${{ needs.setup.outputs.repo }}-${{ github.ref_name }}
+                  SERVER_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ needs.setup.outputs.server_image }}
+                  SERVER_PORT: ${{ vars.SERVER_PORT }}
+                  WEBHOOK_PORT: ${{ vars.WEBHOOK_PORT }}
+                  SERVER_CONTAINER: ${{ needs.setup.outputs.server_container }}
+                  CLIENT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ needs.setup.outputs.client_image }}
+                  CLIENT_PORT: ${{ vars.CLIENT_PORT }}
+                  CLIENT_CONTAINER: ${{ needs.setup.outputs.client_container }}
               run: |
-                  REPO=$REPO-${{ github.ref_name }}
-                  SERVER_PORT=${{ vars.SERVER_PORT }} \
-                  WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }} \
-                  CLIENT_PORT=${{ vars.CLIENT_PORT }} \
+                  cd config/infra/
                   docker compose up -d
 
             - name: configure nginx - stage
               if: github.ref_name == 'stage'
               run: |
+                  cd config/infra/
                   sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT }}/g" \
                   -e "s/{WEBHOOK_PORT}/${{ vars.WEBHOOK_PORT }}/g" \
                   -e "s/{CLIENT_PORT}/${{ vars.CLIENT_PORT }}/g" \
@@ -198,6 +128,7 @@ jobs:
             - name: configure nginx - prod
               if: github.ref_name == 'main'
               run: |
+                  cd config/infra/
                   sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT }}/g" \
                   -e "s/{WEBHOOK_PORT}/${{ vars.WEBHOOK_PORT }}/g" \
                   -e "s/{CLIENT_PORT}/${{ vars.CLIENT_PORT }}/g" \
@@ -205,8 +136,8 @@ jobs:
                   mv wealthwatch.conf.tmp wealthwatch.conf
                   cp wealthwatch.conf /usr/local/etc/nginx/servers/
 
-            - name: test, restart nginx
+            - name: test, reload nginx - stage, prod
               if: github.ref_name != 'test'
               run: |
                   nginx -t
-                  brew services restart nginx
+                  nginx -s reload

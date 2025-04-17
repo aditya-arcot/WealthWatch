@@ -3,10 +3,7 @@ import {
     Holding as PlaidHolding,
     Security as PlaidSecurity,
 } from 'plaid'
-import { SecurityTypeEnum } from 'wealthwatch-shared/enums/security.js'
-import { Holding } from 'wealthwatch-shared/models/holding.js'
-import { Item } from 'wealthwatch-shared/models/item.js'
-import { Security } from 'wealthwatch-shared/models/security.js'
+import { Holding, Item, Security, SecurityTypeEnum } from 'wealthwatch-shared'
 import { PlaidGeneralErrorCodeEnum } from '../enums/plaidApiError.js'
 import { PlaidApiError } from '../models/error.js'
 import { logger } from '../utilities/logger.js'

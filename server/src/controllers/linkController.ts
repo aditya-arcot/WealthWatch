@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
-import { NotificationTypeEnum } from 'wealthwatch-shared/enums/notification.js'
-import { Item } from 'wealthwatch-shared/models/item.js'
-import { PlaidLinkEvent } from 'wealthwatch-shared/models/plaidLinkEvent.js'
+import { Item, NotificationTypeEnum, PlaidLinkEvent } from 'wealthwatch-shared'
 import {
     fetchActiveItemByUserIdAndId,
     fetchActiveItemByUserIdAndInstitutionId,

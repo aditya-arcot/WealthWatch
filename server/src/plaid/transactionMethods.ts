@@ -6,10 +6,12 @@ import {
     TransactionsRefreshRequest,
     TransactionsSyncRequest,
 } from 'plaid'
-import { CategoryEnum } from 'wealthwatch-shared/enums/category.js'
-import { PaymentChannelEnum } from 'wealthwatch-shared/enums/transaction.js'
-import { Item } from 'wealthwatch-shared/models/item.js'
-import { Transaction } from 'wealthwatch-shared/models/transaction.js'
+import {
+    CategoryEnum,
+    Item,
+    PaymentChannelEnum,
+    Transaction,
+} from 'wealthwatch-shared'
 import {
     PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,

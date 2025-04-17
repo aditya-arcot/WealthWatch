@@ -1,0 +1,114 @@
+#!/bin/bash
+
+set -eo pipefail
+
+show_help() {
+    echo "Usage: reset [options]"
+    echo ""
+    echo "Options:"
+    echo "  --env file     Specify the environment file"
+    echo "  -h, --help     Display this help message"
+}
+
+ENV_FILE="../../config/env/.env.dev"
+ADMIN_PASSWORD_REQUIRED=true
+
+while [[ "$1" != "" ]]; do
+    case $1 in
+        --env)
+            shift
+            ENV_FILE=$1
+            ;;
+        -h | --help)
+            show_help
+            exit
+            ;;
+        *)
+            echo "Invalid option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+echo "Environment file: $ENV_FILE"
+echo
+
+source ./load_env
+
+if psql -lqt | cut -d \| -f 1 | grep -qw "$DB_NAME"; then
+    echo "database already exists"
+    echo "checking for active items..."
+    VIEW_EXISTS=$(PGPASSWORD="$DB_PASSWORD" psql "$DB_NAME" -U "$DB_USER" -qtAc "SELECT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'active_items');")
+    if [ "$VIEW_EXISTS" = "t" ]; then
+        ACTIVE_ITEMS_EXIST=$(PGPASSWORD="$DB_PASSWORD" psql "$DB_NAME" -U "$DB_USER" -qtAc "SELECT EXISTS (SELECT 1 FROM active_items);")
+        if [ "$ACTIVE_ITEMS_EXIST" = "f" ]; then
+            echo "database has no active items. dropping..."
+            dropdb $DB_NAME
+        else
+            echo "database has active items. deactivate them before reset. aborting..."
+            exit 1
+        fi
+    else
+        echo "view 'active_items' does not exist. dropping..."
+        dropdb "$DB_NAME"
+    fi
+else
+    echo "database does not exist"
+fi
+echo
+
+echo "creating database..."
+createdb "$DB_NAME"
+echo
+
+echo "modifying schemas..."
+psql "$DB_NAME" -f ../sql/schema/01_schemas.sql -v ON_ERROR_STOP=1 -v user="$USER"
+psql "$DB_NAME" -c "ALTER DATABASE $DB_NAME SET search_path TO core, lookup, debug;"
+echo
+
+USER_EXISTS=$(psql postgres -qtAc "SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='$DB_USER');")
+if [ "$USER_EXISTS" = "t" ]; then
+    echo "user already exists. dropping..."
+    psql postgres -c "DROP USER $DB_USER;"
+else
+    echo "user does not exist"
+fi
+echo
+
+echo "creating user..."
+psql postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
+echo
+
+echo "granting permissions..."
+psql "$DB_NAME" -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+echo
+
+echo "creating objects..."
+
+echo "creating temp file..."
+TEMP_FILE="../sql/schema/temp.sql"
+echo "BEGIN;" > "$TEMP_FILE"
+cat ../sql/schema/02_debug_tables.sql >> "$TEMP_FILE"
+cat ../sql/schema/03_lookup_tables.sql >> "$TEMP_FILE"
+cat ../sql/schema/04_functions.sql >> "$TEMP_FILE"
+cat ../sql/schema/05_core_tables.sql >> "$TEMP_FILE"
+cat ../sql/schema/06_core_views.sql >> "$TEMP_FILE"
+cat ../sql/schema/07_core_triggers.sql >> "$TEMP_FILE"
+echo "COMMIT;" >> "$TEMP_FILE"
+
+echo "executing temp file..."
+PGPASSWORD="$DB_PASSWORD" psql "$DB_NAME" -U "$DB_USER" -f "$TEMP_FILE" -v ON_ERROR_STOP=1
+
+echo "deleting temp file..."
+rm "$TEMP_FILE"
+echo
+
+echo "seeding lookup data..."
+PGPASSWORD="$DB_PASSWORD" psql "$DB_NAME" -U "$DB_USER" -f ../sql/seeds/lookup_data.sql -v ON_ERROR_STOP=1
+echo
+
+echo "seeding user data..."
+PGPASSWORD="$DB_PASSWORD" psql "$DB_NAME" -U "$DB_USER" -f ../sql/seeds/user_data.sql -v ON_ERROR_STOP=1 -v admin_password_hash="$ADMIN_PASSWORD_HASH"
+echo
