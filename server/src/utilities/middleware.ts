@@ -13,13 +13,11 @@ import { production, stage, vars } from './env.js'
 import { capitalizeFirstLetter } from './format.js'
 import { logger } from './logger.js'
 
-const origins = [
-    stage
-        ? 'https://wealthwatch-stage.aditya-arcot.com'
-        : 'https://wealthwatch.aditya-arcot.com',
-]
+const origin = stage
+    ? 'https://wealthwatch-stage.aditya-arcot.com'
+    : 'https://wealthwatch.aditya-arcot.com'
 export const corsMiddleware = cors({
-    origin: production ? origins : true,
+    origin: production ? origin : true,
     credentials: true,
 })
 
