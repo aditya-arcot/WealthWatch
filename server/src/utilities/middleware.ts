@@ -29,7 +29,11 @@ export const createSessionMiddleware = () => {
         pool: getPool(),
         createTableIfMissing: true,
     })
+    const cookieName = production
+        ? 'wealthwatch-session'
+        : `wealthwatch-${vars.nodeEnv}-session`
     return session({
+        name: cookieName,
         store: sessionStore,
         secret: vars.sessionSecret,
         resave: false,
@@ -44,8 +48,8 @@ export const createSessionMiddleware = () => {
 
 export const createCsrfMiddleware = () => {
     const cookieName = production
-        ? '__Host-psifi.x-csrf-token'
-        : `x-csrf-token-${vars.nodeEnv}`
+        ? 'wealthwatch-csrf-token'
+        : `wealthwatch-${vars.nodeEnv}-csrf-token`
     const options = {
         getSecret: () => vars.sessionSecret,
         cookieName,
