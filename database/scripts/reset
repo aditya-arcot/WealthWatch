@@ -3,14 +3,14 @@
 set -e
 
 show_help() {
-    echo "Usage: reset_db [options]"
+    echo "Usage: reset [options]"
     echo ""
     echo "Options:"
     echo "  --env file     Specify the environment file"
     echo "  -h, --help     Display this help message"
 }
 
-ENV_FILE="../.env.dev"
+ENV_FILE="../../config/env/.env.dev"
 ADMIN_PASSWORD_REQUIRED=true
 
 while [[ "$1" != "" ]]; do
@@ -63,7 +63,7 @@ createdb $DB_NAME
 echo
 
 echo "modifying schemas..."
-psql $DB_NAME -f scripts/schemas.sql -v ON_ERROR_STOP=1 -v user=$USER
+psql $DB_NAME -f ../sql/schema/01_schemas.sql -v ON_ERROR_STOP=1 -v user=$USER
 psql $DB_NAME -c "ALTER DATABASE $DB_NAME SET search_path TO core, lookup, debug;"
 echo
 
@@ -86,14 +86,14 @@ echo
 echo "creating objects..."
 
 echo "creating temp file..."
-TEMP_FILE="scripts/create/temp.sql"
+TEMP_FILE="../sql/schema/temp.sql"
 echo "BEGIN;" > $TEMP_FILE
-cat scripts/create/debug_tables.sql >> $TEMP_FILE
-cat scripts/create/lookup_tables.sql >> $TEMP_FILE
-cat scripts/create/functions.sql >> $TEMP_FILE
-cat scripts/create/core_tables.sql >> $TEMP_FILE
-cat scripts/create/core_views.sql >> $TEMP_FILE
-cat scripts/create/core_triggers.sql >> $TEMP_FILE
+cat ../sql/schema/02_debug_tables.sql >> $TEMP_FILE
+cat ../sql/schema/03_lookup_tables.sql >> $TEMP_FILE
+cat ../sql/schema/04_functions.sql >> $TEMP_FILE
+cat ../sql/schema/05_core_tables.sql >> $TEMP_FILE
+cat ../sql/schema/06_core_views.sql >> $TEMP_FILE
+cat ../sql/schema/07_core_triggers.sql >> $TEMP_FILE
 echo "COMMIT;" >> $TEMP_FILE
 
 echo "executing temp file..."
@@ -104,9 +104,9 @@ rm $TEMP_FILE
 echo
 
 echo "seeding lookup data..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed/lookup_data.sql -v ON_ERROR_STOP=1
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f ../sql/seeds/lookup_data.sql -v ON_ERROR_STOP=1
 echo
 
 echo "seeding user data..."
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f scripts/seed/user_data.sql -v ON_ERROR_STOP=1 -v admin_password_hash=$ADMIN_PASSWORD_HASH
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f ../sql/seeds/user_data.sql -v ON_ERROR_STOP=1 -v admin_password_hash=$ADMIN_PASSWORD_HASH
 echo

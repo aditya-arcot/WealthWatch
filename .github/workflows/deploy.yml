@@ -20,8 +20,7 @@ on:
             - 'server/package-lock.json'
             - 'server/package.json'
             - 'server/tsconfig.json'
-            - 'docker-compose.yml'
-            - 'wealthwatch*.conf'
+            - 'config/infra/**'
 
 jobs:
     runner:

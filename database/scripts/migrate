@@ -3,7 +3,7 @@
 set -e
 
 show_help() {
-    echo "Usage: run_db_migration [options]"
+    echo "Usage: migrate [options]"
     echo ""
     echo "Options:"
     echo "  --env file          Specify the environment file"
@@ -13,7 +13,7 @@ show_help() {
     echo "  -h, --help          Display this help message"
 }
 
-ENV_FILE="../.env.dev"
+ENV_FILE="../../config/env/.env.dev"
 OWNER=false
 declare -a PSQL_VARS
 

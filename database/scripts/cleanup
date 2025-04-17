@@ -1,14 +1,16 @@
 #!/bin/bash
 
+set -e
+
 show_help() {
-    echo "Usage: connect_to_db [options]"
+    echo "Usage: cleanup [options]"
     echo ""
     echo "Options:"
     echo "  --env file     Specify the environment file"
     echo "  -h, --help     Display this help message"
 }
 
-ENV_FILE="../.env.dev"
+ENV_FILE="../../config/env/.env.dev"
 
 while [[ "$1" != "" ]]; do
     case $1 in
@@ -30,7 +32,10 @@ while [[ "$1" != "" ]]; do
 done
 
 echo "Environment file: $ENV_FILE"
+echo
 
 source ./load_env
 
-PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER
+echo "cleaning up debug tables..."
+PGPASSWORD=$DB_PASSWORD psql $DB_NAME -U $DB_USER -f ../sql/cleanup/debug_tables.sql -v ON_ERROR_STOP=1
+echo

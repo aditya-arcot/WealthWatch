@@ -6,7 +6,7 @@
         "build": "rm -rf dist/ && tsc --sourceMap false",
         "dev": "tsc-watch --onSuccess 'npm run start'",
         "lint": "eslint --fix --max-warnings=0 src/",
-        "start": "dotenvx run -f ../.env.dev -- node --inspect dist/index.js",
+        "start": "dotenvx run -f ../config/env/.env.dev -- node --inspect dist/index.js",
         "start:deploy": "dotenvx run -- node dist/index.js"
     },
     "lint-staged": {
