@@ -1,6 +1,7 @@
 name: Deploy Client, Server, and Infrastructure
 
 on:
+    workflow_dispatch:
     push:
         branches:
             - test

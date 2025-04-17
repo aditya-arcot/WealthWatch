@@ -1,6 +1,7 @@
 name: Publish Shared Package
 
 on:
+    workflow_dispatch:
     push:
         paths:
             - 'shared/package.json'
