@@ -109,7 +109,7 @@ jobs:
                   CLIENT_CONTAINER: ${{ needs.setup.outputs.client_container }}
               run: |
                   cd config/infra/
-                  docker compose up -d -f docker-compose.yml
+                  docker compose up -d
 
             - name: configure nginx - stage
               if: github.ref_name == 'stage'
