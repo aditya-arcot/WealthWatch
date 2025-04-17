@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+echo "creating global symlink..."
+cd ../shared
+npm link
+echo
+
+echo "linking to client..."
+cd ../client
+npm link @aditya-arcot/wealthwatch-shared
+echo
+
+echo "linking to server..."
+cd ../server
+npm link @aditya-arcot/wealthwatch-shared
+echo

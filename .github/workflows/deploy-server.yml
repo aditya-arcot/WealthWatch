@@ -1,0 +1,93 @@
+name: Deploy Server
+
+on:
+    workflow_call:
+        inputs:
+            runner:
+                required: true
+                type: string
+            image:
+                required: true
+                type: string
+
+permissions:
+    contents: read
+
+jobs:
+    deploy:
+        runs-on: ${{ inputs.runner }}
+        environment: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+        steps:
+            - name: unlock keychain
+              run: security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} login.keychain
+
+            - name: checkout
+              uses: actions/checkout@v4
+
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+                  cache: 'npm'
+                  cache-dependency-path: server/package-lock.json
+
+            - name: create server .env
+              run: |
+                  cd server/
+
+                  echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
+                  echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
+
+                  echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+
+                  echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+                  echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+                  echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+                  echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+
+                  echo "CSRF_SECRET=${{ secrets.CSRF_SECRET }}" >> .env
+                  echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
+
+                  echo "PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }}" >> .env
+                  echo "PLAID_SECRET=${{ secrets.PLAID_SECRET }}" >> .env
+                  echo "PLAID_WEBHOOK_URL=${{ secrets.PLAID_WEBHOOK_URL }}" >> .env
+
+                  echo "DEMO_USER=${{ secrets.DEMO_USER }}" >> .env
+
+                  echo "DOCKER_REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> .env
+                  echo "KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}" >> .env
+
+                  echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
+
+                  echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
+                  echo "PLAID_ENV=${{ vars.PLAID_ENV }}" >> .env
+
+                  echo "CLIENT_PORT=${{ vars.CLIENT_PORT }}" >> .env
+                  echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
+                  echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
+
+            - name: create .npmrc
+              run: |
+                  cd server/
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
+
+            - name: install, build server
+              run: |
+                  cd server/
+                  npm ci
+                  npm run build
+
+            - name: copy server files
+              run: |
+                  cd server/
+                  mkdir stage
+                  cp -r .env .npmrc Dockerfile package.json package-lock.json dist stage/
+                  find stage -type f
+
+            - name: build, push server docker image
+              run: |
+                  cd server/stage/
+                  IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.image }}
+                  docker build -t $IMAGE .
+                  docker push $IMAGE

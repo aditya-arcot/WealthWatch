@@ -11,11 +11,13 @@ import {
     switchMap,
     throwError,
 } from 'rxjs'
-import { CategoryEnum } from 'wealthwatch-shared/enums/category'
-import { Account } from 'wealthwatch-shared/models/account'
-import { Category } from 'wealthwatch-shared/models/category'
-import { ItemWithAccounts } from 'wealthwatch-shared/models/item'
-import { Transaction } from 'wealthwatch-shared/models/transaction'
+import {
+    Account,
+    Category,
+    CategoryEnum,
+    ItemWithAccounts,
+    Transaction,
+} from 'wealthwatch-shared'
 import { AccountFilterComponent } from '../../components/filters/account-filter/account-filter.component'
 import { AmountFilterComponent } from '../../components/filters/amount-filter/amount-filter.component'
 import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'

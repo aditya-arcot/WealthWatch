@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
-import { Item } from 'wealthwatch-shared/models/item.js'
+import { Item } from 'wealthwatch-shared'
 import {
     fetchActiveItemByPlaidId,
     fetchActiveItemByUserIdAndInstitutionId,

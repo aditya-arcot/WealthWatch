@@ -1,4 +1,4 @@
-import { User } from 'wealthwatch-shared/models/user.js'
+import { User } from 'wealthwatch-shared'
 import { DatabaseError } from '../models/error.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 

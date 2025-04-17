@@ -1,7 +1,5 @@
 import { Request, Response } from 'express'
-import { Account } from 'wealthwatch-shared/models/account.js'
-import { Item } from 'wealthwatch-shared/models/item.js'
-import { itemInCooldown } from 'wealthwatch-shared/utilities/item.js'
+import { Account, Item, itemInCooldown } from 'wealthwatch-shared'
 import {
     fetchActiveAccountsByUserId,
     insertAccounts,

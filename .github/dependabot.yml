@@ -14,15 +14,11 @@ updates:
       directory: 'client'
       schedule:
           interval: 'daily'
-      ignore:
-          - dependency-name: 'wealthwatch-shared'
 
     - package-ecosystem: 'npm'
       directory: 'server'
       schedule:
           interval: 'daily'
-      ignore:
-          - dependency-name: 'wealthwatch-shared'
 
     - package-ecosystem: 'docker'
       directory: 'client'

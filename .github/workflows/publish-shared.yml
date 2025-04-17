@@ -1,8 +1,10 @@
 name: Publish Shared Package
 
 on:
+    workflow_dispatch:
     push:
         paths:
+            - '.github/workflows/publish-shared.yml'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
             - 'shared/src/**'
@@ -20,7 +22,28 @@ jobs:
             - name: checkout
               uses: actions/checkout@v4
 
+            - name: check if version already published
+              id: check-version
+              run: |
+                  cd shared
+                  VERSION=$(jq -r .version package.json)
+                  PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
+                  if PUBLISHED=$(npm view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2> /dev/null); then
+                    echo "Latest published version is $PUBLISHED"
+                    if [ "$VERSION" = "$PUBLISHED" ]; then
+                      echo "Package version $VERSION already published"
+                      echo "skip_publish=true" >> $GITHUB_OUTPUT
+                    else
+                      echo "Package version $VERSION not published"
+                      echo "skip_publish=false" >> $GITHUB_OUTPUT
+                    fi
+                  else
+                    echo "Could not get published package version"
+                    echo "skip_publish=false" >> $GITHUB_OUTPUT
+                  fi
+
             - name: setup node
+              if: steps.check-version.outputs.skip_publish == 'false'
               uses: actions/setup-node@v4
               with:
                   node-version: 'lts/*'
@@ -29,12 +52,14 @@ jobs:
                   cache-dependency-path: shared/package-lock.json
 
             - name: build
+              if: steps.check-version.outputs.skip_publish == 'false'
               run: |
                   cd shared
                   npm ci
                   npm run build
 
             - name: publish
+              if: steps.check-version.outputs.skip_publish == 'false'
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |

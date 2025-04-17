@@ -1,9 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import {
-    Transaction,
-    TransactionsAndCounts,
-} from 'wealthwatch-shared/models/transaction'
+import { Transaction, TransactionsAndCounts } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 import { TransactionsRequestParams } from '../models/transaction'
 

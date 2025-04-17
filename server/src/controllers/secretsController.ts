@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Secrets } from 'wealthwatch-shared/models/secrets.js'
+import { Secrets } from 'wealthwatch-shared'
 import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
 

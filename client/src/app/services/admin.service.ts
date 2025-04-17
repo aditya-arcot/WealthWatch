@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { AccessRequestStatusEnum } from 'wealthwatch-shared/enums/accessRequest'
-import { AccessRequest } from 'wealthwatch-shared/models/accessRequest'
+import { AccessRequest, AccessRequestStatusEnum } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 
 @Injectable({

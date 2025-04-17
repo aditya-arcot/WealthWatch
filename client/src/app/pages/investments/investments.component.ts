@@ -9,9 +9,11 @@ import {
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, finalize, throwError } from 'rxjs'
-import { AccountWithHoldings } from 'wealthwatch-shared/models/account'
-import { HoldingWithSecurity } from 'wealthwatch-shared/models/holding'
-import { ItemWithAccountsWithHoldings } from 'wealthwatch-shared/models/item'
+import {
+    AccountWithHoldings,
+    HoldingWithSecurity,
+    ItemWithAccountsWithHoldings,
+} from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { securityTypeNames } from '../../records/security'

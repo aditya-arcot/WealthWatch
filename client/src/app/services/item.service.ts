@@ -6,7 +6,7 @@ import {
     ItemWithCreditCardAccounts,
     ItemWithMortgageAccounts,
     ItemWithStudentLoanAccounts,
-} from 'wealthwatch-shared/models/item'
+} from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 
 @Injectable({

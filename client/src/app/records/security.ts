@@ -1,4 +1,4 @@
-import { SecurityTypeEnum } from 'wealthwatch-shared/enums/security'
+import { SecurityTypeEnum } from 'wealthwatch-shared'
 
 export const securityTypeNames: Record<SecurityTypeEnum, string> = {
     [SecurityTypeEnum.Cash]: 'Cash',
