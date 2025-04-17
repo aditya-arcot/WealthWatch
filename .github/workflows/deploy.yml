@@ -128,8 +128,8 @@ jobs:
                   mv wealthwatch.conf.tmp wealthwatch.conf
                   cp wealthwatch.conf /usr/local/etc/nginx/servers/
 
-            - name: test, restart nginx - stage, prod
+            - name: test, reload nginx - stage, prod
               if: github.ref_name != 'test'
               run: |
                   nginx -t
-                  brew services restart nginx
+                  nginx -s reload
