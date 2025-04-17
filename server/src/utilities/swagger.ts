@@ -7,8 +7,8 @@ import { production, vars } from './env.js'
 export const swaggerOptions: SwaggerUiOptions = {
     swaggerOptions: {
         requestInterceptor: async (req: Request) => {
-            const url = req.url.split('/')[2]
-            const serverUrl = `http://${url}`
+            const port = req.url.split('/')[2]?.split(':')[1] ?? '3000'
+            const serverUrl = `http://localhost:${port}`
             const response = await fetch(`${serverUrl}/csrf-token`)
             const data = (await response.json()) as { csrfToken: string }
             req.headers['x-csrf-token'] = data.csrfToken
