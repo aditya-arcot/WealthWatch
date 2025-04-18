@@ -13,13 +13,11 @@ import { production, stage, vars } from './env.js'
 import { capitalizeFirstLetter } from './format.js'
 import { logger } from './logger.js'
 
-const origins = [
-    stage
-        ? 'https://wealthwatch-stage.aditya-arcot.com'
-        : 'https://wealthwatch.aditya-arcot.com',
-]
+const origin = stage
+    ? 'https://wealthwatch-stage.aditya-arcot.com'
+    : 'https://wealthwatch.aditya-arcot.com'
 export const corsMiddleware = cors({
-    origin: production ? origins : true,
+    origin: production ? origin : true,
     credentials: true,
 })
 
@@ -29,7 +27,11 @@ export const createSessionMiddleware = () => {
         pool: getPool(),
         createTableIfMissing: true,
     })
+    const cookieName = production
+        ? 'wealthwatch-session'
+        : `wealthwatch-${vars.nodeEnv}-session`
     return session({
+        name: cookieName,
         store: sessionStore,
         secret: vars.sessionSecret,
         resave: false,
@@ -44,8 +46,8 @@ export const createSessionMiddleware = () => {
 
 export const createCsrfMiddleware = () => {
     const cookieName = production
-        ? '__Host-psifi.x-csrf-token'
-        : `x-csrf-token-${vars.nodeEnv}`
+        ? 'wealthwatch-csrf-token'
+        : `wealthwatch-${vars.nodeEnv}-csrf-token`
     const options = {
         getSecret: () => vars.sessionSecret,
         cookieName,
