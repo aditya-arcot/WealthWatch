@@ -37,7 +37,7 @@ jobs:
                     fi
                   else
                     echo "Could not get published package version"
-                    echo "skip_publish=false" >> $GITHUB_OUTPUT
+                    exit 1
                   fi
 
             - name: setup node
