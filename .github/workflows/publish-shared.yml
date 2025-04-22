@@ -8,8 +8,6 @@ on:
             - 'shared/package.json'
             - 'shared/tsconfig.json'
             - 'shared/src/**'
-        branches:
-            - main
 
 permissions:
     contents: read
