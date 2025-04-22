@@ -8,6 +8,8 @@ updates:
           root-dependencies:
               patterns:
                   - '*'
+      assignees:
+          - 'aditya-arcot'
 
     - package-ecosystem: 'npm'
       directory: 'shared'
@@ -17,6 +19,8 @@ updates:
           shared-dependencies:
               patterns:
                   - '*'
+      assignees:
+          - 'aditya-arcot'
 
     - package-ecosystem: 'npm'
       directory: 'client'
@@ -26,6 +30,8 @@ updates:
           client-dependencies:
               patterns:
                   - '*'
+      assignees:
+          - 'aditya-arcot'
 
     - package-ecosystem: 'npm'
       directory: 'server'
@@ -35,6 +41,8 @@ updates:
           server-dependencies:
               patterns:
                   - '*'
+      assignees:
+          - 'aditya-arcot'
 
     - package-ecosystem: 'docker'
       directory: 'client'
@@ -44,6 +52,8 @@ updates:
           client-docker:
               patterns:
                   - '*'
+      assignees:
+          - 'aditya-arcot'
 
     - package-ecosystem: 'docker'
       directory: 'server'
@@ -53,6 +63,8 @@ updates:
           server-docker:
               patterns:
                   - '*'
+      assignees:
+          - 'aditya-arcot'
 
     - package-ecosystem: 'github-actions'
       directory: '/'
@@ -62,3 +74,5 @@ updates:
           github-actions:
               patterns:
                   - '*'
+      assignees:
+          - 'aditya-arcot'
