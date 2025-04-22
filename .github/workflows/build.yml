@@ -1,0 +1,70 @@
+name: Build Shared, Client, and Server
+
+on:
+    pull_request:
+        branches:
+            - test
+            - stage
+            - main
+
+permissions:
+    contents: read
+
+jobs:
+    runner:
+        runs-on: mbp-13
+        outputs:
+            runner: ${{ steps.set-runner.outputs.runner }}
+        steps:
+            - name: set runner
+              id: set-runner
+              run: |
+                  if [ "${{ github.base_ref }}" = "test" ]; then
+                      echo "runner=mbp-14" >> $GITHUB_OUTPUT
+                  else
+                      echo "runner=mbp-13" >> $GITHUB_OUTPUT
+                  fi
+
+    build:
+        needs: runner
+        runs-on: ${{ needs.runner.outputs.runner }}
+        steps:
+            - name: checkout
+              uses: actions/checkout@v4
+
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+                  cache: 'npm'
+                  cache-dependency-path: |
+                      shared/package-lock.json
+                      client/package-lock.json
+                      server/package-lock.json
+
+            - name: install, build shared
+              run: |
+                  cd shared/
+                  npm ci
+                  npm run build
+
+            - name: install, build client - non-prod
+              if: github.base_ref != 'main'
+              run: |
+                  cd client/
+                  npm ci
+                  npm run build:${{ github.base_ref }}
+
+            - name: install, build client - prod
+              if: github.base_ref == 'main'
+              run: |
+                  cd client/
+                  npm ci
+                  npm run build
+
+            - name: install, build server
+              run: |
+                  cd server/
+                  npm ci
+                  npm run build
