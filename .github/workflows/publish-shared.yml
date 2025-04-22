@@ -20,6 +20,11 @@ jobs:
             - name: checkout
               uses: actions/checkout@v4
 
+            - name: create .npmrc
+              run: |
+                  cd shared/
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
+
             - name: check if version already published
               id: check-version
               run: |
