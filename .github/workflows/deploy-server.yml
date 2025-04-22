@@ -32,7 +32,7 @@ jobs:
                   cache: 'npm'
                   cache-dependency-path: server/package-lock.json
 
-            - name: create server .env
+            - name: create .env
               run: |
                   cd server/
 
@@ -72,20 +72,20 @@ jobs:
                   cd server/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
 
-            - name: install, build server
+            - name: install, build
               run: |
                   cd server/
                   npm ci
                   npm run build
 
-            - name: copy server files
+            - name: copy files
               run: |
                   cd server/
                   mkdir stage
                   cp -r .env .npmrc Dockerfile package.json package-lock.json dist stage/
                   find stage -type f
 
-            - name: build, push server docker image
+            - name: build, push docker image
               run: |
                   cd server/stage/
                   IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.image }}
