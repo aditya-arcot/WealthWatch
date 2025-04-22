@@ -25,7 +25,7 @@ jobs:
             - name: check if version already published
               id: check-version
               run: |
-                  cd shared
+                  cd shared/
                   VERSION=$(jq -r .version package.json)
                   PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
                   if PUBLISHED=$(npm view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2> /dev/null); then
@@ -51,10 +51,10 @@ jobs:
                   cache: 'npm'
                   cache-dependency-path: shared/package-lock.json
 
-            - name: build
+            - name: install, build
               if: steps.check-version.outputs.skip_publish == 'false'
               run: |
-                  cd shared
+                  cd shared/
                   npm ci
                   npm run build
 
@@ -63,6 +63,6 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  cd shared
+                  cd shared/
                   npm whoami --registry=https://npm.pkg.github.com/
                   npm publish --access public
