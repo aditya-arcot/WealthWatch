@@ -29,7 +29,7 @@ permissions:
 
 jobs:
     runner:
-        runs-on: mbp-13
+        runs-on: self-hosted
         outputs:
             runner: ${{ steps.set-runner.outputs.runner }}
         steps:
@@ -43,7 +43,7 @@ jobs:
                   fi
 
     setup:
-        runs-on: mbp-13
+        runs-on: self-hosted
         environment: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
         outputs:
             repo: ${{ steps.outputs-vars.outputs.repo }}
