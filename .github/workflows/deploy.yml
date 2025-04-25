@@ -24,6 +24,10 @@ on:
             - 'server/tsconfig.json'
             - 'config/infra/**'
 
+concurrency:
+    group: deploy-${{ github.ref_name }}
+    cancel-in-progress: true
+
 permissions:
     contents: read
 
