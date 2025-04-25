@@ -19,19 +19,16 @@ export const createPool = async (): Promise<void> => {
         maxUses: 7500,
     }
     clientPool = new pg.Pool(config)
-
     try {
         await runQuery('SELECT 1')
-    } catch (error) {
-        logger.error(error)
-        await clientPool.end()
+        logger.debug('created database pool')
+    } catch {
         throw new DatabaseError('failed to create database pool')
     }
-    logger.debug('created database pool')
 }
 
 export const getPool = (): pg.Pool => {
-    if (!clientPool) throw new DatabaseError('pool not initialized')
+    if (!clientPool) throw new DatabaseError('database pool not initialized')
     return clientPool
 }
 
@@ -39,6 +36,10 @@ export const stopPool = async (): Promise<void> => {
     logger.debug('stopping database pool')
     if (!clientPool) {
         logger.warn('database pool not initialized')
+        return
+    }
+    if (clientPool.ended) {
+        logger.warn('database pool already stopped')
         return
     }
     await clientPool.end()
