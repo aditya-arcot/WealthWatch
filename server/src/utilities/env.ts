@@ -1,9 +1,8 @@
 import { env } from 'process'
-import { HttpError } from '../models/error.js'
 
 const getEnvVar = (key: string): string => {
     const val = env[key]
-    if (val === undefined) throw new HttpError(`missing env var ${key}`)
+    if (val === undefined) throw Error(`missing env var ${key}`)
     return val
 }
 

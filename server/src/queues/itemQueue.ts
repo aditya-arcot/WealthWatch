@@ -7,7 +7,6 @@ import {
     syncItemLiabilities,
     syncItemTransactions,
 } from '../controllers/itemController.js'
-import { HttpError } from '../models/error.js'
 import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
 import { getRedis } from '../utilities/redis.js'
@@ -31,7 +30,7 @@ export const initializeItemQueue = () => {
 
 export const getItemQueue = () => {
     if (!itemQueue) {
-        throw new HttpError('item queue not initialized')
+        throw Error('item queue not initialized')
     }
     return itemQueue
 }
@@ -81,7 +80,7 @@ export const initializeItemWorker = () => {
             )
 
             const item: Item | undefined = job.data.item
-            if (!item) throw new HttpError('missing item')
+            if (!item) throw Error('missing item')
 
             const syncAccounts: boolean = job.data.syncAccounts
             if (syncAccounts) await syncItemAccounts(item)
@@ -104,7 +103,7 @@ export const initializeItemWorker = () => {
                     break
                 }
                 default:
-                    throw new HttpError(`unknown job type: ${type}`)
+                    throw Error(`unknown job type: ${type}`)
             }
         },
         { connection: getRedis(), ...workerOptions }

@@ -1,5 +1,4 @@
 import { Redis } from 'ioredis'
-import { HttpError } from '../models/error.js'
 import { vars } from './env.js'
 import { logger } from './logger.js'
 
@@ -15,9 +14,7 @@ export const createRedis = (): void => {
 }
 
 export const getRedis = (): Redis => {
-    if (!redis) {
-        throw new HttpError('redis client not initialized')
-    }
+    if (!redis) throw Error('redis client not initialized')
     return redis
 }
 

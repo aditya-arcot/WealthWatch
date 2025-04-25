@@ -1,6 +1,5 @@
 import { Queue, Worker } from 'bullmq'
 import { handleWebhook } from '../controllers/webhookController.js'
-import { HttpError } from '../models/error.js'
 import { Webhook } from '../models/webhook.js'
 import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
@@ -18,7 +17,7 @@ export const initializeWebhookQueue = () => {
 
 const getWebhookQueue = () => {
     if (!webhookQueue) {
-        throw new HttpError('webhook queue not initialized')
+        throw Error('webhook queue not initialized')
     }
     return webhookQueue
 }
@@ -37,7 +36,7 @@ export const initializeWebhookWorker = () => {
             )
 
             const webhook: Webhook | undefined = job.data.webhook
-            if (!webhook) throw new HttpError('missing webhook')
+            if (!webhook) throw Error('missing webhook')
 
             await handleWebhook(webhook)
         },
