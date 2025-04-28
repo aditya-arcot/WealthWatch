@@ -17,9 +17,9 @@ import { logger } from '../utilities/logger.js'
 let plaidClient: PlaidApi | undefined
 
 export const createPlaidClient = () => {
-    logger.debug('configuring plaid client')
+    logger.debug('creating plaid client')
     const basePath = PlaidEnvironments[vars.plaidEnv]
-    if (basePath === undefined) throw new HttpError('invalid plaid env')
+    if (basePath === undefined) throw Error('invalid plaid env')
     const config = new Configuration({
         basePath,
         baseOptions: {
@@ -30,11 +30,11 @@ export const createPlaidClient = () => {
         },
     })
     plaidClient = new PlaidApi(config)
-    logger.debug('configured plaid client')
+    logger.debug('created plaid client')
 }
 
 export const getPlaidClient = (): PlaidApi => {
-    if (!plaidClient) throw new HttpError('plaid client not initialized')
+    if (!plaidClient) throw Error('plaid client not initialized')
     return plaidClient
 }
 

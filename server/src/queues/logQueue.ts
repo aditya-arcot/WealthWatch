@@ -4,7 +4,6 @@ import { insertAppRequest } from '../database/appRequestQueries.js'
 import { insertPlaidApiRequest } from '../database/plaidApiRequestQueries.js'
 import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
 import { AppRequest } from '../models/appRequest.js'
-import { HttpError } from '../models/error.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
@@ -28,7 +27,7 @@ export const initializeLogQueue = () => {
 
 const getLogQueue = () => {
     if (!logQueue) {
-        throw new HttpError('log queue not initialized')
+        throw Error('log queue not initialized')
     }
     return logQueue
 }
@@ -61,24 +60,24 @@ export const initializeLogWorker = () => {
             switch (type) {
                 case LogJobType.LogAppRequest: {
                     const req: AppRequest | undefined = job.data.log
-                    if (!req) throw new HttpError(`missing ${type}`)
+                    if (!req) throw Error(`missing ${type}`)
                     await insertAppRequest(req)
                     break
                 }
                 case LogJobType.LogPlaidLinkEvent: {
                     const event: PlaidLinkEvent | undefined = job.data.log
-                    if (!event) throw new HttpError(`missing ${type}`)
+                    if (!event) throw Error(`missing ${type}`)
                     await insertPlaidLinkEvent(event)
                     break
                 }
                 case LogJobType.LogPlaidApiRequest: {
                     const req: PlaidApiRequest | undefined = job.data.log
-                    if (!req) throw new HttpError(`missing ${type}`)
+                    if (!req) throw Error(`missing ${type}`)
                     await insertPlaidApiRequest(req)
                     break
                 }
                 default:
-                    throw new HttpError(`unknown log job type: ${type}`)
+                    throw Error(`unknown log job type: ${type}`)
             }
         },
         { connection: getRedis(), ...workerOptions }
