@@ -35,7 +35,7 @@ export const createSessionMiddleware = () => {
         store: sessionStore,
         secret: vars.sessionSecret,
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true,
         cookie: {
             secure: production,
             maxAge: 1000 * 60 * 60 * 24, // 1 day,
@@ -50,6 +50,7 @@ export const createCsrfMiddleware = () => {
         : `wealthwatch-${vars.nodeEnv}-csrf-token`
     const options = {
         getSecret: () => vars.sessionSecret,
+        getSessionIdentifier: (req: Request) => req.sessionID,
         cookieName,
         cookieOptions: {
             secure: production,
