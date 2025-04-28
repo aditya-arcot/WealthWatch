@@ -191,7 +191,7 @@ export const loginWithDemo = async (req: Request, res: Response) => {
 
     const user = await fetchUserByUsername(vars.demoUser)
     if (!user) {
-        throw new HttpError('unexpected error')
+        throw new HttpError('demo user not found', 404)
     }
     req.session.user = user
     return res.json(user)

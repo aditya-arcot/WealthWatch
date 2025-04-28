@@ -1,7 +1,6 @@
 import { Request } from 'express'
 import swaggerJSDoc from 'swagger-jsdoc'
 import { SwaggerUiOptions } from 'swagger-ui-express'
-import { HttpError } from '../models/error.js'
 import { production, vars } from './env.js'
 
 export const swaggerOptions: SwaggerUiOptions = {
@@ -18,7 +17,7 @@ export const swaggerOptions: SwaggerUiOptions = {
 }
 
 export const createSwaggerSpec = () => {
-    if (production) throw new HttpError('swagger should not be used in prod')
+    if (production) throw Error('swagger should not be used in prod')
     const options = {
         definition: {
             openapi: '3.0.3',
