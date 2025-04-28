@@ -1,6 +1,6 @@
 import { CategoryEnum } from 'wealthwatch-shared'
 
-export const categoryIcons: Record<CategoryEnum, string> = {
+export const categoryIconMap: Record<CategoryEnum, string> = {
     [CategoryEnum.Uncategorized]: 'bi-question-circle',
     [CategoryEnum.Income]: 'bi-currency-dollar',
     [CategoryEnum.Transfer]: 'bi-arrow-left-right',

@@ -13,9 +13,14 @@ import {
     Transaction,
 } from 'wealthwatch-shared'
 import {
+    PlaidDetailedCategoryEnum,
+    PlaidPrimaryCategoryEnum,
+} from '../enums/category.js'
+import {
     PlaidGeneralErrorCodeEnum,
     PlaidTransactionErrorCodeEnum,
-} from '../enums/plaidApiError.js'
+} from '../enums/plaidError.js'
+import { detailedCategoryMap, primaryCategoryMap } from '../maps/category.js'
 import { PlaidApiError } from '../models/error.js'
 import { logger } from '../utilities/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
@@ -188,73 +193,6 @@ const mapPlaidTransactionCategory = (
     }
 
     return CategoryEnum.Uncategorized
-}
-
-enum PlaidDetailedCategoryEnum {
-    TransferInDeposit = 'TRANSFER_IN_DEPOSIT',
-    TransferInInvestment = 'TRANSFER_IN_INVESTMENT_AND_RETIREMENT_FUNDS',
-    TransferInSavings = 'TRANSFER_IN_SAVINGS',
-    TransferOutInvestment = 'TRANSFER_OUT_INVESTMENT_AND_RETIREMENT_FUNDS',
-    TransferOutSavings = 'TRANSFER_OUT_SAVINGS',
-    TransferOutWithdrawal = 'TRANSFER_OUT_WITHDRAWAL',
-    LoanPaymentsCreditCard = 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT',
-    FoodAndDrinkGroceries = 'FOOD_AND_DRINK_GROCERIES',
-    GovernmentAndNonProfitDonation = 'GOVERNMENT_AND_NON_PROFIT_DONATIONS',
-    GovernmentAndNonProfitTaxes = 'GOVERNMENT_AND_NON_PROFIT_TAX_PAYMENT',
-}
-
-const detailedCategoryMap: Record<PlaidDetailedCategoryEnum, CategoryEnum> = {
-    [PlaidDetailedCategoryEnum.TransferInDeposit]: CategoryEnum.CashAndChecks,
-    [PlaidDetailedCategoryEnum.TransferInInvestment]: CategoryEnum.Investment,
-    [PlaidDetailedCategoryEnum.TransferInSavings]: CategoryEnum.Savings,
-    [PlaidDetailedCategoryEnum.TransferOutInvestment]: CategoryEnum.Investment,
-    [PlaidDetailedCategoryEnum.TransferOutSavings]: CategoryEnum.Savings,
-    [PlaidDetailedCategoryEnum.TransferOutWithdrawal]:
-        CategoryEnum.CashAndChecks,
-    [PlaidDetailedCategoryEnum.LoanPaymentsCreditCard]:
-        CategoryEnum.CreditCardPayment,
-    [PlaidDetailedCategoryEnum.FoodAndDrinkGroceries]: CategoryEnum.Groceries,
-    [PlaidDetailedCategoryEnum.GovernmentAndNonProfitDonation]:
-        CategoryEnum.Donations,
-    [PlaidDetailedCategoryEnum.GovernmentAndNonProfitTaxes]: CategoryEnum.Taxes,
-}
-
-enum PlaidPrimaryCategoryEnum {
-    Income = 'INCOME',
-    TransferIn = 'TRANSFER_IN',
-    TransferOut = 'TRANSFER_OUT',
-    LoanPayments = 'LOAN_PAYMENTS',
-    BankFees = 'BANK_FEES',
-    Entertainment = 'ENTERTAINMENT',
-    FoodAndDrink = 'FOOD_AND_DRINK',
-    GeneralMerchandise = 'GENERAL_MERCHANDISE',
-    HomeImprovement = 'HOME_IMPROVEMENT',
-    Medical = 'MEDICAL',
-    PersonalCare = 'PERSONAL_CARE',
-    GeneralServices = 'GENERAL_SERVICES',
-    GovernmentAndNonProfit = 'GOVERNMENT_AND_NON_PROFIT',
-    Transportation = 'TRANSPORTATION',
-    Travel = 'TRAVEL',
-    RentAndUtilities = 'RENT_AND_UTILITIES',
-}
-
-const primaryCategoryMap: Record<PlaidPrimaryCategoryEnum, CategoryEnum> = {
-    [PlaidPrimaryCategoryEnum.Income]: CategoryEnum.Income,
-    [PlaidPrimaryCategoryEnum.TransferIn]: CategoryEnum.Transfer,
-    [PlaidPrimaryCategoryEnum.TransferOut]: CategoryEnum.Transfer,
-    [PlaidPrimaryCategoryEnum.LoanPayments]: CategoryEnum.LoanPayment,
-    [PlaidPrimaryCategoryEnum.BankFees]: CategoryEnum.Fees,
-    [PlaidPrimaryCategoryEnum.Entertainment]: CategoryEnum.Entertainment,
-    [PlaidPrimaryCategoryEnum.FoodAndDrink]: CategoryEnum.FoodAndDrink,
-    [PlaidPrimaryCategoryEnum.GeneralMerchandise]: CategoryEnum.Merchandise,
-    [PlaidPrimaryCategoryEnum.HomeImprovement]: CategoryEnum.Merchandise,
-    [PlaidPrimaryCategoryEnum.Medical]: CategoryEnum.Medical,
-    [PlaidPrimaryCategoryEnum.PersonalCare]: CategoryEnum.PersonalCare,
-    [PlaidPrimaryCategoryEnum.GeneralServices]: CategoryEnum.Services,
-    [PlaidPrimaryCategoryEnum.GovernmentAndNonProfit]: CategoryEnum.Government,
-    [PlaidPrimaryCategoryEnum.Transportation]: CategoryEnum.Transportation,
-    [PlaidPrimaryCategoryEnum.Travel]: CategoryEnum.Travel,
-    [PlaidPrimaryCategoryEnum.RentAndUtilities]: CategoryEnum.Bills,
 }
 
 const mapPlaidPaymentChannel = (

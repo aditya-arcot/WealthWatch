@@ -1,0 +1,31 @@
+export enum PlaidPrimaryCategoryEnum {
+    Income = 'INCOME ',
+    TransferIn = 'TRANSFER_IN',
+    TransferOut = 'TRANSFER_OUT',
+    LoanPayments = 'LOAN_PAYMENTS',
+    BankFees = 'BANK_FEES',
+    Entertainment = 'ENTERTAINMENT',
+    FoodAndDrink = 'FOOD_AND_DRINK',
+    GeneralMerchandise = 'GENERAL_MERCHANDISE',
+    HomeImprovement = 'HOME_IMPROVEMENT',
+    Medical = 'MEDICAL',
+    PersonalCare = 'PERSONAL_CARE',
+    GeneralServices = 'GENERAL_SERVICES',
+    GovernmentAndNonProfit = 'GOVERNMENT_AND_NON_PROFIT',
+    Transportation = 'TRANSPORTATION',
+    Travel = 'TRAVEL',
+    RentAndUtilities = 'RENT_AND_UTILITIES',
+}
+
+export enum PlaidDetailedCategoryEnum {
+    TransferInDeposit = 'TRANSFER_IN_DEPOSIT',
+    TransferInInvestment = 'TRANSFER_IN_INVESTMENT_AND_RETIREMENT_FUNDS',
+    TransferInSavings = 'TRANSFER_IN_SAVINGS',
+    TransferOutInvestment = 'TRANSFER_OUT_INVESTMENT_AND_RETIREMENT_FUNDS',
+    TransferOutSavings = 'TRANSFER_OUT_SAVINGS',
+    TransferOutWithdrawal = 'TRANSFER_OUT_WITHDRAWAL',
+    LoanPaymentsCreditCard = 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT',
+    FoodAndDrinkGroceries = 'FOOD_AND_DRINK_GROCERIES',
+    GovernmentAndNonProfitDonation = 'GOVERNMENT_AND_NON_PROFIT_DONATIONS',
+    GovernmentAndNonProfitTaxes = 'GOVERNMENT_AND_NON_PROFIT_TAX_PAYMENT',
+}

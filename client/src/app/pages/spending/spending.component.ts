@@ -21,7 +21,7 @@ import { DateFilterComponent } from '../../components/filters/date-filter/date-f
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { DateFilterEnum } from '../../enums/filter'
-import { dateFilterDescriptions } from '../../records/filter'
+import { dateFilterDescriptionMap } from '../../maps/filter'
 import { AlertService } from '../../services/alert.service'
 import { CategoryService } from '../../services/category.service'
 import { CurrencyService } from '../../services/currency.service'
@@ -463,7 +463,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
 
     getSelectedDateRangeString(): string {
         if (this.selectedDateFilter !== DateFilterEnum.CUSTOM) {
-            return dateFilterDescriptions[this.selectedDateFilter]
+            return dateFilterDescriptionMap[this.selectedDateFilter]
         }
         if (this.startDate && !this.endDate) {
             return `On or After ${this.getDateString(this.startDate)}`

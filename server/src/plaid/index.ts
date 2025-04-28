@@ -6,7 +6,7 @@ import {
     insertLinkUpdateWithAccountsNotification,
 } from '../controllers/notificationController.js'
 import { fetchActiveItemByUserIdAndId } from '../database/itemQueries.js'
-import { PlaidGeneralErrorCodeEnum } from '../enums/plaidApiError.js'
+import { PlaidGeneralErrorCodeEnum } from '../enums/plaidError.js'
 import { HttpError, PlaidApiError } from '../models/error.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { queueLogPlaidApiRequest } from '../queues/logQueue.js'

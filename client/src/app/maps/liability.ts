@@ -3,7 +3,7 @@ import {
     StudentLoanStatusTypeEnum,
 } from 'wealthwatch-shared'
 
-export const studentLoanStatusTypeNames: Record<
+export const studentLoanStatusTypeNameMap: Record<
     StudentLoanStatusTypeEnum,
     string
 > = {
@@ -28,7 +28,7 @@ export const studentLoanStatusTypeNames: Record<
     [StudentLoanStatusTypeEnum.Other]: 'Other',
 }
 
-export const studentLoanRepaymentPlanTypeNames: Record<
+export const studentLoanRepaymentPlanTypeNameMap: Record<
     StudentLoanRepaymentPlanTypeEnum,
     string
 > = {

@@ -1,6 +1,6 @@
 import { DateFilterEnum } from '../enums/filter'
 
-export const dateFilterDescriptions: Record<DateFilterEnum, string> = {
+export const dateFilterDescriptionMap: Record<DateFilterEnum, string> = {
     [DateFilterEnum.ALL]: 'All Time',
     [DateFilterEnum.CURRENT_WEEK]: 'This Week',
     [DateFilterEnum.CURRENT_MONTH]: 'This Month',

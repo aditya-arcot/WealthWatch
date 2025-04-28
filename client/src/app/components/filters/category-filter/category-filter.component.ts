@@ -11,7 +11,7 @@ import {
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Category, CategoryEnum } from 'wealthwatch-shared'
-import { categoryIcons } from '../../../records/category'
+import { categoryIconMap } from '../../../maps/category'
 
 @Component({
     selector: 'app-category-filter',
@@ -88,7 +88,7 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
 
     getCategoryClass(c: Category): string {
         const categoryId = c.id as CategoryEnum
-        return categoryIcons[categoryId]
+        return categoryIconMap[categoryId]
     }
 
     categoryIdsChanged(): boolean {
