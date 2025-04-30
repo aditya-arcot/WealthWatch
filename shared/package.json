@@ -1,6 +1,6 @@
 {
     "name": "@aditya-arcot/wealthwatch-shared",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aditya-arcot/WealthWatch.git"
@@ -36,7 +36,7 @@
         "globals": "^16.0.0",
         "tsc-watch": "^6.2.1",
         "typescript": "^5.8.3",
-        "typescript-eslint": "^8.31.0"
+        "typescript-eslint": "^8.31.1"
     },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
