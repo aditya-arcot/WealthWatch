@@ -6,11 +6,7 @@
                 "src/app/pages/net-worth/net-worth.component.ts",
                 "src/app/pages/paychecks/paychecks.component.ts"
             ],
-            "ignoreDependencies": [
-                "bootstrap",
-                "bootstrap-icons",
-                "@angular-eslint/builder"
-            ]
+            "ignoreDependencies": ["bootstrap", "bootstrap-icons"]
         },
         "server": {
             "ignore": ["src/utilities/types.ts", "src/database/index.ts"],
