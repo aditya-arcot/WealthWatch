@@ -6,8 +6,7 @@
         "build:dev": "ng build --watch --configuration dev",
         "build:stage": "ng build --configuration stage",
         "build:test": "ng build --configuration test",
-        "lint": "eslint --fix --max-warnings=0 src/",
-        "ng": "ng",
+        "lint": "ng lint --fix --max-warnings=0",
         "start": "ng serve"
     },
     "lint-staged": {
