@@ -1,5 +1,6 @@
 {
     "scripts": {
+        "knip": "knip",
         "prepare": "husky && npm run sort-package-jsons",
         "prettier": "prettier --write .",
         "sort-package-jsons": "sort-package-json && sort-package-json shared/package.json && sort-package-json server/package.json && sort-package-json client/package.json"
@@ -8,8 +9,8 @@
         "*": "prettier --write --ignore-unknown"
     },
     "devDependencies": {
-        "depcheck": "^1.4.7",
         "husky": "^9.1.7",
+        "knip": "^5.51.0",
         "lint-staged": "^15.5.1",
         "npm-check-updates": "^18.0.1",
         "prettier": "^3.5.3",

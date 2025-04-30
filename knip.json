@@ -1,0 +1,22 @@
+{
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "workspaces": {
+        "client": {
+            "ignore": [
+                "src/app/pages/net-worth/net-worth.component.ts",
+                "src/app/pages/paychecks/paychecks.component.ts"
+            ],
+            "ignoreDependencies": [
+                "bootstrap",
+                "bootstrap-icons",
+                "@angular-eslint/builder"
+            ]
+        },
+        "server": {
+            "ignore": ["src/utilities/types.ts", "src/database/index.ts"],
+            "ignoreDependencies": ["@logtail/pino", "pino-pretty"]
+        },
+        "shared": {}
+    },
+    "ignoreDependencies": ["npm-check-updates"]
+}

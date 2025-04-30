@@ -1,6 +1,0 @@
-ignores: [
-    "@logtail/pino",
-    "@tsconfig/strictest",
-    "pino-pretty",
-    "lint-staged"
-]

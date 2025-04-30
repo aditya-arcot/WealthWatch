@@ -17,21 +17,8 @@ echo "Checking shared project version..."
 ./scripts/check-shared-version
 echo
 
-echo "Checking for dependency issues..."
-echo "Checking base project..."
-depcheck
-echo
-
-echo "Checking shared project..."
-depcheck shared
-echo
-
-echo "Checking client project..."
-depcheck client
-echo
-
-echo "Checking server project..."
-depcheck server
+echo "Checking for knip issues..."
+knip
 echo
 
 echo "Checking for available updates..."
