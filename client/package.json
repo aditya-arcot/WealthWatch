@@ -17,17 +17,17 @@
         ]
     },
     "dependencies": {
-        "@angular/animations": "^19.2.8",
-        "@angular/common": "^19.2.8",
-        "@angular/compiler": "^19.2.8",
-        "@angular/core": "^19.2.8",
-        "@angular/forms": "^19.2.8",
-        "@angular/platform-browser": "^19.2.8",
-        "@angular/platform-browser-dynamic": "^19.2.8",
-        "@angular/router": "^19.2.8",
+        "@angular/animations": "^19.2.9",
+        "@angular/common": "^19.2.9",
+        "@angular/compiler": "^19.2.9",
+        "@angular/core": "^19.2.9",
+        "@angular/forms": "^19.2.9",
+        "@angular/platform-browser": "^19.2.9",
+        "@angular/platform-browser-dynamic": "^19.2.9",
+        "@angular/router": "^19.2.9",
         "@logtail/browser": "^0.5.4",
         "bootstrap": "^5.3.5",
-        "bootstrap-icons": "^1.11.3",
+        "bootstrap-icons": "^1.12.1",
         "chart.js": "^4.4.9",
         "chartjs-plugin-autocolors": "^0.3.1",
         "ng2-charts": "^8.0.0",
@@ -39,14 +39,14 @@
         "zone.js": "~0.15.0"
     },
     "devDependencies": {
-        "@angular/build": "^19.2.9",
-        "@angular/cli": "^19.2.9",
-        "@angular/compiler-cli": "^19.2.8",
-        "@eslint/js": "^9.25.1",
+        "@angular/build": "^19.2.10",
+        "@angular/cli": "^19.2.10",
+        "@angular/compiler-cli": "^19.2.9",
+        "@eslint/js": "^9.26.0",
         "@types/node": "^22.15.3",
         "angular-eslint": "19.3.0",
-        "eslint": "^9.25.1",
+        "eslint": "^9.26.0",
         "typescript": "~5.8.3",
-        "typescript-eslint": "^8.31.0"
+        "typescript-eslint": "^8.31.1"
     }
 }
