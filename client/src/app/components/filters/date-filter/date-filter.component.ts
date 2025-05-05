@@ -10,7 +10,7 @@ import {
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { DateFilterEnum } from '../../../enums/filter'
-import { dateFilterDescriptions } from '../../../records/filter'
+import { dateFilterDescriptionMap } from '../../../maps/filter'
 import { checkDatesEqual } from '../../../utilities/date.utility'
 import { computeDatesBasedOnFilter } from '../../../utilities/filter.utility'
 
@@ -38,7 +38,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
     @Output() resetRange = new EventEmitter<void>()
 
     dateFilterType = DateFilterEnum
-    dateFilters = Object.entries(dateFilterDescriptions).map(
+    dateFilters = Object.entries(dateFilterDescriptionMap).map(
         ([key, value]) => ({
             key: Number(key),
             description: value,

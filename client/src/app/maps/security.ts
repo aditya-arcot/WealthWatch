@@ -1,6 +1,6 @@
 import { SecurityTypeEnum } from 'wealthwatch-shared'
 
-export const securityTypeNames: Record<SecurityTypeEnum, string> = {
+export const securityTypeNameMap: Record<SecurityTypeEnum, string> = {
     [SecurityTypeEnum.Cash]: 'Cash',
     [SecurityTypeEnum.Cryptocurrency]: 'Cryptocurrency',
     [SecurityTypeEnum.Derivative]: 'Derivative',

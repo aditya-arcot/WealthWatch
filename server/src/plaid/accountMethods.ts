@@ -5,7 +5,7 @@ import {
     AccountsGetRequest,
 } from 'plaid'
 import { Account, Item } from 'wealthwatch-shared'
-import { PlaidAccountErrorCodeEnum } from '../enums/plaidApiError.js'
+import { PlaidAccountErrorCodeEnum } from '../enums/plaidError.js'
 import { PlaidApiError } from '../models/error.js'
 import { toTitleCase } from '../utilities/format.js'
 import { logger } from '../utilities/logger.js'
@@ -71,10 +71,7 @@ export const plaidAccountsBalanceGet = async (
     }
 }
 
-export const mapPlaidAccount = (
-    account: AccountBase,
-    itemId: number
-): Account => ({
+const mapPlaidAccount = (account: AccountBase, itemId: number): Account => ({
     id: -1,
     itemId,
     plaidId: account.account_id,

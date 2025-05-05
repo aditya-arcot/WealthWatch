@@ -1,5 +1,0 @@
-ignores: [
-    "depcheck",
-    "npm-check-updates",
-    "prettier-plugin-organize-imports"
-]

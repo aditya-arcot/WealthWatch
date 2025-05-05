@@ -6,8 +6,7 @@
         "build:dev": "ng build --watch --configuration dev",
         "build:stage": "ng build --configuration stage",
         "build:test": "ng build --configuration test",
-        "lint": "eslint --fix --max-warnings=0 src/",
-        "ng": "ng",
+        "lint": "ng lint --fix --max-warnings=0",
         "start": "ng serve"
     },
     "lint-staged": {
@@ -23,7 +22,6 @@
         "@angular/core": "^19.2.9",
         "@angular/forms": "^19.2.9",
         "@angular/platform-browser": "^19.2.9",
-        "@angular/platform-browser-dynamic": "^19.2.9",
         "@angular/router": "^19.2.9",
         "@logtail/browser": "^0.5.4",
         "bootstrap": "^5.3.5",
@@ -35,10 +33,11 @@
         "ngx-plaid-link": "^14.0.0",
         "rxjs": "~7.8.2",
         "uuid": "^11.1.0",
-        "wealthwatch-shared": "npm:@aditya-arcot/wealthwatch-shared@^1.0.2",
+        "wealthwatch-shared": "npm:@aditya-arcot/wealthwatch-shared@^1.0.4",
         "zone.js": "~0.15.0"
     },
     "devDependencies": {
+        "@angular-eslint/builder": "^19.3.0",
         "@angular/build": "^19.2.10",
         "@angular/cli": "^19.2.10",
         "@angular/compiler-cli": "^19.2.9",
@@ -46,6 +45,7 @@
         "@types/node": "^22.15.3",
         "angular-eslint": "19.3.0",
         "eslint": "^9.26.0",
+        "tslib": "^2.8.1",
         "typescript": "~5.8.3",
         "typescript-eslint": "^8.31.1"
     }

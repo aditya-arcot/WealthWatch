@@ -4,7 +4,9 @@ import {
     Security as PlaidSecurity,
 } from 'plaid'
 import { Holding, Item, Security, SecurityTypeEnum } from 'wealthwatch-shared'
-import { PlaidGeneralErrorCodeEnum } from '../enums/plaidApiError.js'
+import { PlaidGeneralErrorCodeEnum } from '../enums/plaidError.js'
+import { PlaidSecurityTypeEnum } from '../enums/security.js'
+import { securityTypeMap } from '../maps/security.js'
 import { PlaidApiError } from '../models/error.js'
 import { logger } from '../utilities/logger.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
@@ -123,28 +125,4 @@ const mapPlaidSecurityType = (type: string | null): SecurityTypeEnum => {
         return securityTypeMap[type as PlaidSecurityTypeEnum]
     }
     return SecurityTypeEnum.Other
-}
-
-enum PlaidSecurityTypeEnum {
-    Cash = 'cash',
-    Cryptocurrency = 'cryptocurrency',
-    Derivative = 'derivative',
-    Equity = 'equity',
-    ETF = 'etf',
-    FixedIncome = 'fixed_income',
-    Loan = 'loan',
-    MutualFund = 'mutual_fund',
-    Other = 'other',
-}
-
-const securityTypeMap: Record<PlaidSecurityTypeEnum, SecurityTypeEnum> = {
-    cash: SecurityTypeEnum.Cash,
-    cryptocurrency: SecurityTypeEnum.Cryptocurrency,
-    derivative: SecurityTypeEnum.Derivative,
-    equity: SecurityTypeEnum.Equity,
-    etf: SecurityTypeEnum.ETF,
-    fixed_income: SecurityTypeEnum.FixedIncome,
-    loan: SecurityTypeEnum.Loan,
-    mutual_fund: SecurityTypeEnum.MutualFund,
-    other: SecurityTypeEnum.Other,
 }
