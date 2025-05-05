@@ -9,15 +9,15 @@ import {
     modifyItemHealthyById,
 } from '../database/itemQueries.js'
 import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
-import { HttpError } from '../models/error.js'
 import {
     HoldingsWebhookCodeEnum,
     ItemWebhookCodeEnum,
     LiabilitiesWebhookCodeEnum,
     TransactionsWebhookCodeEnum,
-    Webhook,
     WebhookTypeEnum,
-} from '../models/webhook.js'
+} from '../enums/webhook.js'
+import { HttpError } from '../models/error.js'
+import { Webhook } from '../models/webhook.js'
 import { plaidWebhookVerificationKeyGet } from '../plaid/webhookMethods.js'
 import {
     queueSyncItemInvestments,

@@ -21,9 +21,9 @@ import {
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import {
-    studentLoanRepaymentPlanTypeNames,
-    studentLoanStatusTypeNames,
-} from '../../records/liability'
+    studentLoanRepaymentPlanTypeNameMap,
+    studentLoanStatusTypeNameMap,
+} from '../../maps/liability'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'
@@ -319,14 +319,14 @@ export class LiabilitiesComponent extends LoggerComponent implements OnInit {
         if (!acc.statusTypeId) {
             return ''
         }
-        return studentLoanStatusTypeNames[acc.statusTypeId]
+        return studentLoanStatusTypeNameMap[acc.statusTypeId]
     }
 
     getStudentLoanRepaymentPlanName(acc: StudentLoanAccount): string {
         if (!acc.repaymentPlanTypeId) {
             return ''
         }
-        return studentLoanRepaymentPlanTypeNames[acc.repaymentPlanTypeId]
+        return studentLoanRepaymentPlanTypeNameMap[acc.repaymentPlanTypeId]
     }
 
     getStudentLoanStatusEndDate(acc: StudentLoanAccount): string {

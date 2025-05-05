@@ -16,7 +16,7 @@ import {
 } from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
-import { securityTypeNames } from '../../records/security'
+import { securityTypeNameMap } from '../../maps/security'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { InvestmentService } from '../../services/investment.service'
@@ -273,7 +273,7 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
     }
 
     getTypeString(holding: HoldingWithSecurity): string {
-        return securityTypeNames[holding.typeId]
+        return securityTypeNameMap[holding.typeId]
     }
 
     getPriceString(holding: HoldingWithSecurity): string {

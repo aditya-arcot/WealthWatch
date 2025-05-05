@@ -28,7 +28,7 @@ export const initializeItemQueue = () => {
     logger.debug('initialized item queue')
 }
 
-export const getItemQueue = () => {
+const getItemQueue = () => {
     if (!itemQueue) {
         throw Error('item queue not initialized')
     }

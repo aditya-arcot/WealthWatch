@@ -58,7 +58,7 @@ export const fetchActiveNotificationsByUserId = async (
     return rows.map(mapDbNotification)
 }
 
-export const fetchActiveNotificationByTypeIdUserIdAndItemId = async (
+const fetchActiveNotificationByTypeIdUserIdAndItemId = async (
     typeId: number,
     userId: number,
     itemId: number
