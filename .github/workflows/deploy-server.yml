@@ -82,12 +82,12 @@ jobs:
               run: |
                   cd server/
                   mkdir stage
-                  cp -r .env .npmrc Dockerfile package.json package-lock.json dist stage/
+                  cp -r .env .npmrc package.json package-lock.json dist stage/
                   find stage -type f
 
             - name: build, push docker image
               run: |
                   cd server/stage/
                   IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.image }}
-                  docker build -t $IMAGE .
+                  docker build -t $IMAGE -f ../Dockerfile .
                   docker push $IMAGE
