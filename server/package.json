@@ -17,12 +17,12 @@
     },
     "dependencies": {
         "@dotenvx/dotenvx": "^1.44.0",
-        "@logtail/pino": "^0.5.4",
+        "@logtail/pino": "^0.5.5",
         "@tsconfig/node-lts": "^22.0.1",
         "@tsconfig/strictest": "^2.0.5",
         "axios": "^1.9.0",
         "bcryptjs": "^3.0.2",
-        "bullmq": "^5.52.2",
+        "bullmq": "^5.52.3",
         "connect-pg-simple": "^10.0.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -43,7 +43,7 @@
         "qs": "^6.14.0",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
-        "wealthwatch-shared": "npm:@aditya-arcot/wealthwatch-shared@^1.0.5"
+        "wealthwatch-shared": "npm:@aditya-arcot/wealthwatch-shared@^1.0.6"
     },
     "devDependencies": {
         "@eslint/js": "^9.27.0",
