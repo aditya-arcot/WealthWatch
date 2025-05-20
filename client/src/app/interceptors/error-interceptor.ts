@@ -10,6 +10,7 @@ import { NGXLogger } from 'ngx-logger'
 import { catchError, Observable, throwError } from 'rxjs'
 import { ServerError } from 'wealthwatch-shared'
 import { AlertService } from '../services/alert.service'
+import { CSRFService } from '../services/csrf.service'
 import {
     createLoggerWithContext,
     LoggerService,
@@ -25,6 +26,7 @@ export class ErrorInterceptor implements HttpInterceptor {
         private alertSvc: AlertService,
         private userSvc: UserService,
         private router: Router,
+        private csrfSvc: CSRFService,
         injector: Injector
     ) {
         const ngxLogger = injector.get(NGXLogger)
@@ -61,6 +63,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                         }
                         if (err.status === 401) {
                             this.userSvc.user = undefined
+                            this.csrfSvc.clearToken()
                             void this.router.navigateByUrl('/login')
                             this.alertSvc.addErrorAlert(
                                 this.logger,

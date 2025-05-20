@@ -54,6 +54,7 @@ export const createCsrfMiddleware = () => {
         cookieName,
         cookieOptions: {
             secure: production,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day,
             sameSite: 'strict' as const,
         },
     }
