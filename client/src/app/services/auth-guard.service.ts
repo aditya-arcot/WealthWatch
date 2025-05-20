@@ -17,34 +17,37 @@ export const AuthGuardService: CanActivateFn = (
     _: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
 ): boolean => {
-    const route = state.url.split('?')[0]
-    const user = inject(UserService).user
+    const userSvc = inject(UserService)
+    const csrfSvc = inject(CSRFService)
+    const router = inject(Router)
+
+    const user = userSvc.user
     if (!user) {
-        inject(CSRFService).clearToken()
-        navigateByUrl('/login')
+        csrfSvc.clearToken()
+        void router.navigateByUrl('/login')
         addErrorAlert('Not logged in')
         return false
     }
+
+    const route = state.url.split('?')[0]
     if (!adminRoutes.includes(route)) return true
     if (!user || !user.admin) {
-        navigateByUrl('/home')
+        void router.navigateByUrl('/home')
         addErrorAlert('You cannot access that page')
         return false
     }
     return true
 }
 
-const navigateByUrl = (url: string) => {
-    void inject(Router).navigateByUrl(url)
-}
-
 const addErrorAlert = (message: string) => {
     const ngxLogger = inject(NGXLogger)
-    const logtail = inject(LogtailService)
+    const logtailSvc = inject(LogtailService)
+    const alertSvc = inject(AlertService)
+
     const logger = createLoggerWithContext(
         ngxLogger,
-        logtail,
+        logtailSvc,
         'AuthGuardService'
     )
-    inject(AlertService).addErrorAlert(logger, message)
+    alertSvc.addErrorAlert(logger, message)
 }
