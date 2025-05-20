@@ -141,44 +141,44 @@ export const handleUnmatchedRoute = (
 }
 
 export const handleError = (
-    err: Error,
+    err: Error & { code?: number | string },
     _req: Request,
     res: Response,
     _next: NextFunction
 ) => {
     logger.error({ err }, 'handling error')
-    let status = err instanceof HttpError ? err.status : 500
-    // error status codes are 4xx and 5xx
-    if (status < 400 || status >= 600) status = 500
-    const error = createErrorObject(err)
-    logger.error({ status, error }, 'sending error response')
+    const status = getErrorStatus(err)
+    const message = createErrorMessage(err)
+    const code = err.code
+    const error: ServerError = { message }
+    if (typeof code === 'string') error.code = code
+    logger.error({ status, code, error }, 'sending error response')
     res.status(status).json(error)
 }
 
-const createErrorObject = (err: Error): ServerError => {
-    if (err instanceof HttpError) {
-        const error: ServerError = {
-            message: err.message,
-        }
-        if (err.code) error.code = err.code
-        return error
+const getErrorStatus = (
+    err: Error & {
+        status?: number
+        statusCode?: number
+        code?: number | string
     }
-    if (err instanceof DatabaseError) {
-        return { message: formatErrorMessage('Database Error', err.message) }
-    }
-    if (err instanceof PlaidApiError) {
-        return {
-            message: formatErrorMessage(
-                'Plaid Error',
-                err.message,
-                err.code,
-                err.detail
-            ),
-        }
-    }
-    return {
-        message: formatErrorMessage('Unexpected Error', err.message),
-    }
+): number => {
+    let status = 500
+    if (err instanceof HttpError) status = err.status
+    else if (typeof err.status === 'number') status = err.status
+    else if (typeof err.statusCode === 'number') status = err.statusCode
+    else if (typeof err.code === 'number') status = err.code
+    // error status codes are 4xx and 5xx
+    if (status < 400 || status >= 600) status = 500
+    return status
+}
+
+const createErrorMessage = (err: Error): string => {
+    if (err instanceof DatabaseError)
+        return formatErrorMessage('Database Error', err.message)
+    if (err instanceof PlaidApiError)
+        return formatErrorMessage('Plaid Error', err.message, err.detail)
+    return err.message
 }
 
 const formatErrorMessage = (category: string, ...messages: string[]) => {
