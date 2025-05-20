@@ -22,11 +22,11 @@ jobs:
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: |
-                      shared/package-lock.json
-                      client/package-lock.json
-                      server/package-lock.json
+                  # cache: 'npm'
+                  # cache-dependency-path: |
+                  #     shared/package-lock.json
+                  #     client/package-lock.json
+                  #     server/package-lock.json
 
             - name: create .npmrc
               run: |
