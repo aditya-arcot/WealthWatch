@@ -16,7 +16,7 @@ export enum StudentLoanStatusTypeEnum {
     Refunded,
     Repayment,
     Transferred,
-    PendingIDR,
+    PendingIdr,
     Other,
 }
 
@@ -31,6 +31,6 @@ export enum StudentLoanRepaymentPlanTypeEnum {
     InterestOnly,
     PayAsYouEarn,
     RevisedPayAsYouEarn,
-    SavingOnAValuableEducation,
+    SavingOnValuableEducation,
     Other,
 }
