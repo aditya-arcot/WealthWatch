@@ -1,34 +1,23 @@
-import {
-    HttpEvent,
-    HttpHandler,
-    HttpInterceptor,
-    HttpRequest,
-} from '@angular/common/http'
-import { Injectable } from '@angular/core'
-import { Observable, switchMap } from 'rxjs'
+import { HttpInterceptorFn } from '@angular/common/http'
+import { inject } from '@angular/core'
+import { switchMap } from 'rxjs'
 import { CSRFService } from '../services/csrf.service'
 
-@Injectable()
-export class CSRFInterceptor implements HttpInterceptor {
-    private ignoreMethods = ['GET', 'HEAD', 'OPTIONS']
+const ignoreMethods = ['GET', 'HEAD', 'OPTIONS']
 
-    constructor(private csrfSvc: CSRFService) {}
+export const csrfInterceptor: HttpInterceptorFn = (req, next) => {
+    if (ignoreMethods.includes(req.method)) return next(req)
 
-    intercept(
-        req: HttpRequest<unknown>,
-        next: HttpHandler
-    ): Observable<HttpEvent<unknown>> {
-        if (this.ignoreMethods.includes(req.method)) return next.handle(req)
-        return this.csrfSvc.getToken().pipe(
-            switchMap((resp) => {
-                return next.handle(
-                    req.clone({
-                        setHeaders: {
-                            'x-csrf-token': resp.csrfToken,
-                        },
-                    })
-                )
-            })
-        )
-    }
+    const csrfSvc = inject(CSRFService)
+    return csrfSvc.getToken().pipe(
+        switchMap((resp) => {
+            return next(
+                req.clone({
+                    setHeaders: {
+                        'x-csrf-token': resp.csrfToken,
+                    },
+                })
+            )
+        })
+    )
 }
