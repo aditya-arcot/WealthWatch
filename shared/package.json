@@ -1,6 +1,6 @@
 {
     "name": "@aditya-arcot/wealthwatch-shared",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aditya-arcot/WealthWatch.git"
@@ -31,10 +31,10 @@
         "@tsconfig/strictest": "^2.0.5"
     },
     "devDependencies": {
-        "@eslint/js": "^9.26.0",
-        "eslint": "^9.26.0",
+        "@eslint/js": "^9.27.0",
+        "eslint": "^9.27.0",
         "globals": "^16.1.0",
-        "tsc-watch": "^6.2.1",
+        "tsc-watch": "^6.3.1",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.32.1"
     },

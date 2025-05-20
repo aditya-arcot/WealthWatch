@@ -7,6 +7,7 @@ import {
 } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
 import { AlertService } from './alert.service'
+import { CSRFService } from './csrf.service'
 import { createLoggerWithContext, LogtailService } from './logger.service'
 import { UserService } from './user.service'
 
@@ -19,6 +20,7 @@ export const AuthGuardService: CanActivateFn = (
     const route = state.url.split('?')[0]
     const user = inject(UserService).user
     if (!user) {
+        inject(CSRFService).clearToken()
         navigateByUrl('/login')
         addErrorAlert('Not logged in')
         return false

@@ -29,8 +29,8 @@ jobs:
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: client/package-lock.json
+                  # cache: 'npm'
+                  # cache-dependency-path: client/package-lock.json
 
             - name: modify env.test.ts
               if: github.ref_name == 'test'
@@ -63,12 +63,12 @@ jobs:
               run: |
                   cd client/
                   mkdir stage
-                  cp -r Dockerfile nginx.conf dist stage/
+                  cp -r nginx.conf dist stage/
                   find stage -type f
 
             - name: build, push docker image
               run: |
                   cd client/stage/
                   IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.image }}
-                  docker build -t $IMAGE .
+                  docker build -t $IMAGE -f ../Dockerfile .
                   docker push $IMAGE

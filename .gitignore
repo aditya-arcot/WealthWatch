@@ -2,6 +2,8 @@
 
 .idea/
 node_modules/
+stage/
+sandbox/
 logs
 
 .env*

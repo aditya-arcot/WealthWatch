@@ -54,7 +54,7 @@ export const createCsrfMiddleware = () => {
         cookieName,
         cookieOptions: {
             secure: production,
-            sameSite: 'strict' as const,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day,
         },
     }
     const { doubleCsrfProtection } = doubleCsrf(options)
