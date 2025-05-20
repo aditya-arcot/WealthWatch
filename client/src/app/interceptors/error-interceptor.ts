@@ -55,12 +55,6 @@ export class ErrorInterceptor implements HttpInterceptor {
                     if (err.status === 0) {
                         errorSubtext.push('No server response')
                     } else {
-                        if (err.error) {
-                            const error = err.error as ServerError
-                            errorSubtext.push(error.message)
-                        } else if (err.statusText) {
-                            errorSubtext.push(err.statusText)
-                        }
                         if (err.status === 401) {
                             this.userSvc.user = undefined
                             this.csrfSvc.clearToken()
@@ -69,6 +63,13 @@ export class ErrorInterceptor implements HttpInterceptor {
                                 this.logger,
                                 'Not logged in'
                             )
+                            return throwError(() => err)
+                        }
+                        if (err.error) {
+                            const error = err.error as ServerError
+                            errorSubtext.push(error.message)
+                        } else if (err.statusText) {
+                            errorSubtext.push(err.statusText)
                         }
                     }
                 }
