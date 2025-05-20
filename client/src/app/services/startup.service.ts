@@ -59,7 +59,7 @@ export class StartupService {
 
     private getCsrfToken() {
         this.logger.info('getting csrf token')
-        return this.csrfSvc.getCsrfToken().pipe(
+        return this.csrfSvc.getToken().pipe(
             catchError((err) => {
                 void this.router.navigateByUrl('/startup-error')
                 this.alertSvc.addErrorAlert(

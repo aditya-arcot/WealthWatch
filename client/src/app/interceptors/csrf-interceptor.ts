@@ -5,25 +5,30 @@ import {
     HttpRequest,
 } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Observable } from 'rxjs'
+import { Observable, switchMap } from 'rxjs'
 import { CSRFService } from '../services/csrf.service'
 
 @Injectable()
 export class CSRFInterceptor implements HttpInterceptor {
+    private ignoreMethods = ['GET', 'HEAD', 'OPTIONS']
+
     constructor(private csrfSvc: CSRFService) {}
 
     intercept(
         req: HttpRequest<unknown>,
         next: HttpHandler
     ): Observable<HttpEvent<unknown>> {
-        const csrfToken = this.csrfSvc.csrfToken
-        if (csrfToken !== null) {
-            req = req.clone({
-                setHeaders: {
-                    'x-csrf-token': csrfToken,
-                },
+        if (this.ignoreMethods.includes(req.method)) return next.handle(req)
+        return this.csrfSvc.getToken().pipe(
+            switchMap((resp) => {
+                return next.handle(
+                    req.clone({
+                        setHeaders: {
+                            'x-csrf-token': resp.csrfToken,
+                        },
+                    })
+                )
             })
-        }
-        return next.handle(req)
+        )
     }
 }
