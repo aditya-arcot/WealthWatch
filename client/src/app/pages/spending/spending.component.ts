@@ -56,7 +56,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
 
     loading = false
 
-    selectedDateFilter: DateFilterEnum = DateFilterEnum.CUSTOM
+    selectedDateFilter: DateFilterEnum = DateFilterEnum.Custom
     startDate: Date | null = null
     defaultStartDate: Date | null = null
     endDate: Date | null = null
@@ -197,7 +197,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
                     Object.keys(params).length === 0 ||
                     this.processParams(params)
                 ) {
-                    this.selectedDateFilter = DateFilterEnum.CURRENT_MONTH
+                    this.selectedDateFilter = DateFilterEnum.CurrentMonth
                     this.startDate = this.defaultStartDate
                         ? new Date(this.defaultStartDate)
                         : null
@@ -265,7 +265,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         if (dateFilterInt === undefined) return true
 
         this.selectedDateFilter = dateFilterInt
-        if (this.selectedDateFilter === DateFilterEnum.CUSTOM) {
+        if (this.selectedDateFilter === DateFilterEnum.Custom) {
             let useDefault = true
 
             const startDate: string | undefined = params['startDate']
@@ -424,7 +424,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         start: Date | null,
         end: Date | null
     ): void {
-        if (filter !== DateFilterEnum.CUSTOM) {
+        if (filter !== DateFilterEnum.Custom) {
             this.selectedDateFilter = filter
             redirectWithParams(this.router, this.route, { dateFilter: filter })
             return
@@ -462,7 +462,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
     }
 
     getSelectedDateRangeString(): string {
-        if (this.selectedDateFilter !== DateFilterEnum.CUSTOM) {
+        if (this.selectedDateFilter !== DateFilterEnum.Custom) {
             return dateFilterDescriptionMap[this.selectedDateFilter]
         }
         if (this.startDate && !this.endDate) {

@@ -21,7 +21,7 @@ export class AmountFilterComponent implements OnInit, OnChanges {
     amountFilterModal!: ElementRef
 
     @Input({ required: true }) selectedFilter: AmountFilterEnum =
-        AmountFilterEnum.ALL
+        AmountFilterEnum.All
     @Input({ required: true }) minAmount: number | null = null
     @Input({ required: true }) maxAmount: number | null = null
 
@@ -59,20 +59,20 @@ export class AmountFilterComponent implements OnInit, OnChanges {
 
     handleFilterChange() {
         switch (this.selectedFilter) {
-            case AmountFilterEnum.ALL:
+            case AmountFilterEnum.All:
                 this.minAmount = null
                 this.maxAmount = null
                 break
 
-            case AmountFilterEnum.EXACTLY:
+            case AmountFilterEnum.Exactly:
                 this.maxAmount = null
                 break
 
-            case AmountFilterEnum.GREATER_THAN:
+            case AmountFilterEnum.GreaterThan:
                 this.maxAmount = null
                 break
 
-            case AmountFilterEnum.LESS_THAN:
+            case AmountFilterEnum.LessThan:
                 this.minAmount = null
                 break
         }
@@ -82,16 +82,16 @@ export class AmountFilterComponent implements OnInit, OnChanges {
         if (this.originalSelectedFilter !== this.selectedFilter) {
             return true
         }
-        if (this.selectedFilter === AmountFilterEnum.EXACTLY) {
+        if (this.selectedFilter === AmountFilterEnum.Exactly) {
             return this.originalMinAmount !== this.minAmount
         }
-        if (this.selectedFilter === AmountFilterEnum.GREATER_THAN) {
+        if (this.selectedFilter === AmountFilterEnum.GreaterThan) {
             return this.originalMinAmount !== this.minAmount
         }
-        if (this.selectedFilter === AmountFilterEnum.LESS_THAN) {
+        if (this.selectedFilter === AmountFilterEnum.LessThan) {
             return this.originalMaxAmount !== this.maxAmount
         }
-        if (this.selectedFilter === AmountFilterEnum.BETWEEN) {
+        if (this.selectedFilter === AmountFilterEnum.Between) {
             return (
                 this.originalMinAmount !== this.minAmount ||
                 this.originalMaxAmount !== this.maxAmount
@@ -102,8 +102,8 @@ export class AmountFilterComponent implements OnInit, OnChanges {
 
     minAmountValid(): boolean {
         if (
-            this.selectedFilter !== AmountFilterEnum.ALL &&
-            this.selectedFilter !== AmountFilterEnum.LESS_THAN
+            this.selectedFilter !== AmountFilterEnum.All &&
+            this.selectedFilter !== AmountFilterEnum.LessThan
         ) {
             return this.minAmount !== null && this.minAmount >= 0
         }
@@ -111,9 +111,9 @@ export class AmountFilterComponent implements OnInit, OnChanges {
     }
 
     maxAmountValid(): boolean {
-        if (this.selectedFilter === AmountFilterEnum.LESS_THAN) {
+        if (this.selectedFilter === AmountFilterEnum.LessThan) {
             return this.maxAmount !== null
-        } else if (this.selectedFilter === AmountFilterEnum.BETWEEN) {
+        } else if (this.selectedFilter === AmountFilterEnum.Between) {
             if (this.maxAmount === null) {
                 return false
             }
@@ -125,12 +125,12 @@ export class AmountFilterComponent implements OnInit, OnChanges {
     }
 
     filterApplied(): boolean {
-        return this.originalSelectedFilter !== AmountFilterEnum.ALL
+        return this.originalSelectedFilter !== AmountFilterEnum.All
     }
 
     clear() {
         this.cancelOnExit = false
-        this.selectedFilter = AmountFilterEnum.ALL
+        this.selectedFilter = AmountFilterEnum.All
         this.minAmount = null
         this.maxAmount = null
         this.filterInputsChanged.emit({
@@ -142,22 +142,22 @@ export class AmountFilterComponent implements OnInit, OnChanges {
 
     apply() {
         this.cancelOnExit = false
-        if (this.selectedFilter === AmountFilterEnum.EXACTLY) {
+        if (this.selectedFilter === AmountFilterEnum.Exactly) {
             if (this.minAmount === null) {
-                this.selectedFilter = AmountFilterEnum.ALL
+                this.selectedFilter = AmountFilterEnum.All
             }
             this.maxAmount = this.minAmount
-        } else if (this.selectedFilter === AmountFilterEnum.GREATER_THAN) {
+        } else if (this.selectedFilter === AmountFilterEnum.GreaterThan) {
             if (this.minAmount === null) {
-                this.selectedFilter = AmountFilterEnum.ALL
+                this.selectedFilter = AmountFilterEnum.All
             }
-        } else if (this.selectedFilter === AmountFilterEnum.LESS_THAN) {
+        } else if (this.selectedFilter === AmountFilterEnum.LessThan) {
             if (this.maxAmount === null) {
-                this.selectedFilter = AmountFilterEnum.ALL
+                this.selectedFilter = AmountFilterEnum.All
             }
-        } else if (this.selectedFilter === AmountFilterEnum.BETWEEN) {
+        } else if (this.selectedFilter === AmountFilterEnum.Between) {
             if (this.minAmount === null || this.maxAmount === null) {
-                this.selectedFilter = AmountFilterEnum.ALL
+                this.selectedFilter = AmountFilterEnum.All
             }
         }
 

@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core'
 })
 export class CurrencyService {
     private formatters: Record<string, Intl.NumberFormat> = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         USD: new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD',

@@ -5,7 +5,7 @@ import { NGXLogger } from 'ngx-logger'
 import { catchError, throwError } from 'rxjs'
 import { ServerError } from 'wealthwatch-shared'
 import { AlertService } from '../services/alert.service'
-import { CSRFService } from '../services/csrf.service'
+import { CsrfService } from '../services/csrf.service'
 import {
     LogtailService,
     createLoggerWithContext,
@@ -14,7 +14,7 @@ import { UserService } from '../services/user.service'
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const userSvc = inject(UserService)
-    const csrfSvc = inject(CSRFService)
+    const csrfSvc = inject(CsrfService)
     const router = inject(Router)
     const alertSvc = inject(AlertService)
     const ngxLogger = inject(NGXLogger)
