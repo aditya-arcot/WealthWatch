@@ -194,11 +194,13 @@ export const fetchCategoryTotalsByDateWithUserIdAndDateRange = async (
     return rows.map(mapDbCategoryTotalByDate)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbCategorySummary {
     category_id: number
     total: number
     count: number
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbCategorySummary = (d: DbCategorySummary): CategorySummary => ({
     categoryId: d.category_id,
@@ -206,6 +208,7 @@ const mapDbCategorySummary = (d: DbCategorySummary): CategorySummary => ({
     count: d.count,
 })
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbCategoryTotalByDate {
     category_id: number
     total_by_date: [
@@ -215,6 +218,7 @@ interface DbCategoryTotalByDate {
         },
     ]
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbCategoryTotalByDate = (
     d: DbCategoryTotalByDate

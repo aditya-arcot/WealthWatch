@@ -14,6 +14,7 @@ import { executePlaidMethod, getPlaidClient } from './index.js'
 export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
     logger.debug({ id: item.id }, 'getting item accounts')
     const params: AccountsGetRequest = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
@@ -33,6 +34,7 @@ export const plaidAccountsBalanceGet = async (
     logger.debug({ id: item.id }, 'getting item account balances')
 
     const params: AccountsBalanceGetRequest = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
     // Capital One
@@ -41,6 +43,7 @@ export const plaidAccountsBalanceGet = async (
             ? formatISO(item.lastRefreshed)
             : formatISO(subDays(new Date(), 30))
         params.options = {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             min_last_updated_datetime: lastUpdated,
         }
     }

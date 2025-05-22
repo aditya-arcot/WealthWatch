@@ -373,6 +373,7 @@ export const modifyItemCursorByPlaidId = async (
     await runQuery(query, [cursor, plaidId])
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbItem {
     id: number
     user_id: number
@@ -387,6 +388,7 @@ interface DbItem {
     transactions_last_refreshed: Date | null
     investments_last_refreshed: Date | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbItem = (dbItem: DbItem): Item => ({
     id: dbItem.id,

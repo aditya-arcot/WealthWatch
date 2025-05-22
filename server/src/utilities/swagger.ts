@@ -1,4 +1,5 @@
 import { Request } from 'express'
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import swaggerJSDoc from 'swagger-jsdoc'
 import { SwaggerUiOptions } from 'swagger-ui-express'
 import { production, vars } from './env.js'
@@ -25,6 +26,7 @@ export const createSwaggerSpec = () => {
                 title: `WealthWatch API - ${vars.nodeEnv}`,
                 version: '1.0.0',
             },
+            /* eslint-disable @typescript-eslint/naming-convention */
             components: {
                 schemas: {
                     AccessCode: {
@@ -939,6 +941,7 @@ export const createSwaggerSpec = () => {
                     },
                 },
             },
+            /* eslint-enable @typescript-eslint/naming-convention */
         },
         apis: ['./dist/routes/*.js'],
     }

@@ -107,6 +107,7 @@ export const modifyAccountsToInactiveByPlaidItemId = async (
     await runQuery(query, [plaidItemId])
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export interface DbAccount {
     id: number
     item_id: number
@@ -123,6 +124,7 @@ export interface DbAccount {
     type: string
     subtype: string | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 export const mapDbAccount = (acc: DbAccount): Account => ({
     id: acc.id,
@@ -152,6 +154,7 @@ export const mapDbAccountWithHoldings = (
     holdings: acc.holdings.map(mapDbHoldingWithSecurity),
 })
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export interface DbCreditCardAccount extends DbAccount {
     aprs: object
     overdue: boolean | null
@@ -162,6 +165,7 @@ export interface DbCreditCardAccount extends DbAccount {
     next_payment_due_date: Date | null
     minimum_payment_amount: number | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 export const mapCreditCardAccount = (
     acc: DbCreditCardAccount
@@ -177,6 +181,7 @@ export const mapCreditCardAccount = (
     minimumPaymentAmount: acc.minimum_payment_amount,
 })
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export interface DbMortgageAccount extends DbAccount {
     mortgage_type: string | null
     interest_rate_type: string | null
@@ -198,6 +203,7 @@ export interface DbMortgageAccount extends DbAccount {
     ytd_interest_paid: number | null
     ytd_principal_paid: number | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 export const mapMortgageAccount = (
     acc: DbMortgageAccount
@@ -224,6 +230,7 @@ export const mapMortgageAccount = (
     ytdPrincipalPaid: acc.ytd_principal_paid,
 })
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export interface DbStudentLoanAccount extends DbAccount {
     student_loan_name: string | null
     interest_rate_percent: number
@@ -248,6 +255,7 @@ export interface DbStudentLoanAccount extends DbAccount {
     ytd_interest_paid: number | null
     ytd_principal_paid: number | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 export const mapStudentLoanAccount = (
     acc: DbStudentLoanAccount

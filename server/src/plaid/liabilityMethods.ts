@@ -21,6 +21,7 @@ import { executePlaidMethod, getPlaidClient } from './index.js'
 export const plaidLiabilitiesGet = async (item: Item) => {
     logger.debug({ id: item.id }, 'getting item liabilities')
     const params = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(

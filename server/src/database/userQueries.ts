@@ -75,6 +75,7 @@ export const removeUserById = async (userId: number) => {
     await runQuery(query, [userId])
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbUser {
     id: number
     username: string
@@ -84,6 +85,7 @@ interface DbUser {
     password_hash: string
     admin: boolean
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbUser = (user: DbUser): User => ({
     id: user.id,

@@ -24,8 +24,10 @@ export const createPlaidClient = () => {
         basePath,
         baseOptions: {
             headers: {
+                /* eslint-disable @typescript-eslint/naming-convention */
                 'PLAID-CLIENT-ID': vars.plaidClientId,
                 'PLAID-SECRET': vars.plaidSecret,
+                /* eslint-enable @typescript-eslint/naming-convention */
             },
         },
     })

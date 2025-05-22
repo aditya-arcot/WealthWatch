@@ -15,6 +15,7 @@ export const plaidInvestmentsRefresh = async (item: Item) => {
     logger.debug({ id: item.id }, 'refreshing item investments')
 
     const params: InvestmentsRefreshRequest = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
 
@@ -50,6 +51,7 @@ export const plaidInvestmentsHoldingsGet = async (
     logger.debug({ id: item.id }, 'getting item investment holdings')
 
     const params = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
 

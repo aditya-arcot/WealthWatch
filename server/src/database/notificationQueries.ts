@@ -130,6 +130,7 @@ export const modifyNotificationsToInactiveByTypeIdUserIdAndItemId = async (
     await runQuery(query, values)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbNotification {
     id: number
     user_id: number
@@ -140,6 +141,7 @@ interface DbNotification {
     read: boolean
     active: boolean
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbNotification = (n: DbNotification): Notification => ({
     id: n.id,

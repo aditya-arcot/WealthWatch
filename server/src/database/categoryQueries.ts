@@ -10,11 +10,13 @@ export const fetchCategories = async (): Promise<Category[]> => {
     return rows.map(mapDbCategory)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbCategory {
     id: number
     name: string
     group_id: number
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbCategory = (dbCategory: DbCategory): Category => ({
     id: dbCategory.id,
