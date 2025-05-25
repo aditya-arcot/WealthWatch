@@ -7,9 +7,9 @@ import {
     modifyNotificationToInactiveByUserIdAndId,
 } from '../database/notificationQueries.js'
 import { HttpError } from '../models/error.js'
-import { parseNumberOrUndefinedFromParam } from '../utilities/format.js'
 import { logger } from '../utilities/logger.js'
 import { createNotification } from '../utilities/notification.js'
+import { parseNumberOrUndefinedFromParam } from '../utilities/param.js'
 
 export const getUserNotifications = async (req: Request, res: Response) => {
     logger.debug('getting notifications')

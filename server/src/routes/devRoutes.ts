@@ -13,7 +13,7 @@ import {
     syncItemLiabilities,
     syncItemTransactions,
 } from '../controllers/devController.js'
-import { catchAsync } from '../utilities/catchAsync.js'
+import { catchAsync } from '../utilities/middleware.js'
 
 const router = express.Router()
 

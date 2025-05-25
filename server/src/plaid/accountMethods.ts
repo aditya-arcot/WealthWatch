@@ -7,8 +7,8 @@ import {
 import { Account, Item } from 'wealthwatch-shared'
 import { PlaidAccountErrorCodeEnum } from '../enums/plaidError.js'
 import { PlaidApiError } from '../models/error.js'
-import { toTitleCase } from '../utilities/format.js'
 import { logger } from '../utilities/logger.js'
+import { toTitleCase } from '../utilities/string.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {

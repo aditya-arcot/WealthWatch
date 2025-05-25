@@ -26,4 +26,4 @@ export const vars = {
 }
 export const dev = vars.nodeEnv === 'dev'
 export const stage = vars.nodeEnv === 'stage'
-export const production = vars.nodeEnv === 'prod' || stage
+export const prod = vars.nodeEnv === 'prod' || stage

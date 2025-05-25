@@ -5,8 +5,7 @@ import {
     handleLinkEvent,
     handleLinkUpdateComplete,
 } from '../controllers/linkController.js'
-import { catchAsync } from '../utilities/catchAsync.js'
-import { authenticate } from '../utilities/middleware.js'
+import { authenticate, catchAsync } from '../utilities/middleware.js'
 
 const router = express.Router()
 
