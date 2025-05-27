@@ -6,6 +6,7 @@ import {
     RouterLinkActive,
 } from '@angular/router'
 import { catchError, filter, of, switchMap, throwError } from 'rxjs'
+import { RouteEnum } from 'src/app/enums/route'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { NotificationService } from '../../services/notification.service'
@@ -92,7 +93,7 @@ export class HeaderComponent
                 })
             )
             .subscribe(() => {
-                void this.router.navigateByUrl('/logout')
+                void this.router.navigateByUrl(RouteEnum.Logout)
             })
     }
 }

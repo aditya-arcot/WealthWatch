@@ -4,6 +4,7 @@ import { Router } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
 import { catchError, throwError } from 'rxjs'
 import { ServerError } from 'wealthwatch-shared'
+import { RouteEnum } from '../enums/route'
 import { AlertService } from '../services/alert.service'
 import { CsrfService } from '../services/csrf.service'
 import {
@@ -41,7 +42,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                     if (err.status === 401) {
                         userSvc.user = undefined
                         csrfSvc.clearToken()
-                        void router.navigateByUrl('/login')
+                        void router.navigateByUrl(RouteEnum.Login)
                         alertSvc.addErrorAlert(logger, 'Not logged in')
                         return throwError(() => err)
                     }

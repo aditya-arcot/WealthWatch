@@ -14,6 +14,7 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
+import { RouteEnum } from 'src/app/enums/route'
 import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
@@ -63,7 +64,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.userSvc.user) {
-            void this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl(RouteEnum.Home)
             this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
         }
     }
@@ -181,7 +182,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
             .register(this.accessCode, username, password)
             .pipe(
                 switchMap(() => {
-                    void this.router.navigateByUrl('/home')
+                    void this.router.navigateByUrl(RouteEnum.Home)
                     this.alertSvc.addSuccessAlert(
                         this.logger,
                         'Success registering'
