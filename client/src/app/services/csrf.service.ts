@@ -6,8 +6,8 @@ import { env } from '../../environments/env'
 @Injectable({
     providedIn: 'root',
 })
-export class CSRFService {
-    readonly baseUrl = `${env.apiUrl}/csrf-token`
+export class CsrfService {
+    readonly baseUrl = `${env.serverUrl}/csrf-token`
     private csrfToken: string | null = null
 
     constructor(private http: HttpClient) {}

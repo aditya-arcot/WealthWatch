@@ -3,7 +3,7 @@ import { Router } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { AlertService } from './alert.service'
-import { CSRFService } from './csrf.service'
+import { CsrfService } from './csrf.service'
 import {
     createLoggerWithContext,
     LoggerService,
@@ -20,7 +20,7 @@ export class StartupService {
     success = false
 
     constructor(
-        private csrfSvc: CSRFService,
+        private csrfSvc: CsrfService,
         private userSvc: UserService,
         private secretsSvc: SecretsService,
         private router: Router,

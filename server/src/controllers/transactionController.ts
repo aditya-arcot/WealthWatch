@@ -10,11 +10,11 @@ import {
     modifyTransactionNoteByPlaidId,
 } from '../database/transactionQueries.js'
 import { HttpError } from '../models/error.js'
+import { logger } from '../utilities/logger.js'
 import {
     parseNumberArrayOrUndefinedFromParam,
     parseNumberOrUndefinedFromParam,
-} from '../utilities/format.js'
-import { logger } from '../utilities/logger.js'
+} from '../utilities/param.js'
 import { refreshItemTransactions } from './itemController.js'
 
 export const getUserTransactionsAndCounts = async (

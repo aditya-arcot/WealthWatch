@@ -29,6 +29,7 @@ export const plaidTransactionsRefresh = async (item: Item) => {
     logger.debug({ id: item.id }, 'refreshing item transactions')
 
     const params: TransactionsRefreshRequest = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
 
@@ -75,10 +76,12 @@ export const plaidTransactionsSync = async (
     try {
         while (hasMore) {
             const params: TransactionsSyncRequest = {
+                /* eslint-disable @typescript-eslint/naming-convention */
                 access_token: item.accessToken,
                 options: {
                     include_original_description: true,
                 },
+                /* eslint-enable @typescript-eslint/naming-convention */
             }
             if (cursor !== null) {
                 params.cursor = cursor

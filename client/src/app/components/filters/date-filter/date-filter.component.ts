@@ -25,7 +25,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
     @ViewChild('dateFilterModal', { static: true }) dateFilterModal!: ElementRef
 
     @Input({ required: true }) selectedFilter: DateFilterEnum =
-        DateFilterEnum.ALL
+        DateFilterEnum.All
     @Input({ required: true }) startDate: Date | null = null
     @Input({ required: true }) endDate: Date | null = null
     @Input({ required: false }) showReset? = false
@@ -97,7 +97,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
     }
 
     private computeStartEndDate() {
-        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+        if (this.selectedFilter === DateFilterEnum.Custom) {
             this.selectorStartDate =
                 this.startDate?.toISOString().split('T')[0] ?? null
             this.selectorEndDate =
@@ -115,7 +115,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
         if (this.originalSelectedFilter !== this.selectedFilter) {
             return true
         }
-        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+        if (this.selectedFilter === DateFilterEnum.Custom) {
             return (
                 !checkDatesEqual(this.originalStartDate, this.startDate) ||
                 !checkDatesEqual(this.originalEndDate, this.endDate)
@@ -125,14 +125,14 @@ export class DateFilterComponent implements OnInit, OnChanges {
     }
 
     startDateValid(): boolean {
-        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+        if (this.selectedFilter === DateFilterEnum.Custom) {
             return !!this.startDate || !!this.endDate
         }
         return true
     }
 
     endDateValid(): boolean {
-        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+        if (this.selectedFilter === DateFilterEnum.Custom) {
             if (!this.endDate) {
                 return !!this.startDate
             }
@@ -144,12 +144,12 @@ export class DateFilterComponent implements OnInit, OnChanges {
     }
 
     filterApplied(): boolean {
-        return this.originalSelectedFilter !== DateFilterEnum.ALL
+        return this.originalSelectedFilter !== DateFilterEnum.All
     }
 
     clear() {
         this.cancelOnExit = false
-        this.selectedFilter = DateFilterEnum.ALL
+        this.selectedFilter = DateFilterEnum.All
         this.startDate = null
         this.endDate = null
         this.filterInputsChanged.emit({
@@ -161,9 +161,9 @@ export class DateFilterComponent implements OnInit, OnChanges {
 
     apply() {
         this.cancelOnExit = false
-        if (this.selectedFilter === DateFilterEnum.CUSTOM) {
+        if (this.selectedFilter === DateFilterEnum.Custom) {
             if (!this.startDate && !this.endDate) {
-                this.selectedFilter = DateFilterEnum.ALL
+                this.selectedFilter = DateFilterEnum.All
             }
         }
 

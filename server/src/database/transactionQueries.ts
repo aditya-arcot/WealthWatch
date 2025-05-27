@@ -393,6 +393,7 @@ export const removeTransactionsByPlaidIds = async (
     await runQuery(query, plaidIds)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbTransaction {
     id: number
     account_id: number
@@ -414,6 +415,7 @@ interface DbTransaction {
     pending: boolean
     note: string | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbTransaction = (dbTransaction: DbTransaction): Transaction => ({
     id: dbTransaction.id,

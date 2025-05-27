@@ -11,7 +11,7 @@ import { HttpError, PlaidApiError } from '../models/error.js'
 import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { queueLogPlaidApiRequest } from '../queues/logQueue.js'
 import { vars } from '../utilities/env.js'
-import { safeStringify } from '../utilities/format.js'
+import { safeStringify } from '../utilities/json.js'
 import { logger } from '../utilities/logger.js'
 
 let plaidClient: PlaidApi | undefined
@@ -24,8 +24,10 @@ export const createPlaidClient = () => {
         basePath,
         baseOptions: {
             headers: {
+                /* eslint-disable @typescript-eslint/naming-convention */
                 'PLAID-CLIENT-ID': vars.plaidClientId,
                 'PLAID-SECRET': vars.plaidSecret,
+                /* eslint-enable @typescript-eslint/naming-convention */
             },
         },
     })

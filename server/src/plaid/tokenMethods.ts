@@ -36,6 +36,7 @@ export const plaidLinkTokenCreate = async (
     }
 
     const params: LinkTokenCreateRequest = {
+        /* eslint-disable @typescript-eslint/naming-convention */
         user: {
             client_user_id: userId.toString(),
         },
@@ -52,6 +53,7 @@ export const plaidLinkTokenCreate = async (
         update: {
             account_selection_enabled: updateAccounts,
         },
+        /* eslint-enable @typescript-eslint/naming-convention */
     }
 
     const resp = await executePlaidMethod(
@@ -69,6 +71,7 @@ export const plaidPublicTokenExchange = async (
 ) => {
     logger.debug({ publicToken, userId }, 'exchanging public token')
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const params: ItemPublicTokenExchangeRequest = { public_token: publicToken }
     const resp = await executePlaidMethod(
         getPlaidClient().itemPublicTokenExchange,
@@ -96,6 +99,7 @@ export const plaidSandboxPublicTokenCreate = async (
     const startDate = `${year}-${month}-${day}`
 
     const params: SandboxPublicTokenCreateRequest = {
+        /* eslint-disable @typescript-eslint/naming-convention */
         institution_id: institutionId,
         initial_products: [PlaidProducts.Transactions],
         options: {
@@ -104,6 +108,7 @@ export const plaidSandboxPublicTokenCreate = async (
                 start_date: startDate,
             },
         },
+        /* eslint-enable @typescript-eslint/naming-convention */
     }
     const resp = await executePlaidMethod(
         getPlaidClient().sandboxPublicTokenCreate,

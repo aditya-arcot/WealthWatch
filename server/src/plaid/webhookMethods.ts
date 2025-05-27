@@ -12,8 +12,10 @@ export const plaidSandboxFireWebhook = async (
 ) => {
     logger.debug({ itemId: item.id, code }, 'firing webhook')
     const params: SandboxItemFireWebhookRequest = {
+        /* eslint-disable @typescript-eslint/naming-convention */
         access_token: item.accessToken,
         webhook_code: code,
+        /* eslint-enable @typescript-eslint/naming-convention */
     }
     const resp = await executePlaidMethod(
         getPlaidClient().sandboxItemFireWebhook,
@@ -26,6 +28,7 @@ export const plaidSandboxFireWebhook = async (
 
 export const plaidWebhookVerificationKeyGet = async (kid: string) => {
     logger.debug({ kid }, 'getting webhook verification key')
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const params = { key_id: kid }
     const resp = await executePlaidMethod(
         getPlaidClient().webhookVerificationKeyGet,

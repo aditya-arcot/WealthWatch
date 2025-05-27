@@ -9,7 +9,7 @@ import { LogtailService } from './logger.service'
     providedIn: 'root',
 })
 export class SecretsService {
-    readonly baseUrl = `${env.apiUrl}/secrets`
+    readonly baseUrl = `${env.serverUrl}/secrets`
     secrets: Secrets | undefined
 
     constructor(

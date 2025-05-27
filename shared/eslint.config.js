@@ -24,6 +24,29 @@ export default tseslint.config(
             ],
             '@typescript-eslint/no-misused-promises': 'error',
             '@typescript-eslint/no-floating-promises': 'error',
+            '@typescript-eslint/naming-convention': [
+                'warn',
+                {
+                    selector: 'default',
+                    format: ['strictCamelCase'],
+                    leadingUnderscore: 'allow',
+                    trailingUnderscore: 'allow',
+                },
+                {
+                    selector: 'variableLike',
+                    format: ['strictCamelCase', 'UPPER_CASE'],
+                    leadingUnderscore: 'allow',
+                    trailingUnderscore: 'allow',
+                },
+                {
+                    selector: 'typeLike',
+                    format: ['StrictPascalCase'],
+                },
+                {
+                    selector: 'enumMember',
+                    format: ['StrictPascalCase'],
+                },
+            ],
             'no-console': 'warn',
         },
     }

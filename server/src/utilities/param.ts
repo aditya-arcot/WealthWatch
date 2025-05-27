@@ -1,29 +1,5 @@
 import { ParsedQs } from 'qs'
 
-export const safeStringify = (obj: object) => {
-    const seen = new WeakSet()
-    return JSON.stringify(obj, (_key, value) => {
-        if (typeof value === 'object' && value !== null) {
-            if (seen.has(value)) {
-                return
-            }
-            seen.add(value)
-        }
-        return value
-    })
-}
-
-export const capitalizeFirstLetter = (str: string): string => {
-    return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-export const toTitleCase = (str: string): string =>
-    str
-        .toLowerCase()
-        .split(' ')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
-
 export const parseNumberOrUndefinedFromParam = (
     param: string | ParsedQs | (string | ParsedQs)[] | undefined,
     nonNegative = false
@@ -55,7 +31,7 @@ export const parseNumberArrayOrUndefinedFromParam = (
             nums.push(num)
         })
     } else {
-        throw Error('invalid array')
+        throw Error('invalid param')
     }
     return nums
 }

@@ -52,8 +52,8 @@ jobs:
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  # cache: 'npm'
-                  # cache-dependency-path: shared/package-lock.json
+                  cache: 'npm'
+                  cache-dependency-path: shared/package-lock.json
 
             - name: install, build
               if: steps.check-version.outputs.skip_publish == 'false'

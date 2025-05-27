@@ -55,6 +55,7 @@ export const insertHoldings = async (holdings: Holding[]): Promise<void> => {
     await runQuery(query, values)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export interface DbHoldingWithSecurity {
     id: number
     account_id: number
@@ -73,6 +74,7 @@ export interface DbHoldingWithSecurity {
     iso_currency_code: string | null
     unofficial_currency_code: string | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 export const mapDbHoldingWithSecurity = (
     holding: DbHoldingWithSecurity

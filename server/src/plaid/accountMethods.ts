@@ -7,13 +7,14 @@ import {
 import { Account, Item } from 'wealthwatch-shared'
 import { PlaidAccountErrorCodeEnum } from '../enums/plaidError.js'
 import { PlaidApiError } from '../models/error.js'
-import { toTitleCase } from '../utilities/format.js'
 import { logger } from '../utilities/logger.js'
+import { toTitleCase } from '../utilities/string.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
     logger.debug({ id: item.id }, 'getting item accounts')
     const params: AccountsGetRequest = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
@@ -33,6 +34,7 @@ export const plaidAccountsBalanceGet = async (
     logger.debug({ id: item.id }, 'getting item account balances')
 
     const params: AccountsBalanceGetRequest = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
     // Capital One
@@ -41,6 +43,7 @@ export const plaidAccountsBalanceGet = async (
             ? formatISO(item.lastRefreshed)
             : formatISO(subDays(new Date(), 30))
         params.options = {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             min_last_updated_datetime: lastUpdated,
         }
     }

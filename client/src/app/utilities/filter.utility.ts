@@ -5,12 +5,12 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
     let endDate: Date | null = null
 
     switch (filter) {
-        case DateFilterEnum.ALL:
+        case DateFilterEnum.All:
             startDate = null
             endDate = null
             break
 
-        case DateFilterEnum.CURRENT_WEEK: {
+        case DateFilterEnum.CurrentWeek: {
             const start = new Date()
             start.setHours(0, 0, 0, 0)
             const day = start.getDay() || 7
@@ -21,7 +21,7 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
             break
         }
 
-        case DateFilterEnum.CURRENT_MONTH: {
+        case DateFilterEnum.CurrentMonth: {
             const start = new Date()
             start.setHours(0, 0, 0, 0)
             start.setDate(1)
@@ -31,7 +31,7 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
             break
         }
 
-        case DateFilterEnum.CURRENT_YEAR: {
+        case DateFilterEnum.CurrentYear: {
             const start = new Date()
             start.setHours(0, 0, 0, 0)
             start.setMonth(0)
@@ -42,7 +42,7 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
             break
         }
 
-        case DateFilterEnum.PAST_WEEK: {
+        case DateFilterEnum.PastWeek: {
             const start = new Date()
             start.setHours(0, 0, 0, 0)
             start.setHours(-24 * 6)
@@ -52,7 +52,7 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
             break
         }
 
-        case DateFilterEnum.PAST_MONTH: {
+        case DateFilterEnum.PastMonth: {
             const start = new Date()
             start.setHours(0, 0, 0, 0)
             start.setHours(-24 * 29)
@@ -62,7 +62,7 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
             break
         }
 
-        case DateFilterEnum.LAST_WEEK: {
+        case DateFilterEnum.LastWeek: {
             const end = new Date()
             end.setHours(0, 0, 0, 0)
             const day = end.getDay() || 7
@@ -76,7 +76,7 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
             break
         }
 
-        case DateFilterEnum.LAST_MONTH: {
+        case DateFilterEnum.LastMonth: {
             const end = new Date()
             end.setHours(0, 0, 0, 0)
             end.setDate(1)
@@ -90,7 +90,7 @@ export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
             break
         }
 
-        case DateFilterEnum.LAST_YEAR: {
+        case DateFilterEnum.LastYear: {
             const end = new Date()
             end.setHours(0, 0, 0, 0)
             end.setMonth(0)

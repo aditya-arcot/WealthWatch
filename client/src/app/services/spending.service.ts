@@ -7,7 +7,7 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class SpendingService {
-    readonly baseUrl = `${env.apiUrl}/spending`
+    readonly baseUrl = `${env.serverUrl}/spending`
 
     constructor(private http: HttpClient) {}
 

@@ -13,7 +13,7 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class ItemService {
-    readonly baseUrl = `${env.apiUrl}/items`
+    readonly baseUrl = `${env.serverUrl}/items`
 
     constructor(private http: HttpClient) {}
 

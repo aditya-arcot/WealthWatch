@@ -18,8 +18,9 @@ import {
     insertUser,
 } from '../database/userQueries.js'
 import { HttpError } from '../models/error.js'
-import { production, vars } from '../utilities/env.js'
+import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
+import { createCookieName } from '../utilities/string.js'
 
 export const requestAccess = async (req: Request, res: Response) => {
     logger.debug('requesting access')
@@ -200,10 +201,7 @@ export const loginWithDemo = async (req: Request, res: Response) => {
 export const logout = (req: Request, res: Response) => {
     logger.debug('logging out')
     req.session.destroy(() => {
-        const cookieName = production
-            ? 'wealthwatch-csrf-token'
-            : `wealthwatch-${vars.nodeEnv}-csrf-token`
-        res.clearCookie(cookieName)
+        res.clearCookie(createCookieName('csrf'))
         res.status(204).send()
     })
 }

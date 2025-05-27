@@ -3,8 +3,7 @@ import {
     getAccessRequests,
     reviewAccessRequest,
 } from '../controllers/adminController.js'
-import { catchAsync } from '../utilities/catchAsync.js'
-import { authenticateAdmin } from '../utilities/middleware.js'
+import { authenticateAdmin, catchAsync } from '../utilities/middleware.js'
 
 const router = express.Router()
 

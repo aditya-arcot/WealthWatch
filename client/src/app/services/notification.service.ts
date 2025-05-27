@@ -9,7 +9,7 @@ import { env } from '../../environments/env'
 })
 export class NotificationService {
     notifications: Notification[] = []
-    readonly baseUrl = `${env.apiUrl}/notifications`
+    readonly baseUrl = `${env.serverUrl}/notifications`
 
     constructor(private http: HttpClient) {}
 

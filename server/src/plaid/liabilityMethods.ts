@@ -21,6 +21,7 @@ import { executePlaidMethod, getPlaidClient } from './index.js'
 export const plaidLiabilitiesGet = async (item: Item) => {
     logger.debug({ id: item.id }, 'getting item liabilities')
     const params = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
@@ -210,7 +211,7 @@ const mapPlaidStudentLoanStatusType = (
         case PlaidStudentLoanStatusTypeEnum.Transferred:
             return StudentLoanStatusTypeEnum.Transferred
         case PlaidStudentLoanStatusTypeEnum.PendingIdr:
-            return StudentLoanStatusTypeEnum.PendingIDR
+            return StudentLoanStatusTypeEnum.PendingIdr
         case PlaidStudentLoanStatusTypeEnum.Other:
             return StudentLoanStatusTypeEnum.Other
     }
@@ -242,7 +243,7 @@ const mapPlaidStudentLoanRepaymentPlanType = (
         case PlaidStudentLoanRepaymentTypeEnum.RevisedPayAsYouEarn:
             return StudentLoanRepaymentPlanTypeEnum.RevisedPayAsYouEarn
         case PlaidStudentLoanRepaymentTypeEnum.SavingOnAValuableEducation:
-            return StudentLoanRepaymentPlanTypeEnum.SavingOnAValuableEducation
+            return StudentLoanRepaymentPlanTypeEnum.SavingOnValuableEducation
         case PlaidStudentLoanRepaymentTypeEnum.Other:
             return StudentLoanRepaymentPlanTypeEnum.Other
         case PlaidStudentLoanRepaymentTypeEnum.Null:

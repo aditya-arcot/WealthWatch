@@ -1,7 +1,7 @@
 import { Component, Injector, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of } from 'rxjs'
-import { CSRFService } from 'src/app/services/csrf.service'
+import { CsrfService } from 'src/app/services/csrf.service'
 import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { UserService } from '../../services/user.service'
@@ -15,7 +15,7 @@ export class LogoutComponent extends LoggerComponent implements OnInit {
         private router: Router,
         private alertSvc: AlertService,
         private userSvc: UserService,
-        private csrfService: CSRFService,
+        private csrfService: CsrfService,
         injector: Injector
     ) {
         super(injector, 'LogoutComponent')

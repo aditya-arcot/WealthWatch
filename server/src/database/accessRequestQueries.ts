@@ -94,6 +94,7 @@ export const modifyAccessRequestStatusAccessCodeAndReviewerById = async (
     await runQuery(query, values)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbAccessRequest {
     id: number
     email: string
@@ -105,6 +106,7 @@ interface DbAccessRequest {
     create_timestamp: Date
     update_timestamp: Date
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbAccessRequest = (req: DbAccessRequest): AccessRequest => ({
     id: req.id,
