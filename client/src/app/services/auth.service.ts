@@ -9,7 +9,7 @@ import { UserService } from './user.service'
     providedIn: 'root',
 })
 export class AuthService {
-    readonly baseUrl = `${env.apiUrl}/auth`
+    readonly baseUrl = `${env.serverUrl}/auth`
 
     constructor(
         private http: HttpClient,

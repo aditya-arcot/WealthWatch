@@ -9,6 +9,7 @@ import {
 import { provideRouter, TitleStrategy } from '@angular/router'
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
+import { EnvNameEnum } from 'wealthwatch-shared'
 import { env } from '../environments/env'
 import { routes } from './app.routes'
 import { authInterceptor } from './interceptors/auth-interceptor'
@@ -21,7 +22,7 @@ const provideLogger = () => {
     return importProvidersFrom(
         LoggerModule.forRoot({
             level:
-                env.name === 'prod'
+                env.name === EnvNameEnum.Prod
                     ? NgxLoggerLevel.WARN
                     : NgxLoggerLevel.DEBUG,
         })

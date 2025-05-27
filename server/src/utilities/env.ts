@@ -1,4 +1,5 @@
 import { env } from 'process'
+import { EnvNameEnum } from 'wealthwatch-shared'
 
 const getEnvVar = (key: string): string => {
     const val = env[key]
@@ -24,6 +25,6 @@ export const vars = {
     nodeEnv: getEnvVar('NODE_ENV'),
     plaidEnv: getEnvVar('PLAID_ENV'),
 }
-export const dev = vars.nodeEnv === 'dev'
-export const stage = vars.nodeEnv === 'stage'
-export const prod = vars.nodeEnv === 'prod' || stage
+export const dev = vars.nodeEnv === EnvNameEnum.Dev
+export const stage = vars.nodeEnv === EnvNameEnum.Stage
+export const prod = vars.nodeEnv === EnvNameEnum.Prod || stage

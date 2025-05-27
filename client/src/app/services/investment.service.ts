@@ -6,7 +6,7 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class InvestmentService {
-    readonly baseUrl = `${env.apiUrl}/investments`
+    readonly baseUrl = `${env.serverUrl}/investments`
 
     constructor(private http: HttpClient) {}
 

@@ -7,7 +7,7 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class LinkService {
-    readonly baseUrl = `${env.apiUrl}/link`
+    readonly baseUrl = `${env.serverUrl}/link`
 
     constructor(private http: HttpClient) {}
 

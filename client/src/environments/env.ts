@@ -1,4 +1,7 @@
-export const env = {
-    name: 'prod',
-    apiUrl: 'https://wealthwatch-api.aditya-arcot.com',
+import { Environment } from 'src/app/models/environment'
+import { EnvNameEnum, ServerUrlEnum } from 'wealthwatch-shared'
+
+export const env: Environment = {
+    name: EnvNameEnum.Prod,
+    serverUrl: ServerUrlEnum.Prod,
 }

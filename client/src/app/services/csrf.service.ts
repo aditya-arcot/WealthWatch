@@ -7,7 +7,7 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class CsrfService {
-    readonly baseUrl = `${env.apiUrl}/csrf-token`
+    readonly baseUrl = `${env.serverUrl}/csrf-token`
     private csrfToken: string | null = null
 
     constructor(private http: HttpClient) {}
