@@ -8,18 +8,6 @@ import {
 } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
 import { RouteEnum } from './enums/route'
-import { AccessRequestComponent } from './pages/access-request/access-request.component'
-import { AccountsComponent } from './pages/accounts/accounts.component'
-import { AdminComponent } from './pages/admin/admin.component'
-import { HomeComponent } from './pages/home/home.component'
-import { InvestmentsComponent } from './pages/investments/investments.component'
-import { LiabilitiesComponent } from './pages/liabilities/liabilities.component'
-import { LoginComponent } from './pages/login/login.component'
-import { LogoutComponent } from './pages/logout/logout.component'
-import { RegisterComponent } from './pages/register/register.component'
-import { SpendingComponent } from './pages/spending/spending.component'
-import { StartupErrorComponent } from './pages/startup-error/startup-error.component'
-import { TransactionsComponent } from './pages/transactions/transactions.component'
 import { AlertService } from './services/alert.service'
 import { CsrfService } from './services/csrf.service'
 import {
@@ -73,68 +61,102 @@ export const routes: Routes = [
     {
         path: RouteEnum.StartupError,
         title: 'Startup Error',
-        component: StartupErrorComponent,
+        loadComponent: () =>
+            import('./pages/startup-error/startup-error.component').then(
+                (m) => m.StartupErrorComponent
+            ),
     },
     {
         path: RouteEnum.Login,
         title: 'Log In',
-        component: LoginComponent,
+        loadComponent: () =>
+            import('./pages/login/login.component').then(
+                (m) => m.LoginComponent
+            ),
     },
     {
         path: RouteEnum.Logout,
         title: 'Log Out',
-        component: LogoutComponent,
+        loadComponent: () =>
+            import('./pages/logout/logout.component').then(
+                (m) => m.LogoutComponent
+            ),
     },
     {
         path: RouteEnum.AccessRequest,
         title: 'Request Access',
-        component: AccessRequestComponent,
+        loadComponent: () =>
+            import('./pages/access-request/access-request.component').then(
+                (m) => m.AccessRequestComponent
+            ),
     },
     {
         path: RouteEnum.Register,
         title: 'Register',
-        component: RegisterComponent,
+        loadComponent: () =>
+            import('./pages/register/register.component').then(
+                (m) => m.RegisterComponent
+            ),
     },
     {
         path: RouteEnum.Home,
         title: 'Home',
-        component: HomeComponent,
+        loadComponent: () =>
+            import('./pages/home/home.component').then((m) => m.HomeComponent),
         canActivate: [activationGuard],
     },
     {
         path: RouteEnum.Accounts,
         title: 'Accounts',
-        component: AccountsComponent,
+        loadComponent: () =>
+            import('./pages/accounts/accounts.component').then(
+                (m) => m.AccountsComponent
+            ),
         canActivate: [activationGuard],
     },
     {
         path: RouteEnum.Transactions,
         title: 'Transactions',
-        component: TransactionsComponent,
+        loadComponent: () =>
+            import('./pages/transactions/transactions.component').then(
+                (m) => m.TransactionsComponent
+            ),
         canActivate: [activationGuard],
     },
     {
         path: RouteEnum.Spending,
         title: 'Spending',
-        component: SpendingComponent,
+        loadComponent: () =>
+            import('./pages/spending/spending.component').then(
+                (m) => m.SpendingComponent
+            ),
         canActivate: [activationGuard],
     },
     {
         path: RouteEnum.Investments,
         title: 'Investments',
-        component: InvestmentsComponent,
+        loadComponent: () =>
+            import('./pages/investments/investments.component').then(
+                (m) => m.InvestmentsComponent
+            ),
         canActivate: [activationGuard],
     },
     {
         path: RouteEnum.Liabilities,
         title: 'Liabilities',
-        component: LiabilitiesComponent,
+        loadComponent: () =>
+            import('./pages/liabilities/liabilities.component').then(
+                (m) => m.LiabilitiesComponent
+            ),
         canActivate: [activationGuard],
     },
     {
         path: RouteEnum.Admin,
         title: 'Admin',
-        component: AdminComponent,
+        loadComponent: () =>
+            import('./pages/admin/admin.component').then(
+                (m) => m.AdminComponent
+            ),
         canActivate: [activationGuard],
     },
     { path: '', redirectTo: RouteEnum.Login, pathMatch: 'full' },
