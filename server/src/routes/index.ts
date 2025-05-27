@@ -1,5 +1,5 @@
 import express from 'express'
-import { production } from '../utilities/env.js'
+import { prod } from '../utilities/env.js'
 import adminRouter from './adminRoutes.js'
 import authRouter from './authRoutes.js'
 import categoryRouter from './categoryRoutes.js'
@@ -17,7 +17,7 @@ const router = express.Router()
 router.use('/admin', adminRouter)
 router.use('/auth', authRouter)
 router.use('/categories', categoryRouter)
-if (!production) {
+if (!prod) {
     router.use('/dev', devRouter)
 }
 router.use('/investments', investmentRouter)

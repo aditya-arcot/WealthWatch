@@ -6,13 +6,13 @@ import swaggerUi from 'swagger-ui-express'
 import { processWebhook } from './controllers/webhookController.js'
 import { HttpError } from './models/error.js'
 import router from './routes/index.js'
-import { catchAsync } from './utilities/catchAsync.js'
-import { production } from './utilities/env.js'
+import { prod } from './utilities/env.js'
 import { logger } from './utilities/logger.js'
 import {
-    corsMiddleware,
-    createCsrfMiddleware,
-    createSessionMiddleware,
+    catchAsync,
+    cors,
+    createCsrf,
+    createSession,
     handleError,
     handleUnmatchedRoute,
     logRequestResponse,
@@ -28,7 +28,7 @@ export const startExpressApps = () => {
 const startMainApp = () => {
     logger.debug('configuring main app')
     const app = express()
-    if (production) {
+    if (prod) {
         app.set('trust proxy', 1)
     }
 
@@ -36,18 +36,18 @@ const startMainApp = () => {
     app.use(
         helmet({
             contentSecurityPolicy: {
-                reportOnly: !production,
+                reportOnly: !prod,
             },
         })
     )
-    app.use(corsMiddleware)
+    app.use(cors)
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
-    app.use(createSessionMiddleware())
+    app.use(createSession())
     app.use(logRequestResponse)
     app.use(methodOverride('_method'))
     app.use(cookieParser())
-    app.use(createCsrfMiddleware())
+    app.use(createCsrf())
 
     logger.debug('configuring routes')
     app.use('/status', (_req, res) => {
@@ -59,7 +59,7 @@ const startMainApp = () => {
         }
         res.json({ csrfToken: req.csrfToken() })
     })
-    if (!production) {
+    if (!prod) {
         app.use(
             '/swagger',
             swaggerUi.serve,
@@ -85,7 +85,7 @@ const startWebhookApp = () => {
     app.use(
         helmet({
             contentSecurityPolicy: {
-                reportOnly: !production,
+                reportOnly: !prod,
             },
         })
     )

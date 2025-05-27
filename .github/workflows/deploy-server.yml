@@ -29,8 +29,8 @@ jobs:
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  # cache: 'npm'
-                  # cache-dependency-path: server/package-lock.json
+                  cache: 'npm'
+                  cache-dependency-path: server/package-lock.json
 
             - name: create .env
               run: |

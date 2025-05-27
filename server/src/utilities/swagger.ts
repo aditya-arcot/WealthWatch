@@ -1,7 +1,8 @@
 import { Request } from 'express'
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import swaggerJSDoc from 'swagger-jsdoc'
 import { SwaggerUiOptions } from 'swagger-ui-express'
-import { production, vars } from './env.js'
+import { prod, vars } from './env.js'
 
 export const swaggerOptions: SwaggerUiOptions = {
     swaggerOptions: {
@@ -17,7 +18,7 @@ export const swaggerOptions: SwaggerUiOptions = {
 }
 
 export const createSwaggerSpec = () => {
-    if (production) throw Error('swagger should not be used in prod')
+    if (prod) throw Error('swagger should not be used in production')
     const options = {
         definition: {
             openapi: '3.0.3',
@@ -25,6 +26,7 @@ export const createSwaggerSpec = () => {
                 title: `WealthWatch API - ${vars.nodeEnv}`,
                 version: '1.0.0',
             },
+            /* eslint-disable @typescript-eslint/naming-convention */
             components: {
                 schemas: {
                     AccessCode: {
@@ -939,6 +941,7 @@ export const createSwaggerSpec = () => {
                     },
                 },
             },
+            /* eslint-enable @typescript-eslint/naming-convention */
         },
         apis: ['./dist/routes/*.js'],
     }

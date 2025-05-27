@@ -14,7 +14,7 @@ lint-staged
 echo
 
 echo "Checking shared project version..."
-./scripts/check-shared-version
+./scripts/check-shared-version.sh
 echo
 
 echo "Checking for knip issues..."

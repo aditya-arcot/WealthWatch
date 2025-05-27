@@ -5,7 +5,7 @@ export const securityTypeNameMap: Record<SecurityTypeEnum, string> = {
     [SecurityTypeEnum.Cryptocurrency]: 'Cryptocurrency',
     [SecurityTypeEnum.Derivative]: 'Derivative',
     [SecurityTypeEnum.Equity]: 'Equity',
-    [SecurityTypeEnum.ETF]: 'ETF',
+    [SecurityTypeEnum.Etf]: 'ETF',
     [SecurityTypeEnum.FixedIncome]: 'Fixed Income',
     [SecurityTypeEnum.Loan]: 'Loan',
     [SecurityTypeEnum.MutualFund]: 'Mutual Fund',

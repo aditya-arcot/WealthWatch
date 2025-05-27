@@ -7,7 +7,7 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class CategoryService {
-    readonly baseUrl = `${env.apiUrl}/categories`
+    readonly baseUrl = `${env.serverUrl}/categories`
 
     constructor(private http: HttpClient) {}
 

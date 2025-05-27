@@ -24,7 +24,7 @@ export const studentLoanStatusTypeNameMap: Record<
     [StudentLoanStatusTypeEnum.Refunded]: 'Refunded',
     [StudentLoanStatusTypeEnum.Repayment]: 'Repayment',
     [StudentLoanStatusTypeEnum.Transferred]: 'Transferred',
-    [StudentLoanStatusTypeEnum.PendingIDR]: 'Pending IDR',
+    [StudentLoanStatusTypeEnum.PendingIdr]: 'Pending IDR',
     [StudentLoanStatusTypeEnum.Other]: 'Other',
 }
 
@@ -42,6 +42,6 @@ export const studentLoanRepaymentPlanTypeNameMap: Record<
     [StudentLoanRepaymentPlanTypeEnum.InterestOnly]: 'Interest Only',
     [StudentLoanRepaymentPlanTypeEnum.PayAsYouEarn]: 'PAYE',
     [StudentLoanRepaymentPlanTypeEnum.RevisedPayAsYouEarn]: 'REPAYE',
-    [StudentLoanRepaymentPlanTypeEnum.SavingOnAValuableEducation]: 'SAVE',
+    [StudentLoanRepaymentPlanTypeEnum.SavingOnValuableEducation]: 'SAVE',
     [StudentLoanRepaymentPlanTypeEnum.Other]: 'Other',
 }

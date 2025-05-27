@@ -8,7 +8,7 @@ import { TransactionsRequestParams } from '../models/transaction'
     providedIn: 'root',
 })
 export class TransactionService {
-    readonly baseUrl = `${env.apiUrl}/transactions`
+    readonly baseUrl = `${env.serverUrl}/transactions`
 
     constructor(private http: HttpClient) {}
 

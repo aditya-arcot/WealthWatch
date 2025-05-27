@@ -5,12 +5,12 @@ import path from 'path'
 import { pino } from 'pino'
 import { dev, vars } from './env.js'
 
-interface pinoTarget {
+interface PinoTarget {
     target: string
     level: string
     options: object
 }
-const targets: pinoTarget[] = [
+const targets: PinoTarget[] = [
     {
         target: '@logtail/pino',
         level: vars.logLevel,

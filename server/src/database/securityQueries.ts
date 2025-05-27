@@ -70,6 +70,7 @@ export const fetchSecurities = async (): Promise<Security[]> => {
     return rows.map(mapDbSecurity)
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 interface DbSecurity {
     id: number
     plaid_id: string
@@ -86,6 +87,7 @@ interface DbSecurity {
     iso_currency_code: string | null
     unofficial_currency_code: string | null
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const mapDbSecurity = (dbSecurity: DbSecurity): Security => ({
     id: dbSecurity.id,

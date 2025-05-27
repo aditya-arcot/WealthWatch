@@ -81,12 +81,12 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
     previousSearchText = ''
 
     dateFilterType = DateFilterEnum
-    selectedDateFilter: DateFilterEnum = DateFilterEnum.ALL
+    selectedDateFilter: DateFilterEnum = DateFilterEnum.All
     startDate: Date | null = null
     endDate: Date | null = null
 
     amountFilterType = AmountFilterEnum
-    selectedAmountFilter: AmountFilterEnum = AmountFilterEnum.ALL
+    selectedAmountFilter: AmountFilterEnum = AmountFilterEnum.All
     minAmount: number | null = null
     maxAmount: number | null = null
 
@@ -258,7 +258,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
             const dateFilterInt = safeParseInt(dateFilter)
             if (dateFilterInt !== undefined) {
                 this.selectedDateFilter = dateFilterInt
-                if (this.selectedDateFilter === DateFilterEnum.CUSTOM) {
+                if (this.selectedDateFilter === DateFilterEnum.Custom) {
                     let dateSet = false
 
                     const startDate: string | undefined = params['startDate']
@@ -280,7 +280,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                     }
 
                     if (!dateSet) {
-                        this.selectedDateFilter = DateFilterEnum.ALL
+                        this.selectedDateFilter = DateFilterEnum.All
                     }
                 } else {
                     const { startDate, endDate } = computeDatesBasedOnFilter(
@@ -306,22 +306,22 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
 
         if (minAmountFloat !== undefined && maxAmountFloat !== undefined) {
             if (minAmountFloat === maxAmountFloat) {
-                this.selectedAmountFilter = AmountFilterEnum.EXACTLY
+                this.selectedAmountFilter = AmountFilterEnum.Exactly
                 this.minAmount = minAmountFloat
                 this.maxAmount = maxAmountFloat
             } else if (minAmountFloat <= maxAmountFloat) {
-                this.selectedAmountFilter = AmountFilterEnum.BETWEEN
+                this.selectedAmountFilter = AmountFilterEnum.Between
                 this.minAmount = minAmountFloat
                 this.maxAmount = maxAmountFloat
             } else {
-                this.selectedAmountFilter = AmountFilterEnum.GREATER_THAN
+                this.selectedAmountFilter = AmountFilterEnum.GreaterThan
                 this.minAmount = minAmountFloat
             }
         } else if (minAmountFloat !== undefined) {
-            this.selectedAmountFilter = AmountFilterEnum.GREATER_THAN
+            this.selectedAmountFilter = AmountFilterEnum.GreaterThan
             this.minAmount = minAmountFloat
         } else if (maxAmountFloat !== undefined) {
-            this.selectedAmountFilter = AmountFilterEnum.LESS_THAN
+            this.selectedAmountFilter = AmountFilterEnum.LessThan
             this.maxAmount = maxAmountFloat
         }
 
@@ -491,7 +491,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
         start: Date | null,
         end: Date | null
     ): void {
-        if (filter !== DateFilterEnum.CUSTOM) {
+        if (filter !== DateFilterEnum.Custom) {
             this.selectedDateFilter = filter
             redirectWithParams(this.router, this.route, {
                 page: 1,
@@ -585,8 +585,8 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
     filterActive(): boolean {
         return (
             this.searchText.length > 0 ||
-            this.selectedDateFilter !== DateFilterEnum.ALL ||
-            this.selectedAmountFilter !== AmountFilterEnum.ALL ||
+            this.selectedDateFilter !== DateFilterEnum.All ||
+            this.selectedAmountFilter !== AmountFilterEnum.All ||
             this.selectedCategoryIds.size !== this.categories.length ||
             this.selectedAccountIds.size !== this.accounts.length
         )
@@ -596,11 +596,11 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
         this.previousSearchText = this.searchText
         this.searchText = ''
 
-        this.selectedDateFilter = DateFilterEnum.ALL
+        this.selectedDateFilter = DateFilterEnum.All
         this.startDate = null
         this.endDate = null
 
-        this.selectedAmountFilter = AmountFilterEnum.ALL
+        this.selectedAmountFilter = AmountFilterEnum.All
         this.minAmount = null
         this.maxAmount = null
 

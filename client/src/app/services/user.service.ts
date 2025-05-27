@@ -9,7 +9,7 @@ import { SecretsService } from './secrets.service'
     providedIn: 'root',
 })
 export class UserService {
-    readonly baseUrl = `${env.apiUrl}/users`
+    readonly baseUrl = `${env.serverUrl}/users`
     user?: User
     loggedOut = false
 

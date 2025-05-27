@@ -7,7 +7,7 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class AdminService {
-    readonly baseUrl = `${env.apiUrl}/admin`
+    readonly baseUrl = `${env.serverUrl}/admin`
 
     constructor(private http: HttpClient) {}
 

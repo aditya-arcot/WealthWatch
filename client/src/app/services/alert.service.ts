@@ -21,7 +21,6 @@ export class AlertService {
         message: string,
         ...subtext: string[]
     ): void {
-        this.clearAlerts()
         this.addAlert(AlertTypeEnum.Success, message, subtext)
         if (subtext.length) logger.info(message, { subtext })
         else logger.info(message)
@@ -32,7 +31,6 @@ export class AlertService {
         message: string,
         ...subtext: string[]
     ): void {
-        this.clearAlerts()
         this.addAlert(AlertTypeEnum.Error, message, subtext)
         if (subtext.length) logger.error(message, { subtext })
         else logger.error(message)
@@ -61,11 +59,6 @@ export class AlertService {
 
     removeAlert(id: string): void {
         this.alerts = this.alerts.filter((n) => n.id !== id)
-        this.alertSubject.next([...this.alerts])
-    }
-
-    private clearAlerts(): void {
-        this.alerts = []
         this.alertSubject.next([...this.alerts])
     }
 }

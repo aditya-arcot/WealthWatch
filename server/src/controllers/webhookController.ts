@@ -17,7 +17,7 @@ import {
     WebhookTypeEnum,
 } from '../enums/webhook.js'
 import { HttpError } from '../models/error.js'
-import { Webhook } from '../models/webhook.js'
+import { mapPlaidWebhook, PlaidWebhook, Webhook } from '../models/webhook.js'
 import { plaidWebhookVerificationKeyGet } from '../plaid/webhookMethods.js'
 import {
     queueSyncItemInvestments,
@@ -33,7 +33,7 @@ import {
     insertLinkUpdateWithAccountsNotification,
 } from './notificationController.js'
 
-const webhook_key_cache = new Map<string, JWKPublicKey>()
+const webhookKeyCache = new Map<string, JWKPublicKey>()
 
 export const processWebhook = async (req: Request, res: Response) => {
     logger.debug('processing webhook')
@@ -48,11 +48,8 @@ export const processWebhook = async (req: Request, res: Response) => {
     await verifyWebhook(token, body)
     logger.debug('verified webhook')
 
-    const webhook: Webhook = {
-        id: -1,
-        timestamp: new Date(),
-        data: req.body,
-    }
+    const plaidWebhook: PlaidWebhook = req.body
+    const webhook = mapPlaidWebhook(plaidWebhook)
     await queueWebhook(webhook)
 
     return res.status(202).send()
@@ -78,10 +75,10 @@ const verifyWebhook = async (token: string, body: string): Promise<void> => {
 
     const { kid } = decodedTokenHeader
 
-    let plaidJwk = webhook_key_cache.get(kid)
+    let plaidJwk = webhookKeyCache.get(kid)
     if (!plaidJwk) {
         const idsToUpdate = [kid]
-        webhook_key_cache.forEach((key, id) => {
+        webhookKeyCache.forEach((key, id) => {
             if (key.expired_at === null) idsToUpdate.push(id)
         })
 
@@ -89,14 +86,14 @@ const verifyWebhook = async (token: string, body: string): Promise<void> => {
             idsToUpdate.map(async (id) => {
                 try {
                     const jwk = await plaidWebhookVerificationKeyGet(id)
-                    webhook_key_cache.set(id, jwk)
+                    webhookKeyCache.set(id, jwk)
                 } catch (error) {
                     logger.error(`failed to fetch key for id ${id}`, error)
                 }
             })
         )
 
-        plaidJwk = webhook_key_cache.get(kid)
+        plaidJwk = webhookKeyCache.get(kid)
     }
 
     if (!plaidJwk) {
@@ -128,39 +125,39 @@ const verifyWebhook = async (token: string, body: string): Promise<void> => {
 export const handleWebhook = async (webhook: Webhook) => {
     logger.debug({ webhook }, 'handling webhook')
 
-    const webhookType = webhook.data.webhook_type
+    const webhookType = webhook.type
     if (typeof webhookType !== 'string')
         throw new HttpError('missing or invalid webhook type', 400)
 
-    const webhookCode = webhook.data.webhook_code
+    const webhookCode = webhook.code
     if (typeof webhookCode !== 'string')
         throw new HttpError('missing or invalid webhook code', 400)
 
     const webhookTypeEnum = webhookType as WebhookTypeEnum
     switch (webhookTypeEnum) {
         case WebhookTypeEnum.Transactions: {
-            const itemId = webhook.data.item_id
+            const itemId = webhook.itemId
             if (itemId === undefined)
                 throw new HttpError('missing item id', 400)
             await handleTransactionsWebhook(webhookCode, itemId)
             break
         }
         case WebhookTypeEnum.Holdings: {
-            const itemId = webhook.data.item_id
+            const itemId = webhook.itemId
             if (itemId === undefined)
                 throw new HttpError('missing item id', 400)
             await handleHoldingsWebhook(webhookCode, itemId)
             break
         }
         case WebhookTypeEnum.Liabilities: {
-            const itemId = webhook.data.item_id
+            const itemId = webhook.itemId
             if (itemId === undefined)
                 throw new HttpError('missing item id', 400)
             await handleLiabilitiesWebhook(webhookCode, itemId)
             break
         }
         case WebhookTypeEnum.Item: {
-            const itemId = webhook.data.item_id
+            const itemId = webhook.itemId
             if (itemId === undefined)
                 throw new HttpError('missing item id', 400)
             await handleItemWebhook(webhookCode, itemId)

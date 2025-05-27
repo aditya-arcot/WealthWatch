@@ -3,7 +3,7 @@ export enum PlaidSecurityTypeEnum {
     Cryptocurrency = 'cryptocurrency',
     Derivative = 'derivative',
     Equity = 'equity',
-    ETF = 'etf',
+    Etf = 'etf',
     FixedIncome = 'fixed_income',
     Loan = 'loan',
     MutualFund = 'mutual_fund',

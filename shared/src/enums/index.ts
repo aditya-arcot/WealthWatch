@@ -1,5 +1,6 @@
 export * from './accessRequest.js'
 export * from './category.js'
+export * from './environment.js'
 export * from './error.js'
 export * from './liability.js'
 export * from './notification.js'

@@ -1,63 +1,53 @@
 import pgSession from 'connect-pg-simple'
-import cors from 'cors'
+import _cors from 'cors'
 import { randomInt } from 'crypto'
 import { doubleCsrf } from 'csrf-csrf'
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 import session from 'express-session'
-import { ServerError } from 'wealthwatch-shared'
+import { ServerError, ServerUrlEnum } from 'wealthwatch-shared'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
 import { DatabaseError, HttpError, PlaidApiError } from '../models/error.js'
 import { queueLogAppRequest } from '../queues/logQueue.js'
-import { production, stage, vars } from './env.js'
-import { capitalizeFirstLetter } from './format.js'
+import { prod, stage, vars } from './env.js'
 import { logger } from './logger.js'
+import { capitalizeFirstLetter, createCookieName } from './string.js'
 
-const origin = stage
-    ? 'https://wealthwatch-stage.aditya-arcot.com'
-    : 'https://wealthwatch.aditya-arcot.com'
-export const corsMiddleware = cors({
-    origin: production ? origin : true,
+export const cors = _cors({
+    origin: prod ? (stage ? ServerUrlEnum.Stage : ServerUrlEnum.Prod) : true,
     credentials: true,
 })
 
-export const createSessionMiddleware = () => {
+export const createSession = () => {
     const postgresSession = pgSession(session)
     const sessionStore = new postgresSession({
         pool: getPool(),
         createTableIfMissing: true,
     })
-    const cookieName = production
-        ? 'wealthwatch-session'
-        : `wealthwatch-${vars.nodeEnv}-session`
     return session({
-        name: cookieName,
+        name: createCookieName('session'),
         store: sessionStore,
         secret: vars.sessionSecret,
         resave: false,
         saveUninitialized: true,
         cookie: {
-            secure: production,
+            secure: prod,
             maxAge: 1000 * 60 * 60 * 24, // 1 day,
             sameSite: 'strict',
         },
     })
 }
 
-export const createCsrfMiddleware = () => {
-    const cookieName = production
-        ? 'wealthwatch-csrf-token'
-        : `wealthwatch-${vars.nodeEnv}-csrf-token`
-    const options = {
+export const createCsrf = () => {
+    const { doubleCsrfProtection } = doubleCsrf({
         getSecret: () => vars.sessionSecret,
         getSessionIdentifier: (req: Request) => req.sessionID,
-        cookieName,
+        cookieName: createCookieName('csrf'),
         cookieOptions: {
-            secure: production,
+            secure: prod,
             maxAge: 1000 * 60 * 60 * 24, // 1 day,
         },
-    }
-    const { doubleCsrfProtection } = doubleCsrf(options)
+    })
     return doubleCsrfProtection
 }
 
@@ -110,6 +100,14 @@ export const logRequestResponse = (
     next()
 }
 
+export const catchAsync = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
+): RequestHandler => {
+    return (req: Request, res: Response, next: NextFunction): void => {
+        fn(req, res, next).catch((err) => next(err))
+    }
+}
+
 export const authenticate = (
     req: Request,
     _res: Response,
@@ -141,47 +139,47 @@ export const handleUnmatchedRoute = (
 }
 
 export const handleError = (
-    err: Error,
+    err: Error & { code?: number | string },
     _req: Request,
     res: Response,
     _next: NextFunction
 ) => {
     logger.error({ err }, 'handling error')
-    let status = err instanceof HttpError ? err.status : 500
-    // error status codes are 4xx and 5xx
-    if (status < 400 || status >= 600) status = 500
-    const error = createErrorObject(err)
-    logger.error({ status, error }, 'sending error response')
+    const status = getErrorStatus(err)
+    const message = createErrorMessage(err)
+    const code = err.code
+    const error: ServerError = { message }
+    if (typeof code === 'string') error.code = code
+    logger.error({ status, code, error }, 'sending error response')
     res.status(status).json(error)
 }
 
-const createErrorObject = (err: Error): ServerError => {
-    if (err instanceof HttpError) {
-        const error: ServerError = {
-            message: err.message,
-        }
-        if (err.code) error.code = err.code
-        return error
+const getErrorStatus = (
+    err: Error & {
+        status?: number
+        statusCode?: number
+        code?: number | string
     }
-    if (err instanceof DatabaseError) {
-        return { message: formatErrorMessage('Database Error', err.message) }
-    }
-    if (err instanceof PlaidApiError) {
-        return {
-            message: formatErrorMessage(
-                'Plaid Error',
-                err.message,
-                err.code,
-                err.detail
-            ),
-        }
-    }
-    return {
-        message: formatErrorMessage('Unexpected Error', err.message),
-    }
+): number => {
+    let status = 500
+    if (err instanceof HttpError) status = err.status
+    else if (typeof err.status === 'number') status = err.status
+    else if (typeof err.statusCode === 'number') status = err.statusCode
+    else if (typeof err.code === 'number') status = err.code
+    // error status codes are 4xx and 5xx
+    if (status < 400 || status >= 600) status = 500
+    return status
+}
+
+const createErrorMessage = (err: Error): string => {
+    if (err instanceof DatabaseError)
+        return formatErrorMessage('Database Error', err.message)
+    if (err instanceof PlaidApiError)
+        return formatErrorMessage('Plaid Error', err.message, err.detail)
+    return err.message
 }
 
 const formatErrorMessage = (category: string, ...messages: string[]) => {
-    if (production) return category
+    if (prod) return category
     return `${category} - ${messages.map((m) => capitalizeFirstLetter(m)).join(' - ')}`
 }

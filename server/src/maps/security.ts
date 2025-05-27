@@ -7,7 +7,7 @@ export const securityTypeMap: Record<PlaidSecurityTypeEnum, SecurityTypeEnum> =
         [PlaidSecurityTypeEnum.Cryptocurrency]: SecurityTypeEnum.Cryptocurrency,
         [PlaidSecurityTypeEnum.Derivative]: SecurityTypeEnum.Derivative,
         [PlaidSecurityTypeEnum.Equity]: SecurityTypeEnum.Equity,
-        [PlaidSecurityTypeEnum.ETF]: SecurityTypeEnum.ETF,
+        [PlaidSecurityTypeEnum.Etf]: SecurityTypeEnum.Etf,
         [PlaidSecurityTypeEnum.FixedIncome]: SecurityTypeEnum.FixedIncome,
         [PlaidSecurityTypeEnum.Loan]: SecurityTypeEnum.Loan,
         [PlaidSecurityTypeEnum.MutualFund]: SecurityTypeEnum.MutualFund,

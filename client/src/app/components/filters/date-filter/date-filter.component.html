@@ -5,7 +5,7 @@
                 <h4 class="modal-title w-100">Filter by Date</h4>
             </div>
             <div class="modal-body p-3 py-2">
-                <div [class.pb-2]="selectedFilter !== dateFilterType.CUSTOM">
+                <div [class.pb-2]="selectedFilter !== dateFilterType.Custom">
                     <label for="dateRange">
                         <b>Date Range</b>
                     </label>
@@ -18,7 +18,7 @@
                     </select>
                 </div>
 
-                @if (selectedFilter === dateFilterType.CUSTOM) {
+                @if (selectedFilter === dateFilterType.Custom) {
                     <div class="mt-2">
                         <label for="startDate">
                             <b>Start Date</b>

@@ -3,7 +3,7 @@ export enum SecurityTypeEnum {
     Cryptocurrency,
     Derivative,
     Equity,
-    ETF,
+    Etf,
     FixedIncome,
     Loan,
     MutualFund,
