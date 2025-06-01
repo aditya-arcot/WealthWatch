@@ -14,6 +14,7 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
+import { RouteEnum } from 'src/app/enums/route'
 import { AccessRequestErrorCodeEnum, ServerError } from 'wealthwatch-shared'
 import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
@@ -53,7 +54,7 @@ export class AccessRequestComponent
 
     ngOnInit(): void {
         if (this.userSvc.user) {
-            void this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl(RouteEnum.Home)
             this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
         }
     }
@@ -84,7 +85,7 @@ export class AccessRequestComponent
             .requestAccess(firstName, lastName, email)
             .pipe(
                 switchMap(() => {
-                    void this.router.navigateByUrl('/login')
+                    void this.router.navigateByUrl(RouteEnum.Login)
                     this.alertSvc.addSuccessAlert(
                         this.logger,
                         'Success requesting access',
@@ -114,7 +115,7 @@ export class AccessRequestComponent
                         `An account with that email already exists`,
                         'Please log in'
                     )
-                    void this.router.navigateByUrl('/login')
+                    void this.router.navigateByUrl(RouteEnum.Login)
                     return true
                 case AccessRequestErrorCodeEnum.RequestPending:
                     this.alertSvc.addErrorAlert(
@@ -129,7 +130,7 @@ export class AccessRequestComponent
                         'A previous request with that email has been approved',
                         'Please check your email for your access code'
                     )
-                    void this.router.navigateByUrl('/register')
+                    void this.router.navigateByUrl(RouteEnum.Register)
                     return true
                 case AccessRequestErrorCodeEnum.RequestRejected:
                     this.alertSvc.addErrorAlert(

@@ -7,18 +7,7 @@ import {
     Routes,
 } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
-import { AccessRequestComponent } from './pages/access-request/access-request.component'
-import { AccountsComponent } from './pages/accounts/accounts.component'
-import { AdminComponent } from './pages/admin/admin.component'
-import { HomeComponent } from './pages/home/home.component'
-import { InvestmentsComponent } from './pages/investments/investments.component'
-import { LiabilitiesComponent } from './pages/liabilities/liabilities.component'
-import { LoginComponent } from './pages/login/login.component'
-import { LogoutComponent } from './pages/logout/logout.component'
-import { RegisterComponent } from './pages/register/register.component'
-import { SpendingComponent } from './pages/spending/spending.component'
-import { StartupErrorComponent } from './pages/startup-error/startup-error.component'
-import { TransactionsComponent } from './pages/transactions/transactions.component'
+import { RouteEnum } from './enums/route'
 import { AlertService } from './services/alert.service'
 import { CsrfService } from './services/csrf.service'
 import {
@@ -40,7 +29,7 @@ const activationGuard: CanActivateFn = (
     const user = userSvc.user
     if (!user) {
         csrfSvc.clearToken()
-        void router.navigateByUrl('/login')
+        void router.navigateByUrl(RouteEnum.Login)
         addErrorAlert('Not logged in')
         return false
     }
@@ -48,7 +37,7 @@ const activationGuard: CanActivateFn = (
     const route = state.url.split('?')[0]
     if (!adminRoutes.includes(route)) return true
     if (!user || !user.admin) {
-        void router.navigateByUrl('/home')
+        void router.navigateByUrl(RouteEnum.Home)
         addErrorAlert('You cannot access that page')
         return false
     }
@@ -70,62 +59,106 @@ const addErrorAlert = (message: string) => {
 
 export const routes: Routes = [
     {
-        path: 'startup-error',
+        path: RouteEnum.StartupError,
         title: 'Startup Error',
-        component: StartupErrorComponent,
+        loadComponent: () =>
+            import('./pages/startup-error/startup-error.component').then(
+                (m) => m.StartupErrorComponent
+            ),
     },
-    { path: 'login', title: 'Log In', component: LoginComponent },
-    { path: 'logout', title: 'Log Out', component: LogoutComponent },
     {
-        path: 'access-request',
+        path: RouteEnum.Login,
+        title: 'Log In',
+        loadComponent: () =>
+            import('./pages/login/login.component').then(
+                (m) => m.LoginComponent
+            ),
+    },
+    {
+        path: RouteEnum.Logout,
+        title: 'Log Out',
+        loadComponent: () =>
+            import('./pages/logout/logout.component').then(
+                (m) => m.LogoutComponent
+            ),
+    },
+    {
+        path: RouteEnum.AccessRequest,
         title: 'Request Access',
-        component: AccessRequestComponent,
+        loadComponent: () =>
+            import('./pages/access-request/access-request.component').then(
+                (m) => m.AccessRequestComponent
+            ),
     },
-    { path: 'register', title: 'Register', component: RegisterComponent },
     {
-        path: 'home',
+        path: RouteEnum.Register,
+        title: 'Register',
+        loadComponent: () =>
+            import('./pages/register/register.component').then(
+                (m) => m.RegisterComponent
+            ),
+    },
+    {
+        path: RouteEnum.Home,
         title: 'Home',
-        component: HomeComponent,
+        loadComponent: () =>
+            import('./pages/home/home.component').then((m) => m.HomeComponent),
         canActivate: [activationGuard],
     },
     {
-        path: 'accounts',
+        path: RouteEnum.Accounts,
         title: 'Accounts',
-        component: AccountsComponent,
+        loadComponent: () =>
+            import('./pages/accounts/accounts.component').then(
+                (m) => m.AccountsComponent
+            ),
         canActivate: [activationGuard],
     },
     {
-        path: 'transactions',
+        path: RouteEnum.Transactions,
         title: 'Transactions',
-        component: TransactionsComponent,
+        loadComponent: () =>
+            import('./pages/transactions/transactions.component').then(
+                (m) => m.TransactionsComponent
+            ),
         canActivate: [activationGuard],
     },
     {
-        path: 'spending',
+        path: RouteEnum.Spending,
         title: 'Spending',
-        component: SpendingComponent,
+        loadComponent: () =>
+            import('./pages/spending/spending.component').then(
+                (m) => m.SpendingComponent
+            ),
         canActivate: [activationGuard],
     },
     {
-        path: 'investments',
+        path: RouteEnum.Investments,
         title: 'Investments',
-        component: InvestmentsComponent,
+        loadComponent: () =>
+            import('./pages/investments/investments.component').then(
+                (m) => m.InvestmentsComponent
+            ),
         canActivate: [activationGuard],
     },
     {
-        path: 'liabilities',
+        path: RouteEnum.Liabilities,
         title: 'Liabilities',
-        component: LiabilitiesComponent,
+        loadComponent: () =>
+            import('./pages/liabilities/liabilities.component').then(
+                (m) => m.LiabilitiesComponent
+            ),
         canActivate: [activationGuard],
     },
-    // { path: 'net-worth', title: 'Net Worth', component: NetWorthComponent, canActivate: [AuthGuardService] },
-    // { path: 'paychecks', title: 'Paychecks', component: PaychecksComponent, canActivate: [AuthGuardService] },
     {
-        path: 'admin',
+        path: RouteEnum.Admin,
         title: 'Admin',
-        component: AdminComponent,
+        loadComponent: () =>
+            import('./pages/admin/admin.component').then(
+                (m) => m.AdminComponent
+            ),
         canActivate: [activationGuard],
     },
-    { path: '', redirectTo: '/login', pathMatch: 'full' },
-    { path: '**', redirectTo: '/login', pathMatch: 'full' },
+    { path: '', redirectTo: RouteEnum.Login, pathMatch: 'full' },
+    { path: '**', redirectTo: RouteEnum.Login },
 ]

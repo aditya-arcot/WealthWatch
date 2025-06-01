@@ -37,7 +37,7 @@ jobs:
               run: |
                   cd client/src/environments/
                   sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT}}/g" \
-                      env.test.ts > env.test.ts.tmp
+                    env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
             - name: create .npmrc

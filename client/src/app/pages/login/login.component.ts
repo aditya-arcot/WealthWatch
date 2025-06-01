@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import {
     AfterViewInit,
     Component,
@@ -15,6 +14,7 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { catchError, finalize, throwError } from 'rxjs'
+import { RouteEnum } from 'src/app/enums/route'
 import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
@@ -23,7 +23,7 @@ import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-login',
-    imports: [ReactiveFormsModule, CommonModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })
@@ -53,7 +53,7 @@ export class LoginComponent
 
     ngOnInit(): void {
         if (this.userSvc.user) {
-            void this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl(RouteEnum.Home)
             this.alertSvc.addSuccessAlert(this.logger, 'Already logged in')
         }
     }
@@ -99,7 +99,7 @@ export class LoginComponent
             .subscribe(() => {
                 this.logger.info('getting secrets')
                 this.secretsSvc.getSecrets().subscribe()
-                void this.router.navigateByUrl('/home')
+                void this.router.navigateByUrl(RouteEnum.Home)
                 this.alertSvc.addSuccessAlert(this.logger, 'Success logging in')
             })
     }

@@ -10,6 +10,7 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
+import { RouteEnum } from 'src/app/enums/route'
 import {
     Account,
     Item,
@@ -217,7 +218,9 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                     this.loading = false
                     return throwError(() => err)
                 }),
-                finalize(() => void this.router.navigateByUrl('/accounts'))
+                finalize(
+                    () => void this.router.navigateByUrl(RouteEnum.Accounts)
+                )
             )
             .subscribe(() => {
                 // don't disable loading flag
@@ -237,7 +240,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
     ): void {
         this.logger.info('handling link exit', { error, metadata, itemId })
         if (itemId !== undefined) {
-            void this.router.navigateByUrl('/accounts')
+            void this.router.navigateByUrl(RouteEnum.Accounts)
         }
         const event: PlaidLinkEvent = {
             id: -1,
@@ -277,7 +280,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
 
     addAccounts(item: Item): void {
         this.logger.info('adding accounts', { item })
-        void this.router.navigate(['/accounts'], {
+        void this.router.navigate([RouteEnum.Accounts], {
             queryParams: {
                 itemId: item.id,
                 withAccounts: true,

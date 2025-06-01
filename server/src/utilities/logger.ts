@@ -50,3 +50,5 @@ export const logger = pino({
     level: vars.logLevel,
     transport: { targets },
 })
+
+export const _test = { targets }
