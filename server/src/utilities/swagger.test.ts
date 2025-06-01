@@ -31,6 +31,7 @@ describe('swaggerUiOptions', () => {
 
 describe('createSwaggerSpec', () => {
     it('returns valid swagger spec for non-prod', async () => {
+        process.env['NODE_ENV'] = EnvNameEnum.Dev
         const { createSwaggerSpec } = await import('./swagger.js')
         const spec = createSwaggerSpec()
         expect(spec).toBeDefined()
