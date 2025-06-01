@@ -14,6 +14,7 @@ permissions:
 jobs:
     test-server:
         runs-on: self-hosted
+        environment: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
         steps:
             - name: checkout
               uses: actions/checkout@v4
