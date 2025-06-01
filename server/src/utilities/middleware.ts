@@ -4,7 +4,7 @@ import { randomInt } from 'crypto'
 import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import session from 'express-session'
-import { ServerError, ServerUrlEnum } from 'wealthwatch-shared'
+import { ClientUrlEnum, ServerError } from 'wealthwatch-shared'
 import { getPool } from '../database/index.js'
 import { AppRequest } from '../models/appRequest.js'
 import { DatabaseError, HttpError, PlaidApiError } from '../models/error.js'
@@ -14,7 +14,7 @@ import { logger } from './logger.js'
 import { capitalizeFirstLetter, createCookieName } from './string.js'
 
 export const cors = _cors({
-    origin: prod ? (stage ? ServerUrlEnum.Stage : ServerUrlEnum.Prod) : true,
+    origin: prod ? (stage ? ClientUrlEnum.Stage : ClientUrlEnum.Prod) : true,
     credentials: true,
 })
 
