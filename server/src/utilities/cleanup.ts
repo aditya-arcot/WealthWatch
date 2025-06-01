@@ -8,9 +8,7 @@ import { stopRedis } from './redis.js'
 export const configureCleanup = (): void => {
     CLEANUP_EVENTS.forEach((event) => {
         process.on(event, (err?: Error) => {
-            runCleanupAndExit(event, err).catch((err) => {
-                logger.fatal(err, 'error during cleanup')
-            })
+            void runCleanupAndExit(event, err)
         })
     })
     logger.debug('configured cleanup')
@@ -35,3 +33,5 @@ const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
         process.exit(1)
     }
 }
+
+export const _test = { runCleanupAndExit }

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import {
     Component,
     Injector,
@@ -42,12 +41,7 @@ import { redirectWithParams } from '../../utilities/redirect.utility'
 
 @Component({
     selector: 'app-spending',
-    imports: [
-        LoadingSpinnerComponent,
-        BaseChartDirective,
-        DateFilterComponent,
-        CommonModule,
-    ],
+    imports: [LoadingSpinnerComponent, BaseChartDirective, DateFilterComponent],
     templateUrl: './spending.component.html',
     styleUrl: './spending.component.css',
 })

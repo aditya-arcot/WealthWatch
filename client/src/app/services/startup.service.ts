@@ -2,6 +2,7 @@ import { Injectable, Injector } from '@angular/core'
 import { Router } from '@angular/router'
 import { NGXLogger } from 'ngx-logger'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
+import { RouteEnum } from '../enums/route'
 import { AlertService } from './alert.service'
 import { CsrfService } from './csrf.service'
 import {
@@ -61,7 +62,7 @@ export class StartupService {
         this.logger.info('getting csrf token')
         return this.csrfSvc.getToken().pipe(
             catchError((err) => {
-                void this.router.navigateByUrl('/startup-error')
+                void this.router.navigateByUrl(RouteEnum.StartupError)
                 this.alertSvc.addErrorAlert(
                     this.logger,
                     'Failed to get CSRF token'
@@ -86,7 +87,7 @@ export class StartupService {
         this.logger.info('getting secrets')
         return this.secretsSvc.getSecrets().pipe(
             catchError((err) => {
-                void this.router.navigateByUrl('/startup-error')
+                void this.router.navigateByUrl(RouteEnum.StartupError)
                 this.alertSvc.addErrorAlert(
                     this.logger,
                     'Failed to get secrets'

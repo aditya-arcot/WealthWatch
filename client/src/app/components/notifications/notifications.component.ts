@@ -1,6 +1,7 @@
 import { Component, Injector } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of, switchMap } from 'rxjs'
+import { RouteEnum } from 'src/app/enums/route'
 import { Notification, NotificationTypeEnum } from 'wealthwatch-shared'
 import { NotificationService } from '../../services/notification.service'
 import { LoggerComponent } from '../logger.component'
@@ -31,7 +32,7 @@ export class NotificationsComponent extends LoggerComponent {
     }
 
     launchLinkUpdate = (n: Notification): void => {
-        void this.router.navigate(['/accounts'], {
+        void this.router.navigate([RouteEnum.Accounts], {
             queryParams: {
                 itemId: n.itemId,
                 withAccounts:

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
+import { RouteEnum } from 'src/app/enums/route'
 import { StartupService } from '../../services/startup.service'
 
 @Component({
@@ -14,7 +15,7 @@ export class StartupErrorComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.startupSvc.success) {
-            void this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl(RouteEnum.Home)
             return
         }
     }

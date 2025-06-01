@@ -9,7 +9,12 @@ export class HttpError extends Error {
     }
 }
 
-export class DatabaseError extends Error {}
+export class DatabaseError extends Error {
+    // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+    constructor(message: string) {
+        super(message)
+    }
+}
 
 export class PlaidApiError extends Error {
     code: string

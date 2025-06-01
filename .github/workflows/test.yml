@@ -1,0 +1,77 @@
+name: Run Tests
+
+on:
+    pull_request:
+        branches:
+            - test
+            - stage
+            - main
+
+permissions:
+    contents: read
+
+jobs:
+    test-server:
+        runs-on: self-hosted
+        environment: ${{ github.base_ref == 'main' && 'prod' || github.base_ref }}
+        steps:
+            - name: checkout
+              uses: actions/checkout@v4
+
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+                  cache: 'npm'
+                  cache-dependency-path: server/package-lock.json
+
+            - name: create .env
+              run: |
+                  cd server/
+
+                  echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
+                  echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
+
+                  echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+
+                  echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+                  echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+                  echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+                  echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+
+                  echo "CSRF_SECRET=${{ secrets.CSRF_SECRET }}" >> .env
+                  echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
+
+                  echo "PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }}" >> .env
+                  echo "PLAID_SECRET=${{ secrets.PLAID_SECRET }}" >> .env
+                  echo "PLAID_WEBHOOK_URL=${{ secrets.PLAID_WEBHOOK_URL }}" >> .env
+
+                  echo "DEMO_USER=${{ secrets.DEMO_USER }}" >> .env
+
+                  echo "DOCKER_REGISTRY=${{ secrets.DOCKER_REGISTRY }}" >> .env
+                  echo "KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}" >> .env
+
+                  echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
+
+                  echo "NODE_ENV=${{ vars.NODE_ENV }}" >> .env
+                  echo "PLAID_ENV=${{ vars.PLAID_ENV }}" >> .env
+
+                  echo "CLIENT_PORT=${{ vars.CLIENT_PORT }}" >> .env
+                  echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
+                  echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
+
+            - name: create .npmrc
+              run: |
+                  cd server/
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
+
+            - name: install
+              run: |
+                  cd server/
+                  npm ci
+
+            - name: run tests
+              run: |
+                  cd server/
+                  npm run test:deploy

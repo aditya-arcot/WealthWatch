@@ -1,6 +1,7 @@
 import { Component, Injector, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of } from 'rxjs'
+import { RouteEnum } from 'src/app/enums/route'
 import { CsrfService } from 'src/app/services/csrf.service'
 import { LoggerComponent } from '../../components/logger.component'
 import { AlertService } from '../../services/alert.service'
@@ -24,7 +25,7 @@ export class LogoutComponent extends LoggerComponent implements OnInit {
     ngOnInit(): void {
         if (this.userSvc.user || !this.userSvc.loggedOut) {
             this.logger.info('not logged out')
-            void this.router.navigateByUrl('/home')
+            void this.router.navigateByUrl(RouteEnum.Home)
             return
         }
         this.userSvc.loggedOut = false
@@ -44,7 +45,7 @@ export class LogoutComponent extends LoggerComponent implements OnInit {
                     this.logger.info('logged out')
                     this.csrfService.clearToken()
                     setTimeout(() => {
-                        void this.router.navigateByUrl('/login')
+                        void this.router.navigateByUrl(RouteEnum.Login)
                         this.alertSvc.addSuccessAlert(
                             this.logger,
                             'Success logging out'
@@ -53,7 +54,7 @@ export class LogoutComponent extends LoggerComponent implements OnInit {
                     return
                 }
                 this.logger.info('not logged out')
-                void this.router.navigateByUrl('/home')
+                void this.router.navigateByUrl(RouteEnum.Home)
             })
     }
 }
