@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express'
 import { Session } from 'express-session'
 import { Socket } from 'node:net'
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
-import { EnvNameEnum, ServerUrlEnum } from 'wealthwatch-shared'
+import { ClientUrlEnum, EnvNameEnum } from 'wealthwatch-shared'
 import { HttpError } from '../models/error.js'
 
 beforeEach(() => {
@@ -33,8 +33,8 @@ describe('cors', () => {
         expect(mockCorsFn).toHaveBeenCalledExactlyOnceWith({
             origin: prod
                 ? stage
-                    ? ServerUrlEnum.Stage
-                    : ServerUrlEnum.Prod
+                    ? ClientUrlEnum.Stage
+                    : ClientUrlEnum.Prod
                 : true,
             credentials: true,
         })
