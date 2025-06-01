@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import {
     Component,
     ElementRef,
@@ -23,7 +22,7 @@ import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-register',
-    imports: [ReactiveFormsModule, CommonModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './register.component.html',
     styleUrl: './register.component.css',
 })

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import {
     AfterViewInit,
     Component,
@@ -24,7 +23,7 @@ import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-login',
-    imports: [ReactiveFormsModule, CommonModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })
