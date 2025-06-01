@@ -3,11 +3,13 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "rm -rf dist/ && tsc --sourceMap false",
-        "dev": "tsc-watch --onSuccess 'npm run start'",
+        "build": "rm -rf dist/ && tsc -p tsconfig.build.json --sourceMap false",
+        "dev": "tsc-watch -p tsconfig.build.json --onSuccess 'npm run start'",
         "lint": "eslint --fix --max-warnings=0 src/",
         "start": "dotenvx run -f ../config/env/.env.dev -- node --inspect dist/main.js",
-        "start:deploy": "dotenvx run -- node dist/main.js"
+        "start:deploy": "dotenvx run -- node dist/main.js",
+        "test": "dotenvx run -f ../config/env/.env.dev -- vitest dev --coverage --ui",
+        "test:deploy": "dotenvx run -- vitest run --coverage"
     },
     "lint-staged": {
         "*": [
@@ -58,10 +60,13 @@
         "@types/qs": "^6.14.0",
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.8",
+        "@vitest/coverage-v8": "^3.1.4",
+        "@vitest/ui": "^3.1.4",
         "eslint": "^9.27.0",
         "globals": "^16.2.0",
         "tsc-watch": "^7.0.0",
         "typescript": "^5.8.3",
-        "typescript-eslint": "^8.32.1"
+        "typescript-eslint": "^8.32.1",
+        "vitest": "^3.1.4"
     }
 }

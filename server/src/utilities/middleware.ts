@@ -172,14 +172,22 @@ const getErrorStatus = (
 }
 
 const createErrorMessage = (err: Error): string => {
+    if (err instanceof HttpError)
+        return formatErrorMessage('Http Error', err.message)
     if (err instanceof DatabaseError)
         return formatErrorMessage('Database Error', err.message)
     if (err instanceof PlaidApiError)
         return formatErrorMessage('Plaid Error', err.message, err.detail)
-    return err.message
+    // err.message is not always defined
+    return err.message?.length
+        ? capitalizeFirstLetter(err.message)
+        : 'Unexpected Error'
 }
 
-const formatErrorMessage = (category: string, ...messages: string[]) => {
-    if (prod) return category
-    return `${category} - ${messages.map((m) => capitalizeFirstLetter(m)).join(' - ')}`
+const formatErrorMessage = (type: string, ...details: string[]): string => {
+    if (prod || !details[0]?.length) return capitalizeFirstLetter(type)
+    const detail = details.map((m) => capitalizeFirstLetter(m)).join(' - ')
+    return `${capitalizeFirstLetter(type)} - ${detail}`
 }
+
+export const _test = { getErrorStatus, createErrorMessage, formatErrorMessage }

@@ -8,7 +8,7 @@ export default tseslint.config(
     tseslint.configs.strict,
     tseslint.configs.stylistic,
     {
-        ignores: ['eslint.config.js', 'dist/**/*'],
+        ignores: ['eslint.config.js', 'vitest.config.js', 'dist/**/*'],
         languageOptions: {
             globals: globals.node,
             parserOptions: {

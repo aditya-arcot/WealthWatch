@@ -4,6 +4,7 @@
 node_modules/
 stage/
 sandbox/
+coverage/
 logs
 
 .env*

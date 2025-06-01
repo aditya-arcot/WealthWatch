@@ -17,7 +17,7 @@ import {
     handleUnmatchedRoute,
     logRequestResponse,
 } from './utilities/middleware.js'
-import { createSwaggerSpec, swaggerOptions } from './utilities/swagger.js'
+import { createSwaggerSpec, swaggerUiOptions } from './utilities/swagger.js'
 
 export const startExpressApps = () => {
     logger.debug('starting express apps')
@@ -63,7 +63,7 @@ const startMainApp = () => {
         app.use(
             '/swagger',
             swaggerUi.serve,
-            swaggerUi.setup(createSwaggerSpec(), swaggerOptions)
+            swaggerUi.setup(createSwaggerSpec(), swaggerUiOptions)
         )
     }
     app.use('/', router)
