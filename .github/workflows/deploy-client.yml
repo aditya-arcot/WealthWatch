@@ -40,11 +40,6 @@ jobs:
                     env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
-            - name: create .npmrc
-              run: |
-                  cd client/
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-
             - name: install, build - non-prod
               if: github.ref_name != 'main'
               run: |
