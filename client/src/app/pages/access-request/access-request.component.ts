@@ -2,9 +2,9 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    Injector,
     OnInit,
     ViewChild,
+    inject,
 } from '@angular/core'
 import {
     FormBuilder,
@@ -31,20 +31,19 @@ export class AccessRequestComponent
     extends LoggerComponent
     implements OnInit, AfterViewInit
 {
+    private formBuilder = inject(FormBuilder)
+    private userSvc = inject(UserService)
+    private router = inject(Router)
+    private authSvc = inject(AuthService)
+    private alertSvc = inject(AlertService)
+
     @ViewChild('accessRequestForm')
     accessRequestForm!: ElementRef<HTMLFormElement>
     accessRequestFormGroup: FormGroup
     loading = false
 
-    constructor(
-        private formBuilder: FormBuilder,
-        private userSvc: UserService,
-        private router: Router,
-        private authSvc: AuthService,
-        private alertSvc: AlertService,
-        injector: Injector
-    ) {
-        super(injector, 'AccessRequestComponent')
+    constructor() {
+        super('AccessRequestComponent')
         this.accessRequestFormGroup = this.formBuilder.group({
             firstName: ['', [Validators.required]],
             lastName: ['', [Validators.required]],

@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Transaction, TransactionsAndCounts } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 import { TransactionsRequestParams } from '../models/transaction'
@@ -8,9 +8,9 @@ import { TransactionsRequestParams } from '../models/transaction'
     providedIn: 'root',
 })
 export class TransactionService {
-    readonly baseUrl = `${env.serverUrl}/transactions`
+    private http = inject(HttpClient)
 
-    constructor(private http: HttpClient) {}
+    readonly baseUrl = `${env.serverUrl}/transactions`
 
     getTransactions(req: TransactionsRequestParams) {
         let params = new HttpParams()

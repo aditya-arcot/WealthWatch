@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { tap } from 'rxjs'
 import { User } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
@@ -9,12 +9,10 @@ import { UserService } from './user.service'
     providedIn: 'root',
 })
 export class AuthService {
-    readonly baseUrl = `${env.serverUrl}/auth`
+    private http = inject(HttpClient)
+    private userSvc = inject(UserService)
 
-    constructor(
-        private http: HttpClient,
-        private userSvc: UserService
-    ) {}
+    readonly baseUrl = `${env.serverUrl}/auth`
 
     requestAccess(firstName: string, lastName: string, email: string) {
         const url = `${this.baseUrl}/access-request`

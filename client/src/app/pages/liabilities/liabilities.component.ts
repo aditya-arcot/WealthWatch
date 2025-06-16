@@ -1,9 +1,9 @@
 import {
     Component,
-    Injector,
     OnInit,
     QueryList,
     ViewChildren,
+    inject,
 } from '@angular/core'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
@@ -38,6 +38,10 @@ import { capitalize } from '../../utilities/string.utility'
     styleUrl: './liabilities.component.css',
 })
 export class LiabilitiesComponent extends LoggerComponent implements OnInit {
+    private alertSvc = inject(AlertService)
+    private itemSvc = inject(ItemService)
+    private currencySvc = inject(CurrencyService)
+
     @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
 
     loading = false
@@ -78,13 +82,8 @@ export class LiabilitiesComponent extends LoggerComponent implements OnInit {
         },
     }
 
-    constructor(
-        private alertSvc: AlertService,
-        private itemSvc: ItemService,
-        private currencySvc: CurrencyService,
-        injector: Injector
-    ) {
-        super(injector, 'LiabilitiesComponent')
+    constructor() {
+        super('LiabilitiesComponent')
     }
 
     ngOnInit(): void {

@@ -2,9 +2,9 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    Injector,
     OnInit,
     ViewChild,
+    inject,
 } from '@angular/core'
 import {
     FormBuilder,
@@ -31,20 +31,19 @@ export class LoginComponent
     extends LoggerComponent
     implements OnInit, AfterViewInit
 {
+    private formBuilder = inject(FormBuilder)
+    private userSvc = inject(UserService)
+    private authSvc = inject(AuthService)
+    private router = inject(Router)
+    private alertSvc = inject(AlertService)
+    private secretsSvc = inject(SecretsService)
+
     @ViewChild('loginForm') loginForm!: ElementRef<HTMLFormElement>
     loginFormGroup: FormGroup
     loading = false
 
-    constructor(
-        private formBuilder: FormBuilder,
-        private userSvc: UserService,
-        private authSvc: AuthService,
-        private router: Router,
-        private alertSvc: AlertService,
-        private secretsSvc: SecretsService,
-        injector: Injector
-    ) {
-        super(injector, 'LoginComponent')
+    constructor() {
+        super('LoginComponent')
         this.loginFormGroup = this.formBuilder.group({
             username: ['', [Validators.required]],
             password: ['', [Validators.required, Validators.minLength(8)]],

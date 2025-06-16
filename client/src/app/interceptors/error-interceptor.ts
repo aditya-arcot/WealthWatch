@@ -1,16 +1,12 @@
 import { HttpInterceptorFn } from '@angular/common/http'
 import { inject } from '@angular/core'
 import { Router } from '@angular/router'
-import { NGXLogger } from 'ngx-logger'
 import { catchError, throwError } from 'rxjs'
 import { ServerError } from 'wealthwatch-shared'
 import { RouteEnum } from '../enums/route'
 import { AlertService } from '../services/alert.service'
 import { CsrfService } from '../services/csrf.service'
-import {
-    LogtailService,
-    createLoggerWithContext,
-} from '../services/logger.service'
+import { createLoggerWithContext } from '../services/logger.service'
 import { UserService } from '../services/user.service'
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -18,13 +14,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const csrfSvc = inject(CsrfService)
     const router = inject(Router)
     const alertSvc = inject(AlertService)
-    const ngxLogger = inject(NGXLogger)
-    const logtailSvc = inject(LogtailService)
-    const logger = createLoggerWithContext(
-        ngxLogger,
-        logtailSvc,
-        'ErrorInterceptor'
-    )
+    const logger = createLoggerWithContext('ErrorInterceptor')
 
     return next(req).pipe(
         catchError((err) => {

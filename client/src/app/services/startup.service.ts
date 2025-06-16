@@ -1,15 +1,10 @@
-import { Injectable, Injector } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { NGXLogger } from 'ngx-logger'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 import { RouteEnum } from '../enums/route'
 import { AlertService } from './alert.service'
 import { CsrfService } from './csrf.service'
-import {
-    createLoggerWithContext,
-    LoggerService,
-    LogtailService,
-} from './logger.service'
+import { createLoggerWithContext, LoggerService } from './logger.service'
 import { SecretsService } from './secrets.service'
 import { UserService } from './user.service'
 
@@ -17,24 +12,17 @@ import { UserService } from './user.service'
     providedIn: 'root',
 })
 export class StartupService {
+    private csrfSvc = inject(CsrfService)
+    private userSvc = inject(UserService)
+    private secretsSvc = inject(SecretsService)
+    private router = inject(Router)
+    private alertSvc = inject(AlertService)
+
     private readonly logger: LoggerService
     success = false
 
-    constructor(
-        private csrfSvc: CsrfService,
-        private userSvc: UserService,
-        private secretsSvc: SecretsService,
-        private router: Router,
-        private alertSvc: AlertService,
-        injector: Injector
-    ) {
-        const ngxLogger = injector.get(NGXLogger)
-        const logtail = injector.get(LogtailService)
-        this.logger = createLoggerWithContext(
-            ngxLogger,
-            logtail,
-            'StartupService'
-        )
+    constructor() {
+        this.logger = createLoggerWithContext('StartupService')
     }
 
     startup(): Observable<void> {

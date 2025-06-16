@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { env } from '../../environments/env'
 
 @Injectable({
     providedIn: 'root',
 })
 export class InvestmentService {
-    readonly baseUrl = `${env.serverUrl}/investments`
+    private http = inject(HttpClient)
 
-    constructor(private http: HttpClient) {}
+    readonly baseUrl = `${env.serverUrl}/investments`
 
     refreshInvestments() {
         const url = `${this.baseUrl}/refresh`

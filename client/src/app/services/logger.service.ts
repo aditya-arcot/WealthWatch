@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { Logtail } from '@logtail/browser'
 import { NGXLogger } from 'ngx-logger'
 
@@ -19,13 +19,11 @@ interface Log {
     context?: string
 }
 
-@Injectable()
 export class LoggerService {
-    constructor(
-        private logger: NGXLogger,
-        private logtailSvc: LogtailService,
-        @Inject(String) private context: string
-    ) {}
+    private logger = inject(NGXLogger)
+    private logtailSvc = inject(LogtailService)
+
+    constructor(private context: string) {}
 
     debug(message: string, data?: object): void {
         this.logger.debug(this.createLogWithData(message, data))
@@ -70,10 +68,6 @@ export class LoggerService {
     }
 }
 
-export function createLoggerWithContext(
-    logger: NGXLogger,
-    logtail: LogtailService,
-    context: string
-): LoggerService {
-    return new LoggerService(logger, logtail, context)
+export function createLoggerWithContext(context: string): LoggerService {
+    return new LoggerService(context)
 }

@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { CategorySummary, CategoryTotalByDate } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 
@@ -7,9 +7,9 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class SpendingService {
-    readonly baseUrl = `${env.serverUrl}/spending`
+    private http = inject(HttpClient)
 
-    constructor(private http: HttpClient) {}
+    readonly baseUrl = `${env.serverUrl}/spending`
 
     getCategorySummaries(startDate: Date | null, endDate: Date | null) {
         let params = new HttpParams()

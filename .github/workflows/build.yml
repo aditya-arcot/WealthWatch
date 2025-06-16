@@ -33,7 +33,7 @@ jobs:
             - name: create .npmrc
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/"  >> .npmrc
+                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
                   cp .npmrc client/
                   cp .npmrc server/
 

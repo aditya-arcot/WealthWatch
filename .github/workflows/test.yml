@@ -67,7 +67,7 @@ jobs:
               run: |
                   cd server/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/"  >> .npmrc
+                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: install
               run: |

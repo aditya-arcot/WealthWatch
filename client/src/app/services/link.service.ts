@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { NotificationTypeEnum, PlaidLinkEvent } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 
@@ -7,9 +7,9 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class LinkService {
-    readonly baseUrl = `${env.serverUrl}/link`
+    private http = inject(HttpClient)
 
-    constructor(private http: HttpClient) {}
+    readonly baseUrl = `${env.serverUrl}/link`
 
     createLinkToken(itemId?: number, withAccounts?: boolean) {
         const url = `${this.baseUrl}/link-token`

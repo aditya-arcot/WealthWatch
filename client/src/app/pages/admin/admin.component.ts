@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { catchError, finalize, throwError } from 'rxjs'
 import { AccessRequest, AccessRequestStatusEnum } from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
@@ -13,16 +13,15 @@ import { formatDate } from '../../utilities/date.utility'
     templateUrl: './admin.component.html',
 })
 export class AdminComponent extends LoggerComponent implements OnInit {
+    private adminSvc = inject(AdminService)
+    private alertSvc = inject(AlertService)
+
     accessRequestStatusEnum = AccessRequestStatusEnum
     loading = false
     accessReqs: AccessRequest[] = []
 
-    constructor(
-        private adminSvc: AdminService,
-        private alertSvc: AlertService,
-        injector: Injector
-    ) {
-        super(injector, 'AdminComponent')
+    constructor() {
+        super('AdminComponent')
     }
 
     ngOnInit(): void {
