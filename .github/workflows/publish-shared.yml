@@ -25,7 +25,7 @@ jobs:
               run: |
                   cd shared/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/"  >> .npmrc
+                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: check if version already published
               id: check-version
