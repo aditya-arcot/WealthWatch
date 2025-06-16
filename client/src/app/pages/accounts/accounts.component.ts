@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
     NgxPlaidLinkService,
@@ -36,21 +36,20 @@ import { safeParseInt } from '../../utilities/number.utility'
     templateUrl: './accounts.component.html',
 })
 export class AccountsComponent extends LoggerComponent implements OnInit {
+    private userSvc = inject(UserService)
+    private linkSvc = inject(LinkService)
+    private plaidLinkSvc = inject(NgxPlaidLinkService)
+    private alertSvc = inject(AlertService)
+    private itemSvc = inject(ItemService)
+    private currencySvc = inject(CurrencyService)
+    private route = inject(ActivatedRoute)
+    private router = inject(Router)
+
     itemsWithAccounts: ItemWithAccounts[] = []
     loading = false
 
-    constructor(
-        private userSvc: UserService,
-        private linkSvc: LinkService,
-        private plaidLinkSvc: NgxPlaidLinkService,
-        private alertSvc: AlertService,
-        private itemSvc: ItemService,
-        private currencySvc: CurrencyService,
-        private route: ActivatedRoute,
-        private router: Router,
-        injector: Injector
-    ) {
-        super(injector, 'AccountsComponent')
+    constructor() {
+        super('AccountsComponent')
     }
 
     ngOnInit(): void {

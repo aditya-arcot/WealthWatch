@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { tap } from 'rxjs'
 import { User } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
@@ -9,14 +9,12 @@ import { SecretsService } from './secrets.service'
     providedIn: 'root',
 })
 export class UserService {
+    private http = inject(HttpClient)
+    private secretsSvc = inject(SecretsService)
+
     readonly baseUrl = `${env.serverUrl}/users`
     user?: User
     loggedOut = false
-
-    constructor(
-        private http: HttpClient,
-        private secretsSvc: SecretsService
-    ) {}
 
     inDemo = () => this.user?.username === this.secretsSvc.secrets?.demoUser
 

@@ -1,6 +1,6 @@
 import {
     Component,
-    Injector,
+    inject,
     OnInit,
     QueryList,
     ViewChildren,
@@ -46,6 +46,13 @@ import { redirectWithParams } from '../../utilities/redirect.utility'
     styleUrl: './spending.component.css',
 })
 export class SpendingComponent extends LoggerComponent implements OnInit {
+    private categorySvc = inject(CategoryService)
+    private currencySvc = inject(CurrencyService)
+    private alertSvc = inject(AlertService)
+    private spendingSvc = inject(SpendingService)
+    private route = inject(ActivatedRoute)
+    private router = inject(Router)
+
     @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
 
     loading = false
@@ -167,16 +174,8 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         },
     }
 
-    constructor(
-        private categorySvc: CategoryService,
-        private currencySvc: CurrencyService,
-        private alertSvc: AlertService,
-        private spendingSvc: SpendingService,
-        private route: ActivatedRoute,
-        private router: Router,
-        injector: Injector
-    ) {
-        super(injector, 'SpendingComponent')
+    constructor() {
+        super('SpendingComponent')
     }
 
     ngOnInit(): void {

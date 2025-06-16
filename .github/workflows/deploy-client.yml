@@ -44,7 +44,7 @@ jobs:
               run: |
                   cd client/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/"  >> .npmrc
+                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: install, build - non-prod
               if: github.ref_name != 'main'

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { tap } from 'rxjs'
 import { Notification } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
@@ -8,10 +8,10 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class NotificationService {
+    private http = inject(HttpClient)
+
     notifications: Notification[] = []
     readonly baseUrl = `${env.serverUrl}/notifications`
-
-    constructor(private http: HttpClient) {}
 
     loadNotifications() {
         return this.http.get<Notification[]>(this.baseUrl).pipe(

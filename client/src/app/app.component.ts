@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
 import { Chart, Tooltip } from 'chart.js'
 import autocolors from 'chartjs-plugin-autocolors'
@@ -13,6 +13,8 @@ import { CustomBarElement } from './models/chart.js'
     styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
+    router = inject(Router)
+
     readonly noHeaderPaths = [
         '/startup-error',
         '/login',
@@ -20,8 +22,6 @@ export class AppComponent implements OnInit {
         '/access-request',
         '/register',
     ]
-
-    constructor(public router: Router) {}
 
     ngOnInit(): void {
         // vertically-centered tooltip for stacked bar graph

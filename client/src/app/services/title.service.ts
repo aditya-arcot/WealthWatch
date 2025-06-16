@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { RouterStateSnapshot, TitleStrategy } from '@angular/router'
 import { EnvNameEnum } from 'wealthwatch-shared'
@@ -6,9 +6,7 @@ import { env } from '../../environments/env'
 
 @Injectable({ providedIn: 'root' })
 export class TitleService extends TitleStrategy {
-    constructor(private readonly title: Title) {
-        super()
-    }
+    private readonly title = inject(Title)
 
     override updateTitle(routerState: RouterStateSnapshot) {
         const title = this.buildTitle(routerState)

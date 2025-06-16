@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of, switchMap } from 'rxjs'
 import { RouteEnum } from 'src/app/enums/route'
@@ -12,12 +12,11 @@ import { LoggerComponent } from '../logger.component'
     styleUrl: './notifications.component.css',
 })
 export class NotificationsComponent extends LoggerComponent {
-    constructor(
-        private router: Router,
-        private notificationSvc: NotificationService,
-        injector: Injector
-    ) {
-        super(injector, 'NotificationsComponent')
+    private router = inject(Router)
+    private notificationSvc = inject(NotificationService)
+
+    constructor() {
+        super('NotificationsComponent')
     }
 
     get notifications(): Notification[] {

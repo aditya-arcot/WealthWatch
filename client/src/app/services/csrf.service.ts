@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Observable, of, tap } from 'rxjs'
 import { env } from '../../environments/env'
 
@@ -7,10 +7,10 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class CsrfService {
+    private http = inject(HttpClient)
+
     readonly baseUrl = `${env.serverUrl}/csrf-token`
     private csrfToken: string | null = null
-
-    constructor(private http: HttpClient) {}
 
     getToken(): Observable<{ csrfToken: string }> {
         if (this.csrfToken) return of({ csrfToken: this.csrfToken })
