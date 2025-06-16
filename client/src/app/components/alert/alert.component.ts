@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, OnDestroy } from '@angular/core'
+import { Component, OnDestroy, inject } from '@angular/core'
 import { Subscription } from 'rxjs'
 import { AlertTypeEnum } from '../../enums/alert'
 import { Alert } from '../../models/alert'
@@ -12,10 +12,12 @@ import { AlertService } from '../../services/alert.service'
     styleUrl: './alert.component.css',
 })
 export class AlertComponent implements OnDestroy {
+    private alertSvc = inject(AlertService)
+
     alerts: Alert[] = []
     subscription: Subscription
 
-    constructor(private alertSvc: AlertService) {
+    constructor() {
         this.subscription = this.alertSvc
             .getAlerts()
             .subscribe((n) => (this.alerts = n))

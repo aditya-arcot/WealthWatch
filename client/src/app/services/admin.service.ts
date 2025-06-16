@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { AccessRequest, AccessRequestStatusEnum } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 
@@ -7,9 +7,9 @@ import { env } from '../../environments/env'
     providedIn: 'root',
 })
 export class AdminService {
-    readonly baseUrl = `${env.serverUrl}/admin`
+    private http = inject(HttpClient)
 
-    constructor(private http: HttpClient) {}
+    readonly baseUrl = `${env.serverUrl}/admin`
 
     getAccessRequests() {
         const url = `${this.baseUrl}/access-requests`

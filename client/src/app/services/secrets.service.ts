@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { tap } from 'rxjs'
 import { Secrets } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
@@ -9,13 +9,11 @@ import { LogtailService } from './logger.service'
     providedIn: 'root',
 })
 export class SecretsService {
+    private http = inject(HttpClient)
+    private logtailSvc = inject(LogtailService)
+
     readonly baseUrl = `${env.serverUrl}/secrets`
     secrets: Secrets | undefined
-
-    constructor(
-        private http: HttpClient,
-        private logtailSvc: LogtailService
-    ) {}
 
     getSecrets() {
         return this.http.get<Secrets>(this.baseUrl).pipe(

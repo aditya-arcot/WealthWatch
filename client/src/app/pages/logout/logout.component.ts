@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of } from 'rxjs'
 import { RouteEnum } from 'src/app/enums/route'
@@ -12,14 +12,13 @@ import { UserService } from '../../services/user.service'
     templateUrl: './logout.component.html',
 })
 export class LogoutComponent extends LoggerComponent implements OnInit {
-    constructor(
-        private router: Router,
-        private alertSvc: AlertService,
-        private userSvc: UserService,
-        private csrfService: CsrfService,
-        injector: Injector
-    ) {
-        super(injector, 'LogoutComponent')
+    private router = inject(Router)
+    private alertSvc = inject(AlertService)
+    private userSvc = inject(UserService)
+    private csrfService = inject(CsrfService)
+
+    constructor() {
+        super('LogoutComponent')
     }
 
     ngOnInit(): void {

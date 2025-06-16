@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { RouterLink } from '@angular/router'
 import { UserService } from '../../services/user.service'
 
@@ -8,7 +8,7 @@ import { UserService } from '../../services/user.service'
     templateUrl: './home.component.html',
 })
 export class HomeComponent {
-    constructor(private userSvc: UserService) {}
+    private userSvc = inject(UserService)
 
     get firstName() {
         return this.userSvc.user?.firstName

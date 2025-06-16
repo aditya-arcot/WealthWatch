@@ -1,10 +1,4 @@
-import {
-    Component,
-    ElementRef,
-    Injector,
-    OnInit,
-    ViewChild,
-} from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core'
 import {
     AbstractControl,
     FormBuilder,
@@ -27,6 +21,13 @@ import { UserService } from '../../services/user.service'
     styleUrl: './register.component.css',
 })
 export class RegisterComponent extends LoggerComponent implements OnInit {
+    private formBuilder = inject(FormBuilder)
+    private userSvc = inject(UserService)
+    private router = inject(Router)
+    private authSvc = inject(AuthService)
+    private alertSvc = inject(AlertService)
+    private secretsSvc = inject(SecretsService)
+
     @ViewChild('accessCodeForm') accessCodeForm!: ElementRef<HTMLFormElement>
     @ViewChild('registerForm') registerForm!: ElementRef<HTMLFormElement>
 
@@ -38,16 +39,8 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
     name = ''
     email = ''
 
-    constructor(
-        private formBuilder: FormBuilder,
-        private userSvc: UserService,
-        private router: Router,
-        private authSvc: AuthService,
-        private alertSvc: AlertService,
-        private secretsSvc: SecretsService,
-        injector: Injector
-    ) {
-        super(injector, 'RegisterComponent')
+    constructor() {
+        super('RegisterComponent')
         this.accessCodeFormGroup = this.formBuilder.group({
             accessCode: [],
         })

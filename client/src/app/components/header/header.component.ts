@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Injector, OnInit } from '@angular/core'
+import { AfterViewInit, Component, OnInit, inject } from '@angular/core'
 import {
     NavigationEnd,
     Router,
@@ -29,17 +29,16 @@ export class HeaderComponent
     extends LoggerComponent
     implements OnInit, AfterViewInit
 {
+    private userSvc = inject(UserService)
+    private alertSvc = inject(AlertService)
+    private authSvc = inject(AuthService)
+    private router = inject(Router)
+    private notificationSvc = inject(NotificationService)
+
     loading = false
 
-    constructor(
-        private userSvc: UserService,
-        private alertSvc: AlertService,
-        private authSvc: AuthService,
-        private router: Router,
-        private notificationSvc: NotificationService,
-        injector: Injector
-    ) {
-        super(injector, 'HeaderComponent')
+    constructor() {
+        super('HeaderComponent')
     }
 
     ngOnInit(): void {

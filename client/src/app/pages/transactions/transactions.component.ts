@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, Injector, OnInit, ViewChild } from '@angular/core'
+import { Component, inject, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Params, Router } from '@angular/router'
 import {
@@ -62,6 +62,14 @@ import { redirectWithParams } from '../../utilities/redirect.utility'
     styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent extends LoggerComponent implements OnInit {
+    private route = inject(ActivatedRoute)
+    private router = inject(Router)
+    private alertSvc = inject(AlertService)
+    private categorySvc = inject(CategoryService)
+    private currencySvc = inject(CurrencyService)
+    private itemSvc = inject(ItemService)
+    private transactionSvc = inject(TransactionService)
+
     @ViewChild(NoteComponent) noteComponent!: NoteComponent
     noteUpdateSubscription: Subscription | null = null
 
@@ -98,17 +106,8 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
 
     maxNameLength = 30
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        private alertSvc: AlertService,
-        private categorySvc: CategoryService,
-        private currencySvc: CurrencyService,
-        private itemSvc: ItemService,
-        private transactionSvc: TransactionService,
-        injector: Injector
-    ) {
-        super(injector, 'TransactionsComponent')
+    constructor() {
+        super('TransactionsComponent')
     }
 
     ngOnInit(): void {

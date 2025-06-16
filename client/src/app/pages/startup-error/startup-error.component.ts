@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { RouteEnum } from 'src/app/enums/route'
 import { StartupService } from '../../services/startup.service'
@@ -8,10 +8,8 @@ import { StartupService } from '../../services/startup.service'
     templateUrl: './startup-error.component.html',
 })
 export class StartupErrorComponent implements OnInit {
-    constructor(
-        private startupSvc: StartupService,
-        private router: Router
-    ) {}
+    private startupSvc = inject(StartupService)
+    private router = inject(Router)
 
     ngOnInit(): void {
         if (this.startupSvc.success) {

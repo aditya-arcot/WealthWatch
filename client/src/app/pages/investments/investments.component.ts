@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common'
 import {
     Component,
-    Injector,
     OnInit,
     QueryList,
     ViewChildren,
+    inject,
 } from '@angular/core'
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
@@ -30,6 +30,11 @@ import { formatDecimalToPercent } from '../../utilities/number.utility'
     styleUrl: './investments.component.css',
 })
 export class InvestmentsComponent extends LoggerComponent implements OnInit {
+    private alertSvc = inject(AlertService)
+    private itemSvc = inject(ItemService)
+    private investmentSvc = inject(InvestmentService)
+    private currencySvc = inject(CurrencyService)
+
     @ViewChildren(BaseChartDirective) charts!: QueryList<BaseChartDirective>
 
     loading = false
@@ -67,14 +72,8 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
         },
     }
 
-    constructor(
-        private alertSvc: AlertService,
-        private itemSvc: ItemService,
-        private investmentSvc: InvestmentService,
-        private currencySvc: CurrencyService,
-        injector: Injector
-    ) {
-        super(injector, 'InvestmentsComponent')
+    constructor() {
+        super('InvestmentsComponent')
     }
 
     ngOnInit(): void {

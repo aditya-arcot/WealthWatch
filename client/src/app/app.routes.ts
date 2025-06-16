@@ -6,14 +6,10 @@ import {
     RouterStateSnapshot,
     Routes,
 } from '@angular/router'
-import { NGXLogger } from 'ngx-logger'
 import { RouteEnum } from './enums/route'
 import { AlertService } from './services/alert.service'
 import { CsrfService } from './services/csrf.service'
-import {
-    LogtailService,
-    createLoggerWithContext,
-} from './services/logger.service'
+import { createLoggerWithContext } from './services/logger.service'
 import { UserService } from './services/user.service'
 
 const adminRoutes: string[] = ['/admin']
@@ -45,15 +41,8 @@ const activationGuard: CanActivateFn = (
 }
 
 const addErrorAlert = (message: string) => {
-    const ngxLogger = inject(NGXLogger)
-    const logtailSvc = inject(LogtailService)
     const alertSvc = inject(AlertService)
-
-    const logger = createLoggerWithContext(
-        ngxLogger,
-        logtailSvc,
-        'AuthGuardService'
-    )
+    const logger = createLoggerWithContext('AuthGuardService')
     alertSvc.addErrorAlert(logger, message)
 }
 
