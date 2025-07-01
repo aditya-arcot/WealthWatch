@@ -42,7 +42,8 @@ updates:
 
     - package-ecosystem: 'npm'
       directory: 'server'
-      registries: 'github-packages'
+      registries:
+          - github-packages
       schedule:
           interval: 'weekly'
       groups:
