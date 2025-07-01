@@ -32,7 +32,7 @@ jobs:
                   cd shared/
                   VERSION=$(jq -r .version package.json)
                   PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
-                  if PUBLISHED=$(npm view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2> /dev/null); then
+                  if PUBLISHED=$(npm view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2>&1); then
                     echo "Latest published version is $PUBLISHED"
                     if [ "$VERSION" = "$PUBLISHED" ]; then
                       echo "Package version $VERSION already published"
@@ -43,6 +43,7 @@ jobs:
                     fi
                   else
                     echo "Could not get published package version"
+                    echo "npm error: $PUBLISHED"
                     exit 1
                   fi
 
