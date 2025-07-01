@@ -63,11 +63,10 @@ jobs:
                   echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
                   echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
 
-            - name: create .npmrc
+            - name: add npm token
               run: |
                   cd server/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: install
               run: |

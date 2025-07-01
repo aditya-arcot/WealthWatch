@@ -30,12 +30,10 @@ jobs:
                       client/package-lock.json
                       server/package-lock.json
 
-            - name: create .npmrc
+            - name: add npm token
               run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-                  cp .npmrc client/
-                  cp .npmrc server/
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> client/.npmrc
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> server/.npmrc
 
             - name: install, build shared
               run: |

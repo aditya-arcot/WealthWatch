@@ -54,9 +54,8 @@ jobs:
             - name: create .npmrc
               if: matrix.language == 'typescript' && matrix.project != 'shared'
               run: |
+                  cd ${{ matrix.project }}
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-                  cp .npmrc ${{ matrix.project }}/
 
             - name: install, build
               if: matrix.language == 'typescript'

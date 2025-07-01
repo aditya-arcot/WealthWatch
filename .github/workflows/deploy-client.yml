@@ -40,11 +40,10 @@ jobs:
                     env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
-            - name: create .npmrc
+            - name: add npm token
               run: |
                   cd client/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: install, build - non-prod
               if: github.ref_name != 'main'
