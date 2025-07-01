@@ -8,7 +8,6 @@ registries:
 updates:
     - package-ecosystem: 'npm'
       directory: '/'
-      registries: '*'
       schedule:
           interval: 'weekly'
       groups:
@@ -20,7 +19,6 @@ updates:
 
     - package-ecosystem: 'npm'
       directory: 'shared'
-      registries: '*'
       schedule:
           interval: 'weekly'
       groups:
@@ -44,7 +42,7 @@ updates:
 
     - package-ecosystem: 'npm'
       directory: 'server'
-      registries: '*'
+      registries: 'github-packages'
       schedule:
           interval: 'weekly'
       groups:
