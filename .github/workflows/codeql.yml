@@ -1,4 +1,4 @@
-name: CodeQL
+name: Run CodeQL Analysis
 
 on:
     push:
@@ -53,19 +53,20 @@ jobs:
 
             - name: create .npmrc
               if: matrix.language == 'typescript' && matrix.project != 'shared'
+              working-directory: ${{ matrix.project }}
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
                   echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-                  cp .npmrc ${{ matrix.project }}/
 
             - name: install, build
               if: matrix.language == 'typescript'
+              working-directory: ${{ matrix.project }}
               run: |
-                  cd ${{ matrix.project }}
-                  npm ci
-                  npm run build
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
+                  npm --userconfig=/dev/null run build
 
-            - name: initialize CodeQL for actions
+            - name: initialize codeql for actions
               if: matrix.language == 'actions'
               uses: github/codeql-action/init@v3
               with:
@@ -75,7 +76,7 @@ jobs:
                       paths:
                       - '.github/workflows/*.yml'
 
-            - name: initialize CodeQL for typescript
+            - name: initialize codeql for typescript
               if: matrix.language == 'typescript'
               uses: github/codeql-action/init@v3
               with:
@@ -85,7 +86,7 @@ jobs:
                       paths:
                       - '${{ matrix.project }}/src/**/*.ts'
 
-            - name: perform CodeQL analysis
+            - name: run codeql
               uses: github/codeql-action/analyze@v3
               with:
                   category: '/language:${{matrix.language}}'

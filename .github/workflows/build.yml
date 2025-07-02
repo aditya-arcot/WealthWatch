@@ -1,4 +1,4 @@
-name: Build Shared, Client, and Server
+name: Build Shared, Client, and Server Projects
 
 on:
     pull_request_target:
@@ -38,27 +38,31 @@ jobs:
                   cp .npmrc server/
 
             - name: install, build shared
+              working-directory: shared
               run: |
-                  cd shared/
-                  npm ci
-                  npm run build
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
+                  npm --userconfig=/dev/null run build
 
             - name: install, build client - non-prod
               if: github.base_ref != 'main'
+              working-directory: client
               run: |
-                  cd client/
-                  npm ci
-                  npm run build:${{ github.base_ref }}
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
+                  npm --userconfig=/dev/null run build:${{ github.base_ref }}
 
             - name: install, build client - prod
               if: github.base_ref == 'main'
+              working-directory: client
               run: |
-                  cd client/
-                  npm ci
-                  npm run build
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
+                  npm --userconfig=/dev/null run build
 
             - name: install, build server
+              working-directory: server
               run: |
-                  cd server/
-                  npm ci
-                  npm run build
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
+                  npm --userconfig=/dev/null run build

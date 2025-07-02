@@ -29,9 +29,8 @@ jobs:
                   cache-dependency-path: server/package-lock.json
 
             - name: create .env
+              working-directory: server
               run: |
-                  cd server/
-
                   echo "CLIENT_LOGTAIL_TOKEN=${{ secrets.CLIENT_LOGTAIL_TOKEN }}" >> .env
                   echo "SERVER_LOGTAIL_TOKEN=${{ secrets.SERVER_LOGTAIL_TOKEN }}" >> .env
 
@@ -64,17 +63,19 @@ jobs:
                   echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
 
             - name: create .npmrc
+              working-directory: server
               run: |
-                  cd server/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
                   echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: install
+              working-directory: server
               run: |
-                  cd server/
-                  npm ci
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
 
             - name: run tests
+              working-directory: server
               run: |
-                  cd server/
-                  npm run test:deploy
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null run test:deploy

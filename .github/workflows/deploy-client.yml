@@ -34,42 +34,44 @@ jobs:
 
             - name: modify env.test.ts
               if: github.ref_name == 'test'
+              working-directory: client/src/environments
               run: |
-                  cd client/src/environments/
                   sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT}}/g" \
                     env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
             - name: create .npmrc
+              working-directory: client
               run: |
-                  cd client/
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
                   echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: install, build - non-prod
               if: github.ref_name != 'main'
+              working-directory: client
               run: |
-                  cd client/
-                  npm ci
-                  npm run build:${{ github.ref_name }}
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
+                  npm --userconfig=/dev/null run build:${{ github.ref_name }}
 
             - name: install, build - prod
               if: github.ref_name == 'main'
+              working-directory: client
               run: |
-                  cd client/
-                  npm ci
-                  npm run build
+                  npm --userconfig=/dev/null config ls
+                  npm --userconfig=/dev/null ci
+                  npm --userconfig=/dev/null run build
 
             - name: copy files
+              working-directory: client
               run: |
-                  cd client/
                   mkdir stage
                   cp -r nginx.conf dist stage/
                   find stage -type f
 
             - name: build, push docker image
+              working-directory: client/stage
               run: |
-                  cd client/stage/
                   IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.image }}
                   docker build -t $IMAGE -f ../Dockerfile .
                   docker push $IMAGE

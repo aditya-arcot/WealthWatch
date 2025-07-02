@@ -40,14 +40,13 @@ jobs:
                   CLIENT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_image }}
                   CLIENT_PORT: ${{ vars.CLIENT_PORT }}
                   CLIENT_CONTAINER: ${{ inputs.client_container }}
-              run: |
-                  cd config/infra/
-                  docker compose up -d
+              working-directory: config/infra
+              run: docker compose up -d
 
             - name: configure nginx - stage
               if: github.ref_name == 'stage'
+              working-directory: config/infra
               run: |
-                  cd config/infra/
                   sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT }}/g" \
                     -e "s/{WEBHOOK_PORT}/${{ vars.WEBHOOK_PORT }}/g" \
                     -e "s/{CLIENT_PORT}/${{ vars.CLIENT_PORT }}/g" \
@@ -57,8 +56,8 @@ jobs:
 
             - name: configure nginx - prod
               if: github.ref_name == 'main'
+              working-directory: config/infra
               run: |
-                  cd config/infra/
                   sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT }}/g" \
                     -e "s/{WEBHOOK_PORT}/${{ vars.WEBHOOK_PORT }}/g" \
                     -e "s/{CLIENT_PORT}/${{ vars.CLIENT_PORT }}/g" \
