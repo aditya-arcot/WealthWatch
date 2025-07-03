@@ -8,6 +8,7 @@ updates:
           root-dependencies:
               patterns:
                   - '*'
+      target-branch: 'stage'
       assignees:
           - 'aditya-arcot'
 
@@ -19,6 +20,7 @@ updates:
           shared-dependencies:
               patterns:
                   - '*'
+      target-branch: 'stage'
       assignees:
           - 'aditya-arcot'
 
@@ -30,6 +32,7 @@ updates:
           client-dependencies:
               patterns:
                   - '*'
+      target-branch: 'stage'
       assignees:
           - 'aditya-arcot'
 
@@ -41,6 +44,7 @@ updates:
           server-dependencies:
               patterns:
                   - '*'
+      target-branch: 'stage'
       assignees:
           - 'aditya-arcot'
 
@@ -52,6 +56,7 @@ updates:
           client-docker:
               patterns:
                   - '*'
+      target-branch: 'stage'
       assignees:
           - 'aditya-arcot'
 
@@ -63,6 +68,7 @@ updates:
           server-docker:
               patterns:
                   - '*'
+      target-branch: 'stage'
       assignees:
           - 'aditya-arcot'
 
@@ -74,5 +80,6 @@ updates:
           github-actions:
               patterns:
                   - '*'
+      target-branch: 'stage'
       assignees:
           - 'aditya-arcot'
