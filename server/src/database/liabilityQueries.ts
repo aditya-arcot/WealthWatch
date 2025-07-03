@@ -1,4 +1,4 @@
-import { CreditCard, Mortgage, StudentLoan } from 'wealthwatch-shared'
+import { CreditCard, Mortgage, StudentLoan } from '../wealthwatch-shared.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertCreditCards = async (

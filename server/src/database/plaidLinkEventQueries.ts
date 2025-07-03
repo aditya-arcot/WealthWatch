@@ -1,4 +1,4 @@
-import { PlaidLinkEvent } from 'wealthwatch-shared'
+import { PlaidLinkEvent } from '../wealthwatch-shared.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertPlaidLinkEvent = async (

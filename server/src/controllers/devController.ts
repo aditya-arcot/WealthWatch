@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
-import { Item } from 'wealthwatch-shared'
 import {
     fetchActiveItemByPlaidId,
     fetchActiveItemByUserIdAndInstitutionId,
@@ -22,6 +21,7 @@ import {
     queueSyncItemTransactions,
 } from '../queues/itemQueue.js'
 import { logger } from '../utilities/logger.js'
+import { Item } from '../wealthwatch-shared.js'
 import {
     refreshItemInvestments,
     refreshItemTransactions,

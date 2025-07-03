@@ -7,6 +7,7 @@ import {
     StudentRepaymentPlanTypeEnum as PlaidStudentLoanRepaymentTypeEnum,
     StudentLoanStatusTypeEnum as PlaidStudentLoanStatusTypeEnum,
 } from 'plaid'
+import { logger } from '../utilities/logger.js'
 import {
     CreditCard,
     Item,
@@ -14,8 +15,7 @@ import {
     StudentLoan,
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
-} from 'wealthwatch-shared'
-import { logger } from '../utilities/logger.js'
+} from '../wealthwatch-shared.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidLiabilitiesGet = async (item: Item) => {

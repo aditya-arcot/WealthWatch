@@ -1,5 +1,4 @@
 import { Queue, Worker } from 'bullmq'
-import { PlaidLinkEvent } from 'wealthwatch-shared'
 import { insertAppRequest } from '../database/appRequestQueries.js'
 import { insertPlaidApiRequest } from '../database/plaidApiRequestQueries.js'
 import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
@@ -8,6 +7,7 @@ import { PlaidApiRequest } from '../models/plaidApiRequest.js'
 import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
 import { getRedis } from '../utilities/redis.js'
+import { PlaidLinkEvent } from '../wealthwatch-shared.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum LogJobType {

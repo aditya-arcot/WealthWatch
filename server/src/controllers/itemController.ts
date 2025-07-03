@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { Account, Item, itemInCooldown } from 'wealthwatch-shared'
 import {
     fetchActiveAccountsByUserId,
     insertAccounts,
@@ -64,6 +63,7 @@ import {
     queueSyncItemTransactions,
 } from '../queues/itemQueue.js'
 import { logger } from '../utilities/logger.js'
+import { Account, Item, itemInCooldown } from '../wealthwatch-shared.js'
 
 export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
     logger.debug('getting items with accounts')

@@ -2,7 +2,7 @@ import {
     PaymentChannelEnum,
     Transaction,
     TransactionsAndCounts,
-} from 'wealthwatch-shared'
+} from '../wealthwatch-shared.js'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (

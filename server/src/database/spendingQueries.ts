@@ -1,4 +1,4 @@
-import { CategorySummary, CategoryTotalByDate } from 'wealthwatch-shared'
+import { CategorySummary, CategoryTotalByDate } from '../wealthwatch-shared.js'
 import { runQuery } from './index.js'
 
 export const fetchCategorySummariesByUserIdAndDateRange = async (

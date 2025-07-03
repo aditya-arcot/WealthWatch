@@ -3,7 +3,6 @@ import { importJWK, jwtVerify } from 'jose'
 import { sha256 } from 'js-sha256'
 import { jwtDecode } from 'jwt-decode'
 import { JWKPublicKey } from 'plaid'
-import { NotificationTypeEnum } from 'wealthwatch-shared'
 import {
     fetchActiveItemByPlaidId,
     modifyItemHealthyById,
@@ -26,6 +25,7 @@ import {
 } from '../queues/itemQueue.js'
 import { queueWebhook } from '../queues/webhookQueue.js'
 import { logger } from '../utilities/logger.js'
+import { NotificationTypeEnum } from '../wealthwatch-shared.js'
 import { removeDeactivateItem } from './itemController.js'
 import {
     insertInfoNotification,

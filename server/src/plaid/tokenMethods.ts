@@ -5,9 +5,9 @@ import {
     Products as PlaidProducts,
     SandboxPublicTokenCreateRequest,
 } from 'plaid'
-import { Item, User } from 'wealthwatch-shared'
 import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
+import { Item, User } from '../wealthwatch-shared.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidLinkTokenCreate = async (

@@ -2,8 +2,8 @@ import {
     SandboxItemFireWebhookRequest,
     SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum,
 } from 'plaid'
-import { Item } from 'wealthwatch-shared'
 import { logger } from '../utilities/logger.js'
+import { Item } from '../wealthwatch-shared.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidSandboxFireWebhook = async (

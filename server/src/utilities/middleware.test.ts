@@ -2,8 +2,8 @@ import type { NextFunction, Request, Response } from 'express'
 import { Session } from 'express-session'
 import { Socket } from 'node:net'
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
-import { ClientUrlEnum, EnvNameEnum } from 'wealthwatch-shared'
 import { HttpError } from '../models/error.js'
+import { ClientUrlEnum, EnvNameEnum } from '../wealthwatch-shared.js'
 
 beforeEach(() => {
     vi.resetModules()

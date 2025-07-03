@@ -18,6 +18,7 @@
         ]
     },
     "dependencies": {
+        "@aditya-arcot/wealthwatch-shared": "2.1.6",
         "@dotenvx/dotenvx": "^1.45.1",
         "@logtail/pino": "^0.5.5",
         "@tsconfig/node-lts": "^22.0.2",
@@ -44,8 +45,7 @@
         "plaid": "^36.0.0",
         "qs": "^6.14.0",
         "swagger-jsdoc": "^6.2.8",
-        "swagger-ui-express": "^5.0.1",
-        "wealthwatch-shared": "npm:@aditya-arcot/wealthwatch-shared@^2.1.5"
+        "swagger-ui-express": "^5.0.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.29.0",

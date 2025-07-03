@@ -1,4 +1,4 @@
-import { Item, NotificationTypeEnum } from 'wealthwatch-shared'
+import { Item, NotificationTypeEnum } from '../wealthwatch-shared.js'
 
 export const createNotification = (
     type: NotificationTypeEnum,

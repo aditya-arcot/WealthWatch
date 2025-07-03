@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EnvNameEnum } from 'wealthwatch-shared'
+import { EnvNameEnum } from '../wealthwatch-shared.js'
 import { capitalizeFirstLetter, toTitleCase } from './string.js'
 
 describe('capitalizeFirstLetter', () => {
