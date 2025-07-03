@@ -3,7 +3,7 @@ name: Run CodeQL Analysis
 on:
     push:
         branches:
-            - main
+            - stage
         paths:
             - '.github/workflows/*.yml'
             - 'client/src/**/*.ts'
@@ -11,7 +11,7 @@ on:
             - 'shared/src/**/*.ts'
     pull_request:
         branches:
-            - main
+            - stage
         paths:
             - '.github/workflows/*.yml'
             - 'client/src/**/*.ts'
