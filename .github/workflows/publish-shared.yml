@@ -24,13 +24,25 @@ permissions:
 
 jobs:
     publish:
-        if: ${{ endsWith(github.actor, '[bot]') == false }}
         runs-on: 'self-hosted'
         steps:
             - name: checkout
               uses: actions/checkout@v4
 
+            - name: check last commit author
+              id: check-author
+              run: |
+                  AUTHOR=$(git log -1 --pretty=format:'%an')
+                  echo "Last commit author is $AUTHOR"
+
+                  if [[ "$AUTHOR" == *"[bot]"* ]]; then
+                    echo "skip_publish=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "skip_publish=false" >> $GITHUB_OUTPUT
+                  fi
+
             - name: setup node
+              if: steps.check-author.outputs.skip_publish == 'false'
               uses: actions/setup-node@v4
               with:
                   node-version: 'lts/*'
@@ -39,12 +51,14 @@ jobs:
                   cache-dependency-path: shared/package-lock.json
 
             - name: create .npmrc
+              if: steps.check-author.outputs.skip_publish == 'false'
               working-directory: shared
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
                   echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: check if version already published
+              if: steps.check-author.outputs.skip_publish == 'false'
               id: check-version
               working-directory: shared
               run: |
@@ -74,7 +88,7 @@ jobs:
                   fi
 
             - name: install, build
-              if: steps.check-version.outputs.skip_publish == 'false'
+              if: steps.check-author.outputs.skip_publish == 'false' && steps.check-version.outputs.skip_publish == 'false'
               working-directory: shared
               run: |
                   npm --userconfig=/dev/null config ls
@@ -82,7 +96,7 @@ jobs:
                   npm --userconfig=/dev/null run build
 
             - name: publish
-              if: steps.check-version.outputs.skip_publish == 'false'
+              if: steps.check-author.outputs.skip_publish == 'false' && steps.check-version.outputs.skip_publish == 'false'
               working-directory: shared
               run: |
                   npm --userconfig=/dev/null config ls
