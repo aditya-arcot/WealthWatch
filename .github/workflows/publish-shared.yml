@@ -3,6 +3,11 @@ name: Publish Shared Package
 on:
     workflow_dispatch:
     push:
+        branches:
+            - dev
+            - test
+            - stage
+            - main
         paths:
             - '.github/workflows/publish-shared.yml'
             - 'shared/package.json'
