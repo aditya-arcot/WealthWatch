@@ -10,7 +10,6 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
-import { RouteEnum } from 'src/app/enums/route'
 import {
     Account,
     Item,
@@ -21,6 +20,7 @@ import {
 } from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
+import { RouteEnum } from '../../enums/route'
 import { AlertService } from '../../services/alert.service'
 import { CurrencyService } from '../../services/currency.service'
 import { ItemService } from '../../services/item.service'

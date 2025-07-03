@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of, switchMap } from 'rxjs'
-import { RouteEnum } from 'src/app/enums/route'
 import { Notification, NotificationTypeEnum } from 'wealthwatch-shared'
+import { RouteEnum } from '../../enums/route'
 import { NotificationService } from '../../services/notification.service'
 import { LoggerComponent } from '../logger.component'
 

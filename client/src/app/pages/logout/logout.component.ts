@@ -1,10 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { catchError, of } from 'rxjs'
-import { RouteEnum } from 'src/app/enums/route'
-import { CsrfService } from 'src/app/services/csrf.service'
 import { LoggerComponent } from '../../components/logger.component'
+import { RouteEnum } from '../../enums/route'
 import { AlertService } from '../../services/alert.service'
+import { CsrfService } from '../../services/csrf.service'
 import { UserService } from '../../services/user.service'
 
 @Component({

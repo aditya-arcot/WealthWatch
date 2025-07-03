@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core'
 import { Router } from '@angular/router'
-import { RouteEnum } from 'src/app/enums/route'
+import { RouteEnum } from '../../enums/route'
 import { StartupService } from '../../services/startup.service'
 
 @Component({

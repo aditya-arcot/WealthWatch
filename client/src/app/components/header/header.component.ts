@@ -6,7 +6,7 @@ import {
     RouterLinkActive,
 } from '@angular/router'
 import { catchError, filter, of, switchMap, throwError } from 'rxjs'
-import { RouteEnum } from 'src/app/enums/route'
+import { RouteEnum } from '../../enums/route'
 import { AlertService } from '../../services/alert.service'
 import { AuthService } from '../../services/auth.service'
 import { NotificationService } from '../../services/notification.service'
