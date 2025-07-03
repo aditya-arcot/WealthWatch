@@ -1,4 +1,4 @@
-import { Notification, NotificationTypeEnum } from '../wealthwatch-shared.js'
+import { Notification, NotificationTypeEnum } from '@wealthwatch-shared'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertNotification = async (n: Notification): Promise<void> => {

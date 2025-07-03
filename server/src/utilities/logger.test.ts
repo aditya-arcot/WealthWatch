@@ -1,5 +1,5 @@
+import { EnvNameEnum } from '@wealthwatch-shared'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { EnvNameEnum } from '../wealthwatch-shared.js'
 
 const mkdirSync = vi.fn()
 const existsSync = vi.fn(() => true)

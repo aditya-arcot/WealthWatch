@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
+import { Notification } from '@wealthwatch-shared'
 import { tap } from 'rxjs'
-import { Notification } from 'wealthwatch-shared'
 import { env } from '../../environments/env'
 
 @Injectable({

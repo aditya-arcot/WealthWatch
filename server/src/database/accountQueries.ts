@@ -6,7 +6,7 @@ import {
     StudentLoanAccount,
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
-} from '../wealthwatch-shared.js'
+} from '@wealthwatch-shared'
 import {
     DbHoldingWithSecurity,
     mapDbHoldingWithSecurity,

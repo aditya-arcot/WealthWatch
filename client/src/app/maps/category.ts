@@ -1,4 +1,4 @@
-import { CategoryEnum } from 'wealthwatch-shared'
+import { CategoryEnum } from '@wealthwatch-shared'
 
 export const categoryIconMap: Record<CategoryEnum, string> = {
     [CategoryEnum.Uncategorized]: 'bi-question-circle',

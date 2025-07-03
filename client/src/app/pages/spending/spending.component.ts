@@ -6,16 +6,16 @@ import {
     ViewChildren,
 } from '@angular/core'
 import { ActivatedRoute, Params, Router } from '@angular/router'
-import { ChartOptions } from 'chart.js'
-import { BaseChartDirective } from 'ng2-charts'
-import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import {
     Category,
     CategoryEnum,
     CategoryGroupEnum,
     CategorySummary,
     CategoryTotalByDate,
-} from 'wealthwatch-shared'
+} from '@wealthwatch-shared'
+import { ChartOptions } from 'chart.js'
+import { BaseChartDirective } from 'ng2-charts'
+import { catchError, finalize, switchMap, throwError } from 'rxjs'
 import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'

@@ -1,3 +1,4 @@
+import { Item } from '@wealthwatch-shared'
 import { Queue, Worker } from 'bullmq'
 import {
     syncItemAccounts,
@@ -9,7 +10,6 @@ import {
 import { vars } from '../utilities/env.js'
 import { logger } from '../utilities/logger.js'
 import { getRedis } from '../utilities/redis.js'
-import { Item } from '../wealthwatch-shared.js'
 import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum ItemJobType {

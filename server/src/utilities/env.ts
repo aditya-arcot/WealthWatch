@@ -1,5 +1,5 @@
+import { EnvNameEnum } from '@wealthwatch-shared'
 import { env } from 'process'
-import { EnvNameEnum } from '../wealthwatch-shared.js'
 
 const getEnvVar = (key: string): string => {
     const val = env[key]

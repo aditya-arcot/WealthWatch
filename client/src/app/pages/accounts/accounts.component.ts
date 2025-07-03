@@ -1,6 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
+    Account,
+    Item,
+    itemInCooldown,
+    itemRefreshCooldown,
+    ItemWithAccounts,
+    PlaidLinkEvent,
+} from '@wealthwatch-shared'
+import {
     NgxPlaidLinkService,
     PlaidConfig,
     PlaidErrorMetadata,
@@ -10,14 +18,6 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
-import {
-    Account,
-    Item,
-    itemInCooldown,
-    itemRefreshCooldown,
-    ItemWithAccounts,
-    PlaidLinkEvent,
-} from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { RouteEnum } from '../../enums/route'

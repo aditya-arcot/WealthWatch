@@ -9,7 +9,7 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { Account, ItemWithAccounts } from 'wealthwatch-shared'
+import { Account, ItemWithAccounts } from '@wealthwatch-shared'
 import { handleCheckboxSelect } from '../../../utilities/checkbox.utility'
 
 @Component({

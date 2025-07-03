@@ -1,9 +1,5 @@
+import { Item, Notification, NotificationTypeEnum } from '@wealthwatch-shared'
 import { describe, expect, it } from 'vitest'
-import {
-    Item,
-    Notification,
-    NotificationTypeEnum,
-} from '../wealthwatch-shared.js'
 import { createNotification } from './notification.js'
 
 describe('createNotification', () => {

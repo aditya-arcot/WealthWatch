@@ -1,3 +1,4 @@
+import { Item, NotificationTypeEnum, PlaidLinkEvent } from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import {
@@ -14,11 +15,6 @@ import {
 } from '../plaid/tokenMethods.js'
 import { queueLogPlaidLinkEvent } from '../queues/logQueue.js'
 import { logger } from '../utilities/logger.js'
-import {
-    Item,
-    NotificationTypeEnum,
-    PlaidLinkEvent,
-} from '../wealthwatch-shared.js'
 import { syncItemData } from './itemController.js'
 
 export const createLinkToken = async (req: Request, res: Response) => {

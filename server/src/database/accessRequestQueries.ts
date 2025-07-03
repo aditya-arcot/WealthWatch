@@ -1,7 +1,4 @@
-import {
-    AccessRequest,
-    AccessRequestStatusEnum,
-} from '../wealthwatch-shared.js'
+import { AccessRequest, AccessRequestStatusEnum } from '@wealthwatch-shared'
 import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccessRequest = async (

@@ -10,7 +10,7 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { Category, CategoryEnum } from 'wealthwatch-shared'
+import { Category, CategoryEnum } from '@wealthwatch-shared'
 import { categoryIconMap } from '../../../maps/category'
 
 @Component({

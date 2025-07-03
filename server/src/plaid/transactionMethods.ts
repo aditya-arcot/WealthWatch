@@ -1,4 +1,10 @@
 import {
+    CategoryEnum,
+    Item,
+    PaymentChannelEnum,
+    Transaction,
+} from '@wealthwatch-shared'
+import {
     Location,
     RemovedTransaction as PlaidRemovedTransaction,
     Transaction as PlaidTransaction,
@@ -17,12 +23,6 @@ import {
 import { detailedCategoryMap, primaryCategoryMap } from '../maps/category.js'
 import { PlaidApiError } from '../models/error.js'
 import { logger } from '../utilities/logger.js'
-import {
-    CategoryEnum,
-    Item,
-    PaymentChannelEnum,
-    Transaction,
-} from '../wealthwatch-shared.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidTransactionsRefresh = async (item: Item) => {

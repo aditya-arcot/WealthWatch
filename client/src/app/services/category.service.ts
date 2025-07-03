@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
-import { Category } from 'wealthwatch-shared'
+import { Category } from '@wealthwatch-shared'
 import { env } from '../../environments/env'
 
 @Injectable({

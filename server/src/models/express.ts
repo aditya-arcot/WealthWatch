@@ -1,4 +1,4 @@
-import { User } from '../wealthwatch-shared.js'
+import { User } from '@wealthwatch-shared'
 
 declare module 'express-session' {
     interface SessionData {

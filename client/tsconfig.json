@@ -18,7 +18,10 @@
         "module": "ES2022",
         "useDefineForClassFields": false,
         "lib": ["ES2022", "dom"],
-        "baseUrl": "src"
+        "baseUrl": "src",
+        "paths": {
+            "@wealthwatch-shared": ["wealthwatch-shared.ts"]
+        }
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,

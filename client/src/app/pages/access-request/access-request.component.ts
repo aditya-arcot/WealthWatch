@@ -13,8 +13,8 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
+import { AccessRequestErrorCodeEnum, ServerError } from '@wealthwatch-shared'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
-import { AccessRequestErrorCodeEnum, ServerError } from 'wealthwatch-shared'
 import { LoggerComponent } from '../../components/logger.component'
 import { RouteEnum } from '../../enums/route'
 import { AlertService } from '../../services/alert.service'

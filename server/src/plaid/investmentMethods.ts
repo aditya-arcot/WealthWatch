@@ -1,3 +1,4 @@
+import { Holding, Item, Security, SecurityTypeEnum } from '@wealthwatch-shared'
 import {
     InvestmentsRefreshRequest,
     Holding as PlaidHolding,
@@ -8,12 +9,6 @@ import { PlaidSecurityTypeEnum } from '../enums/security.js'
 import { securityTypeMap } from '../maps/security.js'
 import { PlaidApiError } from '../models/error.js'
 import { logger } from '../utilities/logger.js'
-import {
-    Holding,
-    Item,
-    Security,
-    SecurityTypeEnum,
-} from '../wealthwatch-shared.js'
 import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidInvestmentsRefresh = async (item: Item) => {

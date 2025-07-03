@@ -5,7 +5,11 @@
     ],
     "compilerOptions": {
         "outDir": "dist",
-        "sourceMap": true
+        "sourceMap": true,
+        "baseUrl": ".",
+        "paths": {
+            "@wealthwatch-shared": ["src/wealthwatch-shared.ts"]
+        }
     },
     "include": ["src"]
 }

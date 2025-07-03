@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core'
+import { AccessRequest, AccessRequestStatusEnum } from '@wealthwatch-shared'
 import { catchError, finalize, throwError } from 'rxjs'
-import { AccessRequest, AccessRequestStatusEnum } from 'wealthwatch-shared'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { AdminService } from '../../services/admin.service'

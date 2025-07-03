@@ -48,6 +48,18 @@ export default tseslint.config(
                 },
             ],
             'no-console': 'warn',
+            'no-restricted-imports': [
+                'warn',
+                {
+                    patterns: [
+                        {
+                            regex: '(?<!@)wealthwatch-shared',
+                            message:
+                                'Use the "@wealthwatch-shared" alias instead',
+                        },
+                    ],
+                },
+            ],
         },
     }
 )

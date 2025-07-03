@@ -1,4 +1,3 @@
-import { DatabaseError } from '../models/error.js'
 import {
     Item,
     ItemWithAccounts,
@@ -6,7 +5,8 @@ import {
     ItemWithCreditCardAccounts,
     ItemWithMortgageAccounts,
     ItemWithStudentLoanAccounts,
-} from '../wealthwatch-shared.js'
+} from '@wealthwatch-shared'
+import { DatabaseError } from '../models/error.js'
 import {
     DbAccount,
     DbAccountWithHoldings,

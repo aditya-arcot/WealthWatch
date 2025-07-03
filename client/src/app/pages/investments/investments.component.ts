@@ -6,14 +6,14 @@ import {
     ViewChildren,
     inject,
 } from '@angular/core'
-import { ChartOptions } from 'chart.js'
-import { BaseChartDirective } from 'ng2-charts'
-import { catchError, finalize, throwError } from 'rxjs'
 import {
     AccountWithHoldings,
     HoldingWithSecurity,
     ItemWithAccountsWithHoldings,
-} from 'wealthwatch-shared'
+} from '@wealthwatch-shared'
+import { ChartOptions } from 'chart.js'
+import { BaseChartDirective } from 'ng2-charts'
+import { catchError, finalize, throwError } from 'rxjs'
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '../../components/logger.component'
 import { securityTypeNameMap } from '../../maps/security'
