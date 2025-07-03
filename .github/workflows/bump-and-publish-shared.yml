@@ -3,7 +3,7 @@ name: Bump and Publish Shared Package after Dependabot Merge
 on:
     pull_request:
         branches:
-            - main
+            - stage
         types:
             - closed
         paths:
