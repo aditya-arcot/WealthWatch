@@ -6,8 +6,8 @@
         "build": "rm -rf dist/ && tsc -p tsconfig.build.json --sourceMap false",
         "dev": "tsc-watch -p tsconfig.build.json --onSuccess 'npm run start'",
         "lint": "eslint --fix --max-warnings=0 src/",
-        "start": "dotenvx run -f ../config/env/.env.dev -- node --inspect dist/main.js",
-        "start:deploy": "dotenvx run -- node dist/main.js",
+        "start": "dotenvx run -f ../config/env/.env.dev -- tsx --inspect dist/main.js",
+        "start:deploy": "dotenvx run -- tsx dist/main.js",
         "test": "dotenvx run -f ../config/env/.env.dev -- vitest dev --coverage --ui",
         "test:deploy": "dotenvx run -- vitest run --coverage"
     },
@@ -45,7 +45,8 @@
         "plaid": "^36.0.0",
         "qs": "^6.14.0",
         "swagger-jsdoc": "^6.2.8",
-        "swagger-ui-express": "^5.0.1"
+        "swagger-ui-express": "^5.0.1",
+        "tsx": "^4.20.3"
     },
     "devDependencies": {
         "@eslint/js": "^9.29.0",
