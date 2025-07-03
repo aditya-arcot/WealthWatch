@@ -14,6 +14,9 @@ permissions:
     contents: write
     packages: write
 
+env:
+    NPM_CONFIG_USERCONFIG: /dev/null
+
 jobs:
     bump-and-publish:
         if: >
@@ -41,8 +44,8 @@ jobs:
             - name: bump version
               working-directory: shared
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null version patch
+                  npm config ls
+                  npm version patch
 
             - name: commit, push changes
               working-directory: shared
@@ -60,13 +63,13 @@ jobs:
             - name: install, build
               working-directory: shared
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build
+                  npm config ls
+                  npm ci
+                  npm run build
 
             - name: publish
               working-directory: shared
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null whoami --registry=https://npm.pkg.github.com/
-                  npm --userconfig=/dev/null publish --access public
+                  npm config ls
+                  npm whoami --registry=https://npm.pkg.github.com/
+                  npm publish --access public

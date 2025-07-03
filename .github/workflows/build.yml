@@ -10,6 +10,9 @@ on:
 permissions:
     contents: read
 
+env:
+    NPM_CONFIG_USERCONFIG: /dev/null
+
 jobs:
     build:
         runs-on: self-hosted
@@ -40,29 +43,29 @@ jobs:
             - name: install, build shared
               working-directory: shared
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build
+                  npm config ls
+                  npm ci
+                  npm run build
 
             - name: install, build client - non-prod
               if: github.base_ref != 'main'
               working-directory: client
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build:${{ github.base_ref }}
+                  npm config ls
+                  npm ci
+                  npm run build:${{ github.base_ref }}
 
             - name: install, build client - prod
               if: github.base_ref == 'main'
               working-directory: client
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build
+                  npm config ls
+                  npm ci
+                  npm run build
 
             - name: install, build server
               working-directory: server
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build
+                  npm config ls
+                  npm ci
+                  npm run build

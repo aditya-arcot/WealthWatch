@@ -13,6 +13,9 @@ on:
 permissions:
     contents: read
 
+env:
+    NPM_CONFIG_USERCONFIG: /dev/null
+
 jobs:
     deploy:
         runs-on: ${{ inputs.runner }}
@@ -50,17 +53,17 @@ jobs:
               if: github.ref_name != 'main'
               working-directory: client
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build:${{ github.ref_name }}
+                  npm config ls
+                  npm ci
+                  npm run build:${{ github.ref_name }}
 
             - name: install, build - prod
               if: github.ref_name == 'main'
               working-directory: client
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build
+                  npm config ls
+                  npm ci
+                  npm run build
 
             - name: copy files
               working-directory: client

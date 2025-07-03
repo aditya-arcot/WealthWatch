@@ -23,6 +23,9 @@ on:
 permissions:
     security-events: write
 
+env:
+    NPM_CONFIG_USERCONFIG: /dev/null
+
 jobs:
     analyze:
         name: analyze ${{ matrix.language }}${{ matrix.project && format(' ({0})', matrix.project) || '' }}
@@ -64,9 +67,9 @@ jobs:
               if: matrix.language == 'typescript'
               working-directory: ${{ matrix.project }}
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build
+                  npm config ls
+                  npm ci
+                  npm run build
 
             - name: initialize codeql for actions
               if: matrix.language == 'actions'
