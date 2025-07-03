@@ -22,6 +22,9 @@ permissions:
     contents: read
     packages: write
 
+env:
+    NPM_CONFIG_USERCONFIG: /dev/null
+
 jobs:
     publish:
         runs-on: 'self-hosted'
@@ -62,12 +65,12 @@ jobs:
               id: check-version
               working-directory: shared
               run: |
-                  npm --userconfig=/dev/null config ls
+                  npm config ls
 
                   VERSION=$(jq -r .version package.json)
                   PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
 
-                  if PUBLISHED=$(npm --userconfig=/dev/null view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2>&1); then
+                  if PUBLISHED=$(npm view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2>&1); then
                     echo "Latest published version is $PUBLISHED"
                     if [ "$VERSION" = "$PUBLISHED" ]; then
                       echo "Package version $VERSION already published"
@@ -91,14 +94,14 @@ jobs:
               if: steps.check-author.outputs.skip_publish == 'false' && steps.check-version.outputs.skip_publish == 'false'
               working-directory: shared
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null ci
-                  npm --userconfig=/dev/null run build
+                  npm config ls
+                  npm ci
+                  npm run build
 
             - name: publish
               if: steps.check-author.outputs.skip_publish == 'false' && steps.check-version.outputs.skip_publish == 'false'
               working-directory: shared
               run: |
-                  npm --userconfig=/dev/null config ls
-                  npm --userconfig=/dev/null whoami --registry=https://npm.pkg.github.com/
-                  npm --userconfig=/dev/null publish --access public
+                  npm config ls
+                  npm whoami --registry=https://npm.pkg.github.com/
+                  npm publish --access public
