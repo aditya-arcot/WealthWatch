@@ -1,4 +1,11 @@
 version: 2
+
+registries:
+    github-packages:
+        type: npm-registry
+        url: https://npm.pkg.github.com
+        token: ${{ secrets.DEPENDABOT_GH_NPM_TOKEN }}
+
 updates:
     - package-ecosystem: 'npm'
       directory: '/'
@@ -26,6 +33,8 @@ updates:
 
     - package-ecosystem: 'npm'
       directory: 'client'
+      registries:
+          - github-packages
       schedule:
           interval: 'weekly'
       groups:
@@ -38,6 +47,8 @@ updates:
 
     - package-ecosystem: 'npm'
       directory: 'server'
+      registries:
+          - github-packages
       schedule:
           interval: 'weekly'
       groups:
