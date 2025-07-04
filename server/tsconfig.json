@@ -6,6 +6,7 @@
     "compilerOptions": {
         "outDir": "dist",
         "sourceMap": true,
+        "listEmittedFiles": true,
         "baseUrl": ".",
         "paths": {
             "@wealthwatch-shared": ["src/wealthwatch-shared.ts"]
