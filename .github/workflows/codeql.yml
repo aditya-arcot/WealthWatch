@@ -6,17 +6,38 @@ on:
             - stage
         paths:
             - '.github/workflows/*.yml'
-            - 'client/src/**/*.ts'
-            - 'server/src/**/*.ts'
-            - 'shared/src/**/*.ts'
+            - 'client/src/**'
+            - 'client/angular.json'
+            - 'client/package-lock.json'
+            - 'client/package.json'
+            - 'client/tsconfig.json'
+            - 'server/src/**'
+            - 'server/package-lock.json'
+            - 'server/package.json'
+            - 'server/tsconfig.json'
+            - 'shared/src/**'
+            - 'shared/package-lock.json'
+            - 'shared/package.json'
+            - 'shared/tsconfig.json'
     pull_request:
         branches:
             - stage
         paths:
             - '.github/workflows/*.yml'
-            - 'client/src/**/*.ts'
-            - 'server/src/**/*.ts'
-            - 'shared/src/**/*.ts'
+            - 'client/src/**'
+            - 'client/angular.json'
+            - 'client/package-lock.json'
+            - 'client/package.json'
+            - 'client/tsconfig.json'
+            - 'server/src/**'
+            - 'server/package-lock.json'
+            - 'server/package.json'
+            - 'server/tsconfig.json'
+            - 'shared/src/**'
+            - 'shared/package-lock.json'
+            - 'shared/package.json'
+            - 'shared/tsconfig.json'
+
     schedule:
         - cron: '30 21 * * 2'
 

@@ -10,9 +10,10 @@ on:
             - main
         paths:
             - '.github/workflows/publish-shared.yml'
+            - 'shared/src/**'
+            - 'shared/package-lock.json'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
-            - 'shared/src/**'
 
 concurrency:
     group: publish-${{ github.ref_name }}
