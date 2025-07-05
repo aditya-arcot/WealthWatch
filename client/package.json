@@ -2,10 +2,10 @@
     "name": "wealthwatch-client",
     "private": true,
     "scripts": {
-        "build": "ng build",
-        "build:dev": "ng build --watch --configuration dev",
-        "build:stage": "ng build --configuration stage",
-        "build:test": "ng build --configuration test",
+        "build": "ng build --verbose",
+        "build:dev": "ng build --verbose --watch --configuration dev",
+        "build:stage": "ng build --verbose --configuration stage",
+        "build:test": "ng build --verbose --configuration test",
         "lint": "ng lint --fix --max-warnings=0",
         "start": "ng serve"
     },
