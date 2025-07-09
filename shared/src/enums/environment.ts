@@ -6,11 +6,11 @@ export enum EnvNameEnum {
 }
 
 export enum ClientUrlEnum {
-    Stage = 'https://wealthwatch-stage.aditya-arcot.com',
-    Prod = 'https://wealthwatch.aditya-arcot.com',
+    Stage = 'https://wealthwatch-stage.aarcot.com',
+    Prod = 'https://wealthwatch.aarcot.com',
 }
 
 export enum ServerUrlEnum {
-    Stage = 'https://wealthwatch-api-stage.aditya-arcot.com',
-    Prod = 'https://wealthwatch-api.aditya-arcot.com',
+    Stage = 'https://wealthwatch-api-stage.aarcot.com',
+    Prod = 'https://wealthwatch-api.aarcot.com',
 }
