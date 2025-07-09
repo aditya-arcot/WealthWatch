@@ -15,7 +15,7 @@
                 "background": {
                     "activeOnStart": true,
                     "beginsPattern": "(.*?)",
-                    "endsPattern": "Watching for file changes."
+                    "endsPattern": "(.*?)"
                 }
             }
         },
