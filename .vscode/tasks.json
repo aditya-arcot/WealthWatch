@@ -15,7 +15,7 @@
                 "background": {
                     "activeOnStart": true,
                     "beginsPattern": "(.*?)",
-                    "endsPattern": "Watching for file changes."
+                    "endsPattern": "(.*?)"
                 }
             }
         },
@@ -33,7 +33,7 @@
                 "background": {
                     "activeOnStart": true,
                     "beginsPattern": "(.*?)",
-                    "endsPattern": "Application bundle generation complete."
+                    "endsPattern": "(.*?)"
                 }
             }
         },
