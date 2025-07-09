@@ -12,6 +12,5 @@
             "@wealthwatch-shared": ["src/wealthwatch-shared.ts"]
         }
     },
-    "include": ["src"],
-    "exclude": ["src/**/*.test.ts"]
+    "include": ["src"]
 }
