@@ -1,4 +1,4 @@
-import { SecurityTypeEnum } from '../enums/security.js'
+import { SecurityTypeEnum } from 'enums/security.js'
 
 export interface Holding {
     id: number

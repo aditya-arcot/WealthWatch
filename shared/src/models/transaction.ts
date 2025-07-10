@@ -1,5 +1,5 @@
-import { CategoryEnum } from '../enums/category.js'
-import { PaymentChannelEnum } from '../enums/transaction.js'
+import { CategoryEnum } from 'enums/category.js'
+import { PaymentChannelEnum } from 'enums/transaction.js'
 
 export interface Transaction {
     id: number
