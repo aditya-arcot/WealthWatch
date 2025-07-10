@@ -18,7 +18,7 @@
         ]
     },
     "dependencies": {
-        "@aditya-arcot/wealthwatch-shared": "^2.1.8",
+        "@aditya-arcot/wealthwatch-shared": "^2.1.9",
         "@dotenvx/dotenvx": "^1.47.3",
         "@logtail/pino": "^0.5.5",
         "@tsconfig/node-lts": "^22.0.2",
