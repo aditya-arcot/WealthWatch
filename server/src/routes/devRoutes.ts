@@ -1,17 +1,17 @@
 import express from 'express'
 import {
-    createSandboxItem,
-    deactivateAllItems,
-    deleteAllUsers,
-    fireSandboxWebhook,
-    forceRefreshItemInvestments,
-    forceRefreshItemTransactions,
-    resetSandboxItemLogin,
-    syncItem,
-    syncItemBalances,
-    syncItemInvestments,
-    syncItemLiabilities,
-    syncItemTransactions,
+    devCreateSandboxItem,
+    devDeactivateAllItems,
+    devDeleteAllUsers,
+    devFireSandboxWebhook,
+    devForceRefreshItemInvestments,
+    devForceRefreshItemTransactions,
+    devResetSandboxItemLogin,
+    devSyncItem,
+    devSyncItemBalances,
+    devSyncItemInvestments,
+    devSyncItemLiabilities,
+    devSyncItemTransactions,
 } from '../controllers/devController.js'
 import { catchAsync } from '../utilities/middleware.js'
 
@@ -34,7 +34,7 @@ const router = express.Router()
  *       204:
  *         description: Deleted all users and deactivated all items
  */
-router.route('/users').delete(catchAsync(deleteAllUsers))
+router.route('/users').delete(catchAsync(devDeleteAllUsers))
 
 /**
  * @swagger
@@ -46,7 +46,7 @@ router.route('/users').delete(catchAsync(deleteAllUsers))
  *       204:
  *         description: Deactivated all items
  */
-router.route('/items').delete(catchAsync(deactivateAllItems))
+router.route('/items').delete(catchAsync(devDeactivateAllItems))
 
 /**
  * @swagger
@@ -58,7 +58,7 @@ router.route('/items').delete(catchAsync(deactivateAllItems))
  *       202:
  *         description: Created the item, queued item syncs
  */
-router.route('/item').post(catchAsync(createSandboxItem))
+router.route('/item').post(catchAsync(devCreateSandboxItem))
 
 /**
  * @swagger
@@ -74,7 +74,7 @@ router.route('/item').post(catchAsync(createSandboxItem))
  */
 router
     .route('/item/refresh-transactions')
-    .post(catchAsync(forceRefreshItemTransactions))
+    .post(catchAsync(devForceRefreshItemTransactions))
 
 /**
  * @swagger
@@ -90,7 +90,7 @@ router
  */
 router
     .route('/item/refresh-investments')
-    .post(catchAsync(forceRefreshItemInvestments))
+    .post(catchAsync(devForceRefreshItemInvestments))
 
 /**
  * @swagger
@@ -104,7 +104,7 @@ router
  *       202:
  *         description: Queued item syncs
  */
-router.route('/item/sync').post(catchAsync(syncItem))
+router.route('/item/sync').post(catchAsync(devSyncItem))
 
 /**
  * @swagger
@@ -118,7 +118,9 @@ router.route('/item/sync').post(catchAsync(syncItem))
  *       202:
  *         description: Queued sync transactions
  */
-router.route('/item/sync-transactions').post(catchAsync(syncItemTransactions))
+router
+    .route('/item/sync-transactions')
+    .post(catchAsync(devSyncItemTransactions))
 
 /**
  * @swagger
@@ -132,7 +134,7 @@ router.route('/item/sync-transactions').post(catchAsync(syncItemTransactions))
  *       202:
  *         description: Queued sync investments
  */
-router.route('/item/sync-investments').post(catchAsync(syncItemInvestments))
+router.route('/item/sync-investments').post(catchAsync(devSyncItemInvestments))
 
 /**
  * @swagger
@@ -146,7 +148,7 @@ router.route('/item/sync-investments').post(catchAsync(syncItemInvestments))
  *       202:
  *         description: Queued sync liabilities
  */
-router.route('/item/sync-liabilities').post(catchAsync(syncItemLiabilities))
+router.route('/item/sync-liabilities').post(catchAsync(devSyncItemLiabilities))
 
 /**
  * @swagger
@@ -160,7 +162,7 @@ router.route('/item/sync-liabilities').post(catchAsync(syncItemLiabilities))
  *       202:
  *         description: Queued sync balances
  */
-router.route('/item/sync-balances').post(catchAsync(syncItemBalances))
+router.route('/item/sync-balances').post(catchAsync(devSyncItemBalances))
 
 /**
  * @swagger
@@ -174,7 +176,7 @@ router.route('/item/sync-balances').post(catchAsync(syncItemBalances))
  *       204:
  *         description: Reset the item login
  */
-router.route('/item/reset-login').post(catchAsync(resetSandboxItemLogin))
+router.route('/item/reset-login').post(catchAsync(devResetSandboxItemLogin))
 /**
  * @swagger
  * /dev/webhook:
@@ -188,6 +190,6 @@ router.route('/item/reset-login').post(catchAsync(resetSandboxItemLogin))
  *       204:
  *         description: Fired the webhook
  */
-router.route('/webhook').post(catchAsync(fireSandboxWebhook))
+router.route('/webhook').post(catchAsync(devFireSandboxWebhook))
 
 export default router

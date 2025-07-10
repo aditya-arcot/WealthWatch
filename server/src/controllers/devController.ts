@@ -29,19 +29,19 @@ import {
     syncItemData,
 } from './itemController.js'
 
-export const deleteAllUsers = async (req: Request, res: Response) => {
+export const devDeleteAllUsers = async (req: Request, res: Response) => {
     logger.debug('deleting all users')
     await deactivateItems(true)
     req.session.destroy(() => res.status(204).send())
 }
 
-export const deactivateAllItems = async (_req: Request, res: Response) => {
+export const devDeactivateAllItems = async (_req: Request, res: Response) => {
     logger.debug('deactivating all items')
     await deactivateItems()
     return res.status(204).send()
 }
 
-export const createSandboxItem = async (req: Request, res: Response) => {
+export const devCreateSandboxItem = async (req: Request, res: Response) => {
     logger.debug('creating sandbox item')
 
     const user = req.session.user
@@ -83,7 +83,7 @@ export const createSandboxItem = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const forceRefreshItemTransactions = async (
+export const devForceRefreshItemTransactions = async (
     req: Request,
     res: Response
 ) => {
@@ -100,7 +100,7 @@ export const forceRefreshItemTransactions = async (
     return res.status(204).send()
 }
 
-export const forceRefreshItemInvestments = async (
+export const devForceRefreshItemInvestments = async (
     req: Request,
     res: Response
 ) => {
@@ -117,7 +117,7 @@ export const forceRefreshItemInvestments = async (
     res.status(204).send()
 }
 
-export const syncItem = async (req: Request, res: Response) => {
+export const devSyncItem = async (req: Request, res: Response) => {
     logger.debug('syncing item')
 
     const plaidItemId = req.query['plaidItemId']
@@ -131,7 +131,7 @@ export const syncItem = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const syncItemTransactions = async (req: Request, res: Response) => {
+export const devSyncItemTransactions = async (req: Request, res: Response) => {
     logger.debug('syncing item transactions')
 
     const plaidItemId = req.query['plaidItemId']
@@ -145,7 +145,7 @@ export const syncItemTransactions = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const syncItemInvestments = async (req: Request, res: Response) => {
+export const devSyncItemInvestments = async (req: Request, res: Response) => {
     logger.debug('syncing item investments')
 
     const plaidItemId = req.query['plaidItemId']
@@ -159,7 +159,7 @@ export const syncItemInvestments = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const syncItemLiabilities = async (req: Request, res: Response) => {
+export const devSyncItemLiabilities = async (req: Request, res: Response) => {
     logger.debug('syncing item liabilities')
 
     const plaidItemId = req.query['plaidItemId']
@@ -173,7 +173,7 @@ export const syncItemLiabilities = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const syncItemBalances = async (req: Request, res: Response) => {
+export const devSyncItemBalances = async (req: Request, res: Response) => {
     logger.debug('syncing item balances')
 
     const plaidItemId = req.query['plaidItemId']
@@ -187,7 +187,7 @@ export const syncItemBalances = async (req: Request, res: Response) => {
     return res.status(202).send()
 }
 
-export const resetSandboxItemLogin = async (req: Request, res: Response) => {
+export const devResetSandboxItemLogin = async (req: Request, res: Response) => {
     logger.debug('resetting sandbox item login')
 
     const plaidItemId = req.query['plaidItemId']
@@ -203,7 +203,7 @@ export const resetSandboxItemLogin = async (req: Request, res: Response) => {
     return res.status(204).send()
 }
 
-export const fireSandboxWebhook = async (req: Request, res: Response) => {
+export const devFireSandboxWebhook = async (req: Request, res: Response) => {
     logger.debug('firing sandbox webhook')
 
     const plaidItemId = req.query['plaidItemId']
