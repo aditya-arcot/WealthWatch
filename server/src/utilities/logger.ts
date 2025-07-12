@@ -1,4 +1,3 @@
-import { formatDate } from 'date-fns'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
@@ -29,8 +28,7 @@ const targets: PinoTarget[] = [
 
 if (dev) {
     const logDirectory = path.resolve(os.homedir(), 'Projects', 'Logs')
-    const formattedDate = formatDate(new Date(), 'yyyy_MM_dd')
-    const fileName = `wealthwatch_server-${formattedDate}.log`
+    const fileName = 'wealthwatch_server.log'
     const logPath = path.join(logDirectory, fileName)
 
     if (!fs.existsSync(logDirectory)) {
