@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 export * from './accessRequest.js'
 export * from './category.js'
 export * from './environment.js'

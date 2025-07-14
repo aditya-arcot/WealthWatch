@@ -1,7 +1,7 @@
 import {
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
-} from 'enums/liability.js'
+} from '../enums/liability.js'
 
 export interface CreditCard {
     id: number

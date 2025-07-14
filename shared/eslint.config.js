@@ -48,17 +48,6 @@ export default tseslint.config(
                 },
             ],
             'no-console': 'warn',
-            'no-restricted-imports': [
-                'warn',
-                {
-                    patterns: [
-                        {
-                            group: ['.*'],
-                            message: 'Avoid relative imports',
-                        },
-                    ],
-                },
-            ],
         },
     }
 )

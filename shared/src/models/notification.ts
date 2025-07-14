@@ -1,4 +1,4 @@
-import { NotificationTypeEnum } from 'enums/notification.js'
+import { NotificationTypeEnum } from '../enums/notification.js'
 
 export interface Notification {
     id: number
