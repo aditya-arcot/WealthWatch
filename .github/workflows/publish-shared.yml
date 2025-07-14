@@ -36,10 +36,10 @@ jobs:
             - name: check last commit author
               id: check-author
               run: |
-                  AUTHOR=$(git log -1 --pretty=format:'%an')
-                  echo "Last commit author is $AUTHOR"
+                  EMAIL=$(git log -1 --pretty=format:'%ae')
+                  echo "Last commit author's email is $EMAIL"
 
-                  if [[ "$AUTHOR" == *"[bot]"* ]]; then
+                  if [[ "$EMAIL" == *"noreply.github.com" ]]; then
                     echo "skip_publish=true" >> $GITHUB_OUTPUT
                   else
                     echo "skip_publish=false" >> $GITHUB_OUTPUT
@@ -69,23 +69,24 @@ jobs:
                   npm config ls
 
                   VERSION=$(jq -r .version package.json)
-                  PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
+                  echo "Local version: $VERSION"
 
+                  PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
                   if PUBLISHED=$(npm view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2>&1); then
-                    echo "Latest published version is $PUBLISHED"
-                    if [ "$VERSION" = "$PUBLISHED" ]; then
-                      echo "Package version $VERSION already published"
-                      echo "skip_publish=true" >> $GITHUB_OUTPUT
-                    else
-                      echo "Package version $VERSION not published"
+                    echo "Published version: $PUBLISHED"
+                    if npx -y semver-compare-cli "$VERSION" gt "$PUBLISHED"; then
+                      echo "Local version is greater. Will publish"
                       echo "skip_publish=false" >> $GITHUB_OUTPUT
+                    else
+                      echo "Local version is not greater. Skipping publish"
+                      echo "skip_publish=true" >> $GITHUB_OUTPUT
                     fi
                   else
                     if echo "$PUBLISHED" | grep -q "E404"; then
-                        echo "Package has never been published"
+                        echo "Package has never been published. Will publish"
                         echo "skip_publish=false" >> $GITHUB_OUTPUT
                     else
-                        echo "Could not get published package version"
+                        echo "Could not get published version"
                         echo "npm error: $PUBLISHED"
                         exit 1
                     fi
