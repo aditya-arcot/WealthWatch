@@ -8,12 +8,12 @@ if [ -z "$1" ]; then
 fi
 
 VERSION=$1
-PKG_REF="npm:@aditya-arcot/wealthwatch-shared@^$VERSION"
+PKG_REF="^$VERSION"
 
 for project in client server; do
     cd "../$project"
     echo "Updating $project/package.json..."
-    jq --arg pkg "$PKG_REF" '.dependencies["wealthwatch-shared"] = $pkg' package.json > package.tmp.json
+    jq --arg pkg "$PKG_REF" '.dependencies["@aditya-arcot/wealthwatch-shared"] = $pkg' package.json > package.tmp.json
     mv package.tmp.json package.json
     trash package-lock.json node_modules
     echo "Installing $project packages..."
