@@ -4,6 +4,7 @@ import { Chart, Tooltip } from 'chart.js'
 import autocolors from 'chartjs-plugin-autocolors'
 import { AlertComponent } from './components/alert/alert.component'
 import { HeaderComponent } from './components/header/header.component'
+import { RouteEnum } from './enums/route'
 import { CustomBarElement } from './models/chart.js'
 
 @Component({
@@ -15,12 +16,12 @@ import { CustomBarElement } from './models/chart.js'
 export class AppComponent implements OnInit {
     router = inject(Router)
 
-    readonly noHeaderPaths = [
-        '/startup-error',
-        '/login',
-        '/logout',
-        '/access-request',
-        '/register',
+    readonly noHeaderPaths: string[] = [
+        RouteEnum.StartupError,
+        RouteEnum.Login,
+        RouteEnum.Logout,
+        RouteEnum.AccessRequest,
+        RouteEnum.Register,
     ]
 
     ngOnInit(): void {
@@ -50,6 +51,6 @@ export class AppComponent implements OnInit {
     }
 
     noHeaderPath(path: string) {
-        return this.noHeaderPaths.includes(path)
+        return this.noHeaderPaths.includes(path.split('/')[1])
     }
 }
