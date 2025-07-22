@@ -173,7 +173,7 @@ const getErrorStatus = (
 
 const createErrorMessage = (err: Error): string => {
     if (err instanceof HttpError)
-        return formatErrorMessage('Http Error', err.message)
+        return formatErrorMessage('HTTP Error', err.message)
     if (err instanceof DatabaseError)
         return formatErrorMessage('Database Error', err.message)
     if (err instanceof PlaidApiError)

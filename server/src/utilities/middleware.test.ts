@@ -581,7 +581,7 @@ describe('createErrorMessage', () => {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { HttpError } = await import('../models/error.js')
         const msg = _test.createErrorMessage(new HttpError(''))
-        expect(msg).toBe('Http Error')
+        expect(msg).toBe('HTTP Error')
     })
 
     it('creates DatabaseError message correctly', async () => {
