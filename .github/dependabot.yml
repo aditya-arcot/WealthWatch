@@ -11,6 +11,9 @@ updates:
       directory: '/'
       schedule:
           interval: 'weekly'
+          day: 'monday'
+          time: '00:00'
+          timezone: 'America/Chicago'
       groups:
           root-dependencies:
               patterns:
@@ -23,6 +26,9 @@ updates:
       directory: 'shared'
       schedule:
           interval: 'weekly'
+          day: 'monday'
+          time: '00:00'
+          timezone: 'America/Chicago'
       groups:
           shared-dependencies:
               patterns:
@@ -37,6 +43,9 @@ updates:
           - github-packages
       schedule:
           interval: 'weekly'
+          day: 'monday'
+          time: '00:00'
+          timezone: 'America/Chicago'
       groups:
           client-dependencies:
               patterns:
@@ -51,6 +60,9 @@ updates:
           - github-packages
       schedule:
           interval: 'weekly'
+          day: 'monday'
+          time: '00:00'
+          timezone: 'America/Chicago'
       groups:
           server-dependencies:
               patterns:
@@ -63,6 +75,9 @@ updates:
       directory: 'client'
       schedule:
           interval: 'weekly'
+          day: 'monday'
+          time: '00:00'
+          timezone: 'America/Chicago'
       groups:
           client-docker:
               patterns:
@@ -75,6 +90,9 @@ updates:
       directory: 'server'
       schedule:
           interval: 'weekly'
+          day: 'monday'
+          time: '00:00'
+          timezone: 'America/Chicago'
       groups:
           server-docker:
               patterns:
@@ -87,6 +105,9 @@ updates:
       directory: '/'
       schedule:
           interval: 'weekly'
+          day: 'monday'
+          time: '00:00'
+          timezone: 'America/Chicago'
       groups:
           github-actions:
               patterns:
