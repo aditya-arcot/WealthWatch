@@ -88,7 +88,7 @@ const verifyWebhook = async (token: string, body: string): Promise<void> => {
                     const jwk = await plaidWebhookVerificationKeyGet(id)
                     webhookKeyCache.set(id, jwk)
                 } catch (error) {
-                    logger.error(`failed to fetch key for id ${id}`, error)
+                    logger.error(error, `failed to fetch key for id ${id}`)
                 }
             })
         )

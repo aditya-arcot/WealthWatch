@@ -3,6 +3,7 @@
     "workspaces": {
         "client": {
             "ignore": [
+                ".ncurc.js",
                 "src/app/pages/net-worth/net-worth.component.ts",
                 "src/app/pages/paychecks/paychecks.component.ts"
             ],
