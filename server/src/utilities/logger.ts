@@ -1,7 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import { pino } from 'pino'
+import pino from 'pino'
 import { dev, vars } from './env.js'
 
 interface PinoTarget {
