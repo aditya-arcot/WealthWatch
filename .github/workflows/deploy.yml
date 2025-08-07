@@ -62,6 +62,9 @@ jobs:
                   echo "REPO=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
                   echo "IMAGE_TAG=$(date +%Y-%m-%d).$VERSION" >> $GITHUB_ENV
 
+            - name: docker context
+              run: docker context ls
+
             - name: docker container names - non-prod
               if: github.ref_name != 'main'
               run: |
