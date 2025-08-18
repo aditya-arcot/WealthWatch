@@ -22,7 +22,7 @@ jobs:
               run: security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} login.keychain
 
             - name: checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: create .env
               working-directory: server
