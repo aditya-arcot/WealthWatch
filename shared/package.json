@@ -28,15 +28,15 @@
     },
     "dependencies": {
         "@tsconfig/node-lts": "^22.0.2",
-        "@tsconfig/strictest": "^2.0.5"
+        "@tsconfig/strictest": "^2.0.6"
     },
     "devDependencies": {
         "@eslint/js": "^9.36.0",
         "eslint": "^9.36.0",
         "globals": "^16.4.0",
-        "tsc-watch": "^7.1.1",
+        "tsc-watch": "^7.2.0",
         "typescript": "^5.9.2",
-        "typescript-eslint": "^8.44.0"
+        "typescript-eslint": "^8.44.1"
     },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
