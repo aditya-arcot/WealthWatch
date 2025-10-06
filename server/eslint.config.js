@@ -8,12 +8,7 @@ export default tseslint.config(
     tseslint.configs.strict,
     tseslint.configs.stylistic,
     {
-        ignores: [
-            '.ncurc.js',
-            'eslint.config.js',
-            'vitest.config.js',
-            'dist/**/*',
-        ],
+        files: ['**/*.ts'],
         languageOptions: {
             globals: globals.node,
             parserOptions: {

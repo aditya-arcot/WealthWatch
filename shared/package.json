@@ -18,11 +18,11 @@
     "scripts": {
         "build": "rm -rf dist/ && tsc",
         "dev": "tsc-watch",
-        "lint": "eslint --fix --max-warnings=0 src/"
+        "lint": "eslint src --ext .ts --fix --max-warnings=0"
     },
     "lint-staged": {
         "*": [
-            "eslint --fix --max-warnings=0 --no-warn-ignored",
+            "eslint --ext .ts --fix --max-warnings=0 --no-warn-ignored",
             "prettier --write --ignore-unknown"
         ]
     },
