@@ -12,6 +12,9 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
+      ignore:
+          - dependency-name: '*'
+            update-types: ['version-update:semver-major']
       groups:
           root-dependencies:
               patterns:
@@ -25,6 +28,9 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
+      ignore:
+          - dependency-name: '*'
+            update-types: ['version-update:semver-major']
       groups:
           shared-dependencies:
               patterns:
@@ -40,6 +46,9 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
+      ignore:
+          - dependency-name: '*'
+            update-types: ['version-update:semver-major']
       groups:
           client-dependencies:
               patterns:
@@ -56,7 +65,7 @@ updates:
           interval: 'weekly'
           day: 'monday'
       ignore:
-          - dependency-name: 'pino'
+          - dependency-name: '*'
             update-types: ['version-update:semver-major']
       groups:
           server-dependencies:
