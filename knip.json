@@ -10,7 +10,11 @@
             "ignoreDependencies": ["bootstrap", "bootstrap-icons"]
         },
         "server": {
-            "ignore": ["src/models/express.ts", "src/database/index.ts"],
+            "ignore": [
+                ".ncurc.js",
+                "src/models/express.ts",
+                "src/database/index.ts"
+            ],
             "ignoreDependencies": ["@logtail/pino", "pino-pretty"]
         },
         "shared": {}

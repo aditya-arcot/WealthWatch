@@ -12,7 +12,9 @@ for project in client server; do
     echo "Updating $project/package.json..."
     jq '.dependencies["@aditya-arcot/wealthwatch-shared"] = "file:../shared"' package.json > package.tmp.json
     mv package.tmp.json package.json
+    set +e
     trash package-lock.json node_modules
+    set -e
     echo "Installing $project packages..."
     npm install
 done
