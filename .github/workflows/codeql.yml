@@ -37,7 +37,6 @@ on:
             - 'shared/package-lock.json'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
-
     schedule:
         - cron: '30 21 * * 2'
 

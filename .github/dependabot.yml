@@ -12,8 +12,9 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
-          time: '00:00'
-          timezone: 'America/Chicago'
+      ignore:
+          - dependency-name: '*'
+            update-types: ['version-update:semver-major']
       groups:
           root-dependencies:
               patterns:
@@ -27,8 +28,9 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
-          time: '00:00'
-          timezone: 'America/Chicago'
+      ignore:
+          - dependency-name: '*'
+            update-types: ['version-update:semver-major']
       groups:
           shared-dependencies:
               patterns:
@@ -44,12 +46,9 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
-          time: '00:00'
-          timezone: 'America/Chicago'
       ignore:
-          - dependency-name: 'typescript'
-            update-types:
-                ['version-update:semver-major', 'version-update:semver-minor']
+          - dependency-name: '*'
+            update-types: ['version-update:semver-major']
       groups:
           client-dependencies:
               patterns:
@@ -65,8 +64,9 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
-          time: '00:00'
-          timezone: 'America/Chicago'
+      ignore:
+          - dependency-name: '*'
+            update-types: ['version-update:semver-major']
       groups:
           server-dependencies:
               patterns:
@@ -80,8 +80,6 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
-          time: '00:00'
-          timezone: 'America/Chicago'
       groups:
           client-docker:
               patterns:
@@ -95,8 +93,6 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
-          time: '00:00'
-          timezone: 'America/Chicago'
       groups:
           server-docker:
               patterns:
@@ -110,8 +106,6 @@ updates:
       schedule:
           interval: 'weekly'
           day: 'monday'
-          time: '00:00'
-          timezone: 'America/Chicago'
       groups:
           github-actions:
               patterns:

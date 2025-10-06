@@ -15,7 +15,9 @@ for project in client server; do
     echo "Updating $project/package.json..."
     jq --arg pkg "$PKG_REF" '.dependencies["@aditya-arcot/wealthwatch-shared"] = $pkg' package.json > package.tmp.json
     mv package.tmp.json package.json
+    set +e
     trash package-lock.json node_modules
+    set -e
     echo "Installing $project packages..."
     npm install
 done
