@@ -47,7 +47,7 @@ jobs:
 
             - name: setup node
               if: steps.check-author.outputs.skip_publish == 'false'
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v6
               with:
                   node-version: 'lts/*'
                   check-latest: true
