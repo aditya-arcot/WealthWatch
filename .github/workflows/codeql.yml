@@ -19,26 +19,12 @@ on:
             - 'shared/package-lock.json'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
-    pull_request:
-        branches:
-            - stage
-        paths:
-            - '.github/workflows/*.yml'
-            - 'client/src/**'
-            - 'client/angular.json'
-            - 'client/package-lock.json'
-            - 'client/package.json'
-            - 'client/tsconfig.json'
-            - 'server/src/**'
-            - 'server/package-lock.json'
-            - 'server/package.json'
-            - 'server/tsconfig.json'
-            - 'shared/src/**'
-            - 'shared/package-lock.json'
-            - 'shared/package.json'
-            - 'shared/tsconfig.json'
     schedule:
         - cron: '30 21 * * 2'
+
+concurrency:
+    group: codeql-${{ github.ref_name }}
+    cancel-in-progress: true
 
 permissions:
     security-events: write
@@ -69,7 +55,7 @@ jobs:
 
             - name: setup node
               if: matrix.language == 'typescript'
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v6
               with:
                   node-version: 'lts/*'
                   check-latest: true
@@ -78,7 +64,7 @@ jobs:
 
             - name: initialize codeql for actions
               if: matrix.language == 'actions'
-              uses: github/codeql-action/init@v3
+              uses: github/codeql-action/init@v4
               with:
                   languages: actions
                   build-mode: none
@@ -88,7 +74,7 @@ jobs:
 
             - name: initialize codeql for typescript
               if: matrix.language == 'typescript'
-              uses: github/codeql-action/init@v3
+              uses: github/codeql-action/init@v4
               with:
                   languages: typescript
                   build-mode: none
@@ -112,6 +98,6 @@ jobs:
                   npm run build
 
             - name: run codeql
-              uses: github/codeql-action/analyze@v3
+              uses: github/codeql-action/analyze@v4
               with:
                   category: '/language:${{matrix.language}}'

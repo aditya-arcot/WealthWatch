@@ -13,9 +13,9 @@
     },
     "devDependencies": {
         "husky": "^9.1.7",
-        "knip": "^5.64.2",
-        "lint-staged": "^16.2.3",
-        "npm-check-updates": "^19.0.0",
+        "knip": "^5.66.3",
+        "lint-staged": "^16.2.6",
+        "npm-check-updates": "^19.1.1",
         "prettier": "^3.6.2",
         "prettier-plugin-organize-imports": "^4.3.0"
     }
