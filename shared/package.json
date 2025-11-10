@@ -31,12 +31,12 @@
         "@tsconfig/strictest": "^2.0.7"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.0",
-        "eslint": "^9.39.0",
+        "@eslint/js": "^9.39.1",
+        "eslint": "^9.39.1",
         "globals": "^16.5.0",
         "tsc-watch": "^7.2.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.46.2"
+        "typescript-eslint": "^8.46.3"
     },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
