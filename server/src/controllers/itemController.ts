@@ -1,4 +1,4 @@
-import { Account, Item, itemInCooldown } from '@wealthwatch-shared'
+import { Account, isInCooldown, Item } from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 import {
     fetchActiveAccountsByUserId,
@@ -137,7 +137,7 @@ export const refreshItem = async (req: Request, res: Response) => {
     const item = await fetchActiveItemByPlaidId(plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    if (itemInCooldown(item.lastRefreshed)) {
+    if (isInCooldown(item.lastRefreshed)) {
         logger.debug(
             { id: item.id, lastRefreshed: item.lastRefreshed },
             'item refresh cooldown'
@@ -183,7 +183,7 @@ export const refreshItemTransactions = (
     item: Item,
     checkCooldown = true
 ): Promise<boolean> => {
-    if (checkCooldown && itemInCooldown(item.transactionsLastRefreshed)) {
+    if (checkCooldown && isInCooldown(item.transactionsLastRefreshed)) {
         logger.debug(
             {
                 id: item.id,
@@ -200,7 +200,7 @@ export const refreshItemInvestments = (
     item: Item,
     checkCooldown = true
 ): Promise<boolean> => {
-    if (checkCooldown && itemInCooldown(item.investmentsLastRefreshed)) {
+    if (checkCooldown && isInCooldown(item.investmentsLastRefreshed)) {
         logger.debug(
             {
                 id: item.id,

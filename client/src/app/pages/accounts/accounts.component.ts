@@ -2,11 +2,11 @@ import { Component, inject, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
     Account,
+    isInCooldown,
     Item,
-    itemInCooldown,
-    itemRefreshCooldown,
     ItemWithAccounts,
     PlaidLinkEvent,
+    refreshCooldown,
 } from '@wealthwatch-shared'
 import {
     NgxPlaidLinkService,
@@ -289,12 +289,12 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
 
     refreshItem(item: Item): void {
         this.logger.info('refreshing item', { item })
-        if (itemInCooldown(item.lastRefreshed)) {
+        if (isInCooldown(item.lastRefreshed)) {
             const lastRefreshed = item.lastRefreshed
                 ? new Date(item.lastRefreshed)
                 : null
             const nextRefresh = new Date(
-                (lastRefreshed?.getTime() ?? 0) + itemRefreshCooldown
+                (lastRefreshed?.getTime() ?? 0) + refreshCooldown
             )
             const nextRefreshString = formatDate(nextRefresh, false, true)
             this.alertSvc.addErrorAlert(
