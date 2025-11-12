@@ -1,7 +1,8 @@
 // 3 hours
-export const itemRefreshCooldown = 1000 * 60 * 60 * 3
+export const refreshCooldown = 1000 * 60 * 60 * 3
 
-export const itemInCooldown = (timestamp: Date | null) => {
-    if (!timestamp) return false
-    return Date.now() - new Date(timestamp).getTime() < itemRefreshCooldown
+export const isInCooldown = (lastRefreshTimestamp: Date | null) => {
+    if (!lastRefreshTimestamp) return false
+    const timeDiff = Date.now() - new Date(lastRefreshTimestamp).getTime()
+    return timeDiff < refreshCooldown
 }

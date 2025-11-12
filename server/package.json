@@ -18,7 +18,7 @@
         ]
     },
     "dependencies": {
-        "@aditya-arcot/wealthwatch-shared": "^3.0.16",
+        "@aditya-arcot/wealthwatch-shared": "^4.0.1",
         "@dotenvx/dotenvx": "^1.51.1",
         "@logtail/pino": "^0.5.7",
         "@tsconfig/node-lts": "^22.0.2",
@@ -56,19 +56,18 @@
         "@types/express": "^5.0.5",
         "@types/express-session": "^1.18.2",
         "@types/method-override": "^3.0.0",
-        "@types/node": "^24.10.0",
+        "@types/node": "^24.10.1",
         "@types/pg": "^8.15.6",
         "@types/qs": "^6.14.0",
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.8",
-        "@vitest/coverage-v8": "^3.2.4",
-        "@vitest/ui": "^3.2.4",
+        "@vitest/coverage-v8": "^4.0.8",
+        "@vitest/ui": "^4.0.8",
         "eslint": "^9.39.1",
         "globals": "^16.5.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.46.3",
-        "vite": "^7.2.2",
+        "typescript-eslint": "^8.46.4",
         "vite-tsconfig-paths": "^5.1.4",
-        "vitest": "^3.2.4"
+        "vitest": "^4.0.8"
     }
 }
