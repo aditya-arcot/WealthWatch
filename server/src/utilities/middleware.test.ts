@@ -66,16 +66,25 @@ describe('createSession', () => {
 
     const mockPool = { dummy: true }
     const mockPgStoreInstance = { on: vi.fn() }
-    const mockPgStoreFn = vi.fn(() => mockPgStoreInstance)
+    const mockPgStoreFn = vi.fn((_: unknown) => mockPgStoreInstance)
     const mockSessionMiddleware = vi.fn((_req, _res, next) => next())
     const mockSessionFn = vi.fn(() => mockSessionMiddleware)
 
     beforeEach(() => {
+        vi.resetModules()
+
         vi.doMock('../database/index', () => ({
             getPool: () => mockPool,
         }))
         vi.doMock('connect-pg-simple', () => ({
-            default: vi.fn(() => mockPgStoreFn),
+            default: () => {
+                // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+                return class PgStore {
+                    constructor(options: unknown) {
+                        return mockPgStoreFn(options)
+                    }
+                }
+            },
         }))
         vi.doMock('express-session', () => ({
             default: mockSessionFn,

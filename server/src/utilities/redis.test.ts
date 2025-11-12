@@ -4,10 +4,13 @@ import * as logger from './logger.js'
 let redisConstructorMock: Mock
 
 const setupMockRedis = (pingMock = vi.fn().mockResolvedValue('PONG')) => {
-    redisConstructorMock = vi.fn().mockImplementation(() => ({
-        ping: pingMock,
-        disconnect: vi.fn(),
-    }))
+    redisConstructorMock = vi.fn().mockImplementation(
+        // @ts-expect-error Mock Redis class
+        class MockRedis {
+            ping = pingMock
+            disconnect = vi.fn()
+        }
+    )
     vi.doMock('ioredis', () => ({
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Redis: redisConstructorMock,

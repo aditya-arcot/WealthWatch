@@ -50,19 +50,19 @@ describe('configureCleanup', () => {
         const { configureCleanup } = await import('./cleanup.js')
         configureCleanup()
 
-        const call = onSpy.mock.calls.find(
+        const onCall = onSpy.mock.calls.find(
             ([event]) => event === CLEANUP_EVENTS[0]
         )
-        expect(call).toBeDefined()
-        const handler = call?.[1]
-        expect(handler).toBeDefined()
+        expect(onCall).toBeDefined()
+        const onHandler = onCall?.[1]
+        expect(onHandler).toBeDefined()
 
         await new Promise<void>((resolve) => {
             vi.spyOn(process, 'exit').mockImplementation(() => {
                 resolve()
                 return undefined as never
             })
-            handler?.(new Error('test error'))
+            onHandler?.(new Error('test error'))
         })
 
         expect(process.exit).toHaveBeenCalledOnce()
@@ -95,6 +95,9 @@ describe('runCleanupAndExit', () => {
         expect(queues.closeWorkers).toHaveBeenCalledOnce()
         expect(redis.stopRedis).toHaveBeenCalledOnce()
         expect(db.stopPool).toHaveBeenCalledOnce()
+        expect(logger.logger.info).toHaveBeenCalledWith(
+            expect.stringContaining('exiting - pid')
+        )
         expect(process.exit).toHaveBeenCalledOnce()
     })
 
@@ -113,6 +116,9 @@ describe('runCleanupAndExit', () => {
             2,
             expect.any(Error),
             'error during cleanup'
+        )
+        expect(logger.logger.info).toHaveBeenCalledWith(
+            expect.stringContaining('exiting - pid')
         )
         expect(process.exit).toHaveBeenCalledOnce()
     })
