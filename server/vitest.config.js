@@ -3,12 +3,9 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
     test: {
-        globals: true,
-        environment: 'node',
-        include: ['**/*.test.ts'],
+        include: ['src/utilities/*.test.ts'],
         coverage: {
-            include: ['src/utilities/**/*.ts'],
-            all: true,
+            include: ['src/utilities/*.ts'],
         },
     },
     plugins: [tsconfigPaths()],

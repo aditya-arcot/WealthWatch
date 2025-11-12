@@ -149,7 +149,7 @@ export const handleError = (
     const message = createErrorMessage(err)
     const code = err.code
     const error: ServerError = { message }
-    if (typeof code === 'string') error.code = code
+    error.code = String(code)
     logger.error({ status, code, error }, 'sending error response')
     res.status(status).json(error)
 }
