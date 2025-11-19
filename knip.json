@@ -3,23 +3,19 @@
     "workspaces": {
         "client": {
             "ignore": [
-                ".ncurc.js",
                 "src/app/pages/net-worth/net-worth.component.ts",
                 "src/app/pages/paychecks/paychecks.component.ts"
             ],
             "ignoreDependencies": ["bootstrap", "bootstrap-icons"]
         },
         "server": {
-            "ignore": [
-                ".ncurc.js",
-                "src/models/express.ts",
-                "src/database/index.ts"
-            ],
+            "ignore": [".ncurc.js", "src/models/express.ts"],
             "ignoreDependencies": ["@logtail/pino", "pino-pretty"]
         },
-        "shared": {
-            "ignore": ["tsconfig.json"]
+        "shared": {},
+        ".": {
+            "ignoreDependencies": ["npm-check-updates"]
         }
     },
-    "ignoreDependencies": ["npm-check-updates"]
+    "tags": ["-knipignore"]
 }

@@ -46,12 +46,14 @@ export const stopPool = async (): Promise<void> => {
     logger.debug('stopped database pool')
 }
 
+/** @knipignore */
 export const beginTransaction = async (): Promise<PoolClient> => {
     const client = await getPool().connect()
     await runQuery('BEGIN', [], client)
     return client
 }
 
+/** @knipignore */
 export const commitTransaction = async (client: PoolClient): Promise<void> => {
     try {
         await runQuery('COMMIT', [], client)
@@ -60,6 +62,7 @@ export const commitTransaction = async (client: PoolClient): Promise<void> => {
     }
 }
 
+/** @knipignore */
 export const rollbackTransaction = async (
     client: PoolClient
 ): Promise<void> => {
