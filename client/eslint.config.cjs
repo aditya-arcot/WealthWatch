@@ -2,6 +2,7 @@
 const eslint = require('@eslint/js')
 const tseslint = require('typescript-eslint')
 const angular = require('angular-eslint')
+const csseslint = require('@eslint/css')
 const { defineConfig } = require('eslint/config')
 
 module.exports = defineConfig(
@@ -89,5 +90,13 @@ module.exports = defineConfig(
             ...angular.configs.templateRecommended,
             ...angular.configs.templateAccessibility,
         ],
+    },
+    {
+        files: ['**/*.css'],
+        language: 'css/css',
+        extends: [csseslint.default.configs.recommended],
+        rules: {
+            'css/no-important': 'off',
+        },
     }
 )
