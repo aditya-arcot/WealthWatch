@@ -14,6 +14,7 @@ on:
             - 'shared/package-lock.json'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
+            - 'shared/tsconfig.build.json'
 
 concurrency:
     group: publish-${{ github.ref_name }}

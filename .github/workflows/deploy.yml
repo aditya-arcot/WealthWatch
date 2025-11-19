@@ -22,6 +22,7 @@ on:
             - 'server/package-lock.json'
             - 'server/package.json'
             - 'server/tsconfig.json'
+            - 'server/tsconfig.build.json'
             - 'config/infra/**'
 
 concurrency:

@@ -17,7 +17,9 @@
             ],
             "ignoreDependencies": ["@logtail/pino", "pino-pretty"]
         },
-        "shared": {}
+        "shared": {
+            "ignore": ["tsconfig.json"]
+        }
     },
     "ignoreDependencies": ["npm-check-updates"]
 }

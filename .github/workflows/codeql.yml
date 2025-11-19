@@ -15,10 +15,12 @@ on:
             - 'server/package-lock.json'
             - 'server/package.json'
             - 'server/tsconfig.json'
+            - 'server/tsconfig.build.json'
             - 'shared/src/**'
             - 'shared/package-lock.json'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
+            - 'shared/tsconfig.build.json'
     schedule:
         - cron: '30 21 * * 2'
 

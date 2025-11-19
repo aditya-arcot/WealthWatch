@@ -7,7 +7,7 @@ PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
 echo "Checking for changes in shared project files..."
 CHANGED_FILES=$(git diff --cached --name-only)
 
-if echo "$CHANGED_FILES" | grep -qE '^shared/(package.json|tsconfig.json|src/)'; then
+if echo "$CHANGED_FILES" | grep -qE '^shared/(package.json|tsconfig.json|tsconfig.build.json|src/)'; then
     echo "Changes found in shared project files"
     echo "Checking for version bump..."
 
