@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
+import { env } from '@environments'
+import { TransactionsRequestParams } from '@models/transaction'
 import { Transaction, TransactionsAndCounts } from '@wealthwatch-shared'
-import { env } from '../../environments/env'
-import { TransactionsRequestParams } from '../models/transaction'
 
 @Injectable({
     providedIn: 'root',

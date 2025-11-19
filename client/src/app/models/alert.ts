@@ -1,4 +1,4 @@
-import { AlertTypeEnum } from '../enums/alert'
+import { AlertTypeEnum } from '@enums/alert'
 
 export interface Alert {
     id: string

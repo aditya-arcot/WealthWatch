@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core'
 import { Router } from '@angular/router'
+import { LoggerComponent } from '@components/logger.component'
+import { RouteEnum } from '@enums/route'
+import { NotificationService } from '@services/notification.service'
 import { Notification, NotificationTypeEnum } from '@wealthwatch-shared'
 import { catchError, of, switchMap } from 'rxjs'
-import { RouteEnum } from '../../enums/route'
-import { NotificationService } from '../../services/notification.service'
-import { LoggerComponent } from '../logger.component'
 
 @Component({
     selector: 'app-notifications',

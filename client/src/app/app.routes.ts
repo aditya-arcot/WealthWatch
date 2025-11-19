@@ -6,11 +6,11 @@ import {
     RouterStateSnapshot,
     Routes,
 } from '@angular/router'
-import { RouteEnum } from './enums/route'
-import { AlertService } from './services/alert.service'
-import { CsrfService } from './services/csrf.service'
-import { createLoggerWithContext } from './services/logger.service'
-import { UserService } from './services/user.service'
+import { RouteEnum } from '@enums/route'
+import { AlertService } from '@services/alert.service'
+import { CsrfService } from '@services/csrf.service'
+import { createLoggerWithContext } from '@services/logger.service'
+import { UserService } from '@services/user.service'
 
 const adminRoutes: string[] = ['/admin']
 

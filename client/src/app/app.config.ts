@@ -7,16 +7,16 @@ import {
     provideZoneChangeDetection,
 } from '@angular/core'
 import { provideRouter, TitleStrategy } from '@angular/router'
+import { routes } from '@app/app.routes'
+import { env } from '@environments'
+import { authInterceptor } from '@interceptors/auth-interceptor'
+import { csrfInterceptor } from '@interceptors/csrf-interceptor'
+import { errorInterceptor } from '@interceptors/error-interceptor'
+import { StartupService } from '@services/startup.service'
+import { TitleService } from '@services/title.service'
 import { EnvNameEnum } from '@wealthwatch-shared'
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger'
-import { env } from '../environments/env'
-import { routes } from './app.routes'
-import { authInterceptor } from './interceptors/auth-interceptor'
-import { csrfInterceptor } from './interceptors/csrf-interceptor'
-import { errorInterceptor } from './interceptors/error-interceptor'
-import { StartupService } from './services/startup.service'
-import { TitleService } from './services/title.service'
 
 const provideLogger = () => {
     return importProvidersFrom(

@@ -1,7 +1,7 @@
 import {
     createLoggerWithContext,
     LoggerService,
-} from '../services/logger.service'
+} from '@services/logger.service'
 
 export abstract class LoggerComponent {
     protected logger: LoggerService

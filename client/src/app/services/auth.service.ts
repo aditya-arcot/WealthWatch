@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
+import { env } from '@environments'
+import { UserService } from '@services/user.service'
 import { User } from '@wealthwatch-shared'
 import { tap } from 'rxjs'
-import { env } from '../../environments/env'
-import { UserService } from './user.service'
 
 @Injectable({
     providedIn: 'root',

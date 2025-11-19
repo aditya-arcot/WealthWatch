@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, inject } from '@angular/core'
+import { AlertTypeEnum } from '@enums/alert'
+import { Alert } from '@models/alert'
+import { AlertService } from '@services/alert.service'
 import { Subscription } from 'rxjs'
-import { AlertTypeEnum } from '../../enums/alert'
-import { Alert } from '../../models/alert'
-import { AlertService } from '../../services/alert.service'
 
 @Component({
     selector: 'app-alert',

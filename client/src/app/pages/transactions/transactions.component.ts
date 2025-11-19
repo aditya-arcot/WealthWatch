@@ -2,6 +2,33 @@ import { CommonModule } from '@angular/common'
 import { Component, inject, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Params, Router } from '@angular/router'
+import { AccountFilterComponent } from '@components/filters/account-filter/account-filter.component'
+import { AmountFilterComponent } from '@components/filters/amount-filter/amount-filter.component'
+import { CategoryFilterComponent } from '@components/filters/category-filter/category-filter.component'
+import { DateFilterComponent } from '@components/filters/date-filter/date-filter.component'
+import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '@components/logger.component'
+import { NoteComponent } from '@components/note/note.component'
+import { AmountFilterEnum, DateFilterEnum } from '@enums/filter'
+import { categoryIconMap } from '@maps/category'
+import { TransactionsRequestParams } from '@models/transaction'
+import { AlertService } from '@services/alert.service'
+import { CategoryService } from '@services/category.service'
+import { CurrencyService } from '@services/currency.service'
+import { ItemService } from '@services/item.service'
+import { TransactionService } from '@services/transaction.service'
+import {
+    checkDatesEqual,
+    checkDateStringValid,
+    formatDate,
+} from '@utilities/date.utility'
+import { computeDatesBasedOnFilter } from '@utilities/filter.utility'
+import {
+    safeParseFloat,
+    safeParseInt,
+    safeParseIntArrayOrUndefinedFromParam,
+} from '@utilities/number.utility'
+import { redirectWithParams } from '@utilities/redirect.utility'
 import {
     Account,
     Category,
@@ -18,33 +45,6 @@ import {
     switchMap,
     throwError,
 } from 'rxjs'
-import { AccountFilterComponent } from '../../components/filters/account-filter/account-filter.component'
-import { AmountFilterComponent } from '../../components/filters/amount-filter/amount-filter.component'
-import { CategoryFilterComponent } from '../../components/filters/category-filter/category-filter.component'
-import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
-import { NoteComponent } from '../../components/note/note.component'
-import { AmountFilterEnum, DateFilterEnum } from '../../enums/filter'
-import { categoryIconMap } from '../../maps/category'
-import { TransactionsRequestParams } from '../../models/transaction'
-import { AlertService } from '../../services/alert.service'
-import { CategoryService } from '../../services/category.service'
-import { CurrencyService } from '../../services/currency.service'
-import { ItemService } from '../../services/item.service'
-import { TransactionService } from '../../services/transaction.service'
-import {
-    checkDatesEqual,
-    checkDateStringValid,
-    formatDate,
-} from '../../utilities/date.utility'
-import { computeDatesBasedOnFilter } from '../../utilities/filter.utility'
-import {
-    safeParseFloat,
-    safeParseInt,
-    safeParseIntArrayOrUndefinedFromParam,
-} from '../../utilities/number.utility'
-import { redirectWithParams } from '../../utilities/redirect.utility'
 
 @Component({
     selector: 'app-transactions',

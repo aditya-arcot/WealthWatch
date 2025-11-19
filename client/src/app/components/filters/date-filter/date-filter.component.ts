@@ -9,10 +9,10 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { DateFilterEnum } from '../../../enums/filter'
-import { dateFilterDescriptionMap } from '../../../maps/filter'
-import { checkDatesEqual } from '../../../utilities/date.utility'
-import { computeDatesBasedOnFilter } from '../../../utilities/filter.utility'
+import { DateFilterEnum } from '@enums/filter'
+import { dateFilterDescriptionMap } from '@maps/filter'
+import { checkDatesEqual } from '@utilities/date.utility'
+import { computeDatesBasedOnFilter } from '@utilities/filter.utility'
 
 // all dates are in client timezone
 

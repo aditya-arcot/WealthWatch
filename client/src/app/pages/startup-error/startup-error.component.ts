@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core'
 import { Router } from '@angular/router'
-import { RouteEnum } from '../../enums/route'
-import { StartupService } from '../../services/startup.service'
+import { RouteEnum } from '@enums/route'
+import { StartupService } from '@services/startup.service'
 
 @Component({
     selector: 'app-startup-error',

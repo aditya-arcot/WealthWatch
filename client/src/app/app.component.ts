@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
+import { AlertComponent } from '@components/alert/alert.component'
+import { HeaderComponent } from '@components/header/header.component'
+import { RouteEnum } from '@enums/route'
+import { CustomBarElement } from '@models/chart.js'
 import { Chart, Tooltip } from 'chart.js'
 import autocolors from 'chartjs-plugin-autocolors'
-import { AlertComponent } from './components/alert/alert.component'
-import { HeaderComponent } from './components/header/header.component'
-import { RouteEnum } from './enums/route'
-import { CustomBarElement } from './models/chart.js'
 
 @Component({
     selector: 'app-root',

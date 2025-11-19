@@ -78,6 +78,10 @@ module.exports = defineConfig(
                             message:
                                 'Use the "@wealthwatch-shared" alias instead',
                         },
+                        {
+                            group: ['.*', 'src/', 'app/'],
+                            message: 'Use path alias instead of relative path',
+                        },
                     ],
                 },
             ],
