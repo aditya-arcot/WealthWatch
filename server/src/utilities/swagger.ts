@@ -946,5 +946,5 @@ const spec = {
         },
         /* eslint-enable @typescript-eslint/naming-convention */
     },
-    apis: ['./dist/routes/*.js'],
+    apis: ['./src/routes/*.ts'],
 }
