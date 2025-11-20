@@ -1,18 +1,19 @@
-import { processWebhook } from '@controllers/webhookController.js'
-import { HttpError } from '@models/error.js'
-import router from '@routes/index.js'
-import { prod } from '@utilities/env.js'
-import { logger } from '@utilities/logger.js'
+import { processWebhook } from '@controllers'
+import { HttpError } from '@models'
+import router from '@routes'
 import {
     catchAsync,
     cors,
     createCsrf,
     createSession,
+    createSwaggerSpec,
     handleError,
     handleUnmatchedRoute,
+    logger,
     logRequestResponse,
-} from '@utilities/middleware.js'
-import { createSwaggerSpec, swaggerUiOptions } from '@utilities/swagger.js'
+    prod,
+    swaggerUiOptions,
+} from '@utilities'
 import cookieParser from 'cookie-parser'
 import express from 'express'
 import helmet from 'helmet'

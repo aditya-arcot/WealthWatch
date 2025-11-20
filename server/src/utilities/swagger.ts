@@ -1,4 +1,4 @@
-import { prod, vars } from '@utilities/env.js'
+import { prod, vars } from '@utilities'
 import { Request } from 'express'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import swaggerJSDoc from 'swagger-jsdoc'

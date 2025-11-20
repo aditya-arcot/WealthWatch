@@ -1,4 +1,4 @@
-import { HttpError } from '@models/error.js'
+import { HttpError } from '@models'
 import { ClientUrlEnum, EnvNameEnum } from '@wealthwatch-shared'
 import type { NextFunction, Request, Response } from 'express'
 import { Session } from 'express-session'
@@ -26,7 +26,7 @@ describe('cors', () => {
 
     const expectCors = async (nodeEnv: string) => {
         process.env['NODE_ENV'] = nodeEnv
-        const { stage, prod } = await import('@utilities/env.js')
+        const { stage, prod } = await import('@utilities')
         const { cors } = await import('./middleware.js')
         cors(req, res, next)
 
@@ -93,8 +93,8 @@ describe('createSession', () => {
 
     const expectSession = async (nodeEnv: string) => {
         process.env['NODE_ENV'] = nodeEnv
-        const { prod, vars } = await import('@utilities/env.js')
-        const { createCookieName } = await import('@utilities/string.js')
+        const { prod, vars } = await import('@utilities')
+        const { createCookieName } = await import('@utilities')
         const { createSession } = await import('./middleware.js')
         const result = createSession()
         void result(req, res, next)
@@ -149,8 +149,8 @@ describe('createCsrf', () => {
 
     const expectCsrf = async (nodeEnv: string) => {
         process.env['NODE_ENV'] = nodeEnv
-        const { prod, vars } = await import('@utilities/env.js')
-        const { createCookieName } = await import('@utilities/string.js')
+        const { prod, vars } = await import('@utilities')
+        const { createCookieName } = await import('@utilities')
         const { createCsrf } = await import('./middleware.js')
         const result = createCsrf()
         void result(req, res, next)
@@ -262,8 +262,8 @@ describe('logRequestResponse', () => {
 
     it('logs request and response info', async () => {
         const { logRequestResponse } = await import('./middleware.js')
-        const { queueLogAppRequest } = await import('@queues/logQueue.js')
-        const { logger } = await import('@utilities/logger.js')
+        const { queueLogAppRequest } = await import('@queues')
+        const { logger } = await import('@utilities')
 
         logRequestResponse(req as Request, res as Response, next)
 
@@ -320,7 +320,7 @@ describe('logRequestResponse', () => {
 
     it('handles missing optional fields', async () => {
         const { logRequestResponse } = await import('./middleware.js')
-        const { queueLogAppRequest } = await import('@queues/logQueue.js')
+        const { queueLogAppRequest } = await import('@queues')
 
         req.session = {} as unknown as Session
         req.socket = {} as unknown as Socket
@@ -350,7 +350,7 @@ describe('logRequestResponse', () => {
         }))
 
         const { logRequestResponse } = await import('./middleware.js')
-        const { logger } = await import('@utilities/logger.js')
+        const { logger } = await import('@utilities')
 
         logRequestResponse(req as Request, res as Response, next)
 
@@ -499,7 +499,7 @@ describe('handleError', () => {
 
     it('logs error and sends response', async () => {
         const { handleError } = await import('./middleware.js')
-        const { logger } = await import('@utilities/logger.js')
+        const { logger } = await import('@utilities')
 
         handleError(mockError, req, res as Response, next)
 
@@ -529,15 +529,15 @@ describe('handleError', () => {
 
 describe('getErrorStatus', () => {
     it('returns status for generic error', async () => {
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const status = _test.getErrorStatus(new Error())
         expect(status).toBe(500)
     })
 
     it('returns status for HttpError', async () => {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { HttpError } = await import('@models/error.js')
-        const { _test } = await import('./middleware.js')
+        const { HttpError } = await import('@models')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const mockCode = 400
         const status = _test.getErrorStatus(new HttpError('test', mockCode))
         expect(status).toBe(mockCode)
@@ -548,7 +548,7 @@ describe('getErrorStatus', () => {
         const error = { status: mockCode } as Error & {
             status: number
         }
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const status = _test.getErrorStatus(error)
         expect(status).toBe(mockCode)
     })
@@ -558,7 +558,7 @@ describe('getErrorStatus', () => {
         const error = { statusCode: mockCode } as Error & {
             statusCode: number
         }
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const status = _test.getErrorStatus(error)
         expect(status).toBe(mockCode)
     })
@@ -568,7 +568,7 @@ describe('getErrorStatus', () => {
         const error = { code: mockCode } as Error & {
             code: number
         }
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const status = _test.getErrorStatus(error)
         expect(status).toBe(mockCode)
     })
@@ -577,7 +577,7 @@ describe('getErrorStatus', () => {
         const error = { status: 200 } as Error & {
             status: number
         }
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const status = _test.getErrorStatus(error)
         expect(status).toBe(500)
     })
@@ -586,41 +586,41 @@ describe('getErrorStatus', () => {
 describe('createErrorMessage', () => {
     it('creates HttpError message correctly', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { HttpError } = await import('@models/error.js')
+        const { HttpError } = await import('@models')
         const msg = _test.createErrorMessage(new HttpError(''))
         expect(msg).toBe('HTTP Error')
     })
 
     it('creates DatabaseError message correctly', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { DatabaseError } = await import('@models/error.js')
+        const { DatabaseError } = await import('@models')
         const msg = _test.createErrorMessage(new DatabaseError(''))
         expect(msg).toBe('Database Error')
     })
 
     it('creates PlaidApiError message correctly', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { PlaidApiError } = await import('@models/error.js')
+        const { PlaidApiError } = await import('@models')
         const msg = _test.createErrorMessage(new PlaidApiError('', '', ''))
         expect(msg).toBe('Plaid Error')
     })
 
     it('creates generic empty error message correctly', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const msg = _test.createErrorMessage(new Error())
         expect(msg).toBe('Unexpected Error')
     })
 
     it('creates generic error message correctly', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const msg = _test.createErrorMessage(new Error('test'))
         expect(msg).toBe('Test')
     })
@@ -629,7 +629,7 @@ describe('createErrorMessage', () => {
 describe('formatErrorMessage', () => {
     it('formats message in non-prod', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Dev
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const msg = _test.formatErrorMessage(
             'category',
             'details 1',
@@ -640,7 +640,7 @@ describe('formatErrorMessage', () => {
 
     it('formats message in prod', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
-        const { _test } = await import('./middleware.js')
+        const { _middlewareTest: _test } = await import('./middleware.js')
         const msg = _test.formatErrorMessage('category', 'details')
         expect(msg).toBe('Category')
     })

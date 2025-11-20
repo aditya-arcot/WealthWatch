@@ -1,5 +1,4 @@
-import { vars } from '@utilities/env.js'
-import { logger } from '@utilities/logger.js'
+import { logger, vars } from '@utilities'
 import { Redis } from 'ioredis'
 
 let redis: Redis | undefined

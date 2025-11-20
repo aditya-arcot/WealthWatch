@@ -1,4 +1,4 @@
-import { createNotification } from '@utilities/notification.js'
+import { createNotification } from '@utilities'
 import { Item, Notification, NotificationTypeEnum } from '@wealthwatch-shared'
 import { describe, expect, it } from 'vitest'
 

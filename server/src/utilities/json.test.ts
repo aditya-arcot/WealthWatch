@@ -1,4 +1,4 @@
-import { safeStringify } from '@utilities/json.js'
+import { safeStringify } from '@utilities'
 import { describe, expect, it } from 'vitest'
 
 describe('safeStringify', () => {

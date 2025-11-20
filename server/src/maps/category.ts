@@ -1,7 +1,4 @@
-import {
-    PlaidDetailedCategoryEnum,
-    PlaidPrimaryCategoryEnum,
-} from '@enums/category.js'
+import { PlaidDetailedCategoryEnum, PlaidPrimaryCategoryEnum } from '@enums'
 import { CategoryEnum } from '@wealthwatch-shared'
 
 export const primaryCategoryMap: Record<

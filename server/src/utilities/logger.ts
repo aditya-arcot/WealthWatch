@@ -1,4 +1,4 @@
-import { dev, vars } from '@utilities/env.js'
+import { dev, vars } from '@utilities'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
@@ -49,4 +49,4 @@ export const logger = pino({
     transport: { targets },
 })
 
-export const _test = { targets }
+export const _loggerTest = { targets }

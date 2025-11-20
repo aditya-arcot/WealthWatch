@@ -1,4 +1,4 @@
-import * as logger from '@utilities/logger.js'
+import * as logger from '@utilities'
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
 
 let redisConstructorMock: Mock
@@ -35,7 +35,7 @@ describe('createRedis', () => {
 
     it('creates redis client with correct config', async () => {
         process.env['REDIS_HOST'] = mockRedisHost
-        const { createRedis, getRedis } = await import('@utilities/redis.js')
+        const { createRedis, getRedis } = await import('@utilities')
         await createRedis()
         const redis = getRedis()
 
@@ -61,7 +61,7 @@ describe('createRedis', () => {
         setupMockRedis(
             vi.fn().mockRejectedValue(new Error('connection failed'))
         )
-        const { createRedis } = await import('@utilities/redis.js')
+        const { createRedis } = await import('@utilities')
         await expect(createRedis()).rejects.toThrow(
             'failed to create redis client'
         )
@@ -70,7 +70,7 @@ describe('createRedis', () => {
 
 describe('getRedis', () => {
     it('returns redis client if initialized', async () => {
-        const { createRedis, getRedis } = await import('@utilities/redis.js')
+        const { createRedis, getRedis } = await import('@utilities')
         await createRedis()
         const redis = getRedis()
 
@@ -79,16 +79,14 @@ describe('getRedis', () => {
     })
 
     it('throws error if redis client not initialized', async () => {
-        const { getRedis } = await import('@utilities/redis.js')
+        const { getRedis } = await import('@utilities')
         expect(() => getRedis()).toThrow('redis client not initialized')
     })
 })
 
 describe('stopRedis', () => {
     it('stops redis client if initialized', async () => {
-        const { createRedis, getRedis, stopRedis } = await import(
-            '@utilities/redis.js'
-        )
+        const { createRedis, getRedis, stopRedis } = await import('@utilities')
         await createRedis()
         const redis = getRedis()
         stopRedis()
@@ -106,7 +104,7 @@ describe('stopRedis', () => {
     })
 
     it('logs warning if redis client not initialized', async () => {
-        const { stopRedis } = await import('@utilities/redis.js')
+        const { stopRedis } = await import('@utilities')
         stopRedis()
 
         expect(logger.logger.debug).toHaveBeenCalledExactlyOnceWith(

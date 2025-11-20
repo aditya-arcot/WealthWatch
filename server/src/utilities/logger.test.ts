@@ -18,14 +18,14 @@ describe('logger', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Dev
         existsSync.mockReturnValue(false)
 
-        const { _test } = await import('@utilities/logger.js')
+        const { _loggerTest } = await import('@utilities')
         expect(mkdirSync).toHaveBeenCalled()
-        expect(_test.targets.length).toBe(3)
+        expect(_loggerTest.targets.length).toBe(3)
     })
 
     it('sets up logger with two targets for non-dev', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Test
-        const { _test } = await import('@utilities/logger.js')
-        expect(_test.targets.length).toBe(2)
+        const { _loggerTest } = await import('@utilities')
+        expect(_loggerTest.targets.length).toBe(2)
     })
 })

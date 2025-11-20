@@ -10,15 +10,16 @@
         // to avoid plaid naming conflict
         "baseUrl": ".",
         "paths": {
-            "@controllers/*": ["src/controllers/*"],
-            "@database/*": ["src/database/*"],
-            "@enums/*": ["src/enums/*"],
-            "@maps/*": ["src/maps/*"],
-            "@models/*": ["src/models/*"],
-            "@plaid/*": ["src/plaid/*"],
-            "@queues/*": ["src/queues/*"],
-            "@routes/*": ["src/routes/*"],
-            "@utilities/*": ["src/utilities/*"],
+            "@controllers": ["src/controllers/index.ts"],
+            "@database": ["src/database/index.ts"],
+            "@enums": ["src/enums/index.ts"],
+            "@maps": ["src/maps/index.ts"],
+            "@models": ["src/models/index.ts"],
+            "@plaid": ["src/plaid/index.ts"],
+            "@queues": ["src/queues/index.ts"],
+            // single default export - router
+            "@routes": ["src/routes/routes.ts"],
+            "@utilities": ["src/utilities/index.ts"],
             "@wealthwatch-shared": ["src/wealthwatch-shared.ts"]
         }
     },

@@ -1,7 +1,7 @@
 import {
     parseNumberArrayOrUndefinedFromParam,
     parseNumberOrUndefinedFromParam,
-} from '@utilities/param.js'
+} from '@utilities'
 import { ParsedQs } from 'qs'
 import { describe, expect, it } from 'vitest'
 
