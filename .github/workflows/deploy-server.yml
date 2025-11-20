@@ -12,6 +12,7 @@ on:
 
 permissions:
     contents: read
+    packages: read
 
 jobs:
     deploy:
@@ -58,11 +59,17 @@ jobs:
                   echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
                   echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
 
+            - name: create .npmrc
+              working-directory: server
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
+
             - name: copy files
               working-directory: server
               run: |
                   mkdir stage
-                  cp -r .env package.json package-lock.json tsconfig.json src stage/
+                  cp -r .env .npmrc package.json package-lock.json tsconfig.json src stage/
                   find stage -type f
 
             - name: build, push docker image
