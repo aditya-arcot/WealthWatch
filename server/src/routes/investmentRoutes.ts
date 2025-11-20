@@ -1,6 +1,6 @@
+import { refreshUserInvestments } from '@controllers/investmentController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
 import express from 'express'
-import { refreshUserInvestments } from '../controllers/investmentController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
 
 const router = express.Router()
 

@@ -1,5 +1,8 @@
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
 import { CreditCard, Mortgage, StudentLoan } from '@wealthwatch-shared'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertCreditCards = async (
     creditCards: CreditCard[]

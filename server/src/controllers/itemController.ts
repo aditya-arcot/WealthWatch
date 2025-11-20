@@ -1,11 +1,9 @@
-import { Account, isInCooldown, Item } from '@wealthwatch-shared'
-import { Request, Response } from 'express'
 import {
     fetchActiveAccountsByUserId,
     insertAccounts,
     modifyAccountsToInactiveByPlaidItemId,
-} from '../database/accountQueries.js'
-import { insertHoldings } from '../database/holdingQueries.js'
+} from '@database/accountQueries.js'
+import { insertHoldings } from '@database/holdingQueries.js'
 import {
     fetchActiveItemByPlaidId,
     fetchActiveItemsWithAccountsByUserId,
@@ -18,52 +16,51 @@ import {
     modifyItemLastRefreshedByPlaidId,
     modifyItemToInactiveById,
     modifyItemTransactionsLastRefreshedByPlaidId,
-} from '../database/itemQueries.js'
+} from '@database/itemQueries.js'
 import {
     insertCreditCards,
     insertMortgages,
     insertStudentLoans,
-} from '../database/liabilityQueries.js'
-import { modifyNotificationsToInactiveByItemId } from '../database/notificationQueries.js'
-import {
-    fetchSecurities,
-    insertSecurities,
-} from '../database/securityQueries.js'
+} from '@database/liabilityQueries.js'
+import { modifyNotificationsToInactiveByItemId } from '@database/notificationQueries.js'
+import { fetchSecurities, insertSecurities } from '@database/securityQueries.js'
 import {
     fetchPaginatedActiveTransactionsAndCountsByUserIdAndFilters,
     insertTransactions,
     removeTransactionsByPlaidIds,
-} from '../database/transactionQueries.js'
-import { HttpError } from '../models/error.js'
+} from '@database/transactionQueries.js'
+import { HttpError } from '@models/error.js'
 import {
     plaidAccountsBalanceGet,
     plaidAccountsGet,
-} from '../plaid/accountMethods.js'
+} from '@plaid/accountMethods.js'
 import {
     mapPlaidHolding,
     mapPlaidSecurity,
     plaidInvestmentsHoldingsGet,
     plaidInvestmentsRefresh,
-} from '../plaid/investmentMethods.js'
-import { plaidItemRemove } from '../plaid/itemMethods.js'
+} from '@plaid/investmentMethods.js'
+import { plaidItemRemove } from '@plaid/itemMethods.js'
 import {
     mapPlaidCreditCard,
     mapPlaidMortgage,
     mapPlaidStudentLoan,
     plaidLiabilitiesGet,
-} from '../plaid/liabilityMethods.js'
+} from '@plaid/liabilityMethods.js'
 import {
     mapPlaidTransaction,
     plaidTransactionsRefresh,
     plaidTransactionsSync,
-} from '../plaid/transactionMethods.js'
+} from '@plaid/transactionMethods.js'
 import {
     queueSyncItemBalances,
     queueSyncItemInvestments,
     queueSyncItemLiabilities,
     queueSyncItemTransactions,
-} from '../queues/itemQueue.js'
-import { logger } from '../utilities/logger.js'
+} from '@queues/itemQueue.js'
+import { logger } from '@utilities/logger.js'
+import { Account, isInCooldown, Item } from '@wealthwatch-shared'
+import { Request, Response } from 'express'
 
 export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
     logger.debug('getting items with accounts')

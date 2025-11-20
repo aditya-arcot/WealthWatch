@@ -1,21 +1,21 @@
-import { Item, NotificationTypeEnum, PlaidLinkEvent } from '@wealthwatch-shared'
-import { Request, Response } from 'express'
-import { LinkSessionSuccessMetadata } from 'plaid'
+import { syncItemData } from '@controllers/itemController.js'
 import {
     fetchActiveItemByUserIdAndId,
     fetchActiveItemByUserIdAndInstitutionId,
     insertItem,
     modifyItemHealthyById,
-} from '../database/itemQueries.js'
-import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
-import { HttpError } from '../models/error.js'
+} from '@database/itemQueries.js'
+import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '@database/notificationQueries.js'
+import { HttpError } from '@models/error.js'
 import {
     plaidLinkTokenCreate,
     plaidPublicTokenExchange,
-} from '../plaid/tokenMethods.js'
-import { queueLogPlaidLinkEvent } from '../queues/logQueue.js'
-import { logger } from '../utilities/logger.js'
-import { syncItemData } from './itemController.js'
+} from '@plaid/tokenMethods.js'
+import { queueLogPlaidLinkEvent } from '@queues/logQueue.js'
+import { logger } from '@utilities/logger.js'
+import { Item, NotificationTypeEnum, PlaidLinkEvent } from '@wealthwatch-shared'
+import { Request, Response } from 'express'
+import { LinkSessionSuccessMetadata } from 'plaid'
 
 export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')

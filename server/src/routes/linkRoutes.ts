@@ -1,11 +1,11 @@
-import express from 'express'
 import {
     createLinkToken,
     exchangePublicToken,
     handleLinkEvent,
     handleLinkUpdateComplete,
-} from '../controllers/linkController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/linkController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

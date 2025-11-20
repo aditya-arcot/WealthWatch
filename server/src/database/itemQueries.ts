@@ -1,13 +1,4 @@
 import {
-    Item,
-    ItemWithAccounts,
-    ItemWithAccountsWithHoldings,
-    ItemWithCreditCardAccounts,
-    ItemWithMortgageAccounts,
-    ItemWithStudentLoanAccounts,
-} from '@wealthwatch-shared'
-import { DatabaseError } from '../models/error.js'
-import {
     DbAccount,
     DbAccountWithHoldings,
     DbCreditCardAccount,
@@ -18,8 +9,20 @@ import {
     mapDbAccountWithHoldings,
     mapMortgageAccount,
     mapStudentLoanAccount,
-} from './accountQueries.js'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
+} from '@database/accountQueries.js'
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
+import { DatabaseError } from '@models/error.js'
+import {
+    Item,
+    ItemWithAccounts,
+    ItemWithAccountsWithHoldings,
+    ItemWithCreditCardAccounts,
+    ItemWithMortgageAccounts,
+    ItemWithStudentLoanAccounts,
+} from '@wealthwatch-shared'
 
 export const insertItem = async (item: Item): Promise<Item> => {
     const values: unknown[] = [

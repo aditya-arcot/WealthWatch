@@ -1,6 +1,6 @@
+import { getSecrets } from '@controllers/secretsController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
 import express from 'express'
-import { getSecrets } from '../controllers/secretsController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
 
 const router = express.Router()
 

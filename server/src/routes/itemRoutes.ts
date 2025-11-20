@@ -1,4 +1,3 @@
-import express from 'express'
 import {
     deactivateItem,
     getUserItemsWithAccounts,
@@ -7,8 +6,9 @@ import {
     getUserItemsWithMortgageAccounts,
     getUserItemsWithStudentLoanAccounts,
     refreshItem,
-} from '../controllers/itemController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/itemController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

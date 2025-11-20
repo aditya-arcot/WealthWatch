@@ -1,5 +1,8 @@
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
 import { Notification, NotificationTypeEnum } from '@wealthwatch-shared'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertNotification = async (n: Notification): Promise<void> => {
     if (n.typeId !== NotificationTypeEnum.Info && n.itemId !== null) {

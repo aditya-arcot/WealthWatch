@@ -1,5 +1,5 @@
+import { safeStringify } from '@utilities/json.js'
 import { describe, expect, it } from 'vitest'
-import { safeStringify } from './json.js'
 
 describe('safeStringify', () => {
     it('stringifies non-circular object', () => {

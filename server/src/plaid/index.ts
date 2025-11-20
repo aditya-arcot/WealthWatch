@@ -1,18 +1,18 @@
-import { AxiosError, isAxiosError } from 'axios'
-import { Configuration, PlaidApi, PlaidEnvironments, PlaidError } from 'plaid'
 import {
     insertInfoNotification,
     insertLinkUpdateNotification,
     insertLinkUpdateWithAccountsNotification,
-} from '../controllers/notificationController.js'
-import { fetchActiveItemByUserIdAndId } from '../database/itemQueries.js'
-import { PlaidGeneralErrorCodeEnum } from '../enums/plaidError.js'
-import { HttpError, PlaidApiError } from '../models/error.js'
-import { PlaidApiRequest } from '../models/plaidApiRequest.js'
-import { queueLogPlaidApiRequest } from '../queues/logQueue.js'
-import { vars } from '../utilities/env.js'
-import { safeStringify } from '../utilities/json.js'
-import { logger } from '../utilities/logger.js'
+} from '@controllers/notificationController.js'
+import { fetchActiveItemByUserIdAndId } from '@database/itemQueries.js'
+import { PlaidGeneralErrorCodeEnum } from '@enums/plaidError.js'
+import { HttpError, PlaidApiError } from '@models/error.js'
+import { PlaidApiRequest } from '@models/plaidApiRequest.js'
+import { queueLogPlaidApiRequest } from '@queues/logQueue.js'
+import { vars } from '@utilities/env.js'
+import { safeStringify } from '@utilities/json.js'
+import { logger } from '@utilities/logger.js'
+import { AxiosError, isAxiosError } from 'axios'
+import { Configuration, PlaidApi, PlaidEnvironments, PlaidError } from 'plaid'
 
 let plaidClient: PlaidApi | undefined
 

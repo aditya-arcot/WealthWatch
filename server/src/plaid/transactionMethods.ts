@@ -1,4 +1,16 @@
 import {
+    PlaidDetailedCategoryEnum,
+    PlaidPrimaryCategoryEnum,
+} from '@enums/category.js'
+import {
+    PlaidGeneralErrorCodeEnum,
+    PlaidTransactionErrorCodeEnum,
+} from '@enums/plaidError.js'
+import { detailedCategoryMap, primaryCategoryMap } from '@maps/category.js'
+import { PlaidApiError } from '@models/error.js'
+import { executePlaidMethod, getPlaidClient } from '@plaid/index.js'
+import { logger } from '@utilities/logger.js'
+import {
     CategoryEnum,
     Item,
     PaymentChannelEnum,
@@ -12,18 +24,6 @@ import {
     TransactionsRefreshRequest,
     TransactionsSyncRequest,
 } from 'plaid'
-import {
-    PlaidDetailedCategoryEnum,
-    PlaidPrimaryCategoryEnum,
-} from '../enums/category.js'
-import {
-    PlaidGeneralErrorCodeEnum,
-    PlaidTransactionErrorCodeEnum,
-} from '../enums/plaidError.js'
-import { detailedCategoryMap, primaryCategoryMap } from '../maps/category.js'
-import { PlaidApiError } from '../models/error.js'
-import { logger } from '../utilities/logger.js'
-import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidTransactionsRefresh = async (item: Item) => {
     logger.debug({ id: item.id }, 'refreshing item transactions')

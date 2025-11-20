@@ -1,8 +1,8 @@
+import { prod, vars } from '@utilities/env.js'
 import { Request } from 'express'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import swaggerJSDoc from 'swagger-jsdoc'
 import { SwaggerUiOptions } from 'swagger-ui-express'
-import { prod, vars } from './env.js'
 
 export const swaggerUiOptions: SwaggerUiOptions = {
     swaggerOptions: {

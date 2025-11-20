@@ -1,13 +1,8 @@
-import cookieParser from 'cookie-parser'
-import express from 'express'
-import helmet from 'helmet'
-import methodOverride from 'method-override'
-import swaggerUi from 'swagger-ui-express'
-import { processWebhook } from './controllers/webhookController.js'
-import { HttpError } from './models/error.js'
-import router from './routes/index.js'
-import { prod } from './utilities/env.js'
-import { logger } from './utilities/logger.js'
+import { processWebhook } from '@controllers/webhookController.js'
+import { HttpError } from '@models/error.js'
+import router from '@routes/index.js'
+import { prod } from '@utilities/env.js'
+import { logger } from '@utilities/logger.js'
 import {
     catchAsync,
     cors,
@@ -16,8 +11,13 @@ import {
     handleError,
     handleUnmatchedRoute,
     logRequestResponse,
-} from './utilities/middleware.js'
-import { createSwaggerSpec, swaggerUiOptions } from './utilities/swagger.js'
+} from '@utilities/middleware.js'
+import { createSwaggerSpec, swaggerUiOptions } from '@utilities/swagger.js'
+import cookieParser from 'cookie-parser'
+import express from 'express'
+import helmet from 'helmet'
+import methodOverride from 'method-override'
+import swaggerUi from 'swagger-ui-express'
 
 export const startExpressApps = () => {
     logger.debug('starting express apps')

@@ -1,9 +1,9 @@
+import { HttpError } from '@models/error.js'
 import { ClientUrlEnum, EnvNameEnum } from '@wealthwatch-shared'
 import type { NextFunction, Request, Response } from 'express'
 import { Session } from 'express-session'
 import { Socket } from 'node:net'
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
-import { HttpError } from '../models/error.js'
 
 beforeEach(() => {
     vi.resetModules()
@@ -26,7 +26,7 @@ describe('cors', () => {
 
     const expectCors = async (nodeEnv: string) => {
         process.env['NODE_ENV'] = nodeEnv
-        const { stage, prod } = await import('./env.js')
+        const { stage, prod } = await import('@utilities/env.js')
         const { cors } = await import('./middleware.js')
         cors(req, res, next)
 
@@ -73,7 +73,7 @@ describe('createSession', () => {
     beforeEach(() => {
         vi.resetModules()
 
-        vi.doMock('../database/index', () => ({
+        vi.doMock('@database/index', () => ({
             getPool: () => mockPool,
         }))
         vi.doMock('connect-pg-simple', () => ({
@@ -93,8 +93,8 @@ describe('createSession', () => {
 
     const expectSession = async (nodeEnv: string) => {
         process.env['NODE_ENV'] = nodeEnv
-        const { prod, vars } = await import('./env.js')
-        const { createCookieName } = await import('./string.js')
+        const { prod, vars } = await import('@utilities/env.js')
+        const { createCookieName } = await import('@utilities/string.js')
         const { createSession } = await import('./middleware.js')
         const result = createSession()
         void result(req, res, next)
@@ -149,8 +149,8 @@ describe('createCsrf', () => {
 
     const expectCsrf = async (nodeEnv: string) => {
         process.env['NODE_ENV'] = nodeEnv
-        const { prod, vars } = await import('./env.js')
-        const { createCookieName } = await import('./string.js')
+        const { prod, vars } = await import('@utilities/env.js')
+        const { createCookieName } = await import('@utilities/string.js')
         const { createCsrf } = await import('./middleware.js')
         const result = createCsrf()
         void result(req, res, next)
@@ -255,15 +255,15 @@ describe('logRequestResponse', () => {
                 error: vi.fn(),
             },
         }))
-        vi.doMock('../queues/logQueue', () => ({
+        vi.doMock('@queues/logQueue', () => ({
             queueLogAppRequest: vi.fn().mockResolvedValue(undefined),
         }))
     })
 
     it('logs request and response info', async () => {
         const { logRequestResponse } = await import('./middleware.js')
-        const { queueLogAppRequest } = await import('../queues/logQueue.js')
-        const { logger } = await import('./logger.js')
+        const { queueLogAppRequest } = await import('@queues/logQueue.js')
+        const { logger } = await import('@utilities/logger.js')
 
         logRequestResponse(req as Request, res as Response, next)
 
@@ -320,7 +320,7 @@ describe('logRequestResponse', () => {
 
     it('handles missing optional fields', async () => {
         const { logRequestResponse } = await import('./middleware.js')
-        const { queueLogAppRequest } = await import('../queues/logQueue.js')
+        const { queueLogAppRequest } = await import('@queues/logQueue.js')
 
         req.session = {} as unknown as Session
         req.socket = {} as unknown as Socket
@@ -345,12 +345,12 @@ describe('logRequestResponse', () => {
     })
 
     it('handles errors in queueLogAppRequest', async () => {
-        vi.doMock('../queues/logQueue', () => ({
+        vi.doMock('@queues/logQueue', () => ({
             queueLogAppRequest: vi.fn().mockRejectedValue(mockError),
         }))
 
         const { logRequestResponse } = await import('./middleware.js')
-        const { logger } = await import('./logger.js')
+        const { logger } = await import('@utilities/logger.js')
 
         logRequestResponse(req as Request, res as Response, next)
 
@@ -499,7 +499,7 @@ describe('handleError', () => {
 
     it('logs error and sends response', async () => {
         const { handleError } = await import('./middleware.js')
-        const { logger } = await import('./logger.js')
+        const { logger } = await import('@utilities/logger.js')
 
         handleError(mockError, req, res as Response, next)
 
@@ -536,7 +536,7 @@ describe('getErrorStatus', () => {
 
     it('returns status for HttpError', async () => {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { HttpError } = await import('../models/error.js')
+        const { HttpError } = await import('@models/error.js')
         const { _test } = await import('./middleware.js')
         const mockCode = 400
         const status = _test.getErrorStatus(new HttpError('test', mockCode))
@@ -588,7 +588,7 @@ describe('createErrorMessage', () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
         const { _test } = await import('./middleware.js')
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { HttpError } = await import('../models/error.js')
+        const { HttpError } = await import('@models/error.js')
         const msg = _test.createErrorMessage(new HttpError(''))
         expect(msg).toBe('HTTP Error')
     })
@@ -597,7 +597,7 @@ describe('createErrorMessage', () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
         const { _test } = await import('./middleware.js')
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { DatabaseError } = await import('../models/error.js')
+        const { DatabaseError } = await import('@models/error.js')
         const msg = _test.createErrorMessage(new DatabaseError(''))
         expect(msg).toBe('Database Error')
     })
@@ -606,7 +606,7 @@ describe('createErrorMessage', () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
         const { _test } = await import('./middleware.js')
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const { PlaidApiError } = await import('../models/error.js')
+        const { PlaidApiError } = await import('@models/error.js')
         const msg = _test.createErrorMessage(new PlaidApiError('', '', ''))
         expect(msg).toBe('Plaid Error')
     })

@@ -1,16 +1,20 @@
-import { Item } from '@wealthwatch-shared'
-import { Queue, Worker } from 'bullmq'
 import {
     syncItemAccounts,
     syncItemBalances,
     syncItemInvestments,
     syncItemLiabilities,
     syncItemTransactions,
-} from '../controllers/itemController.js'
-import { vars } from '../utilities/env.js'
-import { logger } from '../utilities/logger.js'
-import { getRedis } from '../utilities/redis.js'
-import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
+} from '@controllers/itemController.js'
+import {
+    handleJobFailure,
+    handleJobSuccess,
+    workerOptions,
+} from '@queues/index.js'
+import { vars } from '@utilities/env.js'
+import { logger } from '@utilities/logger.js'
+import { getRedis } from '@utilities/redis.js'
+import { Item } from '@wealthwatch-shared'
+import { Queue, Worker } from 'bullmq'
 
 enum ItemJobType {
     SyncTransactions = 'SyncTransactions',

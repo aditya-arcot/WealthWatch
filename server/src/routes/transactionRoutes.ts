@@ -1,12 +1,12 @@
-import express from 'express'
 import {
     getUserTransactionsAndCounts,
     refreshUserTransactions,
     updateTransactionCustomCategoryId,
     updateTransactionCustomName,
     updateTransactionNote,
-} from '../controllers/transactionController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/transactionController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

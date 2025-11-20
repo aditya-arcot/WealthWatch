@@ -1,5 +1,8 @@
-import { Job } from '../models/job.js'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
+import { Job } from '@models/job.js'
 
 export const insertJob = async (job: Job): Promise<void> => {
     const values: unknown[] = [

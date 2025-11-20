@@ -1,5 +1,8 @@
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
 import { PlaidLinkEvent } from '@wealthwatch-shared'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertPlaidLinkEvent = async (
     event: PlaidLinkEvent

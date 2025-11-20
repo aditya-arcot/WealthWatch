@@ -1,4 +1,3 @@
-import express from 'express'
 import {
     devCreateSandboxItem,
     devDeactivateAllItems,
@@ -12,8 +11,9 @@ import {
     devSyncItemInvestments,
     devSyncItemLiabilities,
     devSyncItemTransactions,
-} from '../controllers/devController.js'
-import { catchAsync } from '../utilities/middleware.js'
+} from '@controllers/devController.js'
+import { catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

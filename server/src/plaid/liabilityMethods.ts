@@ -1,3 +1,5 @@
+import { executePlaidMethod, getPlaidClient } from '@plaid/index.js'
+import { logger } from '@utilities/logger.js'
 import {
     CreditCard,
     Item,
@@ -15,8 +17,6 @@ import {
     StudentRepaymentPlanTypeEnum as PlaidStudentLoanRepaymentTypeEnum,
     StudentLoanStatusTypeEnum as PlaidStudentLoanStatusTypeEnum,
 } from 'plaid'
-import { logger } from '../utilities/logger.js'
-import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidLiabilitiesGet = async (item: Item) => {
     logger.debug({ id: item.id }, 'getting item liabilities')

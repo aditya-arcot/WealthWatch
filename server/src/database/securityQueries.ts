@@ -1,5 +1,8 @@
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
 import { Security } from '@wealthwatch-shared'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertSecurities = async (
     securities: Security[]

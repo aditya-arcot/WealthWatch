@@ -1,9 +1,12 @@
 import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
+import {
     PaymentChannelEnum,
     Transaction,
     TransactionsAndCounts,
 } from '@wealthwatch-shared'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertTransactions = async (
     transactions: Transaction[]

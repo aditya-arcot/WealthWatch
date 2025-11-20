@@ -1,4 +1,12 @@
 import {
+    DbHoldingWithSecurity,
+    mapDbHoldingWithSecurity,
+} from '@database/holdingQueries.js'
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
+import {
     Account,
     AccountWithHoldings,
     CreditCardAccount,
@@ -7,11 +15,6 @@ import {
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
 } from '@wealthwatch-shared'
-import {
-    DbHoldingWithSecurity,
-    mapDbHoldingWithSecurity,
-} from './holdingQueries.js'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertAccounts = async (
     accounts: Account[],

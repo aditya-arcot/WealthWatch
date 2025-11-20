@@ -1,5 +1,8 @@
-import { PlaidApiRequest } from '../models/plaidApiRequest.js'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
+import { PlaidApiRequest } from '@models/plaidApiRequest.js'
 
 export const insertPlaidApiRequest = async (
     request: PlaidApiRequest

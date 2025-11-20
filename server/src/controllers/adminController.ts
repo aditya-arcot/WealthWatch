@@ -1,13 +1,13 @@
-import { AccessRequestStatusEnum } from '@wealthwatch-shared'
-import * as crypto from 'crypto'
-import { Request, Response } from 'express'
 import {
     fetchAccessRequests,
     modifyAccessRequestStatusAccessCodeAndReviewerById,
-} from '../database/accessRequestQueries.js'
-import { HttpError } from '../models/error.js'
-import { logger } from '../utilities/logger.js'
-import { parseNumberOrUndefinedFromParam } from '../utilities/param.js'
+} from '@database/accessRequestQueries.js'
+import { HttpError } from '@models/error.js'
+import { logger } from '@utilities/logger.js'
+import { parseNumberOrUndefinedFromParam } from '@utilities/param.js'
+import { AccessRequestStatusEnum } from '@wealthwatch-shared'
+import * as crypto from 'crypto'
+import { Request, Response } from 'express'
 
 export const getAccessRequests = async (_req: Request, res: Response) => {
     logger.debug('getting access requests')

@@ -1,3 +1,8 @@
+import { PlaidAccountErrorCodeEnum } from '@enums/plaidError.js'
+import { PlaidApiError } from '@models/error.js'
+import { executePlaidMethod, getPlaidClient } from '@plaid/index.js'
+import { logger } from '@utilities/logger.js'
+import { toTitleCase } from '@utilities/string.js'
 import { Account, Item } from '@wealthwatch-shared'
 import { formatISO, subDays } from 'date-fns'
 import {
@@ -5,11 +10,6 @@ import {
     AccountsBalanceGetRequest,
     AccountsGetRequest,
 } from 'plaid'
-import { PlaidAccountErrorCodeEnum } from '../enums/plaidError.js'
-import { PlaidApiError } from '../models/error.js'
-import { logger } from '../utilities/logger.js'
-import { toTitleCase } from '../utilities/string.js'
-import { executePlaidMethod, getPlaidClient } from './index.js'
 
 export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
     logger.debug({ id: item.id }, 'getting item accounts')

@@ -1,9 +1,9 @@
+import * as db from '@database/index.js'
+import { CLEANUP_EVENTS } from '@models/constants.js'
+import * as queues from '@queues/index.js'
+import * as logger from '@utilities/logger.js'
+import * as redis from '@utilities/redis.js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import * as db from '../database/index.js'
-import { CLEANUP_EVENTS } from '../models/constants.js'
-import * as queues from '../queues/index.js'
-import * as logger from './logger.js'
-import * as redis from './redis.js'
 
 vi.mock('./logger', () => ({
     logger: {

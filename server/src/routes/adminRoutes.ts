@@ -1,9 +1,9 @@
-import express from 'express'
 import {
     getAccessRequests,
     reviewAccessRequest,
-} from '../controllers/adminController.js'
-import { authenticateAdmin, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/adminController.js'
+import { authenticateAdmin, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

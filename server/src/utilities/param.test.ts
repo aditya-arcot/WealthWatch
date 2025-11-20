@@ -1,9 +1,9 @@
-import { ParsedQs } from 'qs'
-import { describe, expect, it } from 'vitest'
 import {
     parseNumberArrayOrUndefinedFromParam,
     parseNumberOrUndefinedFromParam,
-} from './param.js'
+} from '@utilities/param.js'
+import { ParsedQs } from 'qs'
+import { describe, expect, it } from 'vitest'
 
 const invalidParamError = 'invalid param'
 const invalidNumError = 'invalid number'

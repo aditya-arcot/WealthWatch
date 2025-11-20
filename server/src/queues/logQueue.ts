@@ -1,14 +1,18 @@
+import { insertAppRequest } from '@database/appRequestQueries.js'
+import { insertPlaidApiRequest } from '@database/plaidApiRequestQueries.js'
+import { insertPlaidLinkEvent } from '@database/plaidLinkEventQueries.js'
+import { AppRequest } from '@models/appRequest.js'
+import { PlaidApiRequest } from '@models/plaidApiRequest.js'
+import {
+    handleJobFailure,
+    handleJobSuccess,
+    workerOptions,
+} from '@queues/index.js'
+import { vars } from '@utilities/env.js'
+import { logger } from '@utilities/logger.js'
+import { getRedis } from '@utilities/redis.js'
 import { PlaidLinkEvent } from '@wealthwatch-shared'
 import { Queue, Worker } from 'bullmq'
-import { insertAppRequest } from '../database/appRequestQueries.js'
-import { insertPlaidApiRequest } from '../database/plaidApiRequestQueries.js'
-import { insertPlaidLinkEvent } from '../database/plaidLinkEventQueries.js'
-import { AppRequest } from '../models/appRequest.js'
-import { PlaidApiRequest } from '../models/plaidApiRequest.js'
-import { vars } from '../utilities/env.js'
-import { logger } from '../utilities/logger.js'
-import { getRedis } from '../utilities/redis.js'
-import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 enum LogJobType {
     LogAppRequest = 'AppRequest',

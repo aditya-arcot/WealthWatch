@@ -1,6 +1,6 @@
+import { getCategories } from '@controllers/categoryController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
 import express from 'express'
-import { getCategories } from '../controllers/categoryController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
 
 const router = express.Router()
 

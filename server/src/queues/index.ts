@@ -1,20 +1,20 @@
-import { insertJob } from '../database/jobQueries.js'
-import { logger } from '../utilities/logger.js'
+import { insertJob } from '@database/jobQueries.js'
 import {
     closeItemWorker,
     initializeItemQueue,
     initializeItemWorker,
-} from './itemQueue.js'
+} from '@queues/itemQueue.js'
 import {
     closeLogWorker,
     initializeLogQueue,
     initializeLogWorker,
-} from './logQueue.js'
+} from '@queues/logQueue.js'
 import {
     closeWebhookWorker,
     initializeWebhookQueue,
     initializeWebhookWorker,
-} from './webhookQueue.js'
+} from '@queues/webhookQueue.js'
+import { logger } from '@utilities/logger.js'
 
 export const initializeQueues = () => {
     logger.debug('initializing queues')

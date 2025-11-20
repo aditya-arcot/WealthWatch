@@ -1,10 +1,10 @@
-import express from 'express'
 import {
     getUserNotifications,
     updateUserNotificationsToRead,
     updateUserNotificationToInactive,
-} from '../controllers/notificationController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/notificationController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

@@ -1,15 +1,15 @@
-import { Item, NotificationTypeEnum } from '@wealthwatch-shared'
-import { Request, Response } from 'express'
 import {
     fetchActiveNotificationsByUserId,
     insertNotification,
     modifyNotificationsToReadByUserId,
     modifyNotificationToInactiveByUserIdAndId,
-} from '../database/notificationQueries.js'
-import { HttpError } from '../models/error.js'
-import { logger } from '../utilities/logger.js'
-import { createNotification } from '../utilities/notification.js'
-import { parseNumberOrUndefinedFromParam } from '../utilities/param.js'
+} from '@database/notificationQueries.js'
+import { HttpError } from '@models/error.js'
+import { logger } from '@utilities/logger.js'
+import { createNotification } from '@utilities/notification.js'
+import { parseNumberOrUndefinedFromParam } from '@utilities/param.js'
+import { Item, NotificationTypeEnum } from '@wealthwatch-shared'
+import { Request, Response } from 'express'
 
 export const getUserNotifications = async (req: Request, res: Response) => {
     logger.debug('getting notifications')

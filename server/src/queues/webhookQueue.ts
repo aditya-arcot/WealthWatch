@@ -1,10 +1,14 @@
+import { handleWebhook } from '@controllers/webhookController.js'
+import { Webhook } from '@models/webhook.js'
+import {
+    handleJobFailure,
+    handleJobSuccess,
+    workerOptions,
+} from '@queues/index.js'
+import { vars } from '@utilities/env.js'
+import { logger } from '@utilities/logger.js'
+import { getRedis } from '@utilities/redis.js'
 import { Queue, Worker } from 'bullmq'
-import { handleWebhook } from '../controllers/webhookController.js'
-import { Webhook } from '../models/webhook.js'
-import { vars } from '../utilities/env.js'
-import { logger } from '../utilities/logger.js'
-import { getRedis } from '../utilities/redis.js'
-import { handleJobFailure, handleJobSuccess, workerOptions } from './index.js'
 
 const webhookQueueName = `webhook-${vars.nodeEnv}`
 let webhookQueue: Queue | null = null

@@ -58,6 +58,10 @@ export default defineConfig(
                             message:
                                 'Use the "@wealthwatch-shared" alias instead',
                         },
+                        {
+                            group: ['.*', 'src/'],
+                            message: 'Use path alias instead of relative path',
+                        },
                     ],
                 },
             ],

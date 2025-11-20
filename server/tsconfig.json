@@ -7,8 +7,18 @@
         "outDir": "dist",
         "sourceMap": false,
         "listEmittedFiles": true,
+        // to avoid plaid naming conflict
         "baseUrl": ".",
         "paths": {
+            "@controllers/*": ["src/controllers/*"],
+            "@database/*": ["src/database/*"],
+            "@enums/*": ["src/enums/*"],
+            "@maps/*": ["src/maps/*"],
+            "@models/*": ["src/models/*"],
+            "@plaid/*": ["src/plaid/*"],
+            "@queues/*": ["src/queues/*"],
+            "@routes/*": ["src/routes/*"],
+            "@utilities/*": ["src/utilities/*"],
             "@wealthwatch-shared": ["src/wealthwatch-shared.ts"]
         }
     },

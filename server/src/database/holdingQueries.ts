@@ -1,5 +1,8 @@
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
 import { Holding, HoldingWithSecurity } from '@wealthwatch-shared'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
 
 export const insertHoldings = async (holdings: Holding[]): Promise<void> => {
     if (!holdings.length) return

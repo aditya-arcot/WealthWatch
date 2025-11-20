@@ -1,37 +1,37 @@
-import { NotificationTypeEnum } from '@wealthwatch-shared'
-import { Request, Response } from 'express'
-import { importJWK, jwtVerify } from 'jose'
-import { sha256 } from 'js-sha256'
-import { jwtDecode } from 'jwt-decode'
-import { JWKPublicKey } from 'plaid'
+import { removeDeactivateItem } from '@controllers/itemController.js'
+import {
+    insertInfoNotification,
+    insertLinkUpdateNotification,
+    insertLinkUpdateWithAccountsNotification,
+} from '@controllers/notificationController.js'
 import {
     fetchActiveItemByPlaidId,
     modifyItemHealthyById,
-} from '../database/itemQueries.js'
-import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '../database/notificationQueries.js'
+} from '@database/itemQueries.js'
+import { modifyNotificationsToInactiveByTypeIdUserIdAndItemId } from '@database/notificationQueries.js'
 import {
     HoldingsWebhookCodeEnum,
     ItemWebhookCodeEnum,
     LiabilitiesWebhookCodeEnum,
     TransactionsWebhookCodeEnum,
     WebhookTypeEnum,
-} from '../enums/webhook.js'
-import { HttpError } from '../models/error.js'
-import { mapPlaidWebhook, PlaidWebhook, Webhook } from '../models/webhook.js'
-import { plaidWebhookVerificationKeyGet } from '../plaid/webhookMethods.js'
+} from '@enums/webhook.js'
+import { HttpError } from '@models/error.js'
+import { mapPlaidWebhook, PlaidWebhook, Webhook } from '@models/webhook.js'
+import { plaidWebhookVerificationKeyGet } from '@plaid/webhookMethods.js'
 import {
     queueSyncItemInvestments,
     queueSyncItemLiabilities,
     queueSyncItemTransactions,
-} from '../queues/itemQueue.js'
-import { queueWebhook } from '../queues/webhookQueue.js'
-import { logger } from '../utilities/logger.js'
-import { removeDeactivateItem } from './itemController.js'
-import {
-    insertInfoNotification,
-    insertLinkUpdateNotification,
-    insertLinkUpdateWithAccountsNotification,
-} from './notificationController.js'
+} from '@queues/itemQueue.js'
+import { queueWebhook } from '@queues/webhookQueue.js'
+import { logger } from '@utilities/logger.js'
+import { NotificationTypeEnum } from '@wealthwatch-shared'
+import { Request, Response } from 'express'
+import { importJWK, jwtVerify } from 'jose'
+import { sha256 } from 'js-sha256'
+import { jwtDecode } from 'jwt-decode'
+import { JWKPublicKey } from 'plaid'
 
 const webhookKeyCache = new Map<string, JWKPublicKey>()
 

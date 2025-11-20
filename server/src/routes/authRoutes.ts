@@ -1,4 +1,3 @@
-import express from 'express'
 import {
     login,
     loginWithDemo,
@@ -6,8 +5,9 @@ import {
     register,
     requestAccess,
     validateAccessCode,
-} from '../controllers/authController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/authController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

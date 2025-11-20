@@ -1,5 +1,5 @@
+import { PlaidSecurityTypeEnum } from '@enums/security.js'
 import { SecurityTypeEnum } from '@wealthwatch-shared'
-import { PlaidSecurityTypeEnum } from '../enums/security.js'
 
 export const securityTypeMap: Record<PlaidSecurityTypeEnum, SecurityTypeEnum> =
     {

@@ -1,9 +1,9 @@
-import express from 'express'
 import {
     getUserCategorySummaries,
     getUserSpendingCategoryTotals,
-} from '../controllers/spendingController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/spendingController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

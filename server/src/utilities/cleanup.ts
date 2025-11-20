@@ -1,9 +1,9 @@
+import { stopPool } from '@database/index.js'
+import { CLEANUP_EVENTS } from '@models/constants.js'
+import { closeWorkers } from '@queues/index.js'
+import { logger } from '@utilities/logger.js'
+import { stopRedis } from '@utilities/redis.js'
 import { pid } from 'process'
-import { stopPool } from '../database/index.js'
-import { CLEANUP_EVENTS } from '../models/constants.js'
-import { closeWorkers } from '../queues/index.js'
-import { logger } from './logger.js'
-import { stopRedis } from './redis.js'
 
 export const configureCleanup = (): void => {
     CLEANUP_EVENTS.forEach((event) => {

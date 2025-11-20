@@ -1,9 +1,9 @@
-import express from 'express'
 import {
     deleteCurrentUser,
     getCurrentUser,
-} from '../controllers/userController.js'
-import { authenticate, catchAsync } from '../utilities/middleware.js'
+} from '@controllers/userController.js'
+import { authenticate, catchAsync } from '@utilities/middleware.js'
+import express from 'express'
 
 const router = express.Router()
 

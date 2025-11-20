@@ -1,5 +1,8 @@
-import { AppRequest } from '../models/appRequest.js'
-import { constructInsertQueryParamsPlaceholder, runQuery } from './index.js'
+import {
+    constructInsertQueryParamsPlaceholder,
+    runQuery,
+} from '@database/index.js'
+import { AppRequest } from '@models/appRequest.js'
 
 export const insertAppRequest = async (request: AppRequest): Promise<void> => {
     const values: unknown[] = [

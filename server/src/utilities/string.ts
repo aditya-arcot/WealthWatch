@@ -1,4 +1,4 @@
-import { prod, vars } from './env.js'
+import { prod, vars } from '@utilities/env.js'
 
 export const capitalizeFirstLetter = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1)
