@@ -84,13 +84,6 @@ jobs:
                       paths:
                       - '${{ matrix.project }}/src/**/*.ts'
 
-            - name: create .npmrc
-              if: matrix.language == 'typescript' && matrix.project != 'shared'
-              working-directory: ${{ matrix.project }}
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-
             - name: install, build
               if: matrix.language == 'typescript'
               working-directory: ${{ matrix.project }}

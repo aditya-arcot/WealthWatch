@@ -34,12 +34,7 @@ jobs:
                   check-latest: true
                   cache: 'npm'
                   cache-dependency-path: shared/package-lock.json
-
-            - name: create .npmrc
-              working-directory: shared
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: fetch, rebase
               run: |
@@ -74,6 +69,8 @@ jobs:
 
             - name: publish
               working-directory: shared
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
                   npm whoami --registry=https://npm.pkg.github.com/

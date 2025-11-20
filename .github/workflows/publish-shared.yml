@@ -54,18 +54,14 @@ jobs:
                   check-latest: true
                   cache: 'npm'
                   cache-dependency-path: shared/package-lock.json
-
-            - name: create .npmrc
-              if: steps.check-author.outputs.skip_publish == 'false'
-              working-directory: shared
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: check if version already published
               if: steps.check-author.outputs.skip_publish == 'false'
               id: check-version
               working-directory: shared
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
 
@@ -104,6 +100,8 @@ jobs:
             - name: publish
               if: steps.check-author.outputs.skip_publish == 'false' && steps.check-version.outputs.skip_publish == 'false'
               working-directory: shared
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
                   npm whoami --registry=https://npm.pkg.github.com/
