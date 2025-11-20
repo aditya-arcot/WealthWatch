@@ -8,14 +8,10 @@
             ],
             "ignoreDependencies": ["bootstrap", "bootstrap-icons"]
         },
-        "server": {
-            "ignore": [".ncurc.js", "src/models/express.ts"],
-            "ignoreDependencies": ["@logtail/pino", "pino-pretty"]
-        },
-        "shared": {},
         ".": {
             "ignoreDependencies": ["npm-check-updates"]
         }
     },
-    "tags": ["-knipignore"]
+    "tags": ["-knipignore"],
+    "ignoreFiles": ["server/**", "shared/**"]
 }
