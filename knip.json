@@ -12,7 +12,10 @@
             "ignore": [".ncurc.js", "src/models/express.ts"],
             "ignoreDependencies": ["@logtail/pino", "pino-pretty"]
         },
-        "shared": {},
+        "shared": {
+            "ignore": ["tsconfig.json"],
+            "ignoreDependencies": ["typescript-transform-paths"]
+        },
         ".": {
             "ignoreDependencies": ["npm-check-updates"]
         }
