@@ -1,6 +1,7 @@
 name: Build Shared, Client, and Server Projects
 
 on:
+    workflow_dispatch:
     pull_request_target:
         branches:
             - test
@@ -20,7 +21,7 @@ jobs:
             - name: checkout
               uses: actions/checkout@v5
               with:
-                  ref: ${{ github.event.pull_request.head.sha }}
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
 
             - name: setup node
               uses: actions/setup-node@v6
@@ -41,15 +42,15 @@ jobs:
                   npm run build
 
             - name: install, build client - non-prod
-              if: github.base_ref != 'main'
+              if: (github.base_ref || github.ref_name) != 'main'
               working-directory: client
               run: |
                   npm config ls
                   npm ci
-                  npm run build:${{ github.base_ref }}
+                  npm run build:${{ github.base_ref || github.ref_name }}
 
             - name: install, build client - prod
-              if: github.base_ref == 'main'
+              if: (github.base_ref || github.ref_name) == 'main'
               working-directory: client
               run: |
                   npm config ls
