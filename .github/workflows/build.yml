@@ -6,6 +6,7 @@ on:
             - test
             - stage
             - main
+    workflow_dispatch:
 
 permissions:
     contents: read
@@ -32,13 +33,7 @@ jobs:
                       shared/package-lock.json
                       client/package-lock.json
                       server/package-lock.json
-
-            - name: create .npmrc
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-                  cp .npmrc client/
-                  cp .npmrc server/
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: install, build shared
               working-directory: shared
