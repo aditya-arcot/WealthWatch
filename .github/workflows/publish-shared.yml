@@ -69,7 +69,7 @@ jobs:
                   echo "Local version: $VERSION"
 
                   PACKAGE_NAME="@aditya-arcot/wealthwatch-shared"
-                  if PUBLISHED=$(npm view "$PACKAGE_NAME" version --registry=https://npm.pkg.github.com/ 2>&1); then
+                  if PUBLISHED=$(npm view "$PACKAGE_NAME" version); then
                     echo "Published version: $PUBLISHED"
                     if npx -y semver-compare-cli "$VERSION" gt "$PUBLISHED"; then
                       echo "Local version is greater. Will publish"
