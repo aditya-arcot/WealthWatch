@@ -1,6 +1,7 @@
 name: Run Tests
 
 on:
+    workflow_dispatch:
     pull_request_target:
         branches:
             - test
@@ -8,28 +9,24 @@ on:
             - main
 
 permissions:
-    contents: read
-
-env:
-    NPM_CONFIG_USERCONFIG: /dev/null
+    packages: read
 
 jobs:
     test-server:
         runs-on: self-hosted
-        environment: ${{ github.base_ref == 'main' && 'prod' || github.base_ref }}
+        environment: ${{ github.base_ref == 'main' && 'prod' || github.base_ref || github.ref_name }}
         steps:
             - name: checkout
               uses: actions/checkout@v5
               with:
-                  ref: ${{ github.event.pull_request.head.sha }}
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
 
             - name: setup node
               uses: actions/setup-node@v6
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: server/package-lock.json
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: create .env
               working-directory: server
@@ -65,17 +62,13 @@ jobs:
                   echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
                   echo "WEBHOOK_PORT=${{ vars.WEBHOOK_PORT }}" >> .env
 
-            - name: create .npmrc
-              working-directory: server
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-
             - name: install
               working-directory: server
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
-                  npm ci
+                  npm ci --cache .npm
 
             - name: run tests
               working-directory: server
@@ -83,31 +76,42 @@ jobs:
                   npm config ls
                   npm run test:deploy
 
+            - name: remove cache folder
+              if: always()
+              working-directory: server
+              run: rm -rf .npm
+
     test-shared:
         runs-on: self-hosted
-        environment: ${{ github.base_ref == 'main' && 'prod' || github.base_ref }}
+        environment: ${{ github.base_ref == 'main' && 'prod' || github.base_ref || github.ref_name }}
         steps:
             - name: checkout
               uses: actions/checkout@v5
               with:
-                  ref: ${{ github.event.pull_request.head.sha }}
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
 
             - name: setup node
               uses: actions/setup-node@v6
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: shared/package-lock.json
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: install
               working-directory: shared
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
-                  npm ci
+                  npm ci --cache .npm
 
             - name: run tests
               working-directory: shared
               run: |
                   npm config ls
                   npm run test:deploy
+
+            - name: remove cache folder
+              if: always()
+              working-directory: shared
+              run: rm -rf .npm

@@ -1,6 +1,6 @@
+import { capitalizeFirstLetter, toTitleCase } from '@utilities'
 import { EnvNameEnum } from '@wealthwatch-shared'
 import { describe, expect, it } from 'vitest'
-import { capitalizeFirstLetter, toTitleCase } from './string.js'
 
 describe('capitalizeFirstLetter', () => {
     it('capitalizes first letter of string', () => {
@@ -21,8 +21,8 @@ describe('createCookieName', () => {
 
     const expectCookieName = async (nodeEnv: string, type: string) => {
         process.env['NODE_ENV'] = nodeEnv
-        const { prod, vars } = await import('./env.js')
-        const { createCookieName } = await import('./string.js')
+        const { prod, vars } = await import('@utilities')
+        const { createCookieName } = await import('@utilities')
         const cookieName = prod
             ? `wealthwatch-${type}`
             : `wealthwatch-${vars.nodeEnv}-${type}`

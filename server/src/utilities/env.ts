@@ -29,4 +29,4 @@ export const dev = vars.nodeEnv === EnvNameEnum.Dev
 export const stage = vars.nodeEnv === EnvNameEnum.Stage
 export const prod = vars.nodeEnv === EnvNameEnum.Prod || stage
 
-export const _test = { getEnvVar }
+export const _envTest = { getEnvVar }

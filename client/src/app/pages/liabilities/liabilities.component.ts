@@ -5,6 +5,19 @@ import {
     ViewChildren,
     inject,
 } from '@angular/core'
+import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '@components/logger.component'
+import {
+    studentLoanRepaymentPlanTypeNameMap,
+    studentLoanStatusTypeNameMap,
+} from '@maps/liability'
+import { AlertService } from '@services/alert.service'
+import { CurrencyService } from '@services/currency.service'
+import { ItemService } from '@services/item.service'
+import { handleCheckboxSelect } from '@utilities/checkbox.utility'
+import { formatDate } from '@utilities/date.utility'
+import { formatPercent } from '@utilities/number.utility'
+import { capitalize } from '@utilities/string.utility'
 import {
     Account,
     CreditCardAccount,
@@ -18,19 +31,6 @@ import {
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, finalize, switchMap, tap, throwError } from 'rxjs'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
-import {
-    studentLoanRepaymentPlanTypeNameMap,
-    studentLoanStatusTypeNameMap,
-} from '../../maps/liability'
-import { AlertService } from '../../services/alert.service'
-import { CurrencyService } from '../../services/currency.service'
-import { ItemService } from '../../services/item.service'
-import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
-import { formatDate } from '../../utilities/date.utility'
-import { formatPercent } from '../../utilities/number.utility'
-import { capitalize } from '../../utilities/string.utility'
 
 @Component({
     imports: [LoadingSpinnerComponent, BaseChartDirective],

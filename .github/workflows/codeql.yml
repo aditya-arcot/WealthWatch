@@ -15,10 +15,12 @@ on:
             - 'server/package-lock.json'
             - 'server/package.json'
             - 'server/tsconfig.json'
+            - 'server/tsconfig.build.json'
             - 'shared/src/**'
             - 'shared/package-lock.json'
             - 'shared/package.json'
             - 'shared/tsconfig.json'
+            - 'shared/tsconfig.build.json'
     schedule:
         - cron: '30 21 * * 2'
 
@@ -27,10 +29,8 @@ concurrency:
     cancel-in-progress: true
 
 permissions:
+    packages: read
     security-events: write
-
-env:
-    NPM_CONFIG_USERCONFIG: /dev/null
 
 jobs:
     analyze:
@@ -51,7 +51,7 @@ jobs:
             - name: checkout
               uses: actions/checkout@v5
               with:
-                  ref: stage
+                  ref: ${{ github.ref_name }}
 
             - name: setup node
               if: matrix.language == 'typescript'
@@ -59,8 +59,7 @@ jobs:
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: ${{ matrix.project }}/package-lock.json
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: initialize codeql for actions
               if: matrix.language == 'actions'
@@ -82,22 +81,22 @@ jobs:
                       paths:
                       - '${{ matrix.project }}/src/**/*.ts'
 
-            - name: create .npmrc
-              if: matrix.language == 'typescript' && matrix.project != 'shared'
-              working-directory: ${{ matrix.project }}
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-
             - name: install, build
               if: matrix.language == 'typescript'
               working-directory: ${{ matrix.project }}
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
-                  npm ci
+                  npm ci --cache .npm
                   npm run build
 
             - name: run codeql
               uses: github/codeql-action/analyze@v4
               with:
                   category: '/language:${{matrix.language}}'
+
+            - name: remove cache folder
+              if: always()
+              working-directory: ${{ matrix.project }}
+              run: rm -rf .npm

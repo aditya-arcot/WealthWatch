@@ -1,5 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '@components/logger.component'
+import { RouteEnum } from '@enums/route'
+import { AlertService } from '@services/alert.service'
+import { CurrencyService } from '@services/currency.service'
+import { ItemService } from '@services/item.service'
+import { LinkService } from '@services/link.service'
+import { UserService } from '@services/user.service'
+import { parseBoolean } from '@utilities/boolean.utility'
+import { formatDate } from '@utilities/date.utility'
+import { safeParseInt } from '@utilities/number.utility'
 import {
     Account,
     isInCooldown,
@@ -18,17 +29,6 @@ import {
     PlaidSuccessMetadata,
 } from 'ngx-plaid-link'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
-import { RouteEnum } from '../../enums/route'
-import { AlertService } from '../../services/alert.service'
-import { CurrencyService } from '../../services/currency.service'
-import { ItemService } from '../../services/item.service'
-import { LinkService } from '../../services/link.service'
-import { UserService } from '../../services/user.service'
-import { parseBoolean } from '../../utilities/boolean.utility'
-import { formatDate } from '../../utilities/date.utility'
-import { safeParseInt } from '../../utilities/number.utility'
 
 @Component({
     selector: 'app-accounts',

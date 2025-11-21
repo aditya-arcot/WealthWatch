@@ -6,6 +6,28 @@ import {
     ViewChildren,
 } from '@angular/core'
 import { ActivatedRoute, Params, Router } from '@angular/router'
+import { DateFilterComponent } from '@components/filters/date-filter/date-filter.component'
+import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '@components/logger.component'
+import { DateFilterEnum } from '@enums/filter'
+import { dateFilterDescriptionMap } from '@maps/filter'
+import { AlertService } from '@services/alert.service'
+import { CategoryService } from '@services/category.service'
+import { CurrencyService } from '@services/currency.service'
+import { SpendingService } from '@services/spending.service'
+import { handleCheckboxSelect } from '@utilities/checkbox.utility'
+import {
+    checkDatesEqual,
+    checkDateStringValid,
+    formatDate,
+} from '@utilities/date.utility'
+import { computeDatesBasedOnFilter } from '@utilities/filter.utility'
+import {
+    formatDecimalToPercent,
+    safeParseFloat,
+    safeParseInt,
+} from '@utilities/number.utility'
+import { redirectWithParams } from '@utilities/redirect.utility'
 import {
     Category,
     CategoryEnum,
@@ -16,28 +38,6 @@ import {
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, finalize, switchMap, throwError } from 'rxjs'
-import { DateFilterComponent } from '../../components/filters/date-filter/date-filter.component'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
-import { DateFilterEnum } from '../../enums/filter'
-import { dateFilterDescriptionMap } from '../../maps/filter'
-import { AlertService } from '../../services/alert.service'
-import { CategoryService } from '../../services/category.service'
-import { CurrencyService } from '../../services/currency.service'
-import { SpendingService } from '../../services/spending.service'
-import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
-import {
-    checkDatesEqual,
-    checkDateStringValid,
-    formatDate,
-} from '../../utilities/date.utility'
-import { computeDatesBasedOnFilter } from '../../utilities/filter.utility'
-import {
-    formatDecimalToPercent,
-    safeParseFloat,
-    safeParseInt,
-} from '../../utilities/number.utility'
-import { redirectWithParams } from '../../utilities/redirect.utility'
 
 @Component({
     selector: 'app-spending',

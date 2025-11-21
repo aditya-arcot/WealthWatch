@@ -13,13 +13,13 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
+import { LoggerComponent } from '@components/logger.component'
+import { RouteEnum } from '@enums/route'
+import { AlertService } from '@services/alert.service'
+import { AuthService } from '@services/auth.service'
+import { UserService } from '@services/user.service'
 import { AccessRequestErrorCodeEnum, ServerError } from '@wealthwatch-shared'
 import { catchError, finalize, of, switchMap, throwError } from 'rxjs'
-import { LoggerComponent } from '../../components/logger.component'
-import { RouteEnum } from '../../enums/route'
-import { AlertService } from '../../services/alert.service'
-import { AuthService } from '../../services/auth.service'
-import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-access-request',

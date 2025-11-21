@@ -1,9 +1,9 @@
+import * as db from '@database'
+import { CLEANUP_EVENTS } from '@models'
+import * as queues from '@queues'
+import * as logger from '@utilities'
+import * as redis from '@utilities'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import * as db from '../database/index.js'
-import { CLEANUP_EVENTS } from '../models/constants.js'
-import * as queues from '../queues/index.js'
-import * as logger from './logger.js'
-import * as redis from './redis.js'
 
 vi.mock('./logger', () => ({
     logger: {
@@ -73,7 +73,7 @@ describe('runCleanupAndExit', () => {
     it('runs cleanup functions once and exits', async () => {
         vi.spyOn(process, 'exit').mockImplementation(() => undefined as never)
 
-        const { _test } = await import('./cleanup.js')
+        const { _cleanupTest: _test } = await import('./cleanup.js')
         const error = new Error('test error')
         await _test.runCleanupAndExit(CLEANUP_EVENTS[0], error)
         await _test.runCleanupAndExit(CLEANUP_EVENTS[1], error)
@@ -107,7 +107,7 @@ describe('runCleanupAndExit', () => {
             new Error('test error')
         )
 
-        const { _test } = await import('./cleanup.js')
+        const { _cleanupTest: _test } = await import('./cleanup.js')
         await _test.runCleanupAndExit(CLEANUP_EVENTS[2])
 
         expect(logger.logger.warn).not.toHaveBeenCalled()

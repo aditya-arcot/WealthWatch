@@ -10,8 +10,8 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { categoryIconMap } from '@maps/category'
 import { Category, CategoryEnum } from '@wealthwatch-shared'
-import { categoryIconMap } from '../../../maps/category'
 
 @Component({
     selector: 'app-category-filter',

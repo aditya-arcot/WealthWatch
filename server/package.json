@@ -3,9 +3,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "rm -rf dist/ && tsc",
+        "build": "rm -rf dist/ && tsc -p tsconfig.build.json",
         "dev": "dotenvx run -f ../config/env/.env.dev -- tsx watch --inspect src/main.ts",
-        "lint": "eslint src --ext .ts --fix --max-warnings=0",
+        "lint": "eslint --fix --max-warnings=0 src",
         "start": "dotenvx run -f ../config/env/.env.dev -- tsx --inspect src/main.ts",
         "start:deploy": "dotenvx run -- tsx src/main.ts",
         "test": "dotenvx run -f ../config/env/.env.dev -- vitest dev --coverage --ui",
@@ -13,19 +13,19 @@
     },
     "lint-staged": {
         "*": [
-            "eslint --ext .ts --fix --max-warnings=0 --no-warn-ignored",
+            "eslint --fix --max-warnings=0 --no-warn-ignored",
             "prettier --write --ignore-unknown"
         ]
     },
     "dependencies": {
-        "@aditya-arcot/wealthwatch-shared": "^4.0.1",
+        "@aditya-arcot/wealthwatch-shared": "^4.0.8",
         "@dotenvx/dotenvx": "^1.51.1",
         "@logtail/pino": "^0.5.7",
-        "@tsconfig/node-lts": "^22.0.2",
-        "@tsconfig/strictest": "^2.0.7",
+        "@tsconfig/node-lts": "^22.0.4",
+        "@tsconfig/strictest": "^2.0.8",
         "axios": "^1.13.2",
         "bcryptjs": "^3.0.3",
-        "bullmq": "^5.63.0",
+        "bullmq": "^5.64.0",
         "connect-pg-simple": "^10.0.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -35,7 +35,7 @@
         "express-session": "^1.18.2",
         "helmet": "^8.1.0",
         "ioredis": "^5.8.2",
-        "jose": "^6.1.1",
+        "jose": "^6.1.2",
         "js-sha256": "^0.11.1",
         "jwt-decode": "^4.0.0",
         "method-override": "^3.0.0",
@@ -61,13 +61,13 @@
         "@types/qs": "^6.14.0",
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.8",
-        "@vitest/coverage-v8": "^4.0.8",
-        "@vitest/ui": "^4.0.8",
+        "@vitest/coverage-v8": "^4.0.12",
+        "@vitest/ui": "^4.0.12",
         "eslint": "^9.39.1",
         "globals": "^16.5.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.46.4",
+        "typescript-eslint": "^8.47.0",
         "vite-tsconfig-paths": "^5.1.4",
-        "vitest": "^4.0.8"
+        "vitest": "^4.0.12"
     }
 }

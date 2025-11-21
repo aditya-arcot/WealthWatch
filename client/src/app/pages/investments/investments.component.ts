@@ -6,6 +6,15 @@ import {
     ViewChildren,
     inject,
 } from '@angular/core'
+import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '@components/logger.component'
+import { securityTypeNameMap } from '@maps/security'
+import { AlertService } from '@services/alert.service'
+import { CurrencyService } from '@services/currency.service'
+import { InvestmentService } from '@services/investment.service'
+import { ItemService } from '@services/item.service'
+import { handleCheckboxSelect } from '@utilities/checkbox.utility'
+import { formatDecimalToPercent } from '@utilities/number.utility'
 import {
     AccountWithHoldings,
     HoldingWithSecurity,
@@ -14,15 +23,6 @@ import {
 import { ChartOptions } from 'chart.js'
 import { BaseChartDirective } from 'ng2-charts'
 import { catchError, finalize, throwError } from 'rxjs'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
-import { securityTypeNameMap } from '../../maps/security'
-import { AlertService } from '../../services/alert.service'
-import { CurrencyService } from '../../services/currency.service'
-import { InvestmentService } from '../../services/investment.service'
-import { ItemService } from '../../services/item.service'
-import { handleCheckboxSelect } from '../../utilities/checkbox.utility'
-import { formatDecimalToPercent } from '../../utilities/number.utility'
 
 @Component({
     imports: [LoadingSpinnerComponent, CommonModule, BaseChartDirective],

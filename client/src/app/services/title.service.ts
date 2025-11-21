@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { RouterStateSnapshot, TitleStrategy } from '@angular/router'
+import { env } from '@environments'
 import { EnvNameEnum } from '@wealthwatch-shared'
-import { env } from '../../environments/env'
 
 @Injectable({ providedIn: 'root' })
 export class TitleService extends TitleStrategy {

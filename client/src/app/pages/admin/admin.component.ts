@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core'
+import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '@components/logger.component'
+import { AdminService } from '@services/admin.service'
+import { AlertService } from '@services/alert.service'
+import { formatDate } from '@utilities/date.utility'
 import { AccessRequest, AccessRequestStatusEnum } from '@wealthwatch-shared'
 import { catchError, finalize, throwError } from 'rxjs'
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../../components/logger.component'
-import { AdminService } from '../../services/admin.service'
-import { AlertService } from '../../services/alert.service'
-import { formatDate } from '../../utilities/date.utility'
 
 @Component({
     selector: 'app-admin',

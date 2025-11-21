@@ -9,8 +9,8 @@ import {
     ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { handleCheckboxSelect } from '@utilities/checkbox.utility'
 import { Account, ItemWithAccounts } from '@wealthwatch-shared'
-import { handleCheckboxSelect } from '../../../utilities/checkbox.utility'
 
 @Component({
     selector: 'app-account-filter',

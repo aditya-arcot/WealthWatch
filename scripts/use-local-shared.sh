@@ -16,12 +16,12 @@ for project in client server; do
     trash package-lock.json node_modules
     set -e
     echo "Installing $project packages..."
-    npm install
+    npm install --force
 done
 
 cd ..
 echo "Formatting files..."
-npm install
+npm install --force
 npm run prettier
 
 echo "Done switching to local shared package"
