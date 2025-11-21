@@ -12,7 +12,7 @@ permissions:
     packages: read
 
 jobs:
-    build:
+    build-client:
         runs-on: self-hosted
         steps:
             - name: checkout
@@ -27,14 +27,7 @@ jobs:
                   check-latest: true
                   registry-url: 'https://npm.pkg.github.com'
 
-            - name: install, build shared
-              working-directory: shared
-              run: |
-                  npm config ls
-                  npm ci --cache .npm
-                  npm run build
-
-            - name: install, build client - non-prod
+            - name: install, build - non-prod
               if: (github.base_ref || github.ref_name) != 'main'
               working-directory: client
               env:
@@ -44,7 +37,7 @@ jobs:
                   npm ci --cache .npm
                   npm run build:${{ github.base_ref || github.ref_name }}
 
-            - name: install, build client - prod
+            - name: install, build - prod
               if: (github.base_ref || github.ref_name) == 'main'
               working-directory: client
               env:
@@ -54,7 +47,27 @@ jobs:
                   npm ci --cache .npm
                   npm run build
 
-            - name: install, build server
+            - name: remove cache folder
+              if: always()
+              working-directory: client
+              run: rm -rf .npm
+
+    build-server:
+        runs-on: self-hosted
+        steps:
+            - name: checkout
+              uses: actions/checkout@v5
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
+
+            - name: setup node
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+                  registry-url: 'https://npm.pkg.github.com'
+
+            - name: install, build
               working-directory: server
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,9 +76,33 @@ jobs:
                   npm ci --cache .npm
                   npm run build
 
-            - name: remove cache folders
+            - name: remove cache folder
               if: always()
+              working-directory: server
+              run: rm -rf .npm
+
+    build-shared:
+        runs-on: self-hosted
+        steps:
+            - name: checkout
+              uses: actions/checkout@v5
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
+
+            - name: setup node
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+
+            - name: install, build
+              working-directory: shared
               run: |
-                  rm -rf shared/.npm
-                  rm -rf client/.npm
-                  rm -rf server/.npm
+                  npm config ls
+                  npm ci --cache .npm
+                  npm run build
+
+            - name: remove cache folder
+              if: always()
+              working-directory: shared
+              run: rm -rf .npm
