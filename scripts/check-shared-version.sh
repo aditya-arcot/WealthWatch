@@ -11,7 +11,7 @@ if echo "$CHANGED_FILES" | grep -qE '^shared/(package.json|tsconfig.json|tsconfi
     echo "Changes found in shared project files"
     echo "Checking for version bump..."
 
-    if OLD=$(npm view "$PACKAGE_NAME" version 2> /dev/null); then
+    if OLD=$(npm view "$PACKAGE_NAME" version); then
         echo "Latest published version is $OLD"
     else
         echo "Package not yet published. Skipping version comparison"
