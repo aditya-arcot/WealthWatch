@@ -9,11 +9,14 @@ export class TitleService extends TitleStrategy {
     private readonly title = inject(Title)
 
     override updateTitle(routerState: RouterStateSnapshot) {
-        const title = this.buildTitle(routerState)
-        if (env.name !== EnvNameEnum.Prod) {
-            this.title.setTitle(`${title} | WealthWatch (${env.name})`)
-        } else {
-            this.title.setTitle(`${title} | WealthWatch`)
+        const prefix = this.buildTitle(routerState)
+        const suffix =
+            'WealthWatch' +
+            (env.name !== EnvNameEnum.Prod ? ` (${env.name})` : '')
+        if (!prefix) {
+            this.title.setTitle(suffix)
+            return
         }
+        this.title.setTitle(`${prefix} | ${suffix}`)
     }
 }
