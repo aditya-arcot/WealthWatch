@@ -148,6 +148,5 @@ export const routes: Routes = [
             ),
         canActivate: [activationGuard],
     },
-    { path: '', redirectTo: RouteEnum.Login, pathMatch: 'full' },
     { path: '**', redirectTo: RouteEnum.Login },
 ]

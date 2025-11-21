@@ -51,6 +51,8 @@ export class AppComponent implements OnInit {
     }
 
     noHeaderPath(path: string) {
-        return this.noHeaderPaths.includes(path.split('/')[1])
+        const firstSegment = path.split('/')[1]
+        if (!firstSegment) return true
+        return this.noHeaderPaths.includes(firstSegment)
     }
 }
