@@ -73,7 +73,7 @@ describe('createSession', () => {
     beforeEach(() => {
         vi.resetModules()
 
-        vi.doMock('@database/index', () => ({
+        vi.doMock('../database/index', () => ({
             getPool: () => mockPool,
         }))
         vi.doMock('connect-pg-simple', () => ({
@@ -255,7 +255,7 @@ describe('logRequestResponse', () => {
                 error: vi.fn(),
             },
         }))
-        vi.doMock('@queues/logQueue', () => ({
+        vi.doMock('../queues/index.ts', () => ({
             queueLogAppRequest: vi.fn().mockResolvedValue(undefined),
         }))
     })
@@ -345,7 +345,7 @@ describe('logRequestResponse', () => {
     })
 
     it('handles errors in queueLogAppRequest', async () => {
-        vi.doMock('@queues/logQueue', () => ({
+        vi.doMock('../queues/index.ts', () => ({
             queueLogAppRequest: vi.fn().mockRejectedValue(mockError),
         }))
 
