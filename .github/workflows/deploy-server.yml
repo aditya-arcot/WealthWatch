@@ -11,7 +11,7 @@ on:
                 type: string
 
 permissions:
-    contents: read
+    packages: read
 
 jobs:
     deploy:
@@ -61,7 +61,7 @@ jobs:
             - name: create .npmrc
               working-directory: server
               run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
                   echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
 
             - name: copy files

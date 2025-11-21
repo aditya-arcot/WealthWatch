@@ -11,10 +11,7 @@ on:
                 type: string
 
 permissions:
-    contents: read
-
-env:
-    NPM_CONFIG_USERCONFIG: /dev/null
+    packages: read
 
 jobs:
     deploy:
@@ -32,8 +29,7 @@ jobs:
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: client/package-lock.json
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: modify env.test.ts
               if: github.ref_name == 'test'
@@ -43,26 +39,24 @@ jobs:
                     env.test.ts > env.test.ts.tmp
                   mv env.test.ts.tmp env.test.ts
 
-            - name: create .npmrc
-              working-directory: client
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-
             - name: install, build - non-prod
               if: github.ref_name != 'main'
               working-directory: client
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
-                  npm ci
+                  npm ci --cache .npm
                   npm run build:${{ github.ref_name }}
 
             - name: install, build - prod
               if: github.ref_name == 'main'
               working-directory: client
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
-                  npm ci
+                  npm ci --cache .npm
                   npm run build
 
             - name: copy files
@@ -78,3 +72,8 @@ jobs:
                   IMAGE=${{ secrets.DOCKER_REGISTRY }}/${{ inputs.image }}
                   docker build -t $IMAGE -f ../Dockerfile .
                   docker push $IMAGE
+
+            - name: remove cache folder
+              if: always()
+              working-directory: client
+              run: rm -rf .npm
