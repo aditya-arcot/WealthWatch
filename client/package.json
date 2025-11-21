@@ -16,7 +16,7 @@
         ]
     },
     "dependencies": {
-        "@aditya-arcot/wealthwatch-shared": "^4.0.8",
+        "@aditya-arcot/wealthwatch-shared": "^4.0.10",
         "@angular/animations": "^20.3.13",
         "@angular/common": "^20.3.13",
         "@angular/compiler": "^20.3.13",
