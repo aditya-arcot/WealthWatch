@@ -1,4 +1,4 @@
-import { isInCooldown, refreshCooldown } from '@utilities/item.js'
+import { isInCooldown, refreshCooldown } from '@utilities'
 import { describe, expect, it } from 'vitest'
 
 describe('itemInCooldown', () => {

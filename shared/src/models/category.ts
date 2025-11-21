@@ -1,4 +1,4 @@
-import { CategoryEnum, CategoryGroupEnum } from '@enums/category.js'
+import { CategoryEnum, CategoryGroupEnum } from '@enums'
 
 export interface Category {
     id: CategoryEnum

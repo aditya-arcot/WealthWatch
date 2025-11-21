@@ -1,6 +1,6 @@
 {
     "name": "@aditya-arcot/wealthwatch-shared",
-    "version": "4.0.8",
+    "version": "4.0.9",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aditya-arcot/WealthWatch.git"
@@ -43,6 +43,7 @@
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.47.0",
         "typescript-transform-paths": "^3.5.5",
+        "vite-tsconfig-paths": "^5.1.4",
         "vitest": "^4.0.12"
     },
     "publishConfig": {
