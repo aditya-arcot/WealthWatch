@@ -1,13 +1,13 @@
 import { HttpInterceptorFn } from '@angular/common/http'
 import { inject } from '@angular/core'
 import { Router } from '@angular/router'
+import { RouteEnum } from '@enums/route'
+import { AlertService } from '@services/alert.service'
+import { CsrfService } from '@services/csrf.service'
+import { createLoggerWithContext } from '@services/logger.service'
+import { UserService } from '@services/user.service'
 import { ServerError } from '@wealthwatch-shared'
 import { catchError, throwError } from 'rxjs'
-import { RouteEnum } from '../enums/route'
-import { AlertService } from '../services/alert.service'
-import { CsrfService } from '../services/csrf.service'
-import { createLoggerWithContext } from '../services/logger.service'
-import { UserService } from '../services/user.service'
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const userSvc = inject(UserService)

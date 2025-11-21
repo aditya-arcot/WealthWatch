@@ -1,8 +1,8 @@
+import { dev, vars } from '@utilities'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import pino from 'pino'
-import { dev, vars } from './env.js'
 
 interface PinoTarget {
     target: string
@@ -49,4 +49,4 @@ export const logger = pino({
     transport: { targets },
 })
 
-export const _test = { targets }
+export const _loggerTest = { targets }

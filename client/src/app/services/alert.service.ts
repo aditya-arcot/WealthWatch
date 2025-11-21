@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core'
+import { AlertTypeEnum } from '@enums/alert'
+import { Alert } from '@models/alert'
+import { LoggerService } from '@services/logger.service'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { v4 as uuid } from 'uuid'
-import { AlertTypeEnum } from '../enums/alert'
-import { Alert } from '../models/alert'
-import { LoggerService } from './logger.service'
 
 @Injectable({
     providedIn: 'root',

@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http'
 import { inject } from '@angular/core'
+import { CsrfService } from '@services/csrf.service'
 import { switchMap } from 'rxjs'
-import { CsrfService } from '../services/csrf.service'
 
 const ignoreMethods = ['GET', 'HEAD', 'OPTIONS']
 

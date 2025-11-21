@@ -11,11 +11,7 @@ on:
             - 'shared/package-lock.json'
 
 permissions:
-    contents: write
     packages: write
-
-env:
-    NPM_CONFIG_USERCONFIG: /dev/null
 
 jobs:
     bump-and-publish:
@@ -32,14 +28,7 @@ jobs:
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: shared/package-lock.json
-
-            - name: create .npmrc
-              working-directory: shared
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
+                  registry-url: 'https://npm.pkg.github.com'
 
             - name: fetch, rebase
               run: |
@@ -67,14 +56,23 @@ jobs:
 
             - name: install, build
               working-directory: shared
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
-                  npm ci
+                  npm ci --cache .npm
                   npm run build
 
             - name: publish
               working-directory: shared
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npm config ls
                   npm whoami --registry=https://npm.pkg.github.com/
                   npm publish --access public
+
+            - name: remove cache folder
+              if: always()
+              working-directory: shared
+              run: rm -rf .npm

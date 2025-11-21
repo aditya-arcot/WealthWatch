@@ -20,6 +20,15 @@
         "lib": ["ES2022", "dom"],
         "baseUrl": "src",
         "paths": {
+            "@app/*": ["app/*"],
+            "@components/*": ["app/components/*"],
+            "@enums/*": ["app/enums/*"],
+            "@interceptors/*": ["app/interceptors/*"],
+            "@maps/*": ["app/maps/*"],
+            "@models/*": ["app/models/*"],
+            "@services/*": ["app/services/*"],
+            "@utilities/*": ["app/utilities/*"],
+            "@environments": ["environments/env.ts"],
             "@wealthwatch-shared": ["wealthwatch-shared.ts"]
         }
     },

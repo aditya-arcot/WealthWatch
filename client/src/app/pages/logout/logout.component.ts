@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core'
 import { Router } from '@angular/router'
+import { LoggerComponent } from '@components/logger.component'
+import { RouteEnum } from '@enums/route'
+import { AlertService } from '@services/alert.service'
+import { CsrfService } from '@services/csrf.service'
+import { UserService } from '@services/user.service'
 import { catchError, of } from 'rxjs'
-import { LoggerComponent } from '../../components/logger.component'
-import { RouteEnum } from '../../enums/route'
-import { AlertService } from '../../services/alert.service'
-import { CsrfService } from '../../services/csrf.service'
-import { UserService } from '../../services/user.service'
 
 @Component({
     selector: 'app-logout',

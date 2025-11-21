@@ -1,6 +1,7 @@
 name: Build Shared, Client, and Server Projects
 
 on:
+    workflow_dispatch:
     pull_request_target:
         branches:
             - test
@@ -8,64 +9,100 @@ on:
             - main
 
 permissions:
-    contents: read
-
-env:
-    NPM_CONFIG_USERCONFIG: /dev/null
+    packages: read
 
 jobs:
-    build:
+    build-client:
         runs-on: self-hosted
         steps:
             - name: checkout
               uses: actions/checkout@v5
               with:
-                  ref: ${{ github.event.pull_request.head.sha }}
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
 
             - name: setup node
               uses: actions/setup-node@v6
               with:
                   node-version: 'lts/*'
                   check-latest: true
-                  cache: 'npm'
-                  cache-dependency-path: |
-                      shared/package-lock.json
-                      client/package-lock.json
-                      server/package-lock.json
+                  registry-url: 'https://npm.pkg.github.com'
 
-            - name: create .npmrc
+            - name: install, build - non-prod
+              if: (github.base_ref || github.ref_name) != 'main'
+              working-directory: client
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_NPM_TOKEN }}" >> .npmrc
-                  echo "@aditya-arcot:registry=https://npm.pkg.github.com/" >> .npmrc
-                  cp .npmrc client/
-                  cp .npmrc server/
+                  npm config ls
+                  npm ci --cache .npm
+                  npm run build:${{ github.base_ref || github.ref_name }}
 
-            - name: install, build shared
+            - name: install, build - prod
+              if: (github.base_ref || github.ref_name) == 'main'
+              working-directory: client
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  npm config ls
+                  npm ci --cache .npm
+                  npm run build
+
+            - name: remove cache folder
+              if: always()
+              working-directory: client
+              run: rm -rf .npm
+
+    build-server:
+        runs-on: self-hosted
+        steps:
+            - name: checkout
+              uses: actions/checkout@v5
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
+
+            - name: setup node
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+                  registry-url: 'https://npm.pkg.github.com'
+
+            - name: install, build
+              working-directory: server
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  npm config ls
+                  npm ci --cache .npm
+                  npm run build
+
+            - name: remove cache folder
+              if: always()
+              working-directory: server
+              run: rm -rf .npm
+
+    build-shared:
+        runs-on: self-hosted
+        steps:
+            - name: checkout
+              uses: actions/checkout@v5
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
+
+            - name: setup node
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 'lts/*'
+                  check-latest: true
+
+            - name: install, build
               working-directory: shared
               run: |
                   npm config ls
-                  npm ci
+                  npm ci --cache .npm
                   npm run build
 
-            - name: install, build client - non-prod
-              if: github.base_ref != 'main'
-              working-directory: client
-              run: |
-                  npm config ls
-                  npm ci
-                  npm run build:${{ github.base_ref }}
-
-            - name: install, build client - prod
-              if: github.base_ref == 'main'
-              working-directory: client
-              run: |
-                  npm config ls
-                  npm ci
-                  npm run build
-
-            - name: install, build server
-              working-directory: server
-              run: |
-                  npm config ls
-                  npm ci
-                  npm run build
+            - name: remove cache folder
+              if: always()
+              working-directory: shared
+              run: rm -rf .npm

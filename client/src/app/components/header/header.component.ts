@@ -5,15 +5,15 @@ import {
     RouterLink,
     RouterLinkActive,
 } from '@angular/router'
+import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
+import { LoggerComponent } from '@components/logger.component'
+import { NotificationsComponent } from '@components/notifications/notifications.component'
+import { RouteEnum } from '@enums/route'
+import { AlertService } from '@services/alert.service'
+import { AuthService } from '@services/auth.service'
+import { NotificationService } from '@services/notification.service'
+import { UserService } from '@services/user.service'
 import { catchError, filter, of, switchMap, throwError } from 'rxjs'
-import { RouteEnum } from '../../enums/route'
-import { AlertService } from '../../services/alert.service'
-import { AuthService } from '../../services/auth.service'
-import { NotificationService } from '../../services/notification.service'
-import { UserService } from '../../services/user.service'
-import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component'
-import { LoggerComponent } from '../logger.component'
-import { NotificationsComponent } from '../notifications/notifications.component'
 
 @Component({
     selector: 'app-header',

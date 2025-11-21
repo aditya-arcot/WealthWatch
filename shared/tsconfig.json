@@ -8,7 +8,20 @@
         "sourceMap": true,
         "declaration": true,
         "declarationMap": true,
-        "listEmittedFiles": true
+        "listEmittedFiles": true,
+        "baseUrl": "src",
+        "paths": {
+            "@enums": ["enums/index.ts"],
+            "@models": ["models/index.ts"],
+            "@utilities": ["utilities/index.ts"]
+        },
+        "plugins": [
+            { "transform": "typescript-transform-paths" },
+            {
+                "transform": "typescript-transform-paths",
+                "afterDeclarations": true
+            }
+        ]
     },
     "include": ["src"]
 }

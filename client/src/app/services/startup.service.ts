@@ -1,12 +1,15 @@
 import { inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
+import { RouteEnum } from '@enums/route'
+import { AlertService } from '@services/alert.service'
+import { CsrfService } from '@services/csrf.service'
+import {
+    createLoggerWithContext,
+    LoggerService,
+} from '@services/logger.service'
+import { SecretsService } from '@services/secrets.service'
+import { UserService } from '@services/user.service'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
-import { RouteEnum } from '../enums/route'
-import { AlertService } from './alert.service'
-import { CsrfService } from './csrf.service'
-import { createLoggerWithContext, LoggerService } from './logger.service'
-import { SecretsService } from './secrets.service'
-import { UserService } from './user.service'
 
 @Injectable({
     providedIn: 'root',

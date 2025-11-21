@@ -1,3 +1,14 @@
+import { getPool } from '@database'
+import { AppRequest, DatabaseError, HttpError, PlaidApiError } from '@models'
+import { queueLogAppRequest } from '@queues'
+import {
+    capitalizeFirstLetter,
+    createCookieName,
+    logger,
+    prod,
+    stage,
+    vars,
+} from '@utilities'
 import { ClientUrlEnum, ServerError } from '@wealthwatch-shared'
 import pgSession from 'connect-pg-simple'
 import _cors from 'cors'
@@ -5,13 +16,6 @@ import { randomInt } from 'crypto'
 import { doubleCsrf } from 'csrf-csrf'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import session from 'express-session'
-import { getPool } from '../database/index.js'
-import { AppRequest } from '../models/appRequest.js'
-import { DatabaseError, HttpError, PlaidApiError } from '../models/error.js'
-import { queueLogAppRequest } from '../queues/logQueue.js'
-import { prod, stage, vars } from './env.js'
-import { logger } from './logger.js'
-import { capitalizeFirstLetter, createCookieName } from './string.js'
 
 export const cors = _cors({
     origin: prod ? (stage ? ClientUrlEnum.Stage : ClientUrlEnum.Prod) : true,
@@ -190,4 +194,8 @@ const formatErrorMessage = (type: string, ...details: string[]): string => {
     return `${capitalizeFirstLetter(type)} - ${detail}`
 }
 
-export const _test = { getErrorStatus, createErrorMessage, formatErrorMessage }
+export const _middlewareTest = {
+    getErrorStatus,
+    createErrorMessage,
+    formatErrorMessage,
+}

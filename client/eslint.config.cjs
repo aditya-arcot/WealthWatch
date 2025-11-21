@@ -2,6 +2,7 @@
 const eslint = require('@eslint/js')
 const tseslint = require('typescript-eslint')
 const angular = require('angular-eslint')
+const csseslint = require('@eslint/css')
 const { defineConfig } = require('eslint/config')
 
 module.exports = defineConfig(
@@ -77,6 +78,10 @@ module.exports = defineConfig(
                             message:
                                 'Use the "@wealthwatch-shared" alias instead',
                         },
+                        {
+                            group: ['.*', 'src/', 'app/'],
+                            message: 'Use path alias instead of relative path',
+                        },
                     ],
                 },
             ],
@@ -89,5 +94,13 @@ module.exports = defineConfig(
             ...angular.configs.templateRecommended,
             ...angular.configs.templateAccessibility,
         ],
+    },
+    {
+        files: ['**/*.css'],
+        language: 'css/css',
+        extends: [csseslint.default.configs.recommended],
+        rules: {
+            'css/no-important': 'off',
+        },
     }
 )

@@ -1,4 +1,4 @@
-import { DateFilterEnum } from '../enums/filter'
+import { DateFilterEnum } from '@enums/filter'
 
 export const dateFilterDescriptionMap: Record<DateFilterEnum, string> = {
     [DateFilterEnum.All]: 'All Time',

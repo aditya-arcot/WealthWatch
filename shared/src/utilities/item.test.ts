@@ -1,5 +1,5 @@
+import { isInCooldown, refreshCooldown } from '@utilities'
 import { describe, expect, it } from 'vitest'
-import { isInCooldown, refreshCooldown } from './item.js'
 
 describe('itemInCooldown', () => {
     it('returns false if timestamp is null', () => {
