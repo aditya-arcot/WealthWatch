@@ -33,13 +33,23 @@ export const createSession = () => {
         store: sessionStore,
         secret: vars.sessionSecret,
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         cookie: {
             secure: prod,
             maxAge: 1000 * 60 * 60 * 24, // 1 day,
             sameSite: 'strict',
         },
     })
+}
+
+// initialize dummy property to prevent csrf mismatch
+export const ensureSession = (
+    req: Request,
+    _res: Response,
+    next: NextFunction
+) => {
+    if (req.session._dummy === undefined) req.session._dummy = true
+    next()
 }
 
 export const createCsrf = () => {

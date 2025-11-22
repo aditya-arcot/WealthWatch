@@ -1,7 +1,10 @@
-import { User } from '@wealthwatch-shared'
-
 declare module 'express-session' {
     interface SessionData {
-        user: User
+        user: {
+            id: number
+            username: string
+            admin: boolean
+        }
+        _dummy: boolean
     }
 }

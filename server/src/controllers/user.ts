@@ -1,12 +1,23 @@
 import { logout, removeDeactivateItem } from '@controllers'
-import { fetchActiveItemsByUserId, removeUserById } from '@database'
+import {
+    fetchActiveItemsByUserId,
+    fetchUserByUsername,
+    removeUserById,
+} from '@database'
 import { HttpError } from '@models'
 import { logger } from '@utilities'
 import { Request, Response } from 'express'
 
-export const getCurrentUser = (req: Request, res: Response) => {
+export const getCurrentUser = async (req: Request, res: Response) => {
     logger.debug('getting current user')
-    res.json(req.session.user)
+
+    const sessionUser = req.session.user
+    if (!sessionUser) return res.json(undefined)
+
+    const user = await fetchUserByUsername(sessionUser.username)
+    if (!user) throw new HttpError('user not found', 404)
+
+    return res.json(user)
 }
 
 export const deleteCurrentUser = async (req: Request, res: Response) => {

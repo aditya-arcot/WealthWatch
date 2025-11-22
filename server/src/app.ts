@@ -7,6 +7,7 @@ import {
     createCsrf,
     createSession,
     createSwaggerSpec,
+    ensureSession,
     handleError,
     handleUnmatchedRoute,
     logger,
@@ -48,6 +49,7 @@ const startMainApp = () => {
     app.use(logRequestResponse)
     app.use(methodOverride('_method'))
     app.use(cookieParser())
+    app.use(ensureSession)
     app.use(createCsrf())
 
     logger.debug('configuring routes')

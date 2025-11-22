@@ -152,13 +152,20 @@ export const register = async (req: Request, res: Response) => {
         admin: false,
     }
     const newUser = await insertUser(user)
-    req.session.user = newUser
 
-    await modifyAccessRequestStatusById(
-        accessReq.id,
-        AccessRequestStatusEnum.Completed
-    )
-    return res.status(201).json(newUser)
+    void regenerateSession(req).then(async () => {
+        req.session.user = {
+            id: newUser.id,
+            username: newUser.username,
+            admin: newUser.admin,
+        }
+
+        await modifyAccessRequestStatusById(
+            accessReq.id,
+            AccessRequestStatusEnum.Completed
+        )
+        res.status(201).json(newUser)
+    })
 }
 
 export const login = async (req: Request, res: Response) => {
@@ -179,8 +186,15 @@ export const login = async (req: Request, res: Response) => {
     if (!bcrypt.compareSync(password, user.passwordHash)) {
         throw new HttpError('incorrect password', 400)
     }
-    req.session.user = user
-    return res.json(user)
+
+    void regenerateSession(req).then(() => {
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            admin: user.admin,
+        }
+        res.json(user)
+    })
 }
 
 export const loginWithDemo = async (req: Request, res: Response) => {
@@ -190,13 +204,30 @@ export const loginWithDemo = async (req: Request, res: Response) => {
     if (!user) {
         throw new HttpError('demo user not found', 404)
     }
-    req.session.user = user
-    return res.json(user)
+
+    void regenerateSession(req).then(() => {
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            admin: user.admin,
+        }
+        res.json(user)
+    })
+}
+
+const regenerateSession = (req: Request): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        req.session.regenerate((err) => {
+            if (err) return reject(err)
+            resolve()
+        })
+    })
 }
 
 export const logout = (req: Request, res: Response) => {
     logger.debug('logging out')
     req.session.destroy(() => {
+        res.clearCookie(createCookieName('session'))
         res.clearCookie(createCookieName('csrf'))
         res.status(204).send()
     })

@@ -13,6 +13,7 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
+import { CsrfService } from '@app/services/csrf.service'
 import { LoggerComponent } from '@components/logger.component'
 import { RouteEnum } from '@enums/route'
 import { AlertService } from '@services/alert.service'
@@ -37,6 +38,7 @@ export class LoginComponent
     private router = inject(Router)
     private alertSvc = inject(AlertService)
     private secretsSvc = inject(SecretsService)
+    private csrfSvc = inject(CsrfService)
 
     @ViewChild('loginForm') loginForm!: ElementRef<HTMLFormElement>
     loginFormGroup: FormGroup
@@ -96,6 +98,7 @@ export class LoginComponent
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
+                this.csrfSvc.regenerate = true
                 this.logger.info('getting secrets')
                 this.secretsSvc.getSecrets().subscribe()
                 void this.router.navigateByUrl(RouteEnum.Home)

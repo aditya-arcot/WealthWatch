@@ -8,6 +8,7 @@ import {
     fetchActiveItemByPlaidId,
     fetchActiveItemByUserIdAndInstitutionId,
     fetchActiveItemsByUserId,
+    fetchUserByUsername,
     fetchUsers,
     insertItem,
     removeUserById,
@@ -45,8 +46,11 @@ export const devDeactivateAllItems = async (_req: Request, res: Response) => {
 export const devCreateSandboxItem = async (req: Request, res: Response) => {
     logger.debug('creating sandbox item')
 
-    const user = req.session.user
-    if (!user) throw new HttpError('missing user', 400)
+    const sessionUser = req.session.user
+    if (!sessionUser) throw new HttpError('missing user', 400)
+
+    const user = await fetchUserByUsername(sessionUser.username)
+    if (!user) throw new HttpError('user not found', 404)
 
     const institutionId = 'ins_56'
     const institutionName = 'Chase'
