@@ -17,7 +17,7 @@ jobs:
         environment: ${{ github.base_ref == 'main' && 'prod' || github.base_ref || github.ref_name }}
         steps:
             - name: checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
 
@@ -86,7 +86,7 @@ jobs:
         environment: ${{ github.base_ref == 'main' && 'prod' || github.base_ref || github.ref_name }}
         steps:
             - name: checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
 
