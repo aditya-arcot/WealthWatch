@@ -83,7 +83,8 @@ export const requestAccess = async (req: Request, res: Response) => {
         updateTimestamp: new Date(),
     }
     await insertAccessRequest(accessReq)
-    return res.status(204).send()
+
+    res.status(204).send()
 }
 
 export const validateAccessCode = async (req: Request, res: Response) => {
@@ -100,7 +101,7 @@ export const validateAccessCode = async (req: Request, res: Response) => {
         throw new HttpError('invalid access code', 400)
     }
 
-    return res.json({
+    res.json({
         name: `${accessReq.firstName} ${accessReq.lastName}`,
         email: accessReq.email,
     })

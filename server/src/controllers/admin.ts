@@ -11,7 +11,7 @@ import { Request, Response } from 'express'
 export const getAccessRequests = async (_req: Request, res: Response) => {
     logger.debug('getting access requests')
     const reqs = await fetchAccessRequests()
-    return res.json(reqs)
+    res.json(reqs)
 }
 
 export const reviewAccessRequest = async (req: Request, res: Response) => {
@@ -41,5 +41,5 @@ export const reviewAccessRequest = async (req: Request, res: Response) => {
         accessCode,
         username
     )
-    return res.status(204).send()
+    res.status(204).send()
 }

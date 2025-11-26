@@ -40,7 +40,7 @@ export const devDeleteAllUsers = async (req: Request, res: Response) => {
 export const devDeactivateAllItems = async (_req: Request, res: Response) => {
     logger.debug('deactivating all items')
     await deactivateItems()
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const devCreateSandboxItem = async (req: Request, res: Response) => {
@@ -85,7 +85,7 @@ export const devCreateSandboxItem = async (req: Request, res: Response) => {
 
     await syncItemData(newItem)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devForceRefreshItemTransactions = async (
@@ -102,7 +102,7 @@ export const devForceRefreshItemTransactions = async (
     if (!item) throw new HttpError('item not found', 404)
     await refreshItemTransactions(item, false)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const devForceRefreshItemInvestments = async (
@@ -133,7 +133,7 @@ export const devSyncItem = async (req: Request, res: Response) => {
     if (!item) throw new HttpError('item not found', 404)
     await syncItemData(item)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemTransactions = async (req: Request, res: Response) => {
@@ -147,7 +147,7 @@ export const devSyncItemTransactions = async (req: Request, res: Response) => {
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemTransactions(item, true)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemInvestments = async (req: Request, res: Response) => {
@@ -161,7 +161,7 @@ export const devSyncItemInvestments = async (req: Request, res: Response) => {
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemInvestments(item, true)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemLiabilities = async (req: Request, res: Response) => {
@@ -175,7 +175,7 @@ export const devSyncItemLiabilities = async (req: Request, res: Response) => {
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemLiabilities(item, true)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemBalances = async (req: Request, res: Response) => {
@@ -189,7 +189,7 @@ export const devSyncItemBalances = async (req: Request, res: Response) => {
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemBalances(item)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devResetSandboxItemLogin = async (req: Request, res: Response) => {
@@ -205,7 +205,7 @@ export const devResetSandboxItemLogin = async (req: Request, res: Response) => {
     const reset = await plaidSandboxResetLogin(item)
     if (!reset) throw new HttpError('failed to reset item login')
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const devFireSandboxWebhook = async (req: Request, res: Response) => {
@@ -230,7 +230,7 @@ export const devFireSandboxWebhook = async (req: Request, res: Response) => {
     const fired = await plaidSandboxFireWebhook(item, code as WebhookCodeEnum)
     if (!fired) throw new HttpError('failed to fire webhook')
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 const deactivateItems = async (deleteUsers = false) => {

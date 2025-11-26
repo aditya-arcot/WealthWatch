@@ -26,7 +26,7 @@ export const getUserCategorySummaries = async (req: Request, res: Response) => {
         startDate,
         endDate
     )
-    return res.json(resp)
+    res.json(resp)
 }
 
 export const getUserSpendingCategoryTotals = async (
@@ -56,5 +56,5 @@ export const getUserSpendingCategoryTotals = async (
         startDate,
         endDate
     )
-    return res.json({ dates, totals })
+    res.json({ dates, totals })
 }

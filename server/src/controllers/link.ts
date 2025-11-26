@@ -48,7 +48,7 @@ export const handleLinkEvent = async (req: Request, res: Response) => {
 
     await queueLogPlaidLinkEvent(event)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const exchangePublicToken = async (req: Request, res: Response) => {
@@ -103,7 +103,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
 
     await syncItemData(newItem)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const handleLinkUpdateComplete = async (req: Request, res: Response) => {
@@ -139,5 +139,5 @@ export const handleLinkUpdateComplete = async (req: Request, res: Response) => {
 
     await syncItemData(item)
 
-    return res.status(202).send()
+    res.status(202).send()
 }

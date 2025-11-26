@@ -58,7 +58,7 @@ export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithAccountsByUserId(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithAccountsWithHoldings = async (
@@ -71,7 +71,7 @@ export const getUserItemsWithAccountsWithHoldings = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithAccountsWithHoldingsByUserId(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithCreditCardAccounts = async (
@@ -84,7 +84,7 @@ export const getUserItemsWithCreditCardAccounts = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithCreditCardAccounts(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithMortgageAccounts = async (
@@ -97,7 +97,7 @@ export const getUserItemsWithMortgageAccounts = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithMortgageAccounts(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithStudentLoanAccounts = async (
@@ -110,7 +110,7 @@ export const getUserItemsWithStudentLoanAccounts = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithStudentsLoansAccounts(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const refreshItem = async (req: Request, res: Response) => {
@@ -148,7 +148,7 @@ export const refreshItem = async (req: Request, res: Response) => {
     await queueSyncItemBalances(item)
     await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const deactivateItem = async (req: Request, res: Response) => {
@@ -162,7 +162,7 @@ export const deactivateItem = async (req: Request, res: Response) => {
     if (!item) throw new HttpError('item not found', 404)
     await removeDeactivateItem(item)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const refreshItemTransactions = (

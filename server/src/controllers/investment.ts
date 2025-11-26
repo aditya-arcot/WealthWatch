@@ -25,5 +25,5 @@ export const refreshUserInvestments = async (req: Request, res: Response) => {
         })
     )
 
-    return res.status(204).send()
+    res.status(204).send()
 }

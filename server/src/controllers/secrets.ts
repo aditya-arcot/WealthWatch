@@ -8,5 +8,5 @@ export const getSecrets = async (_req: Request, res: Response) => {
         logtailToken: vars.clientLogtailToken,
         demoUser: vars.demoUser,
     }
-    return res.json(secrets)
+    res.json(secrets)
 }

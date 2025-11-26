@@ -73,7 +73,7 @@ export const getUserTransactionsAndCounts = async (
             limit,
             offset
         )
-    return res.json(resp)
+    res.json(resp)
 }
 
 export const updateTransactionCustomName = async (
@@ -92,7 +92,7 @@ export const updateTransactionCustomName = async (
 
     await modifyTransactionCustomNameByPlaidId(plaidTransactionId, customName)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const updateTransactionCustomCategoryId = async (
@@ -114,7 +114,7 @@ export const updateTransactionCustomCategoryId = async (
         customCategoryId
     )
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const updateTransactionNote = async (req: Request, res: Response) => {
@@ -130,7 +130,7 @@ export const updateTransactionNote = async (req: Request, res: Response) => {
 
     await modifyTransactionNoteByPlaidId(plaidTransactionId, note)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const refreshUserTransactions = async (req: Request, res: Response) => {
@@ -151,5 +151,5 @@ export const refreshUserTransactions = async (req: Request, res: Response) => {
         })
     )
 
-    return res.status(204).send()
+    res.status(204).send()
 }

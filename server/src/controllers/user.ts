@@ -35,5 +35,5 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
 
     logger.debug('deleting user')
     await removeUserById(user.id)
-    return logout(req, res)
+    logout(req, res)
 }

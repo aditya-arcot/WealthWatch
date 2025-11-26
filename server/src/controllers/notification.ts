@@ -20,7 +20,7 @@ export const getUserNotifications = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const notifications = await fetchActiveNotificationsByUserId(userId)
-    return res.json(notifications)
+    res.json(notifications)
 }
 
 export const updateUserNotificationsToRead = async (
@@ -34,7 +34,7 @@ export const updateUserNotificationsToRead = async (
 
     await modifyNotificationsToReadByUserId(userId)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const updateUserNotificationToInactive = async (
@@ -54,7 +54,7 @@ export const updateUserNotificationToInactive = async (
 
     await modifyNotificationToInactiveByUserIdAndId(userId, notificationId)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const insertInfoNotification = (item: Item, message: string) => {
