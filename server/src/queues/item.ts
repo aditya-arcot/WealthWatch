@@ -120,7 +120,7 @@ export const initializeItemWorker = () => {
     itemWorker.on('failed', (job, err) => {
         logger.error(
             { err },
-            `${getQueueName} queue - failed job (id ${job?.id})`
+            `${getQueueName()} queue - failed job (id ${job?.id})`
         )
         handleJobFailure(
             getQueueName(),
