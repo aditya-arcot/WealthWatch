@@ -9,10 +9,16 @@ import {
 import { HttpError } from '@models'
 import { plaidLinkTokenCreate, plaidPublicTokenExchange } from '@plaid'
 import { queueLogPlaidLinkEvent } from '@queues'
-import { logger } from '@utilities'
-import { Item, NotificationTypeEnum, PlaidLinkEvent } from '@wealthwatch-shared'
+import { logger, validate } from '@utilities'
+import {
+    CreateLinkTokenBodySchema,
+    ExchangePublicTokenBodySchema,
+    HandleLinkEventBodySchema,
+    HandleLinkUpdateCompleteBodySchema,
+    Item,
+    NotificationTypeEnum,
+} from '@wealthwatch-shared'
 import { Request, Response } from 'express'
-import { LinkSessionSuccessMetadata } from 'plaid'
 
 export const createLinkToken = async (req: Request, res: Response) => {
     logger.debug('creating link token')
@@ -20,34 +26,36 @@ export const createLinkToken = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const itemId = req.body.itemId
-    const updateAccounts = req.body.updateAccounts
+    const body = validate(req.body, CreateLinkTokenBodySchema)
 
-    if (itemId === undefined) {
+    if (body.itemId === undefined) {
         const linkToken = await plaidLinkTokenCreate(userId)
         return res.json({ linkToken })
     }
 
-    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
-    if (updateAccounts !== undefined && typeof updateAccounts !== 'boolean')
+    if (typeof body.itemId !== 'number')
+        throw new HttpError('invalid item id', 400)
+    if (
+        body.updateAccounts !== undefined &&
+        typeof body.updateAccounts !== 'boolean'
+    )
         throw new HttpError('invalid update accounts flag', 400)
 
-    const item = await fetchActiveItemByUserIdAndId(userId, itemId)
+    const item = await fetchActiveItemByUserIdAndId(userId, body.itemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    const linkToken = await plaidLinkTokenCreate(userId, item, updateAccounts)
+    const linkToken = await plaidLinkTokenCreate(
+        userId,
+        item,
+        body.updateAccounts
+    )
     return res.json({ linkToken })
 }
 
 export const handleLinkEvent = async (req: Request, res: Response) => {
     logger.debug('handling link event')
-
-    const event = req.body.event as PlaidLinkEvent
-    if (typeof event !== 'object')
-        throw new HttpError('missing or invalid event', 400)
-
-    await queueLogPlaidLinkEvent(event)
-
+    const body = validate(req.body, HandleLinkEventBodySchema)
+    await queueLogPlaidLinkEvent(body.event)
     res.status(202).send()
 }
 
@@ -57,18 +65,11 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const publicToken = req.body.publicToken
-    if (typeof publicToken !== 'string')
-        throw new HttpError('missing or invalid public token', 400)
+    const body = validate(req.body, ExchangePublicTokenBodySchema)
 
-    const metadata = req.body.metadata as LinkSessionSuccessMetadata
-    if (typeof metadata !== 'object')
-        throw new HttpError('missing or invalid metadata', 400)
-
-    const institution = metadata?.institution
+    const institution = body.metadata.institution
     if (
-        !institution ||
-        institution.institution_id === undefined ||
+        institution?.institution_id === undefined ||
         institution.name === undefined
     )
         throw new HttpError('missing institution info', 400)
@@ -80,7 +81,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     if (existingItem) throw new HttpError('item already linked', 409)
 
     const { accessToken, plaidItemId } = await plaidPublicTokenExchange(
-        publicToken,
+        body.publicToken,
         userId
     )
 
@@ -99,8 +100,6 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
         investmentsLastRefreshed: null,
     }
     const newItem = await insertItem(item)
-    if (!newItem) throw new HttpError('failed to insert item')
-
     await syncItemData(newItem)
 
     res.status(202).send()
@@ -112,29 +111,21 @@ export const handleLinkUpdateComplete = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const itemId = req.body.itemId
-    if (typeof itemId !== 'number') throw new HttpError('invalid item id', 400)
+    const body = validate(req.body, HandleLinkUpdateCompleteBodySchema)
 
-    const item = await fetchActiveItemByUserIdAndId(userId, itemId)
+    const notificationTypeId = body.notificationTypeId as NotificationTypeEnum
+
+    const item = await fetchActiveItemByUserIdAndId(userId, body.itemId)
     if (!item) throw new HttpError('item not found', 404)
 
     logger.debug('updating item to healthy')
-    await modifyItemHealthyById(itemId, true)
-
-    const notificationTypeId = req.body.notificationTypeId
-    if (typeof notificationTypeId !== 'number')
-        throw new HttpError('invalid notification type', 400)
-
-    const typeEnum = notificationTypeId as NotificationTypeEnum
-    if (!Object.values(NotificationTypeEnum).includes(typeEnum)) {
-        throw new HttpError('invalid notification type', 400)
-    }
+    await modifyItemHealthyById(body.itemId, true)
 
     logger.debug('updating notifications to inactive')
     await modifyNotificationsToInactiveByTypeIdUserIdAndItemId(
         notificationTypeId,
         userId,
-        itemId
+        body.itemId
     )
 
     await syncItemData(item)

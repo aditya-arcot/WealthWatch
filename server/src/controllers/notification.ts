@@ -5,12 +5,12 @@ import {
     modifyNotificationToInactiveByUserIdAndId,
 } from '@database'
 import { HttpError } from '@models'
+import { createNotification, logger, validate } from '@utilities'
 import {
-    createNotification,
-    logger,
-    parseNumberOrUndefinedFromParam,
-} from '@utilities'
-import { Item, NotificationTypeEnum } from '@wealthwatch-shared'
+    Item,
+    NotificationTypeEnum,
+    UpdateUserNotificationToInactiveParamsSchema,
+} from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 
 export const getUserNotifications = async (req: Request, res: Response) => {
@@ -46,13 +46,15 @@ export const updateUserNotificationToInactive = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const notificationId = parseNumberOrUndefinedFromParam(
-        req.params['notificationId']
+    const params = validate(
+        req.params,
+        UpdateUserNotificationToInactiveParamsSchema
     )
-    if (notificationId === undefined)
-        throw new HttpError('missing or invalid notification id', 400)
 
-    await modifyNotificationToInactiveByUserIdAndId(userId, notificationId)
+    await modifyNotificationToInactiveByUserIdAndId(
+        userId,
+        params.notificationId
+    )
 
     res.status(204).send()
 }

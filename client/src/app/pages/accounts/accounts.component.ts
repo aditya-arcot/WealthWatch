@@ -150,7 +150,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.user?.id ?? -1,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             type: 'success',
             sessionId: metadata.link_session_id,
             institutionId: metadata.institution?.institution_id,
@@ -244,7 +244,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.user?.id ?? -1,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             type: 'exit',
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,
@@ -263,7 +263,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.user?.id ?? -1,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             type: `event - ${eventName.toLowerCase()}`,
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,

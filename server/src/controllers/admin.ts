@@ -3,8 +3,12 @@ import {
     modifyAccessRequestStatusAccessCodeAndReviewerById,
 } from '@database'
 import { HttpError } from '@models'
-import { logger, parseNumberOrUndefinedFromParam } from '@utilities'
-import { AccessRequestStatusEnum } from '@wealthwatch-shared'
+import { logger, validate } from '@utilities'
+import {
+    AccessRequestStatusEnum,
+    ReviewAccessRequestBodySchema,
+    ReviewAccessRequestParamsSchema,
+} from '@wealthwatch-shared'
 import * as crypto from 'crypto'
 import { Request, Response } from 'express'
 
@@ -17,26 +21,20 @@ export const getAccessRequests = async (_req: Request, res: Response) => {
 export const reviewAccessRequest = async (req: Request, res: Response) => {
     logger.debug('reviewing access request')
 
-    const accessRequestId = parseNumberOrUndefinedFromParam(
-        req.params['requestId']
-    )
-    if (accessRequestId === undefined)
-        throw new HttpError('missing or invalid access request id', 400)
-
-    const statusId = req.body.statusId
-    if (statusId === undefined || typeof statusId !== 'number')
-        throw new HttpError('missing or invalid status id', 400)
-
-    let accessCode: string | null = null
-    if (statusId === AccessRequestStatusEnum.Approved) {
-        accessCode = crypto.randomBytes(4).toString('hex').slice(0, 8)
-    }
-
     const username = req.session.user?.username
     if (username === undefined) throw new HttpError('missing username', 400)
 
+    const params = validate(req.params, ReviewAccessRequestParamsSchema)
+    const body = validate(req.body, ReviewAccessRequestBodySchema)
+
+    const statusId = body.statusId as AccessRequestStatusEnum
+
+    let accessCode: string | null = null
+    if (statusId === AccessRequestStatusEnum.Approved)
+        accessCode = crypto.randomBytes(4).toString('hex').slice(0, 8)
+
     await modifyAccessRequestStatusAccessCodeAndReviewerById(
-        accessRequestId,
+        params.accessRequestId,
         statusId,
         accessCode,
         username

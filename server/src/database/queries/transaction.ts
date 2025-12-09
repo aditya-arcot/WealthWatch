@@ -1,5 +1,6 @@
 import { constructInsertQueryParamsPlaceholder, runQuery } from '@database'
 import {
+    CategoryEnum,
     PaymentChannelEnum,
     Transaction,
     TransactionsAndCounts,
@@ -359,7 +360,7 @@ export const modifyTransactionCustomNameByPlaidId = async (
 
 export const modifyTransactionCustomCategoryIdByPlaidId = async (
     plaidId: string,
-    categoryId: number | null
+    categoryId: CategoryEnum | null
 ): Promise<void> => {
     const query = `
         UPDATE transactions

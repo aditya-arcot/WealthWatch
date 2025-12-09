@@ -47,8 +47,14 @@ import {
     queueSyncItemLiabilities,
     queueSyncItemTransactions,
 } from '@queues'
-import { logger } from '@utilities'
-import { Account, isInCooldown, Item } from '@wealthwatch-shared'
+import { logger, validate } from '@utilities'
+import {
+    Account,
+    DeactivateItemParamsSchema,
+    isInCooldown,
+    Item,
+    RefreshItemParamsSchema,
+} from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 
 export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
@@ -116,11 +122,9 @@ export const getUserItemsWithStudentLoanAccounts = async (
 export const refreshItem = async (req: Request, res: Response) => {
     logger.debug('refreshing item')
 
-    const plaidItemId = req.params['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const params = validate(req.params, RefreshItemParamsSchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(params.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
     if (isInCooldown(item.lastRefreshed)) {
@@ -154,11 +158,9 @@ export const refreshItem = async (req: Request, res: Response) => {
 export const deactivateItem = async (req: Request, res: Response) => {
     logger.debug('deactivating item')
 
-    const plaidItemId = req.params['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const params = validate(req.params, DeactivateItemParamsSchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(params.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await removeDeactivateItem(item)
 

@@ -115,7 +115,7 @@ export const modifyNotificationToInactiveByUserIdAndId = async (
 }
 
 export const modifyNotificationsToInactiveByTypeIdUserIdAndItemId = async (
-    typeId: number,
+    typeId: NotificationTypeEnum,
     userId: number,
     itemId: number
 ): Promise<void> => {
