@@ -30,7 +30,9 @@ export const HandleLinkEventBodySchema = z.object({
 
 export const ExchangePublicTokenBodySchema = z.object({
     publicToken: z.string(),
-    metadata: z.object() as z.ZodType<LinkSessionSuccessMetadata>,
+    metadata: z.custom<LinkSessionSuccessMetadata>((val) => {
+        return typeof val === 'object' && val !== null
+    }),
 })
 
 export const HandleLinkUpdateCompleteBodySchema = z.object({
