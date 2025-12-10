@@ -211,12 +211,12 @@ export const devFireSandboxWebhook = async (req: Request, res: Response) => {
 
     const query = validate(req.query, DevFireSandboxWebhookQuerySchema)
 
-    const code = query.code as WebhookCodeEnum
+    const webhookCode = query.webhookCode as WebhookCodeEnum
 
     const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    const fired = await plaidSandboxFireWebhook(item, code)
+    const fired = await plaidSandboxFireWebhook(item, webhookCode)
     if (!fired) throw new HttpError('failed to fire webhook')
 
     res.status(204).send()

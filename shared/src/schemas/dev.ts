@@ -37,5 +37,5 @@ export const DevResetSandboxItemLoginQuerySchema = z.object({
 
 export const DevFireSandboxWebhookQuerySchema = z.object({
     plaidItemId: z.string(),
-    code: z.enum(WebhookCodeEnum),
+    webhookCode: z.enum(WebhookCodeEnum),
 })
