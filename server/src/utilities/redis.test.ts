@@ -35,7 +35,7 @@ describe('createRedis', () => {
 
     it('creates redis client with correct config', async () => {
         process.env['REDIS_HOST'] = mockRedisHost
-        const { createRedis, getRedis } = await import('@utilities')
+        const { createRedis, getRedis } = await import('./redis.js')
         await createRedis()
         const redis = getRedis()
 
@@ -61,7 +61,7 @@ describe('createRedis', () => {
         setupMockRedis(
             vi.fn().mockRejectedValue(new Error('connection failed'))
         )
-        const { createRedis } = await import('@utilities')
+        const { createRedis } = await import('./redis.js')
         await expect(createRedis()).rejects.toThrow(
             'failed to create redis client'
         )
@@ -70,7 +70,7 @@ describe('createRedis', () => {
 
 describe('getRedis', () => {
     it('returns redis client if initialized', async () => {
-        const { createRedis, getRedis } = await import('@utilities')
+        const { createRedis, getRedis } = await import('./redis.js')
         await createRedis()
         const redis = getRedis()
 
@@ -79,14 +79,14 @@ describe('getRedis', () => {
     })
 
     it('throws error if redis client not initialized', async () => {
-        const { getRedis } = await import('@utilities')
+        const { getRedis } = await import('./redis.js')
         expect(() => getRedis()).toThrow('redis client not initialized')
     })
 })
 
 describe('stopRedis', () => {
     it('stops redis client if initialized', async () => {
-        const { createRedis, getRedis, stopRedis } = await import('@utilities')
+        const { createRedis, getRedis, stopRedis } = await import('./redis.js')
         await createRedis()
         const redis = getRedis()
         stopRedis()
@@ -104,7 +104,7 @@ describe('stopRedis', () => {
     })
 
     it('logs warning if redis client not initialized', async () => {
-        const { stopRedis } = await import('@utilities')
+        const { stopRedis } = await import('./redis.js')
         stopRedis()
 
         expect(logger.logger.debug).toHaveBeenCalledExactlyOnceWith(

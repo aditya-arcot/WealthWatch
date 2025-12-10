@@ -1,20 +1,17 @@
 import { processWebhook } from '@controllers'
-import { HttpError } from '@models'
-import router from '@routes'
 import {
     catchAsync,
     cors,
     createCsrf,
     createSession,
-    createSwaggerSpec,
     ensureSession,
     handleError,
     handleUnmatchedRoute,
-    logger,
     logRequestResponse,
-    prod,
-    swaggerUiOptions,
-} from '@utilities'
+} from '@middleware'
+import { HttpError } from '@models'
+import router from '@routes'
+import { createSwaggerSpec, logger, prod, swaggerUiOptions } from '@utilities'
 import cookieParser from 'cookie-parser'
 import express from 'express'
 import helmet from 'helmet'

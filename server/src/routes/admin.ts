@@ -1,5 +1,5 @@
 import { getAccessRequests, reviewAccessRequest } from '@controllers'
-import { authenticateAdmin, catchAsync } from '@utilities'
+import { authenticateAdmin, catchAsync } from '@middleware'
 import express from 'express'
 
 const router = express.Router()

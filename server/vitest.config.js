@@ -3,9 +3,9 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
     test: {
-        include: ['src/utilities/*.test.ts'],
+        include: ['src/**/*.test.ts'],
         coverage: {
-            include: ['src/utilities/*.ts'],
+            include: ['src/middleware/*.ts', 'src/utilities/*.ts'],
         },
     },
     plugins: [tsconfigPaths()],

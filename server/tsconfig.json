@@ -14,6 +14,7 @@
             "@database": ["src/database/index.ts"],
             "@enums": ["src/enums/index.ts"],
             "@maps": ["src/maps/index.ts"],
+            "@middleware": ["src/middleware/index.ts"],
             "@models": ["src/models/index.ts"],
             "@plaid": ["src/plaid/index.ts"],
             "@queues": ["src/queues/index.ts"],
