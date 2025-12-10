@@ -1,6 +1,6 @@
 {
     "name": "@aditya-arcot/wealthwatch-shared",
-    "version": "4.0.16",
+    "version": "4.0.17",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aditya-arcot/WealthWatch.git"
@@ -17,9 +17,8 @@
     ],
     "scripts": {
         "build": "rm -rf dist/ && tspc -p tsconfig.build.json",
-        "dev": "tsc-watch -p tsconfig.build.json",
+        "dev": "tspc --watch -p tsconfig.build.json",
         "lint": "eslint --fix --max-warnings=0 src",
-        "prepare": "ts-patch install -s",
         "test": "vitest dev --coverage --ui",
         "test:deploy": "vitest run --coverage"
     },
