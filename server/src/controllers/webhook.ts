@@ -16,7 +16,7 @@ import {
     TransactionsWebhookCodeEnum,
     WebhookTypeEnum,
 } from '@enums'
-import { HttpError, mapPlaidWebhook, PlaidWebhook, Webhook } from '@models'
+import { HttpError, mapPlaidWebhook, Webhook } from '@models'
 import { plaidWebhookVerificationKeyGet } from '@plaid'
 import {
     queueSyncItemInvestments,
@@ -24,8 +24,11 @@ import {
     queueSyncItemTransactions,
     queueWebhook,
 } from '@queues'
-import { logger } from '@utilities'
-import { NotificationTypeEnum } from '@wealthwatch-shared'
+import { logger, validate } from '@utilities'
+import {
+    NotificationTypeEnum,
+    ProcessWebhookBodySchema,
+} from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 import { importJWK, jwtVerify } from 'jose'
 import { sha256 } from 'js-sha256'
@@ -42,13 +45,12 @@ export const processWebhook = async (req: Request, res: Response) => {
         throw new HttpError('missing or invalid plaid signature', 400)
     }
 
-    const body = JSON.stringify(req.body, null, 2)
+    const body = validate(req.body, ProcessWebhookBodySchema)
 
-    await verifyWebhook(token, body)
-    logger.debug('verified webhook')
+    const bodyString = JSON.stringify(body, null, 2)
+    await verifyWebhook(token, bodyString)
 
-    const plaidWebhook: PlaidWebhook = req.body
-    const webhook = mapPlaidWebhook(plaidWebhook)
+    const webhook = mapPlaidWebhook(body)
     await queueWebhook(webhook)
 
     return res.status(202).send()
@@ -119,6 +121,8 @@ const verifyWebhook = async (token: string, body: string): Promise<void> => {
     if (sha256(body) !== payload['request_body_sha256']) {
         throw new HttpError('body hash does not match', 400)
     }
+
+    logger.debug('verified webhook')
 }
 
 export const handleWebhook = async (webhook: Webhook) => {
