@@ -8,12 +8,16 @@ import {
     modifyAccessRequestStatusById,
 } from '@database'
 import { HttpError } from '@models'
-import { createCookieName, logger, vars } from '@utilities'
+import { createCookieName, logger, validate, vars } from '@utilities'
 import {
     AccessRequest,
     AccessRequestErrorCodeEnum,
     AccessRequestStatusEnum,
+    LoginBodySchema,
+    RegisterBodySchema,
+    RequestAccessBodySchema,
     User,
+    ValidateAccessCodeBodySchema,
 } from '@wealthwatch-shared'
 import bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
@@ -21,19 +25,9 @@ import { Request, Response } from 'express'
 export const requestAccess = async (req: Request, res: Response) => {
     logger.debug('requesting access')
 
-    const firstName = req.body.firstName
-    if (typeof firstName !== 'string')
-        throw new HttpError('missing or invalid first name', 400)
+    const body = validate(req.body, RequestAccessBodySchema)
 
-    const lastName = req.body.lastName
-    if (typeof lastName !== 'string')
-        throw new HttpError('missing or invalid last name', 400)
-
-    const email = req.body.email
-    if (typeof email !== 'string')
-        throw new HttpError('missing or invalid email', 400)
-
-    const emailExists = !!(await fetchUserByEmail(email))
+    const emailExists = !!(await fetchUserByEmail(body.email))
     if (emailExists)
         throw new HttpError(
             'user exists',
@@ -41,7 +35,7 @@ export const requestAccess = async (req: Request, res: Response) => {
             AccessRequestErrorCodeEnum.UserExists
         )
 
-    const existingAccessReq = await fetchAccessRequestByEmail(email)
+    const existingAccessReq = await fetchAccessRequestByEmail(body.email)
     if (existingAccessReq) {
         switch (existingAccessReq.statusId) {
             case AccessRequestStatusEnum.Pending:
@@ -73,9 +67,9 @@ export const requestAccess = async (req: Request, res: Response) => {
 
     const accessReq: AccessRequest = {
         id: -1,
-        firstName,
-        lastName,
-        email,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        email: body.email,
         statusId: AccessRequestStatusEnum.Pending,
         accessCode: null,
         reviewer: null,
@@ -83,24 +77,21 @@ export const requestAccess = async (req: Request, res: Response) => {
         updateTimestamp: new Date(),
     }
     await insertAccessRequest(accessReq)
-    return res.status(204).send()
+
+    res.status(204).send()
 }
 
 export const validateAccessCode = async (req: Request, res: Response) => {
     logger.debug('validating access code')
 
-    const accessCode = req.body.accessCode
-    if (typeof accessCode !== 'string')
-        throw new HttpError('missing or invalid access code', 400)
+    const body = validate(req.body, ValidateAccessCodeBodySchema)
 
-    const accessReq = await fetchAccessRequestByAccessCode(accessCode)
+    const accessReq = await fetchAccessRequestByAccessCode(body.accessCode)
     if (!accessReq) throw new HttpError('invalid access code', 400)
-
-    if (accessReq.statusId !== AccessRequestStatusEnum.Approved) {
+    if (accessReq.statusId !== AccessRequestStatusEnum.Approved)
         throw new HttpError('invalid access code', 400)
-    }
 
-    return res.json({
+    res.json({
         name: `${accessReq.firstName} ${accessReq.lastName}`,
         email: accessReq.email,
     })
@@ -109,19 +100,9 @@ export const validateAccessCode = async (req: Request, res: Response) => {
 export const register = async (req: Request, res: Response) => {
     logger.debug('registering')
 
-    const accessCode = req.body.accessCode
-    if (typeof accessCode !== 'string')
-        throw new HttpError('missing or invalid access code', 400)
+    const body = validate(req.body, RegisterBodySchema)
 
-    const username = req.body.username
-    if (typeof username !== 'string')
-        throw new HttpError('missing or invalid username', 400)
-
-    const password = req.body.password
-    if (typeof password !== 'string')
-        throw new HttpError('missing or invalid password', 400)
-
-    const accessReq = await fetchAccessRequestByAccessCode(accessCode)
+    const accessReq = await fetchAccessRequestByAccessCode(body.accessCode)
     if (!accessReq) throw new HttpError('invalid access code', 400)
 
     if (accessReq.statusId !== AccessRequestStatusEnum.Approved) {
@@ -133,7 +114,7 @@ export const register = async (req: Request, res: Response) => {
     const lastName = accessReq.lastName
 
     const emailExists = !!(await fetchUserByEmail(email))
-    const usernameExists = !!(await fetchUserByUsername(username))
+    const usernameExists = !!(await fetchUserByUsername(body.username))
     if (emailExists || usernameExists) {
         throw new HttpError(
             'a user with this email or username already exists',
@@ -141,10 +122,10 @@ export const register = async (req: Request, res: Response) => {
         )
     }
 
-    const passwordHash = bcrypt.hashSync(password)
+    const passwordHash = bcrypt.hashSync(body.password)
     const user: User = {
         id: -1,
-        username,
+        username: body.username,
         email,
         firstName,
         lastName,
@@ -152,35 +133,40 @@ export const register = async (req: Request, res: Response) => {
         admin: false,
     }
     const newUser = await insertUser(user)
-    req.session.user = newUser
 
-    await modifyAccessRequestStatusById(
-        accessReq.id,
-        AccessRequestStatusEnum.Completed
-    )
-    return res.status(201).json(newUser)
+    void regenerateSession(req).then(async () => {
+        req.session.user = {
+            id: newUser.id,
+            username: newUser.username,
+            admin: newUser.admin,
+        }
+
+        await modifyAccessRequestStatusById(
+            accessReq.id,
+            AccessRequestStatusEnum.Completed
+        )
+        res.status(201).json(newUser)
+    })
 }
 
 export const login = async (req: Request, res: Response) => {
     logger.debug('logging in')
 
-    const username = req.body.username
-    if (typeof username !== 'string')
-        throw new HttpError('missing or invalid username', 400)
+    const body = validate(req.body, LoginBodySchema)
 
-    const password = req.body.password
-    if (typeof password !== 'string')
-        throw new HttpError('missing or invalid password', 400)
-
-    const user = await fetchUserByUsername(username)
-    if (!user) {
-        throw new HttpError('invalid username', 404)
-    }
-    if (!bcrypt.compareSync(password, user.passwordHash)) {
+    const user = await fetchUserByUsername(body.username)
+    if (!user) throw new HttpError('invalid username', 404)
+    if (!bcrypt.compareSync(body.password, user.passwordHash))
         throw new HttpError('incorrect password', 400)
-    }
-    req.session.user = user
-    return res.json(user)
+
+    void regenerateSession(req).then(() => {
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            admin: user.admin,
+        }
+        res.json(user)
+    })
 }
 
 export const loginWithDemo = async (req: Request, res: Response) => {
@@ -190,13 +176,30 @@ export const loginWithDemo = async (req: Request, res: Response) => {
     if (!user) {
         throw new HttpError('demo user not found', 404)
     }
-    req.session.user = user
-    return res.json(user)
+
+    void regenerateSession(req).then(() => {
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            admin: user.admin,
+        }
+        res.json(user)
+    })
+}
+
+const regenerateSession = (req: Request): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        req.session.regenerate((err) => {
+            if (err) return reject(err)
+            resolve()
+        })
+    })
 }
 
 export const logout = (req: Request, res: Response) => {
     logger.debug('logging out')
     req.session.destroy(() => {
+        res.clearCookie(createCookieName('session'))
         res.clearCookie(createCookieName('csrf'))
         res.status(204).send()
     })

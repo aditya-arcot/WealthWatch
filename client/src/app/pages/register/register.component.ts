@@ -6,6 +6,7 @@ import {
     ReactiveFormsModule,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
+import { CsrfService } from '@app/services/csrf.service'
 import { LoggerComponent } from '@components/logger.component'
 import { RouteEnum } from '@enums/route'
 import { AlertService } from '@services/alert.service'
@@ -27,6 +28,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
     private authSvc = inject(AuthService)
     private alertSvc = inject(AlertService)
     private secretsSvc = inject(SecretsService)
+    private csrfSvc = inject(CsrfService)
 
     @ViewChild('accessCodeForm') accessCodeForm!: ElementRef<HTMLFormElement>
     @ViewChild('registerForm') registerForm!: ElementRef<HTMLFormElement>
@@ -204,6 +206,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
+                this.csrfSvc.regenerate = true
                 this.logger.info('getting secrets')
                 this.secretsSvc.getSecrets().subscribe()
             })

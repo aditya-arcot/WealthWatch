@@ -4,7 +4,7 @@ import {
     CreditCardAccount,
     MortgageAccount,
     StudentLoanAccount,
-} from '@models'
+} from '../models/index.js'
 
 export interface Item {
     id: number

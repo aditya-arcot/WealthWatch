@@ -11,9 +11,11 @@ export class CsrfService {
 
     readonly baseUrl = `${env.serverUrl}/csrf-token`
     private csrfToken: string | null = null
+    regenerate = false
 
     getToken(): Observable<{ csrfToken: string }> {
-        if (this.csrfToken) return of({ csrfToken: this.csrfToken })
+        if (this.csrfToken && !this.regenerate)
+            return of({ csrfToken: this.csrfToken })
         return this.http
             .get<{ csrfToken: string }>(this.baseUrl)
             .pipe(tap((resp) => (this.csrfToken = resp.csrfToken)))

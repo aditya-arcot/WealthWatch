@@ -47,8 +47,14 @@ import {
     queueSyncItemLiabilities,
     queueSyncItemTransactions,
 } from '@queues'
-import { logger } from '@utilities'
-import { Account, isInCooldown, Item } from '@wealthwatch-shared'
+import { logger, validate } from '@utilities'
+import {
+    Account,
+    DeactivateItemParamsSchema,
+    isInCooldown,
+    Item,
+    RefreshItemParamsSchema,
+} from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 
 export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
@@ -58,7 +64,7 @@ export const getUserItemsWithAccounts = async (req: Request, res: Response) => {
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithAccountsByUserId(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithAccountsWithHoldings = async (
@@ -71,7 +77,7 @@ export const getUserItemsWithAccountsWithHoldings = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithAccountsWithHoldingsByUserId(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithCreditCardAccounts = async (
@@ -84,7 +90,7 @@ export const getUserItemsWithCreditCardAccounts = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithCreditCardAccounts(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithMortgageAccounts = async (
@@ -97,7 +103,7 @@ export const getUserItemsWithMortgageAccounts = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithMortgageAccounts(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const getUserItemsWithStudentLoanAccounts = async (
@@ -110,17 +116,15 @@ export const getUserItemsWithStudentLoanAccounts = async (
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
     const items = await fetchActiveItemsWithStudentsLoansAccounts(userId)
-    return res.json(items)
+    res.json(items)
 }
 
 export const refreshItem = async (req: Request, res: Response) => {
     logger.debug('refreshing item')
 
-    const plaidItemId = req.params['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const params = validate(req.params, RefreshItemParamsSchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(params.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
     if (isInCooldown(item.lastRefreshed)) {
@@ -148,21 +152,19 @@ export const refreshItem = async (req: Request, res: Response) => {
     await queueSyncItemBalances(item)
     await modifyItemLastRefreshedByPlaidId(item.plaidId, new Date())
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const deactivateItem = async (req: Request, res: Response) => {
     logger.debug('deactivating item')
 
-    const plaidItemId = req.params['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const params = validate(req.params, DeactivateItemParamsSchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(params.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await removeDeactivateItem(item)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const refreshItemTransactions = (

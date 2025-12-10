@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 export * from './accessRequest.js'
 export * from './account.js'
 export * from './category.js'
@@ -13,3 +12,4 @@ export * from './security.js'
 export * from './spending.js'
 export * from './transaction.js'
 export * from './user.js'
+export * from './webhook.js'

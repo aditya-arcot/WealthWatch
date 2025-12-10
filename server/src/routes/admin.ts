@@ -35,7 +35,7 @@ router
 
 /**
  * @swagger
- * /admin/access-requests/{requestId}:
+ * /admin/access-requests/{accessRequestId}:
  *   patch:
  *     summary: Review access request
  *     tags: [Admin]
@@ -54,7 +54,7 @@ router
  *         $ref: '#/components/responses/Unauthorized'
  */
 router
-    .route('/access-requests/:requestId')
+    .route('/access-requests/:accessRequestId')
     .patch(authenticateAdmin, catchAsync(reviewAccessRequest))
 
 export default router

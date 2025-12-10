@@ -131,6 +131,28 @@ describe('createSession', () => {
     })
 })
 
+describe('ensureSession', () => {
+    const req = {} as Request
+    const res = {} as Response
+    const next: NextFunction = vi.fn()
+
+    it('sets dummy property if not present', async () => {
+        const { ensureSession } = await import('./middleware.js')
+        req.session = {} as unknown as Session
+        ensureSession(req, res, next)
+        expect(req.session._dummy).toBe(true)
+        expect(next).toHaveBeenCalledOnce()
+    })
+
+    it('does not set dummy property if already present', async () => {
+        const { ensureSession } = await import('./middleware.js')
+        req.session = { _dummy: false } as unknown as Session
+        ensureSession(req, res, next)
+        expect(req.session._dummy).toBe(false)
+        expect(next).toHaveBeenCalledOnce()
+    })
+})
+
 describe('createCsrf', () => {
     const req = {} as Request
     const res = {} as Response
