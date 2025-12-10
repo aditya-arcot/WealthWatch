@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { CategoryEnum } from '@enums'
 import * as z from 'zod'
+import { CategoryEnum } from '../enums/index.js'
 
 export const GetUserTransactionsAndCountsQuerySchema = z.object({
     searchQuery: z.string().optional(),

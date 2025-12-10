@@ -1,4 +1,4 @@
-import { AccessRequestStatusEnum } from '@enums'
+import { AccessRequestStatusEnum } from '../enums/index.js'
 
 export interface AccessRequest {
     id: number

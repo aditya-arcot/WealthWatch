@@ -49,17 +49,6 @@ export default defineConfig(
                 },
             ],
             'no-console': 'warn',
-            'no-restricted-imports': [
-                'warn',
-                {
-                    patterns: [
-                        {
-                            group: ['.*', 'src/'],
-                            message: 'Use path alias instead of relative path',
-                        },
-                    ],
-                },
-            ],
         },
     }
 )

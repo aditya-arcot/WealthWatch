@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { AccessRequestStatusEnum } from '@enums'
 import * as z from 'zod'
+import { AccessRequestStatusEnum } from '../enums/index.js'
 
 export const ReviewAccessRequestParamsSchema = z.object({
     accessRequestId: z.coerce.number().int().min(1),

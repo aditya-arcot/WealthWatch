@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { NotificationTypeEnum } from '@enums'
 import { LinkSessionSuccessMetadata } from 'plaid'
 import * as z from 'zod'
+import { NotificationTypeEnum } from '../enums/index.js'
 
 export const CreateLinkTokenBodySchema = z.object({
     itemId: z.int().optional(),

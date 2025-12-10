@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 export * from './admin.js'
 export * from './auth.js'
 export * from './dev.js'
