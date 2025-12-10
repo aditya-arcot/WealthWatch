@@ -36,10 +36,10 @@ jobs:
     runner:
         runs-on: self-hosted
         outputs:
-            runner: ${{ steps.set-runner.outputs.runner }}
+            runner: ${{ steps.runner.outputs.runner }}
         steps:
-            - name: set runner
-              id: set-runner
+            - name: runner
+              id: runner
               run: |
                   if [ "${{ github.ref_name }}" = "test" ]; then
                       echo "runner=mbp-14" >> $GITHUB_OUTPUT
@@ -51,11 +51,12 @@ jobs:
         runs-on: self-hosted
         environment: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
         outputs:
-            repo: ${{ steps.outputs-vars.outputs.repo }}
-            client_image: ${{ steps.outputs-vars.outputs.client_image }}
-            client_container: ${{ steps.outputs-vars.outputs.client_container }}
-            server_image: ${{ steps.outputs-vars.outputs.server_image }}
-            server_container: ${{ steps.outputs-vars.outputs.server_container }}
+            repo: ${{ steps.create-vars.outputs.repo }}
+            image_tag: ${{ steps.create-vars.outputs.image_tag }}
+            client_image: ${{ steps.create-vars.outputs.client_image }}
+            client_container: ${{ steps.create-vars.outputs.client_container }}
+            server_image: ${{ steps.create-vars.outputs.server_image }}
+            server_container: ${{ steps.create-vars.outputs.server_container }}
         steps:
             - name: initial vars
               run: |
@@ -79,9 +80,10 @@ jobs:
                   echo "SERVER_CONTAINER=$REPO-server" >> $GITHUB_ENV
 
             - name: output vars
-              id: outputs-vars
+              id: output-vars
               run: |
                   echo "repo=$REPO" >> $GITHUB_OUTPUT
+                  echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
                   echo "client_image=$CLIENT_CONTAINER:$IMAGE_TAG" >> $GITHUB_OUTPUT
                   echo "client_container=$CLIENT_CONTAINER" >> $GITHUB_OUTPUT
                   echo "server_image=$SERVER_CONTAINER:$IMAGE_TAG" >> $GITHUB_OUTPUT
@@ -92,6 +94,7 @@ jobs:
         uses: ./.github/workflows/deploy-client.yml
         with:
             runner: ${{ needs.runner.outputs.runner }}
+            image_tag: ${{ needs.setup.outputs.image_tag }}
             image: ${{ needs.setup.outputs.client_image }}
         secrets: inherit
 

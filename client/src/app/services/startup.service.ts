@@ -9,6 +9,7 @@ import {
 } from '@services/logger.service'
 import { SecretsService } from '@services/secrets.service'
 import { UserService } from '@services/user.service'
+import { build } from 'build'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 
 @Injectable({
@@ -30,6 +31,7 @@ export class StartupService {
 
     startup(): Observable<void> {
         this.logger.info('starting up')
+        this.logger.info(`image tag: ${build.imageTag}`)
         return this.getCsrfToken().pipe(
             switchMap(() => this.getCurrentUser()),
             switchMap((userReceived) => {
