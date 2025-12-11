@@ -16,7 +16,7 @@
         ]
     },
     "dependencies": {
-        "@aditya-arcot/wealthwatch-shared": "^4.0.18",
+        "@aditya-arcot/wealthwatch-shared": "^4.0.19",
         "@angular/animations": "^21.0.3",
         "@angular/common": "^21.0.3",
         "@angular/compiler": "^21.0.3",
@@ -45,6 +45,7 @@
         "@types/node": "^24.10.2",
         "angular-eslint": "21.1.0",
         "eslint": "^9.39.1",
+        "eslint-config-prettier": "^10.1.8",
         "tslib": "^2.8.1",
         "typescript": "~5.9.3",
         "typescript-eslint": "^8.49.0"

@@ -17,7 +17,7 @@ export class AdminService {
     }
 
     reviewAccessRequest(requestId: number, statusId: AccessRequestStatusEnum) {
-        const url = `${this.baseUrl}/access-requests/${requestId}`
+        const url = `${this.baseUrl}/access-requests/${String(requestId)}`
         /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.patch<void>(url, { statusId })
     }

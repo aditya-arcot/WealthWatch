@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import {
     AfterViewInit,
     Component,
@@ -6,12 +7,7 @@ import {
     ViewChild,
     inject,
 } from '@angular/core'
-import {
-    FormBuilder,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms'
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { CsrfService } from '@app/services/csrf.service'
 import { LoggerComponent } from '@components/logger.component'
@@ -41,15 +37,14 @@ export class LoginComponent
     private csrfSvc = inject(CsrfService)
 
     @ViewChild('loginForm') loginForm!: ElementRef<HTMLFormElement>
-    loginFormGroup: FormGroup
+    loginFormGroup = this.formBuilder.group({
+        username: ['', [Validators.required]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
+    })
     loading = false
 
     constructor() {
         super('LoginComponent')
-        this.loginFormGroup = this.formBuilder.group({
-            username: ['', [Validators.required]],
-            password: ['', [Validators.required, Validators.minLength(8)]],
-        })
     }
 
     ngOnInit(): void {
@@ -60,7 +55,7 @@ export class LoginComponent
     }
 
     ngAfterViewInit(): void {
-        const form = this.loginForm?.nativeElement
+        const form = this.loginForm.nativeElement
         form.addEventListener('submit', (submitEvent: SubmitEvent) => {
             if (!this.loginFormGroup.valid || !form.checkValidity()) {
                 this.logger.info('validation failed')
@@ -77,16 +72,28 @@ export class LoginComponent
         this.logger.info('logging in', { demo })
         this.loading = true
 
+        let username = ''
+        let password = ''
+        if (!demo) {
+            if (
+                !this.loginFormGroup.value.username ||
+                !this.loginFormGroup.value.password
+            ) {
+                this.logger.info('validation failed')
+                this.loading = false
+                return
+            }
+            username = this.loginFormGroup.value.username
+            password = this.loginFormGroup.value.password
+        }
+
         const loginObservable = demo
             ? this.authSvc.loginWithDemo()
-            : this.authSvc.login(
-                  this.loginFormGroup.value.username,
-                  this.loginFormGroup.value.password
-              )
+            : this.authSvc.login(username, password)
 
         loginObservable
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(this.logger, 'Failed to log in')
                     if (err.status === 404) {
                         this.loginFormGroup.reset()

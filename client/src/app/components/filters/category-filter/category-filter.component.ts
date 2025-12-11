@@ -11,7 +11,7 @@ import {
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { categoryIconMap } from '@maps/category'
-import { Category, CategoryEnum } from '@wealthwatch-shared'
+import { Category } from '@wealthwatch-shared'
 
 @Component({
     selector: 'app-category-filter',
@@ -35,7 +35,8 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
     cancelOnExit = true
 
     ngOnInit(): void {
-        const modalElement = this.categoryFilterModal.nativeElement
+        const modalElement = this.categoryFilterModal
+            .nativeElement as HTMLElement
         modalElement.addEventListener('hidden.bs.modal', (event: Event) => {
             if (event.target === this.categoryFilterModal.nativeElement) {
                 if (this.cancelOnExit) {
@@ -57,7 +58,7 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
         if (this.selectedCategoryIds.size === this.categories.length) {
             return 'All Selected'
         }
-        return `${this.selectedCategoryIds.size} Selected`
+        return `${String(this.selectedCategoryIds.size)} Selected`
     }
 
     inputChecked(id: number): boolean {
@@ -71,7 +72,7 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
         if (!(event.target instanceof HTMLInputElement)) {
             return
         }
-        const checkbox = event.target as HTMLInputElement
+        const checkbox = event.target
 
         if (event instanceof KeyboardEvent) {
             // space bar press also generates a click event
@@ -87,8 +88,7 @@ export class CategoryFilterComponent implements OnInit, OnChanges {
     }
 
     getCategoryClass(c: Category): string {
-        const categoryId = c.id as CategoryEnum
-        return categoryIconMap[categoryId]
+        return categoryIconMap[c.id]
     }
 
     categoryIdsChanged(): boolean {

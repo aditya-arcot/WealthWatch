@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core'
     providedIn: 'root',
 })
 export class CurrencyService {
-    private formatters: Record<string, Intl.NumberFormat> = {
+    private formatters: Partial<Record<string, Intl.NumberFormat>> = {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         USD: new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -15,12 +15,10 @@ export class CurrencyService {
     format(amount: number | null, currency: string | null): string {
         if (amount === null) return '-'
         if (currency === null) return amount.toString()
-        if (!this.formatters[currency]) {
-            this.formatters[currency] = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency,
-            })
-        }
+        this.formatters[currency] ??= new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency,
+        })
         return this.formatters[currency].format(amount)
     }
 }

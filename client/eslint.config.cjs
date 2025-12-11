@@ -1,9 +1,9 @@
-// @ts-check
 const eslint = require('@eslint/js')
 const tseslint = require('typescript-eslint')
 const angular = require('angular-eslint')
 const csseslint = require('@eslint/css')
 const { defineConfig } = require('eslint/config')
+const eslintConfigPrettier = require('eslint-config-prettier/flat')
 
 module.exports = defineConfig(
     {
@@ -15,9 +15,10 @@ module.exports = defineConfig(
         },
         extends: [
             eslint.configs.recommended,
-            ...tseslint.configs.strict,
-            ...tseslint.configs.stylistic,
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.stylisticTypeChecked,
             ...angular.configs.tsRecommended,
+            eslintConfigPrettier,
         ],
         processor: angular.processInlineTemplates,
         rules: {
@@ -66,6 +67,12 @@ module.exports = defineConfig(
                 {
                     selector: 'enumMember',
                     format: ['StrictPascalCase'],
+                },
+            ],
+            '@typescript-eslint/unbound-method': [
+                'error',
+                {
+                    ignoreStatic: true,
                 },
             ],
             'no-console': 'warn',

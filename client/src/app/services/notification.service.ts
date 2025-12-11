@@ -28,7 +28,7 @@ export class NotificationService {
     }
 
     updateNotificationToInactive(notificationId: number) {
-        const url = `${this.baseUrl}/${notificationId}/inactive`
+        const url = `${this.baseUrl}/${String(notificationId)}/inactive`
         /* eslint-disable-next-line @typescript-eslint/no-invalid-void-type */
         return this.http.patch<void>(url, {})
     }

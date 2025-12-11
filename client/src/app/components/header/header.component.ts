@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { AfterViewInit, Component, OnInit, inject } from '@angular/core'
 import {
     NavigationEnd,
@@ -83,7 +84,7 @@ export class HeaderComponent
         this.authSvc
             .logout()
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to log out'

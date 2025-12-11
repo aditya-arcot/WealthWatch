@@ -4,7 +4,7 @@ export const handleCheckboxSelect = (
     if (!(event.target instanceof HTMLInputElement)) {
         return false
     }
-    const checkbox = event.target as HTMLInputElement
+    const checkbox = event.target
     // space bar also generates a mouse event
     if (event instanceof KeyboardEvent) {
         if (event.key !== 'Enter') return false

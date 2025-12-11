@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { RouteEnum } from '@enums/route'
@@ -44,7 +45,7 @@ export class StartupService {
                 this.logger.info('startup success')
                 return of(undefined)
             }),
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 this.logger.error('startup error', { err })
                 return of(undefined)
             })
@@ -54,7 +55,7 @@ export class StartupService {
     private getCsrfToken() {
         this.logger.info('getting csrf token')
         return this.csrfSvc.getToken().pipe(
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 void this.router.navigateByUrl(RouteEnum.StartupError)
                 this.alertSvc.addErrorAlert(
                     this.logger,
@@ -79,7 +80,7 @@ export class StartupService {
     private getSecrets() {
         this.logger.info('getting secrets')
         return this.secretsSvc.getSecrets().pipe(
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 void this.router.navigateByUrl(RouteEnum.StartupError)
                 this.alertSvc.addErrorAlert(
                     this.logger,
