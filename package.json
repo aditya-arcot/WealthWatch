@@ -13,7 +13,7 @@
     },
     "devDependencies": {
         "husky": "^9.1.7",
-        "knip": "^5.73.1",
+        "knip": "^5.73.3",
         "lint-staged": "^16.2.7",
         "npm-check-updates": "^19.2.0",
         "prettier": "^3.7.4",
