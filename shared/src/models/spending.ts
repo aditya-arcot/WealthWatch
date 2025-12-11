@@ -1,11 +1,13 @@
+import { CategoryEnum } from '../enums/index.js'
+
 export interface CategorySummary {
-    categoryId: number
+    categoryId: CategoryEnum
     total: number
     count: number
 }
 
 export interface CategoryTotalByDate {
-    categoryId: number
+    categoryId: CategoryEnum
     totalByDate: [
         {
             date: Date

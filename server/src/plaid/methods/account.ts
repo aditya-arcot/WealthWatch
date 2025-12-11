@@ -17,6 +17,7 @@ export const plaidAccountsGet = async (item: Item): Promise<Account[]> => {
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().accountsGet,
         params,
         item.userId,
@@ -49,6 +50,7 @@ export const plaidAccountsBalanceGet = async (
 
     try {
         const resp = await executePlaidMethod(
+            // eslint-disable-next-line @typescript-eslint/unbound-method
             getPlaidClient().accountsBalanceGet,
             params,
             item.userId,
@@ -60,7 +62,8 @@ export const plaidAccountsBalanceGet = async (
     } catch (error) {
         if (!(error instanceof PlaidApiError)) throw error
         if (
-            error.code !==
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            (error.code as PlaidAccountErrorCodeEnum) !==
             PlaidAccountErrorCodeEnum.LastUpdatedDatetimeOutOfRange
         )
             throw error

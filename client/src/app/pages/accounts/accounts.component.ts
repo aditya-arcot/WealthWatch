@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { Component, inject, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
@@ -55,12 +56,12 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
     ngOnInit(): void {
         this.loadAccounts()
         this.route.queryParams.subscribe((params) => {
-            const itemId: string | undefined = params['itemId']
+            const itemId = params['itemId'] as string | undefined
             if (itemId === undefined) return
             const itemIdNum = safeParseInt(itemId)
             if (itemIdNum === undefined) throw Error('invalid item id')
 
-            const withAccounts: string | undefined = params['withAccounts']
+            const withAccounts = params['withAccounts'] as string | undefined
             if (withAccounts === undefined) throw Error('missing with accounts')
             const withAccountsBool = parseBoolean(withAccounts)
 
@@ -74,7 +75,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         this.itemSvc
             .getItemsWithAccounts()
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to load accounts'
@@ -99,7 +100,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                         withAccounts
                     )
                 ),
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to create link token'
@@ -125,12 +126,15 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         })
         const config: PlaidConfig = {
             token,
-            onSuccess: (token: string, metadata: PlaidSuccessMetadata) =>
-                this.handleLinkSuccess(token, metadata, itemId, withAccounts),
-            onExit: (error: PlaidErrorObject, metadata: PlaidErrorMetadata) =>
-                this.handleLinkExit(error, metadata, itemId),
-            onEvent: (eventName: string, metadata: PlaidEventMetadata) =>
-                this.handleLinkEvent(eventName, metadata),
+            onSuccess: (token: string, metadata: PlaidSuccessMetadata) => {
+                this.handleLinkSuccess(token, metadata, itemId, withAccounts)
+            },
+            onExit: (error: PlaidErrorObject, metadata: PlaidErrorMetadata) => {
+                this.handleLinkExit(error, metadata, itemId)
+            },
+            onEvent: (eventName: string, metadata: PlaidEventMetadata) => {
+                this.handleLinkEvent(eventName, metadata)
+            },
         }
         return this.plaidLinkSvc.createPlaid(config)
     }
@@ -150,7 +154,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.user?.id ?? -1,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             type: 'success',
             sessionId: metadata.link_session_id,
             institutionId: metadata.institution?.institution_id,
@@ -173,7 +177,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         this.linkSvc
             .exchangePublicToken(token, metadata)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     if (err.status === 409) {
                         this.alertSvc.addErrorAlert(
                             this.logger,
@@ -196,7 +200,9 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                     'Success linking institution',
                     'Loading account data'
                 )
-                setTimeout(() => this.loadAccounts(), 3000)
+                setTimeout(() => {
+                    this.loadAccounts()
+                }, 3000)
             })
     }
 
@@ -209,7 +215,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         this.linkSvc
             .handleLinkUpdateComplete(itemId, withAccounts)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to complete link update'
@@ -228,7 +234,9 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
                     'Success linking institution',
                     'Loading account data'
                 )
-                setTimeout(() => this.loadAccounts(), 3000)
+                setTimeout(() => {
+                    this.loadAccounts()
+                }, 3000)
             })
     }
 
@@ -244,12 +252,12 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.user?.id ?? -1,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             type: 'exit',
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,
-            institutionId: metadata.institution?.institution_id,
-            institutionName: metadata.institution?.name,
+            institutionId: metadata.institution.institution_id,
+            institutionName: metadata.institution.name,
             status: metadata.status,
             errorType: error?.error_type,
             errorCode: error?.error_code,
@@ -263,7 +271,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         const event: PlaidLinkEvent = {
             id: -1,
             userId: this.userSvc.user?.id ?? -1,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             type: `event - ${eventName.toLowerCase()}`,
             sessionId: metadata.link_session_id,
             requestId: metadata.request_id,
@@ -309,7 +317,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         this.itemSvc
             .refreshItem(item.plaidId)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     if (err.status === 429) {
                         item.lastRefreshed = new Date()
                     }
@@ -342,7 +350,7 @@ export class AccountsComponent extends LoggerComponent implements OnInit {
         this.itemSvc
             .deactivateItem(item.plaidId)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         `Failed to remove ${item.institutionName} accounts`

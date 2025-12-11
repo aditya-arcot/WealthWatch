@@ -1,8 +1,8 @@
 import {
     StudentLoanRepaymentPlanTypeEnum,
     StudentLoanStatusTypeEnum,
-} from '@enums'
-import { HoldingWithSecurity } from '@models'
+} from '../enums/index.js'
+import { HoldingWithSecurity } from '../models/index.js'
 
 export interface Account {
     id: number

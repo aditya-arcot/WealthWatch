@@ -40,7 +40,7 @@ export class AmountFilterComponent implements OnInit, OnChanges {
     cancelOnExit = true
 
     ngOnInit(): void {
-        const modalElement = this.amountFilterModal.nativeElement
+        const modalElement = this.amountFilterModal.nativeElement as HTMLElement
         modalElement.addEventListener('hidden.bs.modal', (event: Event) => {
             if (event.target === this.amountFilterModal.nativeElement) {
                 if (this.cancelOnExit) {

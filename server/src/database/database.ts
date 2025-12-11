@@ -84,7 +84,7 @@ export const constructInsertQueryParamsPlaceholder = (
     for (let i = 0; i < rowCount; i++) {
         const paramList: string[] = []
         for (let j = 0; j < paramCount; j++) {
-            paramList.push(`$${counter++}`)
+            paramList.push(`$${String(counter++)}`)
         }
         placeholders.push(`(${paramList.join(', ')})`)
     }
@@ -99,12 +99,12 @@ export const runQuery = async <T extends QueryResultRow>(
 ): Promise<QueryResult<T>> => {
     const start = Date.now()
 
-    // replace whitespace with single space, lowercase, trim
+    // replace whitespace with single space
     query = query.replace(/\s+/g, ' ').trim()
 
-    // replace parameterized values with placeholder
+    // collapse `VALUES ($1, $2, $3), ($4, $5, $6)` into `VALUES (2 x 3)`
     let collapsedQuery = query
-    if (query.startsWith('insert')) {
+    if (/^insert/i.exec(query)) {
         // parameterized value rows
         const rows = query.match(/\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)/g)
         if (rows) {
@@ -114,14 +114,12 @@ export const runQuery = async <T extends QueryResultRow>(
                 .replace(')', '')
                 .split(',').length
 
-            // replace parameterized values with placeholder
             const parameterizedValues =
-                /values\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)(\s*,\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\))*\s*/
-            const valuesPlaceholder = `values (${rowCount} x ${paramCount}) `
-            collapsedQuery = query.replace(
-                parameterizedValues,
-                valuesPlaceholder
-            )
+                /values\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)(\s*,\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\))*\s*/i
+            const valuesPlaceholder = `VALUES (${String(rowCount)} x ${String(paramCount)}) `
+            collapsedQuery = query
+                .replace(parameterizedValues, valuesPlaceholder)
+                .trim()
         }
     }
 
@@ -135,7 +133,7 @@ export const runQuery = async <T extends QueryResultRow>(
             rowCount: res.rowCount,
         }
         if (
-            /^(select|insert|update|delete)\b/.test(query) &&
+            /^(select|insert|update|delete)\b/i.test(query) &&
             res.rowCount === null
         ) {
             throw new DatabaseError('unexpected null row count')

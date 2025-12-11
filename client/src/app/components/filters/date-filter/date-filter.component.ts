@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms'
 import { DateFilterEnum } from '@enums/filter'
 import { dateFilterDescriptionMap } from '@maps/filter'
 import { checkDatesEqual } from '@utilities/date.utility'
-import { computeDatesBasedOnFilter } from '@utilities/filter.utility'
+import { computeDatesFromFilter } from '@utilities/filter.utility'
 
 // all dates are in client timezone
 
@@ -55,7 +55,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
     cancelOnExit = true
 
     ngOnInit(): void {
-        const modalElement = this.dateFilterModal.nativeElement
+        const modalElement = this.dateFilterModal.nativeElement as HTMLElement
         modalElement.addEventListener('hidden.bs.modal', (event: Event) => {
             if (event.target === this.dateFilterModal.nativeElement) {
                 if (this.cancelOnExit) {
@@ -103,7 +103,7 @@ export class DateFilterComponent implements OnInit, OnChanges {
             this.selectorEndDate =
                 this.endDate?.toISOString().split('T')[0] ?? null
         } else {
-            const { startDate, endDate } = computeDatesBasedOnFilter(
+            const { startDate, endDate } = computeDatesFromFilter(
                 this.selectedFilter
             )
             this.startDate = startDate

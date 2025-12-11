@@ -28,7 +28,7 @@ const runCleanupAndExit = async (event: string, err?: Error): Promise<void> => {
     } catch (error) {
         logger.fatal(error, 'error during cleanup')
     } finally {
-        logger.info(`exiting - pid ${pid}`)
+        logger.info(`exiting - pid ${String(pid)}`)
         process.exit(1)
     }
 }

@@ -4,6 +4,10 @@ import { handleJobFailure, handleJobSuccess, workerOptions } from '@queues'
 import { getRedis, logger, vars } from '@utilities'
 import { Queue, Worker } from 'bullmq'
 
+interface WebhookJobData {
+    webhook?: Webhook
+}
+
 let webhookQueue: Queue | null = null
 let webhookWorker: Worker | null = null
 
@@ -27,11 +31,11 @@ export const queueWebhook = async (webhook: Webhook) => {
 }
 
 export const initializeWebhookWorker = () => {
-    webhookWorker = new Worker(
+    webhookWorker = new Worker<WebhookJobData>(
         getQueueName(),
         async (job) => {
             logger.debug(
-                `${getQueueName()} queue - starting job (id ${job.id})`
+                `${getQueueName()} queue - starting job (id ${String(job.id)})`
             )
 
             const webhook: Webhook | undefined = job.data.webhook
@@ -43,26 +47,31 @@ export const initializeWebhookWorker = () => {
     )
 
     webhookWorker.on('completed', (job) => {
-        logger.debug(`${getQueueName()} queue - completed job (id ${job.id})`)
-        handleJobSuccess(getQueueName(), job.id, job.name, job.data).catch(
-            (err) => {
-                logger.error(err, `error handling job success`)
-            }
+        logger.debug(
+            `${getQueueName()} queue - completed job (id ${String(job.id)})`
         )
+        handleJobSuccess(
+            getQueueName(),
+            job.id,
+            job.name,
+            job.data as WebhookJobData
+        ).catch((err: unknown) => {
+            logger.error(err, `error handling job success`)
+        })
     })
 
     webhookWorker.on('failed', (job, err) => {
         logger.error(
             { err },
-            `${getQueueName()} queue - failed job (id ${job?.id})`
+            `${getQueueName()} queue - failed job (id ${String(job?.id)})`
         )
         handleJobFailure(
             getQueueName(),
             job?.id,
             job?.name,
-            job?.data,
+            job?.data as WebhookJobData,
             err
-        ).catch((err) => {
+        ).catch((err: unknown) => {
             logger.error(err, `error handling job failure`)
         })
     })

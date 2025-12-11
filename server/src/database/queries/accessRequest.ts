@@ -81,7 +81,7 @@ export const modifyAccessRequestStatusById = async (
 
 export const modifyAccessRequestStatusAccessCodeAndReviewerById = async (
     id: number,
-    statusId: number,
+    statusId: AccessRequestStatusEnum,
     accessCode: string | null,
     reviewer: string | null
 ): Promise<void> => {

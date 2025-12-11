@@ -805,7 +805,7 @@ const spec = {
             parameters: {
                 AccessRequestId: {
                     in: 'path',
-                    name: 'requestId',
+                    name: 'accessRequestId',
                     schema: {
                         type: 'integer',
                     },

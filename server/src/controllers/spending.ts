@@ -4,7 +4,11 @@ import {
     fetchCategoryTotalsByDateWithUserIdAndDateRange,
 } from '@database'
 import { HttpError } from '@models'
-import { logger } from '@utilities'
+import { logger, validate } from '@utilities'
+import {
+    GetUserCategorySummariesQuerySchema,
+    GetUserSpendingCategoryTotalsQuerySchema,
+} from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 
 export const getUserCategorySummaries = async (req: Request, res: Response) => {
@@ -13,20 +17,14 @@ export const getUserCategorySummaries = async (req: Request, res: Response) => {
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const startDate = req.query['startDate']
-    if (startDate !== undefined && typeof startDate !== 'string')
-        throw new HttpError('invalid start date', 400)
-
-    const endDate = req.query['endDate']
-    if (endDate !== undefined && typeof endDate !== 'string')
-        throw new HttpError('invalid end date', 400)
+    const query = validate(req.query, GetUserCategorySummariesQuerySchema)
 
     const resp = await fetchCategorySummariesByUserIdAndDateRange(
         userId,
-        startDate,
-        endDate
+        query.startDate,
+        query.endDate
     )
-    return res.json(resp)
+    res.json(resp)
 }
 
 export const getUserSpendingCategoryTotals = async (
@@ -38,23 +36,17 @@ export const getUserSpendingCategoryTotals = async (
     const userId = req.session.user?.id
     if (userId === undefined) throw new HttpError('missing user id', 400)
 
-    const startDate = req.query['startDate']
-    if (startDate !== undefined && typeof startDate !== 'string')
-        throw new HttpError('invalid start date', 400)
-
-    const endDate = req.query['endDate']
-    if (endDate !== undefined && typeof endDate !== 'string')
-        throw new HttpError('invalid end date', 400)
+    const query = validate(req.query, GetUserSpendingCategoryTotalsQuerySchema)
 
     const dates = await fetchActiveTransactionsDateSeriesByUserIdAndDateRange(
         userId,
-        startDate,
-        endDate
+        query.startDate,
+        query.endDate
     )
     const totals = await fetchCategoryTotalsByDateWithUserIdAndDateRange(
         userId,
-        startDate,
-        endDate
+        query.startDate,
+        query.endDate
     )
-    return res.json({ dates, totals })
+    res.json({ dates, totals })
 }

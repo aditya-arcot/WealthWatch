@@ -1,11 +1,12 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core'
 import {
     AbstractControl,
     FormBuilder,
-    FormGroup,
     ReactiveFormsModule,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
+import { CsrfService } from '@app/services/csrf.service'
 import { LoggerComponent } from '@components/logger.component'
 import { RouteEnum } from '@enums/route'
 import { AlertService } from '@services/alert.service'
@@ -27,13 +28,24 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
     private authSvc = inject(AuthService)
     private alertSvc = inject(AlertService)
     private secretsSvc = inject(SecretsService)
+    private csrfSvc = inject(CsrfService)
 
     @ViewChild('accessCodeForm') accessCodeForm!: ElementRef<HTMLFormElement>
     @ViewChild('registerForm') registerForm!: ElementRef<HTMLFormElement>
 
     loading = false
-    accessCodeFormGroup: FormGroup
-    registerFormGroup: FormGroup
+    accessCodeFormGroup = this.formBuilder.group({
+        accessCode: [''],
+    })
+    registerFormGroup = this.formBuilder.group(
+        {
+            username: [''],
+            password: [''],
+            confirmPassword: [''],
+        },
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        { validators: this.validateConfirmPassword }
+    )
     accessCodeValidated = false
     accessCode = ''
     name = ''
@@ -41,17 +53,6 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
 
     constructor() {
         super('RegisterComponent')
-        this.accessCodeFormGroup = this.formBuilder.group({
-            accessCode: [],
-        })
-        this.registerFormGroup = this.formBuilder.group(
-            {
-                username: [],
-                password: [],
-                confirmPassword: [],
-            },
-            { validators: this.validateConfirmPassword }
-        )
     }
 
     ngOnInit(): void {
@@ -74,7 +75,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
     }
 
     validateAccessCodeForm() {
-        const accessCodeForm = this.accessCodeForm?.nativeElement
+        const accessCodeForm = this.accessCodeForm.nativeElement
         if (
             !this.accessCodeFormGroup.valid ||
             !accessCodeForm.checkValidity()
@@ -87,7 +88,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
     }
 
     validateRegisterForm() {
-        const registerForm = this.registerForm?.nativeElement
+        const registerForm = this.registerForm.nativeElement
         if (!this.registerFormGroup.valid || !registerForm.checkValidity()) {
             this.logger.info('validation failed')
         } else {
@@ -97,8 +98,8 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
     }
 
     validateConfirmPassword(control: AbstractControl) {
-        const password: string = control.get('password')?.value
-        const confirmPassword: string = control.get('confirmPassword')?.value
+        const password = control.get('password')?.value as string
+        const confirmPassword = control.get('confirmPassword')?.value as string
         if (password !== confirmPassword) {
             return { mismatchedPasswords: true }
         }
@@ -106,18 +107,15 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
     }
 
     setConfirmPasswordValidity(input: HTMLInputElement) {
-        if (this.registerFormGroup.controls['confirmPassword'].errors) {
-            for (const err in this.registerFormGroup.controls['confirmPassword']
-                .errors) {
-                input.setCustomValidity(
-                    this.registerFormGroup.controls['confirmPassword'].errors[
-                        err
-                    ]
-                )
+        const rfg = this.registerFormGroup
+        const confirmPwdErrors = rfg.controls.confirmPassword.errors
+        if (confirmPwdErrors) {
+            for (const err in confirmPwdErrors) {
+                input.setCustomValidity(confirmPwdErrors[err] as string)
             }
-        } else if (this.registerFormGroup.errors) {
-            for (const err in this.registerFormGroup.errors) {
-                input.setCustomValidity(this.registerFormGroup.errors[err])
+        } else if (rfg.errors) {
+            for (const err in rfg.errors) {
+                input.setCustomValidity(rfg.errors[err] as string)
             }
         } else {
             input.setCustomValidity('')
@@ -128,7 +126,14 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
         this.logger.info('validating access code')
         this.loading = true
 
-        this.accessCode = this.accessCodeFormGroup.value.accessCode
+        const accessCode = this.accessCodeFormGroup.value.accessCode
+        if (!accessCode) {
+            this.logger.info('validation failed')
+            this.loading = false
+            return
+        }
+
+        this.accessCode = accessCode
         this.authSvc
             .validateAccessCode(this.accessCode)
             .pipe(
@@ -143,7 +148,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
                     this.accessCodeValidated = true
                     return of(undefined)
                 }),
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     if (err.status === 400) {
                         this.alertSvc.addErrorAlert(
                             this.logger,
@@ -169,6 +174,11 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
 
         const username = this.registerFormGroup.value.username
         const password = this.registerFormGroup.value.password
+        if (!username || !password) {
+            this.logger.info('validation failed')
+            this.loading = false
+            return
+        }
 
         this.authSvc
             .register(this.accessCode, username, password)
@@ -181,7 +191,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
                     )
                     return of(undefined)
                 }),
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     if (err.status === 409) {
                         this.alertSvc.addErrorAlert(
                             this.logger,
@@ -204,6 +214,7 @@ export class RegisterComponent extends LoggerComponent implements OnInit {
                 finalize(() => (this.loading = false))
             )
             .subscribe(() => {
+                this.csrfSvc.regenerate = true
                 this.logger.info('getting secrets')
                 this.secretsSvc.getSecrets().subscribe()
             })

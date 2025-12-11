@@ -25,8 +25,8 @@ export const vars = {
     nodeEnv: getEnvVar('NODE_ENV'),
     plaidEnv: getEnvVar('PLAID_ENV'),
 }
-export const dev = vars.nodeEnv === EnvNameEnum.Dev
-export const stage = vars.nodeEnv === EnvNameEnum.Stage
-export const prod = vars.nodeEnv === EnvNameEnum.Prod || stage
+export const dev = (vars.nodeEnv as EnvNameEnum) === EnvNameEnum.Dev
+export const stage = (vars.nodeEnv as EnvNameEnum) === EnvNameEnum.Stage
+export const prod = (vars.nodeEnv as EnvNameEnum) === EnvNameEnum.Prod || stage
 
 export const _envTest = { getEnvVar }

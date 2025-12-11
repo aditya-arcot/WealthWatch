@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit, inject } from '@angular/core'
 import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component'
 import { LoggerComponent } from '@components/logger.component'
@@ -34,7 +35,7 @@ export class AdminComponent extends LoggerComponent implements OnInit {
         this.adminSvc
             .getAccessRequests()
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to load access requests'
@@ -97,7 +98,7 @@ export class AdminComponent extends LoggerComponent implements OnInit {
         this.adminSvc
             .reviewAccessRequest(req.id, statusId)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to review access request'
@@ -106,6 +107,8 @@ export class AdminComponent extends LoggerComponent implements OnInit {
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe(() => this.loadRequests())
+            .subscribe(() => {
+                this.loadRequests()
+            })
     }
 }

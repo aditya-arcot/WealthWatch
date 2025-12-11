@@ -1,6 +1,11 @@
 import { EnvNameEnum } from '@wealthwatch-shared'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+interface SwaggerRequest {
+    url: string
+    headers: Record<string, string>
+}
+
 beforeEach(() => vi.resetModules())
 
 describe('swaggerUiOptions', () => {
@@ -11,11 +16,13 @@ describe('swaggerUiOptions', () => {
         })
 
         const { swaggerUiOptions } = await import('./swagger.js')
-        const req = { url, headers: {} }
-        const result =
-            await swaggerUiOptions.swaggerOptions?.['requestInterceptor']?.(req)
+        const req: SwaggerRequest = { url, headers: {} }
+        const interceptor = swaggerUiOptions.swaggerOptions?.[
+            'requestInterceptor'
+        ] as (req: SwaggerRequest) => Promise<SwaggerRequest>
+        const result = await interceptor(req)
 
-        const csrfUrl = `http://localhost:${port}/csrf-token`
+        const csrfUrl = `http://localhost:${String(port)}/csrf-token`
         expect(global.fetch).toHaveBeenCalledWith(csrfUrl)
         expect(result.headers['x-csrf-token']).toBe(mockCsrfToken)
     }

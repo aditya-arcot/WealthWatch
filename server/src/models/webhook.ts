@@ -1,11 +1,4 @@
-export interface PlaidWebhook {
-    /* eslint-disable @typescript-eslint/naming-convention */
-    webhook_type: string
-    webhook_code: string
-    item_id?: string
-    error?: string
-    /* eslint-enable @typescript-eslint/naming-convention */
-}
+import { PlaidWebhook } from '@wealthwatch-shared'
 
 export interface Webhook {
     id: number

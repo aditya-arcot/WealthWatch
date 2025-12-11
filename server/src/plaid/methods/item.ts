@@ -8,6 +8,7 @@ export const plaidItemRemove = async (item: Item) => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const params: ItemRemoveRequest = { access_token: item.accessToken }
     await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().itemRemove,
         params,
         item.userId,
@@ -22,6 +23,7 @@ export const plaidSandboxResetLogin = async (item: Item) => {
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().sandboxItemResetLogin,
         params,
         item.userId,

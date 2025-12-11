@@ -1,111 +1,118 @@
 import { DateFilterEnum } from '@enums/filter'
 
-export const computeDatesBasedOnFilter = (filter: DateFilterEnum) => {
-    let startDate: Date | null = null
-    let endDate: Date | null = null
-
+export const computeDatesFromFilter = (filter: DateFilterEnum) => {
     switch (filter) {
         case DateFilterEnum.All:
-            startDate = null
-            endDate = null
-            break
+            return {
+                startDate: null,
+                endDate: null,
+            }
 
         case DateFilterEnum.CurrentWeek: {
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-            const day = start.getDay() || 7
-            if (day !== 1) start.setHours(-24 * (day - 1))
+            const startDate = new Date()
+            startDate.setHours(0, 0, 0, 0)
+            const day = startDate.getDay() || 7
+            if (day !== 1) startDate.setHours(-24 * (day - 1))
 
-            startDate = start ? new Date(start) : null
-            endDate = null
-            break
+            return {
+                startDate,
+                endDate: null,
+            }
         }
 
         case DateFilterEnum.CurrentMonth: {
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-            start.setDate(1)
+            const startDate = new Date()
+            startDate.setHours(0, 0, 0, 0)
+            startDate.setDate(1)
 
-            startDate = start ? new Date(start) : null
-            endDate = null
-            break
+            return {
+                startDate,
+                endDate: null,
+            }
         }
 
         case DateFilterEnum.CurrentYear: {
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-            start.setMonth(0)
-            start.setDate(1)
+            const startDate = new Date()
+            startDate.setHours(0, 0, 0, 0)
+            startDate.setMonth(0)
+            startDate.setDate(1)
 
-            startDate = start ? new Date(start) : null
-            endDate = null
-            break
+            return {
+                startDate,
+                endDate: null,
+            }
         }
 
         case DateFilterEnum.PastWeek: {
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-            start.setHours(-24 * 6)
+            const startDate = new Date()
+            startDate.setHours(0, 0, 0, 0)
+            startDate.setHours(-24 * 6)
 
-            startDate = start ? new Date(start) : null
-            endDate = null
-            break
+            return {
+                startDate,
+                endDate: null,
+            }
         }
 
         case DateFilterEnum.PastMonth: {
-            const start = new Date()
-            start.setHours(0, 0, 0, 0)
-            start.setHours(-24 * 29)
+            const startDate = new Date()
+            startDate.setHours(0, 0, 0, 0)
+            startDate.setHours(-24 * 29)
 
-            startDate = start ? new Date(start) : null
-            endDate = null
-            break
+            return {
+                startDate,
+                endDate: null,
+            }
         }
 
         case DateFilterEnum.LastWeek: {
-            const end = new Date()
-            end.setHours(0, 0, 0, 0)
-            const day = end.getDay() || 7
-            if (day !== 1) end.setHours(-24 * day)
+            const endDate = new Date()
+            endDate.setHours(0, 0, 0, 0)
+            const day = endDate.getDay() || 7
+            if (day !== 1) endDate.setHours(-24 * day)
 
-            const start = new Date(end.getTime())
-            start.setHours(-24 * 6)
+            const startDate = new Date(endDate.getTime())
+            startDate.setHours(-24 * 6)
 
-            startDate = start ? new Date(start) : null
-            endDate = end ? new Date(end) : null
-            break
+            return {
+                startDate,
+                endDate,
+            }
         }
 
         case DateFilterEnum.LastMonth: {
-            const end = new Date()
-            end.setHours(0, 0, 0, 0)
-            end.setDate(1)
-            end.setHours(-24)
+            const endDate = new Date()
+            endDate.setHours(0, 0, 0, 0)
+            endDate.setDate(1)
+            endDate.setHours(-24)
 
-            const start = new Date(end.getTime())
-            start.setDate(1)
+            const startDate = new Date(endDate.getTime())
+            startDate.setDate(1)
 
-            startDate = start ? new Date(start) : null
-            endDate = end ? new Date(end) : null
-            break
+            return {
+                startDate,
+                endDate,
+            }
         }
 
         case DateFilterEnum.LastYear: {
-            const end = new Date()
-            end.setHours(0, 0, 0, 0)
-            end.setMonth(0)
-            end.setDate(1)
-            end.setHours(-24)
+            const endDate = new Date()
+            endDate.setHours(0, 0, 0, 0)
+            endDate.setMonth(0)
+            endDate.setDate(1)
+            endDate.setHours(-24)
 
-            const start = new Date(end.getTime())
-            start.setMonth(0)
-            start.setDate(1)
+            const startDate = new Date(endDate.getTime())
+            startDate.setMonth(0)
+            startDate.setDate(1)
 
-            startDate = start ? new Date(start) : null
-            endDate = end ? new Date(end) : null
-            break
+            return {
+                startDate,
+                endDate,
+            }
         }
-    }
 
-    return { startDate, endDate }
+        default:
+            throw Error('unexpected filter value')
+    }
 }

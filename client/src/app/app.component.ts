@@ -40,6 +40,7 @@ export class AppComponent implements OnInit {
             return false
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         Chart.register(autocolors)
 
         // bootstrap 5 font family

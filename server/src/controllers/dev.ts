@@ -8,6 +8,7 @@ import {
     fetchActiveItemByPlaidId,
     fetchActiveItemByUserIdAndInstitutionId,
     fetchActiveItemsByUserId,
+    fetchUserByUsername,
     fetchUsers,
     insertItem,
     removeUserById,
@@ -25,8 +26,19 @@ import {
     queueSyncItemLiabilities,
     queueSyncItemTransactions,
 } from '@queues'
-import { logger } from '@utilities'
-import { Item } from '@wealthwatch-shared'
+import { logger, validate } from '@utilities'
+import {
+    DevFireSandboxWebhookQuerySchema,
+    DevForceRefreshItemInvestmentsQuerySchema,
+    DevForceRefreshItemTransactionsQuerySchema,
+    DevResetSandboxItemLoginQuerySchema,
+    DevSyncItemBalancesQuerySchema,
+    DevSyncItemInvestmentsQuerySchema,
+    DevSyncItemLiabilitiesQuerySchema,
+    DevSyncItemQuerySchema,
+    DevSyncItemTransactionsQuerySchema,
+    Item,
+} from '@wealthwatch-shared'
 import { Request, Response } from 'express'
 import { SandboxItemFireWebhookRequestWebhookCodeEnum as WebhookCodeEnum } from 'plaid'
 
@@ -39,14 +51,17 @@ export const devDeleteAllUsers = async (req: Request, res: Response) => {
 export const devDeactivateAllItems = async (_req: Request, res: Response) => {
     logger.debug('deactivating all items')
     await deactivateItems()
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const devCreateSandboxItem = async (req: Request, res: Response) => {
     logger.debug('creating sandbox item')
 
-    const user = req.session.user
-    if (!user) throw new HttpError('missing user', 400)
+    const sessionUser = req.session.user
+    if (!sessionUser) throw new HttpError('missing user', 400)
+
+    const user = await fetchUserByUsername(sessionUser.username)
+    if (!user) throw new HttpError('user not found', 404)
 
     const institutionId = 'ins_56'
     const institutionName = 'Chase'
@@ -77,11 +92,9 @@ export const devCreateSandboxItem = async (req: Request, res: Response) => {
         investmentsLastRefreshed: null,
     }
     const newItem = await insertItem(item)
-    if (!newItem) throw new HttpError('failed to insert item')
-
     await syncItemData(newItem)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devForceRefreshItemTransactions = async (
@@ -90,15 +103,16 @@ export const devForceRefreshItemTransactions = async (
 ) => {
     logger.debug('force refreshing item transactions')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(
+        req.query,
+        DevForceRefreshItemTransactionsQuerySchema
+    )
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await refreshItemTransactions(item, false)
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const devForceRefreshItemInvestments = async (
@@ -107,11 +121,9 @@ export const devForceRefreshItemInvestments = async (
 ) => {
     logger.debug('force refreshing item investments')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevForceRefreshItemInvestmentsQuerySchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await refreshItemInvestments(item, false)
 
@@ -121,112 +133,91 @@ export const devForceRefreshItemInvestments = async (
 export const devSyncItem = async (req: Request, res: Response) => {
     logger.debug('syncing item')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevSyncItemQuerySchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await syncItemData(item)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemTransactions = async (req: Request, res: Response) => {
     logger.debug('syncing item transactions')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevSyncItemTransactionsQuerySchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemTransactions(item, true)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemInvestments = async (req: Request, res: Response) => {
     logger.debug('syncing item investments')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevSyncItemInvestmentsQuerySchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemInvestments(item, true)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemLiabilities = async (req: Request, res: Response) => {
     logger.debug('syncing item liabilities')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevSyncItemLiabilitiesQuerySchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemLiabilities(item, true)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devSyncItemBalances = async (req: Request, res: Response) => {
     logger.debug('syncing item balances')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevSyncItemBalancesQuerySchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
     await queueSyncItemBalances(item)
 
-    return res.status(202).send()
+    res.status(202).send()
 }
 
 export const devResetSandboxItemLogin = async (req: Request, res: Response) => {
     logger.debug('resetting sandbox item login')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevResetSandboxItemLoginQuerySchema)
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
     const reset = await plaidSandboxResetLogin(item)
     if (!reset) throw new HttpError('failed to reset item login')
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 export const devFireSandboxWebhook = async (req: Request, res: Response) => {
     logger.debug('firing sandbox webhook')
 
-    const plaidItemId = req.query['plaidItemId']
-    if (typeof plaidItemId !== 'string')
-        throw new HttpError('missing or invalid Plaid item id', 400)
+    const query = validate(req.query, DevFireSandboxWebhookQuerySchema)
 
-    const code = req.query['code']
-    if (typeof code !== 'string')
-        throw new HttpError('missing or invalid webhook code', 400)
+    const webhookCode = query.webhookCode as WebhookCodeEnum
 
-    const item = await fetchActiveItemByPlaidId(plaidItemId)
+    const item = await fetchActiveItemByPlaidId(query.plaidItemId)
     if (!item) throw new HttpError('item not found', 404)
 
-    const validCodes: string[] = [...Object.values(WebhookCodeEnum)]
-    if (!validCodes.includes(code)) {
-        throw new HttpError('invalid webhook code', 400)
-    }
-
-    const fired = await plaidSandboxFireWebhook(item, code as WebhookCodeEnum)
+    const fired = await plaidSandboxFireWebhook(item, webhookCode)
     if (!fired) throw new HttpError('failed to fire webhook')
 
-    return res.status(204).send()
+    res.status(204).send()
 }
 
 const deactivateItems = async (deleteUsers = false) => {

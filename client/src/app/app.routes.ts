@@ -32,7 +32,7 @@ const activationGuard: CanActivateFn = (
 
     const route = state.url.split('?')[0]
     if (!adminRoutes.includes(route)) return true
-    if (!user || !user.admin) {
+    if (!user.admin) {
         void router.navigateByUrl(RouteEnum.Home)
         addErrorAlert('You cannot access that page')
         return false

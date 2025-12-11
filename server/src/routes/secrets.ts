@@ -1,5 +1,5 @@
 import { getSecrets } from '@controllers'
-import { authenticate, catchAsync } from '@utilities'
+import { authenticate } from '@middleware'
 import express from 'express'
 
 const router = express.Router()
@@ -29,6 +29,6 @@ const router = express.Router()
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.route('/').get(authenticate, catchAsync(getSecrets))
+router.route('/').get(authenticate, getSecrets)
 
 export default router

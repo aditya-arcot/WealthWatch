@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import {
     Component,
     OnInit,
@@ -97,7 +98,7 @@ export class LiabilitiesComponent extends LoggerComponent implements OnInit {
             .pipe(
                 switchMap(() => this.loadItemsWithMortgageAccounts()),
                 switchMap(() => this.loadItemsWithStudentLoanAccounts()),
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to load liabilities'
@@ -106,7 +107,9 @@ export class LiabilitiesComponent extends LoggerComponent implements OnInit {
                 }),
                 finalize(() => (this.loading = false))
             )
-            .subscribe(() => this.processData())
+            .subscribe(() => {
+                this.processData()
+            })
     }
 
     loadItemsWithCreditCardAccounts() {
@@ -218,7 +221,7 @@ export class LiabilitiesComponent extends LoggerComponent implements OnInit {
         if (this.selectedAccountIds.size === accounts) {
             return 'All Accounts Selected'
         }
-        return `${this.selectedAccountIds.size} Selected`
+        return `${String(this.selectedAccountIds.size)} Selected`
     }
 
     accountSelected(id: number) {

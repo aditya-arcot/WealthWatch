@@ -25,6 +25,7 @@ export const plaidLiabilitiesGet = async (item: Item) => {
         access_token: item.accessToken,
     }
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().liabilitiesGet,
         params,
         item.userId,
@@ -138,7 +139,7 @@ export const mapPlaidStudentLoan = (
     lastStatementDate: loan.last_statement_issue_date
         ? new Date(loan.last_statement_issue_date)
         : null,
-    lastStatementBalance: loan.last_statement_balance || null,
+    lastStatementBalance: loan.last_statement_balance ?? null,
     nextPaymentDueDate: loan.next_payment_due_date
         ? new Date(loan.next_payment_due_date)
         : null,
@@ -150,7 +151,6 @@ export const mapPlaidStudentLoan = (
 const mapPlaidLiabilityAddress = (
     address: PlaidMortgageAddress | PlaidServicerAddress
 ): string | null => {
-    if (!address) return null
     const addressString = [
         address.street,
         address.city,
