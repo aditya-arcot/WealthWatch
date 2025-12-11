@@ -15,6 +15,10 @@ enum LogJobType {
     LogPlaidApiRequest = 'PlaidApiRequest',
 }
 
+interface LogJobData {
+    log?: object
+}
+
 let logQueue: Queue | null = null
 let logWorker: Worker | null = null
 
@@ -50,7 +54,7 @@ const queueLog = async (type: LogJobType, log: object) => {
 }
 
 export const initializeLogWorker = () => {
-    logWorker = new Worker(
+    logWorker = new Worker<LogJobData>(
         getQueueName(),
         async (job) => {
             const type: LogJobType = job.name as LogJobType
@@ -59,25 +63,25 @@ export const initializeLogWorker = () => {
             // )
             switch (type) {
                 case LogJobType.LogAppRequest: {
-                    const req: AppRequest | undefined = job.data.log
+                    const req = job.data.log as AppRequest | undefined
                     if (!req) throw Error(`missing ${type}`)
                     await insertAppRequest(req)
                     break
                 }
                 case LogJobType.LogPlaidLinkEvent: {
-                    const event: PlaidLinkEvent | undefined = job.data.log
+                    const event = job.data.log as PlaidLinkEvent | undefined
                     if (!event) throw Error(`missing ${type}`)
                     await insertPlaidLinkEvent(event)
                     break
                 }
                 case LogJobType.LogPlaidApiRequest: {
-                    const req: PlaidApiRequest | undefined = job.data.log
+                    const req = job.data.log as PlaidApiRequest | undefined
                     if (!req) throw Error(`missing ${type}`)
                     await insertPlaidApiRequest(req)
                     break
                 }
                 default:
-                    throw Error(`unknown log job type: ${type}`)
+                    throw Error(`unknown log job type: ${String(type)}`)
             }
         },
         { connection: getRedis(), ...workerOptions }
@@ -85,25 +89,28 @@ export const initializeLogWorker = () => {
 
     logWorker.on('completed', (job) => {
         // logger.debug(`${getQueueName()} queue - completed job (id ${job.id})`)
-        handleJobSuccess(getQueueName(), job.id, job.name, job.data).catch(
-            (err) => {
-                logger.error(err, `error handling job success`)
-            }
-        )
+        handleJobSuccess(
+            getQueueName(),
+            job.id,
+            job.name,
+            job.data as LogJobData
+        ).catch((err: unknown) => {
+            logger.error(err, `error handling job success`)
+        })
     })
 
     logWorker.on('failed', (job, err) => {
         logger.error(
             { err },
-            `${getQueueName()} queue - failed job (id ${job?.id})`
+            `${getQueueName()} queue - failed job (id ${String(job?.id)})`
         )
         handleJobFailure(
             getQueueName(),
             job?.id,
             job?.name,
-            job?.data,
+            job?.data as LogJobData,
             err
-        ).catch((err) => {
+        ).catch((err: unknown) => {
             logger.error(err, `error handling job failure`)
         })
     })

@@ -79,10 +79,12 @@ describe('logRequestResponse', () => {
         expect(res._body).toEqual(mockResBody)
         expect(res.send).toHaveBeenCalledExactlyOnceWith(mockResBody)
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const finishHandler = (res.on as Mock).mock.calls.find(
             ([event]) => event === 'finish'
         )?.[1]
         expect(finishHandler).toBeDefined()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         finishHandler?.()
 
         expect(logger.info).toHaveBeenCalledTimes(2)
@@ -102,9 +104,12 @@ describe('logRequestResponse', () => {
         expect(queueLogAppRequest).toHaveBeenCalledExactlyOnceWith(
             expect.objectContaining({
                 id: -1,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 requestId: expect.stringMatching(/^\d+-\d+$/),
                 userId: mockUserId,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 timestamp: expect.any(Date),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 duration: expect.any(Number),
                 method: mockMethod,
                 url: mockUrl,
@@ -136,9 +141,11 @@ describe('logRequestResponse', () => {
         const wrappedSend = res.send as unknown as (body: unknown) => unknown
         wrappedSend.call(res, mockResBody)
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const finishHandler = (res.on as Mock).mock.calls.find(
             ([event]) => event === 'finish'
         )?.[1]
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         finishHandler?.()
 
         expect(queueLogAppRequest).toHaveBeenCalledExactlyOnceWith(
@@ -163,11 +170,14 @@ describe('logRequestResponse', () => {
         const wrappedSend = res.send as unknown as (body: unknown) => unknown
         wrappedSend.call(res, mockResBody)
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const finishHandler = (res.on as Mock).mock.calls.find(
             ([event]) => event === 'finish'
         )?.[1]
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         finishHandler?.()
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         await new Promise(process.nextTick)
 
         expect(logger.error).toHaveBeenCalledExactlyOnceWith(

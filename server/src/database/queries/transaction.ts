@@ -122,13 +122,13 @@ export const fetchPaginatedActiveTransactionsAndCountsByUserIdAndFilters =
         let query = initialQuery
         if (limit !== undefined) {
             query += `
-            LIMIT $${placeholder}
+            LIMIT $${String(placeholder)}
         `
             values.push(limit)
 
             if (offset !== undefined) {
                 query += `
-                OFFSET $${placeholder + 1}
+                OFFSET $${String(placeholder + 1)}
             `
                 values.push(offset)
             }
@@ -172,7 +172,7 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     let query = `
         SELECT *
         FROM active_transactions
-        WHERE user_id = $${placeholder}
+        WHERE user_id = $${String(placeholder)}
     `
     values.push(userId)
     placeholder++
@@ -189,7 +189,7 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
                     merchant,
                     name
                 )
-            ) LIKE $${placeholder}
+            ) LIKE $${String(placeholder)}
         `
         values.push(`%${modifiedSearchQuery}%`)
         placeholder++
@@ -198,8 +198,8 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     if (startDate !== undefined && endDate !== undefined) {
         filtered = true
         query += `
-            AND date >= $${placeholder}
-            AND date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
+            AND date >= $${String(placeholder)}
+            AND date < ($${String(placeholder + 1)}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(startDate)
         values.push(endDate)
@@ -207,14 +207,14 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     } else if (startDate !== undefined) {
         filtered = true
         query += `
-            AND date >= $${placeholder}
+            AND date >= $${String(placeholder)}
         `
         values.push(startDate)
         placeholder++
     } else if (endDate !== undefined) {
         filtered = true
         query += `
-            AND date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
+            AND date < ($${String(placeholder)}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(endDate)
         placeholder++
@@ -223,7 +223,7 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     if (minAmount !== undefined && maxAmount !== undefined) {
         filtered = true
         query += `
-            AND ABS(amount) >= $${placeholder} AND ABS(amount) <= $${placeholder + 1}
+            AND ABS(amount) >= $${String(placeholder)} AND ABS(amount) <= $${String(placeholder + 1)}
         `
         values.push(minAmount)
         values.push(maxAmount)
@@ -231,14 +231,14 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     } else if (minAmount !== undefined) {
         filtered = true
         query += `
-            AND ABS(amount) >= $${placeholder}
+            AND ABS(amount) >= $${String(placeholder)}
         `
         values.push(minAmount)
         placeholder++
     } else if (maxAmount !== undefined) {
         filtered = true
         query += `
-            AND ABS(amount) <= $${placeholder}
+            AND ABS(amount) <= $${String(placeholder)}
         `
         values.push(maxAmount)
         placeholder++
@@ -247,7 +247,7 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     if (categoryIds !== undefined && categoryIds.length > 0) {
         filtered = true
         const idsPlaceholder = categoryIds
-            .map((_, idx) => `$${idx + placeholder}`)
+            .map((_, idx) => `$${String(idx + placeholder)}`)
             .join(', ')
         query += `
             AND COALESCE (
@@ -262,7 +262,7 @@ const constructFetchActiveTransactionsByUserIdAndFiltersQuery = (
     if (accountIds !== undefined && accountIds.length > 0) {
         filtered = true
         const idsPlaceholder = accountIds
-            .map((_, idx) => `$${idx + placeholder}`)
+            .map((_, idx) => `$${String(idx + placeholder)}`)
             .join(', ')
         query += `
             AND account_id IN (${idsPlaceholder})
@@ -389,7 +389,7 @@ export const removeTransactionsByPlaidIds = async (
     const query = `
         DELETE FROM transactions
         WHERE plaid_id IN
-            (${plaidIds.map((_id, idx) => `$${idx + 1}`).join(', ')})
+            (${plaidIds.map((_id, idx) => `$${String(idx + 1)}`).join(', ')})
     `
     await runQuery(query, plaidIds)
 }

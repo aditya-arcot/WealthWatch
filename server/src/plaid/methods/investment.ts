@@ -20,6 +20,7 @@ export const plaidInvestmentsRefresh = async (item: Item) => {
 
     try {
         await executePlaidMethod(
+            // eslint-disable-next-line @typescript-eslint/unbound-method
             getPlaidClient().investmentsRefresh,
             params,
             item.userId,
@@ -28,7 +29,10 @@ export const plaidInvestmentsRefresh = async (item: Item) => {
         return true
     } catch (error) {
         if (!(error instanceof PlaidApiError)) throw error
-        if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
+        if (
+            (error.code as PlaidGeneralErrorCodeEnum) !==
+            PlaidGeneralErrorCodeEnum.ProductsNotSupported
+        )
             throw error
         logger.error(error)
         logger.debug(
@@ -56,6 +60,7 @@ export const plaidInvestmentsHoldingsGet = async (
 
     try {
         const resp = await executePlaidMethod(
+            // eslint-disable-next-line @typescript-eslint/unbound-method
             getPlaidClient().investmentsHoldingsGet,
             params,
             item.userId,
@@ -67,7 +72,10 @@ export const plaidInvestmentsHoldingsGet = async (
         }
     } catch (error) {
         if (!(error instanceof PlaidApiError)) throw error
-        if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
+        if (
+            (error.code as PlaidGeneralErrorCodeEnum) !==
+            PlaidGeneralErrorCodeEnum.ProductsNotSupported
+        )
             throw error
         logger.error(error)
         logger.debug(

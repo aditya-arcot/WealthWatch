@@ -73,7 +73,7 @@ const startMainApp = () => {
     logger.debug('starting main app')
     const port = 3000
     app.listen(port, () => {
-        logger.info(`main app running on port ${port}`)
+        logger.info(`main app running on port ${String(port)}`)
     })
 }
 
@@ -104,6 +104,6 @@ const startWebhookApp = () => {
     logger.debug('starting webhook app')
     const webhookPort = 3001
     app.listen(webhookPort, () => {
-        logger.info(`webhook app running on port ${webhookPort}`)
+        logger.info(`webhook app running on port ${String(webhookPort)}`)
     })
 }

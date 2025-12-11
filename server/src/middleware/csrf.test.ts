@@ -9,8 +9,9 @@ beforeEach(() => {
 describe('createCsrf', () => {
     const req = {} as Request
     const res = {} as Response
-    const next: NextFunction = vi.fn()
+    const next = vi.fn() as NextFunction
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     const mockCsrfMiddleware = vi.fn((_req, _res, next) => next())
     const mockCsrfFn = vi.fn(() => ({
         doubleCsrfProtection: mockCsrfMiddleware,
@@ -28,21 +29,23 @@ describe('createCsrf', () => {
         const { createCookieName } = await import('@utilities')
         const { createCsrf } = await import('./csrf.js')
         const result = createCsrf()
-        void result(req, res, next)
+        result(req, res, next)
 
         expect(mockCsrfFn).toHaveBeenCalledExactlyOnceWith(
             expect.objectContaining({
+                /* eslint-disable @typescript-eslint/no-unsafe-assignment */
                 getSecret: expect.any(Function),
                 getSessionIdentifier: expect.any(Function),
                 cookieName: createCookieName('csrf'),
                 cookieOptions: expect.objectContaining({
                     secure: prod,
                 }),
+                /* eslint-enable @typescript-eslint/no-unsafe-assignment */
             })
         )
 
         const lastCall = mockCsrfFn.mock.lastCall as unknown[] | undefined
-        if (!lastCall || lastCall.length !== 1)
+        if (lastCall?.length !== 1)
             throw new Error('unexpected mock call structure')
         const config = lastCall[0] as {
             getSecret: () => string

@@ -6,7 +6,7 @@ import { pid } from 'process'
 // eslint-disable-next-line no-restricted-imports
 import { startExpressApps } from './app.js'
 
-logger.info(`started - pid ${pid}`)
+logger.info(`started - pid ${String(pid)}`)
 logger.debug(vars, 'env vars')
 configureCleanup()
 createPlaidClient()

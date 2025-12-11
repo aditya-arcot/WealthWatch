@@ -10,8 +10,9 @@ beforeEach(() => {
 describe('cors', () => {
     const req = {} as Request
     const res = {} as Response
-    const next: NextFunction = vi.fn()
+    const next = vi.fn() as NextFunction
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     const mockCorsMiddleware = vi.fn((_req, _res, next) => next())
     const mockCorsFn = vi.fn(() => mockCorsMiddleware)
 

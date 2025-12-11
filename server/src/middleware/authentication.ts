@@ -6,8 +6,9 @@ export const authenticate = (
     _res: Response,
     next: NextFunction
 ) => {
-    if (req.session && req.session.user) {
-        return next()
+    if (req.session.user) {
+        next()
+        return
     }
     throw new HttpError('Unauthorized', 401)
 }
@@ -17,8 +18,9 @@ export const authenticateAdmin = (
     _res: Response,
     next: NextFunction
 ) => {
-    if (req.session && req.session.user && req.session.user.admin) {
-        return next()
+    if (req.session.user?.admin) {
+        next()
+        return
     }
     throw new HttpError('Unauthorized', 401)
 }

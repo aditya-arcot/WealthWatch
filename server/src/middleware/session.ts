@@ -30,6 +30,6 @@ export const ensureSession = (
     _res: Response,
     next: NextFunction
 ) => {
-    if (req.session._dummy === undefined) req.session._dummy = true
+    req.session._dummy ??= true
     next()
 }

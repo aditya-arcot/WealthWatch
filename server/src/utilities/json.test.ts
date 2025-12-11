@@ -10,7 +10,10 @@ describe('safeStringify', () => {
     it('stringifies circular object', () => {
         const obj = { prop1: 0, prop2: {} }
         obj.prop2 = obj
-        const parsed = JSON.parse(safeStringify(obj))
+        const parsed = JSON.parse(safeStringify(obj)) as {
+            prop1: number
+            prop2?: unknown
+        }
         expect(() => JSON.stringify(obj)).toThrow()
         expect(() => safeStringify(obj)).not.toThrow()
         expect(parsed.prop1).toBe(0)

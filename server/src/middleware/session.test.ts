@@ -10,11 +10,12 @@ beforeEach(() => {
 describe('createSession', () => {
     const req = {} as Request
     const res = {} as Response
-    const next: NextFunction = vi.fn()
+    const next = vi.fn() as NextFunction
 
     const mockPool = { dummy: true }
     const mockPgStoreInstance = { on: vi.fn() }
     const mockPgStoreFn = vi.fn((_: unknown) => mockPgStoreInstance)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     const mockSessionMiddleware = vi.fn((_req, _res, next) => next())
     const mockSessionFn = vi.fn(() => mockSessionMiddleware)
 
@@ -55,6 +56,7 @@ describe('createSession', () => {
                 name: createCookieName('session'),
                 store: mockPgStoreInstance,
                 secret: vars.sessionSecret,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 cookie: expect.objectContaining({ secure: prod }),
             })
         )

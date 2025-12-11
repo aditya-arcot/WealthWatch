@@ -4,6 +4,7 @@ import type { NextFunction, Request, Response } from 'express'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const expectHttpError = (message: string, status: number) =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     expect.toSatisfy((err: HttpError) => {
         expect(err.message).toBe(message)
         expect(err.status).toBe(status)
@@ -54,6 +55,7 @@ describe('handleUnmatchedRoute', () => {
     it('throws 404 error for unmatched route', async () => {
         const { handleUnmatchedRoute } = await import('./handlers.js')
         expect(() => handleUnmatchedRoute(req, res, next)).toThrow(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             expectHttpError(`Endpoint not found - ${mockUrl}`, 404)
         )
         expect(next).not.toHaveBeenCalled()

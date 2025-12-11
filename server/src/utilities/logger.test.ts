@@ -13,7 +13,7 @@ vi.mock('fs', () => ({
 
 beforeEach(() => vi.resetModules())
 
-describe('logger', async () => {
+describe('logger', () => {
     it('creates log directory and sets up logger with three targets for dev', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Dev
         existsSync.mockReturnValue(false)

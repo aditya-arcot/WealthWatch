@@ -39,12 +39,15 @@ describe('createRedis', () => {
         await createRedis()
         const redis = getRedis()
 
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
         const args = redisConstructorMock.mock.calls[0]?.[0]
         expect(args).toBeDefined()
         expect(args.host).toBe(mockRedisHost)
         expect(args.maxRetriesPerRequest).toBeNull()
         expect(args.retryStrategy()).toBeNull()
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.ping).toHaveBeenCalled()
         expect(logger.logger.debug).toHaveBeenCalledTimes(2)
         expect(logger.logger.debug).toHaveBeenNthCalledWith(
@@ -74,7 +77,9 @@ describe('getRedis', () => {
         await createRedis()
         const redis = getRedis()
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.ping).toBeInstanceOf(Function)
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.disconnect).toBeInstanceOf(Function)
     })
 
@@ -91,6 +96,7 @@ describe('stopRedis', () => {
         const redis = getRedis()
         stopRedis()
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.disconnect).toHaveBeenCalled()
         expect(logger.logger.debug).toHaveBeenCalledTimes(4)
         expect(logger.logger.debug).toHaveBeenNthCalledWith(

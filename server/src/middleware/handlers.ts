@@ -7,7 +7,9 @@ export const catchAsync = (
     fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
 ): RequestHandler => {
     return (req: Request, res: Response, next: NextFunction): void => {
-        fn(req, res, next).catch((err) => next(err))
+        fn(req, res, next).catch((err: unknown) => {
+            next(err)
+        })
     }
 }
 
@@ -59,7 +61,7 @@ const createErrorMessage = (err: Error): string => {
         return formatErrorMessage('Database Error', err.message)
     if (err instanceof PlaidApiError)
         return formatErrorMessage('Plaid Error', err.message, err.detail)
-    // err.message is not always defined
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- err.message is not always defined
     return err.message?.length
         ? capitalizeFirstLetter(err.message)
         : 'Unexpected Error'

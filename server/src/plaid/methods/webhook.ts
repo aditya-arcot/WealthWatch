@@ -18,6 +18,7 @@ export const plaidSandboxFireWebhook = async (
         /* eslint-enable @typescript-eslint/naming-convention */
     }
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().sandboxItemFireWebhook,
         params,
         item.userId,
@@ -31,6 +32,7 @@ export const plaidWebhookVerificationKeyGet = async (kid: string) => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const params = { key_id: kid }
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().webhookVerificationKeyGet,
         params
     )
