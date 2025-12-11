@@ -10,6 +10,7 @@ export const GetUserTransactionsAndCountsQuerySchema = z.object({
     maxAmount: z.coerce.number().int().min(0).optional(),
     categoryId: z
         .preprocess(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             (value) => (Array.isArray(value) ? value : [value]),
             z.array(
                 z.coerce
@@ -21,6 +22,7 @@ export const GetUserTransactionsAndCountsQuerySchema = z.object({
         .optional(),
     accountId: z
         .preprocess(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             (value) => (Array.isArray(value) ? value : [value]),
             z.array(z.coerce.number().int().min(1))
         )
