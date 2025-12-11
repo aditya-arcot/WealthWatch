@@ -35,7 +35,8 @@ export class AccountFilterComponent implements OnInit, OnChanges {
     cancelOnExit = true
 
     ngOnInit(): void {
-        const modalElement = this.accountFilterModal.nativeElement
+        const modalElement = this.accountFilterModal
+            .nativeElement as HTMLElement
         modalElement.addEventListener('hidden.bs.modal', (event: Event) => {
             if (event.target === this.accountFilterModal.nativeElement) {
                 if (this.cancelOnExit) {
@@ -59,7 +60,7 @@ export class AccountFilterComponent implements OnInit, OnChanges {
         if (this.selectedAccountIds.size === this.accounts.length) {
             return 'All Selected'
         }
-        return `${this.selectedAccountIds.size} Selected`
+        return `${String(this.selectedAccountIds.size)} Selected`
     }
 
     inputChecked(id: number): boolean {

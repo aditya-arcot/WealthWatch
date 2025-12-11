@@ -12,7 +12,7 @@ import {
     devSyncItemLiabilities,
     devSyncItemTransactions,
 } from '@controllers'
-import { catchAsync } from '@utilities'
+import { catchAsync } from '@middleware'
 import express from 'express'
 
 const router = express.Router()

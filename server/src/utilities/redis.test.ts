@@ -35,16 +35,19 @@ describe('createRedis', () => {
 
     it('creates redis client with correct config', async () => {
         process.env['REDIS_HOST'] = mockRedisHost
-        const { createRedis, getRedis } = await import('@utilities')
+        const { createRedis, getRedis } = await import('./redis.js')
         await createRedis()
         const redis = getRedis()
 
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
         const args = redisConstructorMock.mock.calls[0]?.[0]
         expect(args).toBeDefined()
         expect(args.host).toBe(mockRedisHost)
         expect(args.maxRetriesPerRequest).toBeNull()
         expect(args.retryStrategy()).toBeNull()
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.ping).toHaveBeenCalled()
         expect(logger.logger.debug).toHaveBeenCalledTimes(2)
         expect(logger.logger.debug).toHaveBeenNthCalledWith(
@@ -61,7 +64,7 @@ describe('createRedis', () => {
         setupMockRedis(
             vi.fn().mockRejectedValue(new Error('connection failed'))
         )
-        const { createRedis } = await import('@utilities')
+        const { createRedis } = await import('./redis.js')
         await expect(createRedis()).rejects.toThrow(
             'failed to create redis client'
         )
@@ -70,27 +73,30 @@ describe('createRedis', () => {
 
 describe('getRedis', () => {
     it('returns redis client if initialized', async () => {
-        const { createRedis, getRedis } = await import('@utilities')
+        const { createRedis, getRedis } = await import('./redis.js')
         await createRedis()
         const redis = getRedis()
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.ping).toBeInstanceOf(Function)
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.disconnect).toBeInstanceOf(Function)
     })
 
     it('throws error if redis client not initialized', async () => {
-        const { getRedis } = await import('@utilities')
+        const { getRedis } = await import('./redis.js')
         expect(() => getRedis()).toThrow('redis client not initialized')
     })
 })
 
 describe('stopRedis', () => {
     it('stops redis client if initialized', async () => {
-        const { createRedis, getRedis, stopRedis } = await import('@utilities')
+        const { createRedis, getRedis, stopRedis } = await import('./redis.js')
         await createRedis()
         const redis = getRedis()
         stopRedis()
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(redis.disconnect).toHaveBeenCalled()
         expect(logger.logger.debug).toHaveBeenCalledTimes(4)
         expect(logger.logger.debug).toHaveBeenNthCalledWith(
@@ -104,7 +110,7 @@ describe('stopRedis', () => {
     })
 
     it('logs warning if redis client not initialized', async () => {
-        const { stopRedis } = await import('@utilities')
+        const { stopRedis } = await import('./redis.js')
         stopRedis()
 
         expect(logger.logger.debug).toHaveBeenCalledExactlyOnceWith(

@@ -92,8 +92,6 @@ export const devCreateSandboxItem = async (req: Request, res: Response) => {
         investmentsLastRefreshed: null,
     }
     const newItem = await insertItem(item)
-    if (!newItem) throw new HttpError('failed to insert item')
-
     await syncItemData(newItem)
 
     res.status(202).send()

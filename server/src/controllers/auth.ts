@@ -190,7 +190,10 @@ export const loginWithDemo = async (req: Request, res: Response) => {
 const regenerateSession = (req: Request): Promise<void> => {
     return new Promise((resolve, reject) => {
         req.session.regenerate((err) => {
-            if (err) return reject(err)
+            if (err) {
+                reject(err instanceof Error ? err : new Error(String(err)))
+                return
+            }
             resolve()
         })
     })

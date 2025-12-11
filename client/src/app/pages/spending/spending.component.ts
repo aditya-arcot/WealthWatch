@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import {
     Component,
     inject,
@@ -21,7 +22,7 @@ import {
     checkDateStringValid,
     formatDate,
 } from '@utilities/date.utility'
-import { computeDatesBasedOnFilter } from '@utilities/filter.utility'
+import { computeDatesFromFilter } from '@utilities/filter.utility'
 import {
     formatDecimalToPercent,
     safeParseFloat,
@@ -123,7 +124,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
                     title: (tooltipItems) => {
                         const date = tooltipItems[0].label
                         const category = tooltipItems[0].dataset.label
-                        return `${category} (${date})`
+                        return `${String(category)} (${date})`
                     },
                     label: (tooltipItem) => {
                         const val = tooltipItem.parsed.y
@@ -207,7 +208,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         this.logger.info('loading categories')
         this.loading = true
         return this.categorySvc.getCategories().pipe(
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 this.alertSvc.addErrorAlert(
                     this.logger,
                     'Failed to load categories'
@@ -232,7 +233,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
                         this.endDate
                     )
                 }),
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to load spending data'
@@ -251,7 +252,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
     processParams(params: Params): boolean {
         this.logger.info('processing params', { params })
 
-        const dateFilter: string | undefined = params['dateFilter']
+        const dateFilter = params['dateFilter'] as string | undefined
         if (dateFilter === undefined) return true
 
         const dateFilterInt = safeParseInt(dateFilter)
@@ -261,13 +262,13 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         if (this.selectedDateFilter === DateFilterEnum.Custom) {
             let useDefault = true
 
-            const startDate: string | undefined = params['startDate']
+            const startDate = params['startDate'] as string | undefined
             if (startDate !== undefined && checkDateStringValid(startDate)) {
                 this.startDate = new Date(`${startDate}T00:00:00`)
                 useDefault = false
             }
 
-            const endDate: string | undefined = params['endDate']
+            const endDate = params['endDate'] as string | undefined
             if (endDate !== undefined && checkDateStringValid(endDate)) {
                 this.endDate = new Date(`${endDate}T00:00:00`)
                 useDefault = false
@@ -276,7 +277,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
             return useDefault
         }
 
-        const { startDate, endDate } = computeDatesBasedOnFilter(
+        const { startDate, endDate } = computeDatesFromFilter(
             this.selectedDateFilter
         )
         this.startDate = startDate
@@ -342,7 +343,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
             if (category.id === CategoryEnum.Bills && !this.includeBills) return
 
             const data = this.dates.map(
-                (date) => t.totalByDate.find((d) => d.date === date)?.total || 0
+                (date) => t.totalByDate.find((d) => d.date === date)?.total ?? 0
             )
             this.barGraphDatasets.push({
                 label: category.name,
@@ -393,7 +394,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
             if (billsTotalByDate) {
                 const data = this.dates.map(
                     (date) =>
-                        billsTotalByDate.find((d) => d.date === date)?.total ||
+                        billsTotalByDate.find((d) => d.date === date)?.total ??
                         0
                 )
                 this.barGraphDatasets.push({
@@ -449,7 +450,7 @@ export class SpendingComponent extends LoggerComponent implements OnInit {
         redirectWithParams(this.router, this.route, {}, false)
     }
 
-    getCategoryName(categoryId: number): string {
+    getCategoryName(categoryId: CategoryEnum): string {
         const category = this.categories.find((c) => c.id === categoryId)
         return category?.name ?? 'Unknown'
     }

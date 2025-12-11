@@ -56,6 +56,7 @@ export const plaidLinkTokenCreate = async (
     }
 
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().linkTokenCreate,
         params,
         userId,
@@ -73,6 +74,7 @@ export const plaidPublicTokenExchange = async (
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const params: ItemPublicTokenExchangeRequest = { public_token: publicToken }
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().itemPublicTokenExchange,
         params,
         userId
@@ -92,7 +94,7 @@ export const plaidSandboxPublicTokenCreate = async (
     const lastYear = new Date()
     lastYear.setFullYear(lastYear.getFullYear() - 1)
 
-    const year = lastYear.getFullYear()
+    const year = String(lastYear.getFullYear())
     const month = String(lastYear.getMonth() + 1).padStart(2, '0')
     const day = String(lastYear.getDate()).padStart(2, '0')
     const startDate = `${year}-${month}-${day}`
@@ -110,6 +112,7 @@ export const plaidSandboxPublicTokenCreate = async (
         /* eslint-enable @typescript-eslint/naming-convention */
     }
     const resp = await executePlaidMethod(
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         getPlaidClient().sandboxPublicTokenCreate,
         params,
         user.id

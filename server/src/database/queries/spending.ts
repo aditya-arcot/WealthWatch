@@ -19,28 +19,28 @@ export const fetchCategorySummariesByUserIdAndDateRange = async (
                 amount,
                 date
             FROM active_transactions
-            WHERE user_id = $${placeholder}
+            WHERE user_id = $${String(placeholder)}
     `
     values.push(userId)
     placeholder++
 
     if (startDate !== undefined && endDate !== undefined) {
         query += `
-                AND date >= $${placeholder}
-                AND date < ($${placeholder + 1}::TIMESTAMPTZ + INTERVAL '1 day')
+                AND date >= $${String(placeholder)}
+                AND date < ($${String(placeholder + 1)}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(startDate)
         values.push(endDate)
         placeholder += 2
     } else if (startDate !== undefined) {
         query += `
-                AND date >= $${placeholder}
+                AND date >= $${String(placeholder)}
         `
         values.push(startDate)
         placeholder++
     } else if (endDate !== undefined) {
         query += `
-                AND date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
+                AND date < ($${String(placeholder)}::TIMESTAMPTZ + INTERVAL '1 day')
         `
         values.push(endDate)
         placeholder++
@@ -146,7 +146,7 @@ export const fetchCategoryTotalsByDateWithUserIdAndDateRange = async (
     if (endDate !== undefined) {
         const placeholder = startDate !== undefined ? 3 : 2
         query += `
-                        AND ut.date < ($${placeholder}::TIMESTAMPTZ + INTERVAL '1 day')
+                        AND ut.date < ($${String(placeholder)}::TIMESTAMPTZ + INTERVAL '1 day')
         `
     }
 

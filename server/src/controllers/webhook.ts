@@ -205,6 +205,7 @@ const handleHoldingsWebhook = async (webhookCode: string, itemId: string) => {
 
     const webhookCodeEnum = webhookCode as HoldingsWebhookCodeEnum
     switch (webhookCodeEnum) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         case HoldingsWebhookCodeEnum.DefaultUpdate: {
             await handleHoldingsDefaultUpdateWebhook(itemId)
             break
@@ -222,6 +223,7 @@ const handleLiabilitiesWebhook = async (
 
     const webhookCodeEnum = webhookCode as LiabilitiesWebhookCodeEnum
     switch (webhookCodeEnum) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         case LiabilitiesWebhookCodeEnum.DefaultUpdate: {
             await handleLiabilitiesDefaultUpdateWebhook(itemId)
             break

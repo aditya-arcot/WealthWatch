@@ -6,6 +6,9 @@ on:
             runner:
                 required: true
                 type: string
+            image_tag:
+                required: true
+                type: string
             image:
                 required: true
                 type: string
@@ -30,6 +33,13 @@ jobs:
                   node-version: 'lts/*'
                   check-latest: true
                   registry-url: 'https://npm.pkg.github.com'
+
+            - name: modify build.ts
+              working-directory: client/src
+              run: |
+                  sed -e "s/{IMAGE_TAG}/${{ inputs.image_tag }}/g" \
+                    build.ts > build.ts.tmp
+                  mv build.ts.tmp build.ts
 
             - name: modify env.test.ts
               if: github.ref_name == 'test'

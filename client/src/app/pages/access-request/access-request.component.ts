@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import {
     AfterViewInit,
     Component,
@@ -6,12 +7,7 @@ import {
     ViewChild,
     inject,
 } from '@angular/core'
-import {
-    FormBuilder,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms'
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { LoggerComponent } from '@components/logger.component'
 import { RouteEnum } from '@enums/route'
@@ -39,16 +35,15 @@ export class AccessRequestComponent
 
     @ViewChild('accessRequestForm')
     accessRequestForm!: ElementRef<HTMLFormElement>
-    accessRequestFormGroup: FormGroup
+    accessRequestFormGroup = this.formBuilder.group({
+        firstName: [''],
+        lastName: ['', [Validators.required]],
+        email: ['', [Validators.required, Validators.email]],
+    })
     loading = false
 
     constructor() {
         super('AccessRequestComponent')
-        this.accessRequestFormGroup = this.formBuilder.group({
-            firstName: ['', [Validators.required]],
-            lastName: ['', [Validators.required]],
-            email: ['', [Validators.required, Validators.email]],
-        })
     }
 
     ngOnInit(): void {
@@ -59,7 +54,7 @@ export class AccessRequestComponent
     }
 
     ngAfterViewInit(): void {
-        const form = this.accessRequestForm?.nativeElement
+        const form = this.accessRequestForm.nativeElement
         form.addEventListener('submit', (submitEvent: SubmitEvent) => {
             if (!this.accessRequestFormGroup.valid || !form.checkValidity()) {
                 this.logger.info('validation failed')
@@ -79,6 +74,11 @@ export class AccessRequestComponent
         const firstName = this.accessRequestFormGroup.value.firstName
         const lastName = this.accessRequestFormGroup.value.lastName
         const email = this.accessRequestFormGroup.value.email
+        if (!firstName || !lastName || !email) {
+            this.logger.info('validation failed')
+            this.loading = false
+            return
+        }
 
         this.authSvc
             .requestAccess(firstName, lastName, email)
@@ -92,7 +92,7 @@ export class AccessRequestComponent
                     )
                     return of(undefined)
                 }),
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     const code = (err.error as ServerError).code
                     if (this.handleRequestAccessError(code)) {
                         return of(undefined)
@@ -107,7 +107,7 @@ export class AccessRequestComponent
     handleRequestAccessError(code?: string): boolean {
         this.logger.info('handling request access error', { code })
         if (code !== undefined) {
-            switch (code) {
+            switch (code as AccessRequestErrorCodeEnum) {
                 case AccessRequestErrorCodeEnum.UserExists:
                     this.alertSvc.addErrorAlert(
                         this.logger,
@@ -140,6 +140,7 @@ export class AccessRequestComponent
                     return true
             }
         }
+        this.logger.warn('unknown request access error', { code })
         this.alertSvc.addErrorAlert(this.logger, 'Failed to request access')
         return false
     }

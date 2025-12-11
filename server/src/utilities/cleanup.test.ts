@@ -39,6 +39,7 @@ describe('configureCleanup', () => {
         configureCleanup()
 
         CLEANUP_EVENTS.forEach((event) => {
+            // eslint-disable-next-line @typescript-eslint/unbound-method
             expect(process.on).toHaveBeenCalledWith(event, expect.any(Function))
         })
         expect(logger.logger.debug).toHaveBeenCalledOnce()
@@ -65,6 +66,7 @@ describe('configureCleanup', () => {
             onHandler?.(new Error('test error'))
         })
 
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(process.exit).toHaveBeenCalledOnce()
     })
 })
@@ -98,6 +100,7 @@ describe('runCleanupAndExit', () => {
         expect(logger.logger.info).toHaveBeenCalledWith(
             expect.stringContaining('exiting - pid')
         )
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(process.exit).toHaveBeenCalledOnce()
     })
 
@@ -120,6 +123,7 @@ describe('runCleanupAndExit', () => {
         expect(logger.logger.info).toHaveBeenCalledWith(
             expect.stringContaining('exiting - pid')
         )
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(process.exit).toHaveBeenCalledOnce()
     })
 })

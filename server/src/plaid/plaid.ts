@@ -60,7 +60,7 @@ export const executePlaidMethod = async <T extends object, P extends object>(
         const sanitized = JSON.parse(safeStringify(resp)) as {
             request?: object
         }
-        delete sanitized['request']
+        delete sanitized.request
         req.response = sanitized
 
         await queueLogPlaidApiRequest(req)

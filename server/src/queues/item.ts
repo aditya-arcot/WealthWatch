@@ -17,6 +17,11 @@ enum ItemJobType {
     SyncBalances = 'SyncBalances',
 }
 
+interface ItemJobData {
+    item?: Item
+    syncAccounts?: boolean
+}
+
 let itemQueue: Queue | null = null
 let itemWorker: Worker | null = null
 
@@ -70,18 +75,18 @@ const queueItem = async (
 }
 
 export const initializeItemWorker = () => {
-    itemWorker = new Worker(
+    itemWorker = new Worker<ItemJobData>(
         getQueueName(),
         async (job) => {
             const type: ItemJobType = job.name as ItemJobType
             logger.debug(
-                `${getQueueName()} queue - starting job (id ${job.id}, ${type})`
+                `${getQueueName()} queue - starting job (id ${String(job.id)}, ${type}})`
             )
 
-            const item: Item | undefined = job.data.item
+            const item = job.data.item
             if (!item) throw Error('missing item')
 
-            const syncAccounts: boolean = job.data.syncAccounts
+            const syncAccounts = job.data.syncAccounts
             if (syncAccounts) await syncItemAccounts(item)
 
             switch (type) {
@@ -102,33 +107,38 @@ export const initializeItemWorker = () => {
                     break
                 }
                 default:
-                    throw Error(`unknown job type: ${type}`)
+                    throw Error(`unknown job type: ${String(type)}`)
             }
         },
         { connection: getRedis(), ...workerOptions }
     )
 
     itemWorker.on('completed', (job) => {
-        logger.debug(`${getQueueName()} queue - completed job (id ${job.id})`)
-        handleJobSuccess(getQueueName(), job.id, job.name, job.data).catch(
-            (err) => {
-                logger.error(err, `error handling job success`)
-            }
+        logger.debug(
+            `${getQueueName()} queue - completed job (id ${String(job.id)})`
         )
+        handleJobSuccess(
+            getQueueName(),
+            job.id,
+            job.name,
+            job.data as ItemJobData
+        ).catch((err: unknown) => {
+            logger.error(err, `error handling job success`)
+        })
     })
 
     itemWorker.on('failed', (job, err) => {
         logger.error(
             { err },
-            `${getQueueName()} queue - failed job (id ${job?.id})`
+            `${getQueueName()} queue - failed job (id ${String(job?.id)})`
         )
         handleJobFailure(
             getQueueName(),
             job?.id,
             job?.name,
-            job?.data,
+            job?.data as ItemJobData,
             err
-        ).catch((err) => {
+        ).catch((err: unknown) => {
             logger.error(err, `error handling job failure`)
         })
     })

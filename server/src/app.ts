@@ -1,20 +1,17 @@
 import { processWebhook } from '@controllers'
-import { HttpError } from '@models'
-import router from '@routes'
 import {
     catchAsync,
     cors,
     createCsrf,
     createSession,
-    createSwaggerSpec,
     ensureSession,
     handleError,
     handleUnmatchedRoute,
-    logger,
     logRequestResponse,
-    prod,
-    swaggerUiOptions,
-} from '@utilities'
+} from '@middleware'
+import { HttpError } from '@models'
+import router from '@routes'
+import { createSwaggerSpec, logger, prod, swaggerUiOptions } from '@utilities'
 import cookieParser from 'cookie-parser'
 import express from 'express'
 import helmet from 'helmet'
@@ -76,7 +73,7 @@ const startMainApp = () => {
     logger.debug('starting main app')
     const port = 3000
     app.listen(port, () => {
-        logger.info(`main app running on port ${port}`)
+        logger.info(`main app running on port ${String(port)}`)
     })
 }
 
@@ -107,6 +104,6 @@ const startWebhookApp = () => {
     logger.debug('starting webhook app')
     const webhookPort = 3001
     app.listen(webhookPort, () => {
-        logger.info(`webhook app running on port ${webhookPort}`)
+        logger.info(`webhook app running on port ${String(webhookPort)}`)
     })
 }

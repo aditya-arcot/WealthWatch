@@ -5,7 +5,7 @@ import {
     updateTransactionCustomName,
     updateTransactionNote,
 } from '@controllers'
-import { authenticate, catchAsync } from '@utilities'
+import { authenticate, catchAsync } from '@middleware'
 import express from 'express'
 
 const router = express.Router()

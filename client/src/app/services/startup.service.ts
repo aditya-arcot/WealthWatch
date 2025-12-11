@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { RouteEnum } from '@enums/route'
@@ -9,6 +10,7 @@ import {
 } from '@services/logger.service'
 import { SecretsService } from '@services/secrets.service'
 import { UserService } from '@services/user.service'
+import { build } from 'build'
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs'
 
 @Injectable({
@@ -30,6 +32,7 @@ export class StartupService {
 
     startup(): Observable<void> {
         this.logger.info('starting up')
+        this.logger.info(`image tag: ${build.imageTag}`)
         return this.getCsrfToken().pipe(
             switchMap(() => this.getCurrentUser()),
             switchMap((userReceived) => {
@@ -42,7 +45,7 @@ export class StartupService {
                 this.logger.info('startup success')
                 return of(undefined)
             }),
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 this.logger.error('startup error', { err })
                 return of(undefined)
             })
@@ -52,7 +55,7 @@ export class StartupService {
     private getCsrfToken() {
         this.logger.info('getting csrf token')
         return this.csrfSvc.getToken().pipe(
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 void this.router.navigateByUrl(RouteEnum.StartupError)
                 this.alertSvc.addErrorAlert(
                     this.logger,
@@ -77,7 +80,7 @@ export class StartupService {
     private getSecrets() {
         this.logger.info('getting secrets')
         return this.secretsSvc.getSecrets().pipe(
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 void this.router.navigateByUrl(RouteEnum.StartupError)
                 this.alertSvc.addErrorAlert(
                     this.logger,

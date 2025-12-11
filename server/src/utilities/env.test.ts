@@ -23,7 +23,7 @@ describe('env flags', () => {
 
     it('sets dev env flags', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Dev
-        const { dev, stage, prod } = await import('@utilities')
+        const { dev, stage, prod } = await import('./env.js')
         expect(dev).toBe(true)
         expect(stage).toBe(false)
         expect(prod).toBe(false)
@@ -31,7 +31,7 @@ describe('env flags', () => {
 
     it('sets test env flags', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Test
-        const { dev, stage, prod } = await import('@utilities')
+        const { dev, stage, prod } = await import('./env.js')
         expect(dev).toBe(false)
         expect(stage).toBe(false)
         expect(prod).toBe(false)
@@ -39,7 +39,7 @@ describe('env flags', () => {
 
     it('sets stage env flags', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Stage
-        const { dev, stage, prod } = await import('@utilities')
+        const { dev, stage, prod } = await import('./env.js')
         expect(dev).toBe(false)
         expect(stage).toBe(true)
         expect(prod).toBe(true)
@@ -47,7 +47,7 @@ describe('env flags', () => {
 
     it('sets prod env flags', async () => {
         process.env['NODE_ENV'] = EnvNameEnum.Prod
-        const { dev, stage, prod } = await import('@utilities')
+        const { dev, stage, prod } = await import('./env.js')
         expect(dev).toBe(false)
         expect(stage).toBe(false)
         expect(prod).toBe(true)

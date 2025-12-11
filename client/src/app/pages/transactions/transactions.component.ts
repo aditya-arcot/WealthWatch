@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common'
+import { HttpErrorResponse } from '@angular/common/http'
 import { Component, inject, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Params, Router } from '@angular/router'
@@ -22,7 +23,7 @@ import {
     checkDateStringValid,
     formatDate,
 } from '@utilities/date.utility'
-import { computeDatesBasedOnFilter } from '@utilities/filter.utility'
+import { computeDatesFromFilter } from '@utilities/filter.utility'
 import {
     safeParseFloat,
     safeParseInt,
@@ -139,7 +140,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                 this.categories = categories
                 return this.itemSvc.getItemsWithAccounts()
             }),
-            catchError((err) => {
+            catchError((err: HttpErrorResponse) => {
                 this.alertSvc.addErrorAlert(this.logger, 'Failed to load data')
                 return throwError(() => err)
             }),
@@ -172,7 +173,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
         this.transactionSvc
             .getTransactions(req)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to reload transactions'
@@ -204,7 +205,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
         this.transactionSvc
             .refreshTransactions()
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to refresh transactions'
@@ -225,7 +226,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
     processParams(params: Params): void {
         this.logger.info('processing params', { params })
 
-        const page: string | undefined = params['page']
+        const page = params['page'] as string | undefined
         if (page !== undefined) {
             const pageInt = safeParseInt(page)
             if (pageInt === undefined || pageInt < 1) {
@@ -235,7 +236,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
             }
         }
 
-        const pageSizeIdx: string | undefined = params['pageSize']
+        const pageSizeIdx = params['pageSize'] as string | undefined
         if (pageSizeIdx !== undefined) {
             const pageSizeIdxInt = safeParseInt(pageSizeIdx)
             if (pageSizeIdxInt === undefined || pageSizeIdxInt < 0) {
@@ -247,12 +248,12 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
             }
         }
 
-        const query: string | undefined = params['query']
+        const query = params['query'] as string | undefined
         if (query !== undefined) {
             this.searchText = query
         }
 
-        const dateFilter: string | undefined = params['dateFilter']
+        const dateFilter = params['dateFilter'] as string | undefined
         if (dateFilter !== undefined) {
             const dateFilterInt = safeParseInt(dateFilter)
             if (dateFilterInt !== undefined) {
@@ -260,7 +261,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                 if (this.selectedDateFilter === DateFilterEnum.Custom) {
                     let dateSet = false
 
-                    const startDate: string | undefined = params['startDate']
+                    const startDate = params['startDate'] as string | undefined
                     if (
                         startDate !== undefined &&
                         checkDateStringValid(startDate)
@@ -269,7 +270,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                         dateSet = true
                     }
 
-                    const endDate: string | undefined = params['endDate']
+                    const endDate = params['endDate'] as string | undefined
                     if (
                         endDate !== undefined &&
                         checkDateStringValid(endDate)
@@ -282,7 +283,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
                         this.selectedDateFilter = DateFilterEnum.All
                     }
                 } else {
-                    const { startDate, endDate } = computeDatesBasedOnFilter(
+                    const { startDate, endDate } = computeDatesFromFilter(
                         this.selectedDateFilter
                     )
                     this.startDate = startDate
@@ -291,13 +292,13 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
             }
         }
 
-        const minAmount: string | undefined = params['min']
+        const minAmount = params['min'] as string | undefined
         let minAmountFloat: number | undefined
         if (minAmount !== undefined) {
             minAmountFloat = safeParseFloat(minAmount)
         }
 
-        const maxAmount: string | undefined = params['max']
+        const maxAmount = params['max'] as string | undefined
         let maxAmountFloat: number | undefined
         if (maxAmount !== undefined) {
             maxAmountFloat = safeParseFloat(maxAmount)
@@ -324,13 +325,13 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
             this.maxAmount = maxAmountFloat
         }
 
-        const categoryIds = params['categoryId']
+        const categoryIds = params['categoryId'] as string | undefined
         if (categoryIds !== undefined) {
             const categoryIdNums =
                 safeParseIntArrayOrUndefinedFromParam(categoryIds)
             if (categoryIdNums !== undefined && categoryIdNums.length > 0) {
                 const filteredIds = categoryIdNums.filter(
-                    (id) =>
+                    (id: CategoryEnum) =>
                         this.categories.find((c) => c.id === id) !== undefined
                 )
                 if (filteredIds.length > 0) {
@@ -339,7 +340,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
             }
         }
 
-        const accountIds = params['accountId']
+        const accountIds = params['accountId'] as string | undefined
         if (accountIds !== undefined) {
             const accountIdNums =
                 safeParseIntArrayOrUndefinedFromParam(accountIds)
@@ -359,7 +360,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
         this.transactionSvc
             .updateTransactionCustomName(transaction)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         reset
@@ -384,7 +385,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
         this.transactionSvc
             .updateTransactionCustomCategoryId(transaction)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         reset
@@ -409,7 +410,7 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
         this.transactionSvc
             .updateTransactionNote(transaction)
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to update transaction note'
@@ -673,7 +674,9 @@ export class TransactionsComponent extends LoggerComponent implements OnInit {
     updateCategory(target: EventTarget | null, t: Transaction): void {
         if (!target) return
         const element = target as HTMLInputElement
-        const newCategoryId = safeParseInt(element.value.trim())
+        const newCategoryId = safeParseInt(element.value.trim()) as
+            | CategoryEnum
+            | undefined
 
         if (newCategoryId === undefined || t.categoryId === newCategoryId) {
             t.customCategoryId = null

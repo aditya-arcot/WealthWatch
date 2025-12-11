@@ -33,6 +33,7 @@ export const plaidTransactionsRefresh = async (item: Item) => {
 
     try {
         await executePlaidMethod(
+            // eslint-disable-next-line @typescript-eslint/unbound-method
             getPlaidClient().transactionsRefresh,
             params,
             item.userId,
@@ -41,7 +42,10 @@ export const plaidTransactionsRefresh = async (item: Item) => {
         return true
     } catch (error) {
         if (!(error instanceof PlaidApiError)) throw error
-        if (error.code !== PlaidGeneralErrorCodeEnum.ProductsNotSupported)
+        if (
+            (error.code as PlaidGeneralErrorCodeEnum) !==
+            PlaidGeneralErrorCodeEnum.ProductsNotSupported
+        )
             throw error
         logger.error(error)
         logger.debug(
@@ -85,6 +89,7 @@ export const plaidTransactionsSync = async (
                 params.cursor = cursor
             }
             const resp = await executePlaidMethod(
+                // eslint-disable-next-line @typescript-eslint/unbound-method
                 getPlaidClient().transactionsSync,
                 params,
                 item.userId,
@@ -103,7 +108,8 @@ export const plaidTransactionsSync = async (
             throw error
         }
         if (
-            error.code !==
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            (error.code as PlaidTransactionErrorCodeEnum) !==
             PlaidTransactionErrorCodeEnum.TransactionsSyncMutationDuringPagination
         ) {
             throw error
@@ -160,6 +166,7 @@ export const mapPlaidTransaction = (
         id: -1,
         accountId,
         plaidId: transaction.transaction_id,
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         name: transaction.original_description ?? transaction.name,
         customName,
         amount: transaction.amount,
@@ -210,7 +217,6 @@ const mapPlaidPaymentChannel = (
 }
 
 const mapPlaidLocation = (location: Location): string | null => {
-    if (!location) return null
     const locationString = [
         location.address,
         location.city,

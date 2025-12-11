@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common'
+import { HttpErrorResponse } from '@angular/common/http'
 import {
     Component,
     OnInit,
@@ -86,7 +87,7 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
         this.itemSvc
             .getItemsWithAccountsWithHoldings()
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to load holdings'
@@ -131,7 +132,7 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
         this.investmentSvc
             .refreshInvestments()
             .pipe(
-                catchError((err) => {
+                catchError((err: HttpErrorResponse) => {
                     this.alertSvc.addErrorAlert(
                         this.logger,
                         'Failed to refresh investments'
@@ -206,7 +207,7 @@ export class InvestmentsComponent extends LoggerComponent implements OnInit {
         if (this.selectedAccountIds.size === accounts) {
             return 'All Accounts Selected'
         }
-        return `${this.selectedAccountIds.size} Selected`
+        return `${String(this.selectedAccountIds.size)} Selected`
     }
 
     accountSelected(id: number) {

@@ -84,7 +84,7 @@ export const constructInsertQueryParamsPlaceholder = (
     for (let i = 0; i < rowCount; i++) {
         const paramList: string[] = []
         for (let j = 0; j < paramCount; j++) {
-            paramList.push(`$${counter++}`)
+            paramList.push(`$${String(counter++)}`)
         }
         placeholders.push(`(${paramList.join(', ')})`)
     }
@@ -104,7 +104,7 @@ export const runQuery = async <T extends QueryResultRow>(
 
     // collapse `VALUES ($1, $2, $3), ($4, $5, $6)` into `VALUES (2 x 3)`
     let collapsedQuery = query
-    if (query.match(/^insert/i)) {
+    if (/^insert/i.exec(query)) {
         // parameterized value rows
         const rows = query.match(/\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)/g)
         if (rows) {
@@ -116,7 +116,7 @@ export const runQuery = async <T extends QueryResultRow>(
 
             const parameterizedValues =
                 /values\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\)(\s*,\s*\(\s*(\$\d+(\s*,\s*\$\d+)*)\s*\))*\s*/i
-            const valuesPlaceholder = `VALUES (${rowCount} x ${paramCount}) `
+            const valuesPlaceholder = `VALUES (${String(rowCount)} x ${String(paramCount)}) `
             collapsedQuery = query
                 .replace(parameterizedValues, valuesPlaceholder)
                 .trim()
