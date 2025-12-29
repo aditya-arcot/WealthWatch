@@ -13,18 +13,13 @@ services:
             # api - port 3000
             - traefik.http.routers.${SERVER_CONTAINER?}-api.rule=Host(`wealthwatch-api-stage.aarcot.com`)
             - traefik.http.routers.${SERVER_CONTAINER?}-api.entrypoints=websecure
-            - traefik.http.routers.${SERVER_CONTAINER?}-api.tls=true
-            - traefik.http.routers.${SERVER_CONTAINER?}-api.tls.certresolver=le
-            - traefik.http.routers.${SERVER_CONTAINER?}-api.priority=1
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.service=${SERVER_CONTAINER?}-api
             - traefik.http.services.${SERVER_CONTAINER?}-api.loadbalancer.server.port=3000
 
             # webhooks - port 3001
             - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.rule=Host(`wealthwatch-api-stage.aarcot.com`) && PathPrefix(`/webhooks`)
             - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.entrypoints=websecure
-            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.tls=true
-            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.tls.certresolver=le
-            # higher priority than api router
-            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.priority=10
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.service=${SERVER_CONTAINER?}-webhooks
             - traefik.http.services.${SERVER_CONTAINER?}-webhooks.loadbalancer.server.port=3001
 
     client:
