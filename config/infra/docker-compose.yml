@@ -1,16 +1,45 @@
-name: ${REPO}
+name: ${REPO?}
+
 services:
     server:
-        image: ${SERVER_IMAGE}
-        ports:
-            - '${SERVER_PORT}:3000'
-            - '${WEBHOOK_PORT}:3001'
+        image: ${SERVER_IMAGE?}
+        container_name: ${SERVER_CONTAINER?}
         restart: always
-        container_name: ${SERVER_CONTAINER}
+        networks:
+            - traefik-public
+        labels:
+            - traefik.enable=true
+
+            # api - port 3000
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.rule=Host(`wealthwatch-api-stage.aarcot.com`)
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.entrypoints=websecure
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.tls=true
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.tls.certresolver=le
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.priority=1
+            - traefik.http.services.${SERVER_CONTAINER?}-api.loadbalancer.server.port=3000
+
+            # webhooks - port 3001
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.rule=Host(`wealthwatch-api-stage.aarcot.com`) && PathPrefix(`/webhooks`)
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.entrypoints=websecure
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.tls=true
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.tls.certresolver=le
+            # higher priority than api router
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.priority=10
+            - traefik.http.services.${SERVER_CONTAINER?}-webhooks.loadbalancer.server.port=3001
 
     client:
-        image: ${CLIENT_IMAGE}
-        ports:
-            - '${CLIENT_PORT}:80'
+        image: ${CLIENT_IMAGE?}
+        container_name: ${CLIENT_CONTAINER?}
         restart: always
-        container_name: ${CLIENT_CONTAINER}
+        networks:
+            - traefik-public
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.${CLIENT_CONTAINER?}.rule=Host(`wealthwatch-stage.aarcot.com`)
+            - traefik.http.routers.${CLIENT_CONTAINER?}.entrypoints=websecure
+            - traefik.http.routers.${CLIENT_CONTAINER?}.tls=true
+            - traefik.http.routers.${CLIENT_CONTAINER?}.tls.certresolver=le
+
+networks:
+    traefik-public:
+        external: true
