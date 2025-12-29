@@ -31,11 +31,8 @@ jobs:
               env:
                   REPO: wealthwatch-${{ github.ref_name }}
                   SERVER_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_image }}
-                  SERVER_PORT: ${{ vars.SERVER_PORT }}
-                  WEBHOOK_PORT: ${{ vars.WEBHOOK_PORT }}
                   SERVER_CONTAINER: ${{ inputs.server_container }}
                   CLIENT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_image }}
-                  CLIENT_PORT: ${{ vars.CLIENT_PORT }}
                   CLIENT_CONTAINER: ${{ inputs.client_container }}
               working-directory: config/infra
               run: docker compose up -d
