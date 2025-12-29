@@ -32,8 +32,6 @@ services:
             - traefik.enable=true
             - traefik.http.routers.${CLIENT_CONTAINER?}.rule=Host(`wealthwatch-stage.aarcot.com`)
             - traefik.http.routers.${CLIENT_CONTAINER?}.entrypoints=websecure
-            - traefik.http.routers.${CLIENT_CONTAINER?}.tls=true
-            - traefik.http.routers.${CLIENT_CONTAINER?}.tls.certresolver=le
 
 networks:
     traefik-public:
