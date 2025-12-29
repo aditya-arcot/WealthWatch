@@ -9,11 +9,11 @@
         "*": "prettier --write --ignore-unknown"
     },
     "dependencies": {
-        "sort-package-json": "^3.5.1"
+        "sort-package-json": "^3.6.0"
     },
     "devDependencies": {
         "husky": "^9.1.7",
-        "knip": "^5.73.3",
+        "knip": "^5.78.0",
         "lint-staged": "^16.2.7",
         "npm-check-updates": "^19.2.0",
         "prettier": "^3.7.4",
