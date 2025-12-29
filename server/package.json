@@ -18,14 +18,14 @@
         ]
     },
     "dependencies": {
-        "@aditya-arcot/wealthwatch-shared": "^4.0.21",
+        "@aditya-arcot/wealthwatch-shared": "^4.0.22",
         "@dotenvx/dotenvx": "^1.51.2",
         "@logtail/pino": "^0.5.7",
         "@tsconfig/node-lts": "^24.0.0",
         "@tsconfig/strictest": "^2.0.8",
         "axios": "^1.13.2",
         "bcryptjs": "^3.0.3",
-        "bullmq": "^5.66.2",
+        "bullmq": "^5.66.4",
         "connect-pg-simple": "^10.0.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -66,7 +66,7 @@
         "eslint-config-prettier": "^10.1.8",
         "globals": "^16.5.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.50.0",
+        "typescript-eslint": "^8.50.1",
         "vite-tsconfig-paths": "^5.1.4",
         "vitest": "^4.0.15"
     }
