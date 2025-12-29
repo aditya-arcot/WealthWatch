@@ -39,31 +39,3 @@ jobs:
                   CLIENT_CONTAINER: ${{ inputs.client_container }}
               working-directory: config/infra
               run: docker compose up -d
-
-            - name: configure nginx - stage
-              if: github.ref_name == 'stage'
-              working-directory: config/infra
-              run: |
-                  sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT }}/g" \
-                    -e "s/{WEBHOOK_PORT}/${{ vars.WEBHOOK_PORT }}/g" \
-                    -e "s/{CLIENT_PORT}/${{ vars.CLIENT_PORT }}/g" \
-                    wealthwatch-stage.conf > wealthwatch-stage.conf.tmp
-                  mv wealthwatch-stage.conf.tmp wealthwatch-stage.conf
-                  cp wealthwatch-stage.conf /usr/local/etc/nginx/servers/
-
-            - name: configure nginx - prod
-              if: github.ref_name == 'main'
-              working-directory: config/infra
-              run: |
-                  sed -e "s/{SERVER_PORT}/${{ vars.SERVER_PORT }}/g" \
-                    -e "s/{WEBHOOK_PORT}/${{ vars.WEBHOOK_PORT }}/g" \
-                    -e "s/{CLIENT_PORT}/${{ vars.CLIENT_PORT }}/g" \
-                    wealthwatch.conf > wealthwatch.conf.tmp
-                  mv wealthwatch.conf.tmp wealthwatch.conf
-                  cp wealthwatch.conf /usr/local/etc/nginx/servers/
-
-            - name: test, reload nginx - stage, prod
-              if: github.ref_name != 'test'
-              run: |
-                  nginx -t
-                  nginx -s reload
