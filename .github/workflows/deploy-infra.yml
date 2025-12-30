@@ -41,8 +41,19 @@ jobs:
               working-directory: config/infra
               run: docker compose -f docker-compose.test.yml up -d
 
-            - name: start docker - stage, prod
-              if: github.ref_name != 'test'
+            - name: start docker - stage
+              if: github.ref_name == 'stage'
+              env:
+                  REPO: wealthwatch-${{ github.ref_name }}
+                  SERVER_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_image }}
+                  SERVER_CONTAINER: ${{ inputs.server_container }}
+                  CLIENT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ inputs.client_image }}
+                  CLIENT_CONTAINER: ${{ inputs.client_container }}
+              working-directory: config/infra
+              run: docker compose -f docker-compose.stage.yml up -d
+
+            - name: start docker - prod
+              if: github.ref_name == 'main'
               env:
                   REPO: wealthwatch-${{ github.ref_name }}
                   SERVER_IMAGE: ${{ secrets.DOCKER_REGISTRY }}/${{ inputs.server_image }}

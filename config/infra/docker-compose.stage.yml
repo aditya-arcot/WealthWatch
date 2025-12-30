@@ -11,16 +11,16 @@ services:
             - traefik.enable=true
 
             # api - port 3000
-            - traefik.http.routers.${SERVER_CONTAINER?}-api.rule=Host(`wealthwatch-api.aarcot.com`)
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.rule=Host(`wealthwatch-api-stage.aarcot.com`)
             - traefik.http.routers.${SERVER_CONTAINER?}-api.entrypoints=websecure
-            - traefik.http.routers.${SERVER_CONTAINER?}-api.service=server-api-wealthwatch-main
-            - traefik.http.services.server-api-wealthwatch-main.loadbalancer.server.port=3000
+            - traefik.http.routers.${SERVER_CONTAINER?}-api.service=server-api-wealthwatch-stage
+            - traefik.http.services.server-api-wealthwatch-stage.loadbalancer.server.port=3000
 
             # webhooks - port 3001
-            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.rule=Host(`wealthwatch-api.aarcot.com`) && PathPrefix(`/webhooks`)
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.rule=Host(`wealthwatch-api-stage.aarcot.com`) && PathPrefix(`/webhooks`)
             - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.entrypoints=websecure
-            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.service=server-webhooks-wealthwatch-main
-            - traefik.http.services.server-webhooks-wealthwatch-main.loadbalancer.server.port=3001
+            - traefik.http.routers.${SERVER_CONTAINER?}-webhooks.service=server-webhooks-wealthwatch-stage
+            - traefik.http.services.server-webhooks-wealthwatch-stage.loadbalancer.server.port=3001
 
     client:
         image: ${CLIENT_IMAGE?}
@@ -30,7 +30,7 @@ services:
             - traefik-public
         labels:
             - traefik.enable=true
-            - traefik.http.routers.${CLIENT_CONTAINER?}.rule=Host(`wealthwatch.aarcot.com`)
+            - traefik.http.routers.${CLIENT_CONTAINER?}.rule=Host(`wealthwatch-stage.aarcot.com`)
             - traefik.http.routers.${CLIENT_CONTAINER?}.entrypoints=websecure
 
 networks:
