@@ -1,6 +1,6 @@
 {
     "name": "@aditya-arcot/wealthwatch-shared",
-    "version": "4.0.24",
+    "version": "4.0.25",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aditya-arcot/WealthWatch.git"
@@ -32,7 +32,7 @@
         "@tsconfig/node-lts": "^24.0.0",
         "@tsconfig/strictest": "^2.0.8",
         "plaid": "^41.0.0",
-        "zod": "^4.2.1"
+        "zod": "^4.3.4"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
