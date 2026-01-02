@@ -9,7 +9,7 @@ services:
             - traefik-public
         labels:
             - traefik.enable=true
-            - traefik.stage=true
+            - traefik.prod=false
 
             # api - port 3000
             - traefik.http.routers.${SERVER_CONTAINER?}-api.rule=Host(`wealthwatch-api-stage.aarcot.com`)
@@ -31,7 +31,7 @@ services:
             - traefik-public
         labels:
             - traefik.enable=true
-            - traefik.stage=true
+            - traefik.prod=false
             - traefik.http.routers.${CLIENT_CONTAINER?}.rule=Host(`wealthwatch-stage.aarcot.com`)
             - traefik.http.routers.${CLIENT_CONTAINER?}.entrypoints=websecure
 
