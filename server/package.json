@@ -18,7 +18,7 @@
         ]
     },
     "dependencies": {
-        "@aditya-arcot/wealthwatch-shared": "^5.0.0",
+        "@aditya-arcot/wealthwatch-shared": "^5.0.1",
         "@dotenvx/dotenvx": "^1.51.4",
         "@logtail/pino": "^0.5.7",
         "@tsconfig/node-lts": "^24.0.0",
@@ -64,7 +64,7 @@
         "@vitest/ui": "^4.0.16",
         "eslint": "^9.39.2",
         "eslint-config-prettier": "^10.1.8",
-        "globals": "^16.5.0",
+        "globals": "^17.0.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.51.0",
         "vite-tsconfig-paths": "^6.0.3",
