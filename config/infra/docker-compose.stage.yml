@@ -6,7 +6,7 @@ services:
         container_name: ${SERVER_CONTAINER?}
         restart: always
         networks:
-            - traefik-public
+            - traefik-stage-public
         labels:
             - traefik.enable=true
             - traefik.prod=false
@@ -28,7 +28,7 @@ services:
         container_name: ${CLIENT_CONTAINER?}
         restart: always
         networks:
-            - traefik-public
+            - traefik-stage-public
         labels:
             - traefik.enable=true
             - traefik.prod=false
@@ -36,5 +36,5 @@ services:
             - traefik.http.routers.${CLIENT_CONTAINER?}.entrypoints=websecure
 
 networks:
-    traefik-public:
+    traefik-stage-public:
         external: true
