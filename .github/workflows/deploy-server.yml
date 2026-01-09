@@ -31,6 +31,7 @@ jobs:
                   registry: ${{ secrets.DOCKER_REGISTRY }}
                   username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
                   password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+                  logout: false
 
             - name: create .env
               working-directory: server
