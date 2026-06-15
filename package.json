@@ -9,14 +9,14 @@
         "*": "prettier --write --ignore-unknown"
     },
     "dependencies": {
-        "sort-package-json": "^3.6.1"
+        "sort-package-json": "^3.7.1"
     },
     "devDependencies": {
         "husky": "^9.1.7",
-        "knip": "^6.15.0",
+        "knip": "^6.16.1",
         "lint-staged": "^17.0.7",
-        "npm-check-updates": "^22.2.1",
-        "prettier": "^3.8.3",
+        "npm-check-updates": "^22.2.3",
+        "prettier": "^3.8.4",
         "prettier-plugin-organize-imports": "^4.3.0"
     }
 }
