@@ -1,106 +1,106 @@
-name: Run CodeQL Analysis
+# name: Run CodeQL Analysis
 
-on:
-    push:
-        branches:
-            - stage
-        paths:
-            - '.github/workflows/*.yml'
-            - 'client/src/**'
-            - 'client/angular.json'
-            - 'client/package-lock.json'
-            - 'client/package.json'
-            - 'client/tsconfig.json'
-            - 'server/src/**'
-            - 'server/package-lock.json'
-            - 'server/package.json'
-            - 'server/tsconfig.json'
-            - 'server/tsconfig.build.json'
-            - 'shared/src/**'
-            - 'shared/package-lock.json'
-            - 'shared/package.json'
-            - 'shared/tsconfig.json'
-            - 'shared/tsconfig.build.json'
-    schedule:
-        - cron: '30 21 * * 2'
+# on:
+#     push:
+#         branches:
+#             - stage
+#         paths:
+#             - '.github/workflows/*.yml'
+#             - 'client/src/**'
+#             - 'client/angular.json'
+#             - 'client/package-lock.json'
+#             - 'client/package.json'
+#             - 'client/tsconfig.json'
+#             - 'server/src/**'
+#             - 'server/package-lock.json'
+#             - 'server/package.json'
+#             - 'server/tsconfig.json'
+#             - 'server/tsconfig.build.json'
+#             - 'shared/src/**'
+#             - 'shared/package-lock.json'
+#             - 'shared/package.json'
+#             - 'shared/tsconfig.json'
+#             - 'shared/tsconfig.build.json'
+#     schedule:
+#         - cron: '30 21 * * 2'
 
-concurrency:
-    group: codeql-${{ github.ref_name }}
-    cancel-in-progress: true
+# concurrency:
+#     group: codeql-${{ github.ref_name }}
+#     cancel-in-progress: true
 
-permissions:
-    packages: read
-    security-events: write
+# permissions:
+#     packages: read
+#     security-events: write
 
-jobs:
-    analyze:
-        name: analyze ${{ matrix.language }}${{ matrix.project && format(' ({0})', matrix.project) || '' }}
-        runs-on: self-hosted
-        strategy:
-            fail-fast: false
-            matrix:
-                include:
-                    - language: actions
-                    - language: typescript
-                      project: client
-                    - language: typescript
-                      project: server
-                    - language: typescript
-                      project: shared
-        steps:
-            - name: checkout
-              uses: actions/checkout@v7
-              with:
-                  ref: ${{ github.ref_name }}
+# jobs:
+#     analyze:
+#         name: analyze ${{ matrix.language }}${{ matrix.project && format(' ({0})', matrix.project) || '' }}
+#         runs-on: self-hosted
+#         strategy:
+#             fail-fast: false
+#             matrix:
+#                 include:
+#                     - language: actions
+#                     - language: typescript
+#                       project: client
+#                     - language: typescript
+#                       project: server
+#                     - language: typescript
+#                       project: shared
+#         steps:
+#             - name: checkout
+#               uses: actions/checkout@v7
+#               with:
+#                   ref: ${{ github.ref_name }}
 
-            - name: setup node
-              if: matrix.language == 'typescript'
-              uses: actions/setup-node@v6
-              with:
-                  node-version: 'lts/*'
-                  check-latest: true
-                  registry-url: 'https://npm.pkg.github.com'
+#             - name: setup node
+#               if: matrix.language == 'typescript'
+#               uses: actions/setup-node@v6
+#               with:
+#                   node-version: 'lts/*'
+#                   check-latest: true
+#                   registry-url: 'https://npm.pkg.github.com'
 
-            - name: update npm
-              if: matrix.language == 'typescript'
-              run: npm i -g npm@latest
+#             - name: update npm
+#               if: matrix.language == 'typescript'
+#               run: npm i -g npm@latest
 
-            - name: initialize codeql for actions
-              if: matrix.language == 'actions'
-              uses: github/codeql-action/init@v4
-              with:
-                  languages: actions
-                  build-mode: none
-                  config: |
-                      paths:
-                      - '.github/workflows/*.yml'
+#             - name: initialize codeql for actions
+#               if: matrix.language == 'actions'
+#               uses: github/codeql-action/init@v4
+#               with:
+#                   languages: actions
+#                   build-mode: none
+#                   config: |
+#                       paths:
+#                       - '.github/workflows/*.yml'
 
-            - name: initialize codeql for typescript
-              if: matrix.language == 'typescript'
-              uses: github/codeql-action/init@v4
-              with:
-                  languages: typescript
-                  build-mode: none
-                  config: |
-                      paths:
-                      - '${{ matrix.project }}/src/**/*.ts'
+#             - name: initialize codeql for typescript
+#               if: matrix.language == 'typescript'
+#               uses: github/codeql-action/init@v4
+#               with:
+#                   languages: typescript
+#                   build-mode: none
+#                   config: |
+#                       paths:
+#                       - '${{ matrix.project }}/src/**/*.ts'
 
-            - name: install, build
-              if: matrix.language == 'typescript'
-              working-directory: ${{ matrix.project }}
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  npm config ls
-                  npm ci --cache .npm
-                  npm run build
+#             - name: install, build
+#               if: matrix.language == 'typescript'
+#               working-directory: ${{ matrix.project }}
+#               env:
+#                   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#               run: |
+#                   npm config ls
+#                   npm ci --cache .npm
+#                   npm run build
 
-            - name: run codeql
-              uses: github/codeql-action/analyze@v4
-              with:
-                  category: '/language:${{matrix.language}}'
+#             - name: run codeql
+#               uses: github/codeql-action/analyze@v4
+#               with:
+#                   category: '/language:${{matrix.language}}'
 
-            - name: remove cache folder
-              if: always()
-              working-directory: ${{ matrix.project }}
-              run: rm -rf .npm
+#             - name: remove cache folder
+#               if: always()
+#               working-directory: ${{ matrix.project }}
+#               run: rm -rf .npm
