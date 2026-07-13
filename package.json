@@ -13,10 +13,10 @@
     },
     "devDependencies": {
         "husky": "^9.1.7",
-        "knip": "^6.24.0",
+        "knip": "^6.26.0",
         "lint-staged": "^17.0.8",
         "npm-check-updates": "^22.2.9",
-        "prettier": "^3.9.4",
+        "prettier": "^3.9.5",
         "prettier-plugin-organize-imports": "^4.3.0"
     }
 }
